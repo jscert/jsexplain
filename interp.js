@@ -213,7 +213,7 @@ function run_trm(t) {
         var res = run_trm(t.t2);
         env_pop();
         return res;
-      }
+      });
     case "trm_alloc":
       return if_success(t.arg, function(arg) {
         var loc = heap_alloc(arg);
