@@ -184,7 +184,7 @@ function heap_write(loc, arg) {
 }
 
 function heap_read(loc) {
-  var v = heap[loc];
+  var v = heap[loc.loc];
   if (v === undefined)
     stuck("unbound loc " + loc);
   return v;
@@ -200,34 +200,39 @@ function env_push(x, v) {
   env = { tag: "env_cons", env: env, name: x, val: v }; 
 }
 
+function if_success_run_trm(t, K) {
+  return if_success(run_trm(t), K);
+}
+
 function run_trm(t) {
   switch (t.tag) {
-    case "trm_var": 
-      return lookup_var(t.name);
+    case "trm_var":
+      var v = lookup_var(t.name);
+      return res_val(v);
     case "trm_cst":
       var c = { tag: "val_cst", cst: t.cst };
       return res_val(c);
     case "trm_let":
-      return if_success(t.t1, function(v1) {
+      return if_success_run_trm(t.t1, function(v1) {
         env_push(t.name, v1);
         var res = run_trm(t.t2);
         env_pop();
         return res;
       });
     case "trm_alloc":
-      return if_success(t.arg, function(arg) {
+      return if_success_run_trm(t.arg, function(arg) {
         var loc = heap_alloc(arg);
         var v = { tag: "val_loc", loc: loc };
         return res_val(v);
       });
     case "trm_read":
-      return if_success(t.loc, function(loc) {
+      return if_success_run_trm(t.loc, function(loc) {
         var v = heap_read(loc);
         return res_val(v);
       });
     case "trm_write":
-      return if_success(t.loc, function(loc) {
-        return if_success(t.arg, function(arg) {
+      return if_success_run_trm(t.loc, function(loc) {
+        return if_success_run_trm(t.arg, function(arg) {
           heap_write(loc, arg);
           var c = { tag: "val_bool", bool: true };
           return res_val(c);
@@ -248,16 +253,22 @@ function trm_number(n) {
   return { tag: "trm_cst", cst: { tag: "cst_number", number: n } };
 }
 
-function trm_let(x, t1, t2) {
-  return { tag: "trm_let", name: x, t1: t1, t2: t2 };
+function trm_let(name, t1, t2) {
+  return { tag: "trm_let", name: name, t1: t1, t2: t2 };
+}
+
+function trm_var(name) {
+  return { tag: "trm_var", name: name };
 }
 
 var trm1 =  
   trm_let("x", { tag: "trm_alloc", arg: trm_number(1) },
     trm_let("y", { tag: "trm_alloc", arg: 
-      { tag: "trm_read", loc: { tag: "trm_var", name: "x" } }
+      { tag: "trm_read", loc: trm_var("x") }
     },
-    trm_number(0)));
+      trm_let("z", { tag: "trm_alloc", arg: trm_var("x") },
+      trm_let("t", { tag: "trm_write", loc: trm_var("x"), arg: trm_var("z") },
+        trm_number(0)))));
 
 var program = [trm1];
 
@@ -320,3 +331,53 @@ Definition run_trm R m t : result :=
        runs_branches R m B v1 bs)
   | trm_abort
 */
+
+
+function jsheap_of_heap(heap) {
+  var jsheap = []
+
+  for (var i = 0; i < heap.length; i++) {
+    jsheap[i] = {}
+  }
+
+  for (var i = 0; i < heap.length; i++) {
+    var obj = jsvalue_of_value(jsheap, heap[i])
+    if (typeof obj === "object") {
+      Object.defineProperties(jsheap[i], obj)
+    } else {
+      jsheap[i] = obj
+    }
+  }
+
+  return jsheap
+}
+
+
+
+function jsvalue_of_cst(c) {
+  switch (c.tag) {
+    case "cst_bool":
+      return c.bool
+    case "cst_number":
+      return c.number
+  }
+}
+
+function jsvalue_of_value(jsheap, v) {
+  switch (v.tag) {
+    case "val_cst":
+      return jsvalue_of_cst(v.cst)
+    case "val_loc":
+      return jsheap[v.loc]
+    case "val_abs":
+      return "<closure>"
+    // case "val_constr":
+    // case "val_record":
+    default:
+      stuck("unrecognised value")
+  }
+}
+
+
+var j = jsheap_of_heap(heap)
+
