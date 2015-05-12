@@ -104,7 +104,7 @@
 
 
 function stuck(msg) {
-   throw {type:"stuck", msg:msg};
+   throw { type: "stuck", msg: msg };
 }
 
 // all monads have return type "res"
@@ -170,8 +170,9 @@ function lookup_var(x) {
 }
 
 function res_val(v) {
-  return { tag: "res_val", val: v};
+  return { tag: "res_val", val: v };
 }
+
 
 function heap_alloc(arg) {
   var loc = heap.length;
@@ -190,6 +191,7 @@ function heap_read(loc) {
   return v;
 }
 
+
 function env_pop() {
   if (env.tag !== "env_cons")
     stuck("pop from empty env");
@@ -200,9 +202,6 @@ function env_push(x, v) {
   env = { tag: "env_cons", env: env, name: x, val: v }; 
 }
 
-function if_success_run_trm(t, K) {
-  return if_success(run_trm(t), K);
-}
 
 function run_trm(t) {
   switch (t.tag) {
@@ -210,32 +209,29 @@ function run_trm(t) {
       var v = lookup_var(t.name);
       return res_val(v);
     case "trm_cst":
-      var c = { tag: "val_cst", cst: t.cst };
-      return res_val(c);
+      return res_val({ tag: "val_cst", cst: t.cst });
     case "trm_let":
-      return if_success_run_trm(t.t1, function(v1) {
+      return if_success(run_trm(t.t1), function(v1) {
         env_push(t.name, v1);
         var res = run_trm(t.t2);
         env_pop();
         return res;
       });
     case "trm_alloc":
-      return if_success_run_trm(t.arg, function(arg) {
+      return if_success(run_trm(t.arg), function(arg) {
         var loc = heap_alloc(arg);
-        var v = { tag: "val_loc", loc: loc };
-        return res_val(v);
+        return res_val({ tag: "val_loc", loc: loc });
       });
     case "trm_read":
-      return if_success_run_trm(t.loc, function(loc) {
+      return if_success(run_trm(t.loc), function(loc) {
         var v = heap_read(loc);
         return res_val(v);
       });
     case "trm_write":
-      return if_success_run_trm(t.loc, function(loc) {
-        return if_success_run_trm(t.arg, function(arg) {
+      return if_success(run_trm(t.loc), function(loc) {
+        return if_success(run_trm(t.arg), function(arg) {
           heap_write(loc, arg);
-          var c = { tag: "val_bool", bool: true };
-          return res_val(c);
+          return res_val({ tag: "val_bool", bool: true });
         });
       });
     default:
@@ -248,6 +244,8 @@ function run_program(program) {
     run_trm(program[i]);
   }
 }
+
+
 
 function trm_number(n) {
   return { tag: "trm_cst", cst: { tag: "cst_number", number: n } };

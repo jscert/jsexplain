@@ -22,6 +22,7 @@
   represented by base, with the index key modified with the value val.
 */
 
+// data should be undefined or an array (but not null)
 var SemiPersistentArray = function(data) {
   if (data === undefined)
     data = [];
@@ -61,18 +62,18 @@ SemiPersistentArray.prototype.copyAndSet = function(i, v) {
 // compress path, at rate of about 5 million nodes per seconds.
 // ensures this.data is not null after the call.
 SemiPersistentArray.prototype.reroot = function() {
-  var cost = 0;
+  // var cost = 0;
   if (this.data !== null)
     return;
   var stack = [];
   var arr = this;
   while (arr.data === null) {
     // console.log("walk  key=" + arr.key + " / val=" + arr.val);
-    cost++;
+    // cost++;
     stack.push(arr);
     arr = arr.base;
   }
-  console.log("cost = " + cost);
+  // console.log("cost = " + cost);
   var data = arr.data;
   arr.data = null;
   // assert (stack.length > 0)
