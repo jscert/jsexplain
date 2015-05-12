@@ -5,7 +5,7 @@ tracer_items = datalog;
 var h = null
 
 var tracer_length = tracer_items.length;
-var tracer_pos = 0; 
+var tracer_pos = 29; 
 
 $("#navigation_total").html(tracer_length - 1);
 
@@ -170,6 +170,52 @@ function updateFileList() {
   $('#file_list').html(s);
 }
 
+function text_of_cst(c) {
+  switch (c.tag) {
+  case "cst_bool":
+    return c.bool + "";
+  case "cst_number":
+    return c.number + "";
+  default:
+    return "unrecognized cst";
+  }
+}
+
+var next_fresh_id = 0;
+
+function fresh_id() {
+  return "fresh_id_" + (next_fresh_id++);
+}
+
+var handlers = [];
+
+function text_of_value(heap, v, target) {
+  switch (v.tag) {
+  case "val_cst":
+    return text_of_cst(v.cst);
+  case "val_loc":
+    handlers[target] = function() {  
+      
+    };
+    return "<span class='heap_link'><a onclick=\"handlers['" + target + "']()\">&lt;Location&gt;(" + v.loc + ")</a></span>";
+  case "val_abs":
+    return "&lt;Closure&gt;";
+  default:
+    return "<pre style='margin:0; padding: 0; margin-left:1em'>" + JSON.stringify(v, null, 2) + "</pre>";
+  }
+}
+
+function updateContext(heap, env) { // env here is the ctx
+  $("#disp_context").html("");
+  // TODO: une fonction de conversion de env vers array
+  while (env.tag === "env_cons") {
+    var target = fresh_id();
+    $("#disp_context").append("<div id='" + target + "'></div>");
+    $("#" + target).html(env.name + ": " + text_of_value(heap, env.val, target));
+    env = env.env;
+  }
+}
+
 function updateSelection() {
   var item = tracer_items[tracer_pos];
   h = jsheap_of_heap(item.heap); // export for client
@@ -181,9 +227,10 @@ function updateSelection() {
   $('.CodeMirror-focused .CodeMirror-selected').css({ background: color });
   if (item.line === undefined)
     alert("missing line in log event");
-  $("#infos").html("type = " + item.type);
+  $("#disp_infos").html("type = " + item.type);
+  updateContext(item.heap, item.ctx);
   $("#navigation_step").val(tracer_pos);
-  console.log(item);
+  // console.log(item);
   var anchor = {line: item.start_line-1 , ch: item.start_col };
   var head = {line: item.end_line-1, ch: item.end_col };
   editor.setSelection(anchor, head);

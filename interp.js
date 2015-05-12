@@ -482,8 +482,6 @@ function jsvalue_of_value(jsheap, v) {
     return jsheap[v.loc];
   case "val_abs":
     return "<closure>";
-    // case "val_constr":
-    // case "val_record":
   default:
     stuck("unrecognized value");
   }
