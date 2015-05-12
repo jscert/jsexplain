@@ -1,6 +1,3 @@
-
-
-
 /*
   User provided info: // cannot use "tag" and "type"
 
@@ -101,6 +98,21 @@
 
 */
 
+// types heap and env have special treatment: they are updated by side effects
+var heap = new PersistentArray([]);
+var env = { tag: "env_nil" };
+
+var datalog = [];
+
+function log_custom(arg) {
+  arg.heap = heap;
+  arg.env = env;
+  datalog.push(arg);
+}
+
+function log(line, ctx, type) {
+  log_custom({line: line, ctx: ctx, type: type});
+}
 
 function stuck(msg) {
   throw { type: "stuck", msg: msg };
@@ -153,10 +165,6 @@ function if_success_bool_cases(res, K1, K2) {
 }
 
 
-// types heap and env have special treatment: they are updated by side effects
-var heap = [];
-var env = { tag: "env_nil" };
-
 function lookup_var(x) {
   var e = env;
   while (e.tag === "env_cons") {
@@ -174,80 +182,149 @@ function res_val(v) {
 
 
 function heap_alloc() {
-  var loc = heap.length;
-  heap[loc] = {};
+  var loc = heap.length();
+  var obj = new PersistentArray({});
+  heap = heap.copyAndSet(loc, obj);
   return loc;
 }
 
 // loc has type value (with a loc field), field is a string
 function heap_get(loc, field) {
-  var obj = heap[loc.loc];
+  var obj = heap.get(loc.loc);
   if (obj === undefined)
     stuck("unbound loc " + loc);
-  var v = obj[field];
+  var v = obj.get(field);
   if (v === undefined)
     stuck("unbound field " + field + " in loc " + loc);
   return v;
 }
 
 function heap_set(loc, field, arg) {
-  var obj = heap[loc.loc];
+  var obj = heap.get(loc.loc); // obj:PersistentArray
   if (obj === undefined)
     stuck("unbound loc " + loc);
-  obj[field] = arg;
+  var objnew = obj.copyAndSet(field, arg);
+  heap = heap.copyAndSet(loc.loc, objnew);
+  log_custom({type: "heap_set"});
 }
 
 function env_pop() {
   if (env.tag !== "env_cons")
     stuck("pop from empty env");
   env = env.env;
+  log_custom({type: "env_pop"});
 }
 
 function env_push(x, v) {
-  env = { tag: "env_cons", env: env, name: x, val: v }; 
+  env = { tag: "env_cons", env: env, name: x, val: v };
+  log_custom({type: "env_push"});
+}
+
+function ctx_empty() {
+  return {};
+}
+
+function ctx_push(ctx, name, value) {
+  return {tail: ctx, name: name, value: value};
+}
+
+function run_trm_wrap(t) {
+  log_custom({type: "enter"});
+  var res = run_trm(t);
+  log_custom({type: "exit"});
+  return res;
 }
 
 function run_trm(t) {
+  var run_trm = run_trm_wrap;
+  var ctx = ctx_empty();
+  ctx = ctx_push(ctx, "t", t);
+  log(1, ctx, "run_trm");
   switch (t.tag) {
   case "trm_var":
+    log(2, ctx, "case");
     var v = lookup_var(t.name);
+    ctx = ctx_push(ctx, "v", v);
+    log(2.5, ctx, "var");
     return res_val(v);
   case "trm_cst":
+    log(3, ctx, "case");
     return res_val({ tag: "val_cst", cst: t.cst });
   case "trm_let":
+    log(4, ctx, "case");
     return if_success(run_trm(t.t1), function(v1) {
+      ctx = ctx_push(ctx, "v1", v1);
+      log(5, ctx, "fun");
       env_push(t.name, v1);
       var res = run_trm(t.t2);
+      ctx = ctx_push(ctx, "res", res);
+      log(6, ctx, "var");
       env_pop();
       return res;
     });
   case "trm_seq":
+    log(6.5, ctx, "case");
     return if_success(run_trm(t.t1), function(v1) {
-      return run_trm(t.t2);
+      ctx = ctx_push(ctx, "v1", v1);
+      log(7, ctx, "fun");
+      return if_success(run_trm(t.t2), function (v2) {
+        ctx = ctx_push(ctx, "v2", v2);
+        log(8, ctx, "fun");
+        return(res_val(v2));        
+      });
     });
   case "trm_alloc":
+    log(8.5, ctx, "case");
     var loc = heap_alloc();
+    ctx = ctx_push(ctx, "loc", loc);
+    log(9, ctx, "var");
     return res_val({ tag: "val_loc", loc: loc });
   case "trm_get":
+    log(9.5, ctx, "case");
     return if_success(run_trm(t.loc), function(loc) {
+      ctx = ctx_push(ctx, "loc", loc);
+      log(10, ctx, "fun");
       var v = heap_get(loc, t.field);
+      ctx = ctx_push(ctx, "v", v);
+      log(11, ctx, "var");
       return res_val(v);
     });
   case "trm_set":
+    log(11.5, ctx, "case");
     return if_success(run_trm(t.loc), function(loc) {
+      ctx = ctx_push(ctx, "loc", loc);
+      log(12, ctx, "fun");
       return if_success(run_trm(t.arg), function(arg) {
+        ctx = ctx_push(ctx, "arg", arg);
+        log(13, ctx, "fun");
         heap_set(loc, t.field, arg);
         return res_val(arg);
       });
     });
   case "trm_if":
+    log(13.2, ctx, "case");
     return if_success(run_trm(t.cond), function(cond) {
+      ctx = ctx_push(ctx, "cond", cond);
+      log(14, ctx, "fun");
       return if_bool(cond, function(b) {
+        ctx = ctx_push(ctx, "b", b);
+        log(15, ctx, "fun");
         if (b) {
-          return run_trm(t.then);
+          log(15.5, ctx, "case");
+          return if_success(run_trm(t.then), function(v) {
+            ctx = ctx_push(ctx, "v", v);
+            log(16, ctx, "fun");
+            return res_val(v);
+          });
         } else if (t.else_option !== undefined) {
-          return run_trm(t.else);
+          log(16.5, ctx, "case");
+          return if_success(run_trm(t.else), function(v) {
+            ctx = ctx_push(ctx, "v", v);
+            log(17, ctx, "fun");
+            return res_val(v);
+          });
         } else {
+          log(18, ctx, "case");
           // res_unit
           return res_val({tag:"val_cst", cst:{tag:"cst_bool", bool:true}});
         }
@@ -260,10 +337,9 @@ function run_trm(t) {
 
   function run_program(program) {
     for (var i = 0; i < program.length; i++) {
-      run_trm(program[i]);
+      run_trm_wrap(program[i]);
     }
   }
-
 
 
 function trm_number(n) {
@@ -294,81 +370,28 @@ var program = [trm1];
 
 run_program(program);
 
-  /*
-   Definition run_trm R m t : result := 
-   let run_trm := runs_trm R in
-   match t with
-   | trm_var x => res_stuck
-   | trm_cst c => out_ter m c
-   | trm_abs oy p t1 => 
-   out_ter m (val_abs oy p t1)
-   | trm_constr k ts => 
-   runs_list R m ts nil (fun m vs => 
-   out_ter m (val_constr k vs))
-   | trm_record ats => res_unimplem
-   | trm_unary f t1 => 
-   if_success (run_trm m t1) (fun m v1 =>
-   let ret v := out_ter m v in
-   match f with
-   | prim_neg => if_bool v1 (fun z => ret (neg z))
-   | prim_not => if_int v1 (fun n => ret (-n))
-   | _ => stuck "invalid unary operator"
-   end)
-   | trm_binary f t1 t2 => 
-   if_success (run_trm m t1) (fun m v1 =>
-   if_success (run_trm m t2) (fun m v2 =>
-   let ret v := out_ter m v in
-   let op_int F :=
-   if_int v1 (fun n1 => if_int v2 (fun n2 => F n1 n2)) in
-   match f with
-   | prim_eq => run_primitive_eq m v1 v2
-   | prim_add => op_int (fun n1 n2 => ret (n1+n2))
-   | _ => stuck "invalid binary operator"
-   end))
-   | trm_app t1 t2 =>
-   if_success (run_trm m t1) (fun m v1 =>
-   if_success (run_trm m t2) (fun m v2 =>
-   if_abs v1 (fun oy p t => 
-   run_call R m oy p t v2)))
-   | trm_seq t1 t2 =>
-   if_success (run_trm m t1) (fun m v1 =>
-   If v1 = val_unit 
-   then (run_trm m t2)
-   else stuck "sequence with LHS that is not unit")
-   | trm_if t1 t2 t3o => 
-   if_success_bool_cases (run_trm m t1)
-   (fun m => run_trm m t2)
-   (fun m =>
-   match t3o with
-   | None => out_ter m val_unit
-   | Some t3 => run_trm m t3
-   end)
-   | trm_match t1 bs => 
-   if_success (run_trm m t1) (fun m v1 =>
-   let B := (beh_exn constr_matching_failure) in
-   runs_branches R m B v1 bs)
-   | trm_abort
-   */
-
-
-  function jsheap_of_heap(heap) {
-    var jsheap = [];
-    var i;
+function jsheap_of_heap(heap) {
+  var jsheap = [];
+  var i;
     
-    for (i = 0; i < heap.length; i++) {
-      jsheap[i] = {};
-    }
+  for (i = 0; i < heap.length(); i++) {
+    jsheap[i] = {};
+  }
 
-    for (i = 0; i < heap.length; i++) {
-      for (var x in heap[i]) {
-        jsheap[i][x] = jsvalue_of_value(jsheap, heap[i][x]);
-      }
+  for (i = 0; i < heap.length(); i++) {
+    // obj is an object
+    var obj = heap.get(i);
+    if (obj === undefined) break;
+    obj = obj.asReadOnlyArray();
+    for (var x in obj) {
+      if (obj[x] === undefined) continue;
+      jsheap[i][x] = jsvalue_of_value(jsheap, obj[x]);
     }
+  }
+  jsheap.length = i+1;
 
-    return jsheap;
+  return jsheap;
 }
-
-
 
 function jsvalue_of_cst(c) {
   switch (c.tag) {
@@ -396,6 +419,26 @@ function jsvalue_of_value(jsheap, v) {
   }
 }
 
+function jsenv_of_env(env) {
+  var obj = {};
+  var stack = [];
+  while (env.tag === "env_cons") {
+    stack.push({name: env.name, val: env.val});
+    env = env.env;
+  }
+  while (stack.length > 0) {
+    var iv = stack.pop();
+    obj[iv.name] = iv.val;
+  }
+  return obj;
+}
 
-var j = jsheap_of_heap(heap)
+var j = jsheap_of_heap(heap);
+
+for (var k = 0; k < datalog.length; k++) {
+  var item = datalog[k];
+  item.heap = jsheap_of_heap(item.heap);
+  item.env = jsenv_of_env(item.env);
+}
+
 
