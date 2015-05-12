@@ -127,11 +127,14 @@ Reach condition:
      var timeoutID = window.setTimeout(function() { $("#reach_output").html(""); }, 1000);
    });
 
-   // Assumes tracer_files to be a string containing the source code
+   // Assumes tracer_files to be an array of objects with two field:
+   // - file, containing the name of the file,
+   // - contents, a string containing its source code
 
    // Assumes tracer_items to be an array with items, e.g.:
-   // { type: 'enter_call', file: 'foo.ml', start_line: 4, start_col: 0, end_line: 5, end_col: 10 },
-   // { type: 'exit_call', file: 'foo.ml', start_line: 4, start_col: 0, end_line: 5, end_col: 10 },
+   // { type: 'enter', file: 'foo.ml', start_line: 4, start_col: 0, end_line: 5, end_col: 10 },
+   // { type: 'exit', file: 'foo.ml', start_line: 4, start_col: 0, end_line: 5, end_col: 10 },
+   // { type: 'other_event', file: 'foo.ml', start_line: 4, start_col: 0, end_line: 5, end_col: 10 },
 
    function tracer_valid_pos(i) {
       return (i >= 0 && i < tracer_length);
@@ -142,20 +145,19 @@ Reach condition:
       var i = tracer_pos;
       i += dir; 
       if (! tracer_valid_pos(i)) 
-         return; // not found
+         return; // not found, we don’t update the tracer position.
       tracer_pos = i;
    }
-   
+
    // dir is -1 or +1,
-   // target is 0 for (next/prev) 
-   // or -1 (finish)
+   // target (= target depth) is 0 for (next/prev) or -1 (finish)
    function shared_next(dir, target) { 
       var i = tracer_pos;
       var depth = 0;
       var ty = tracer_items[i].type;
-      if (dir == +1 && ty == 'exit_call') {
+      if (dir === +1 && ty === 'exit') {
          depth = 1;
-      } else if (dir == -1 && ty == 'enter_call') {
+      } else if (dir === -1 && ty === 'enter') {
          depth = -1;
       } 
       while (true) {
@@ -163,14 +165,14 @@ Reach condition:
             tracer_pos = i - dir; // just before out of range
             return; // not found
          }
-         if (i != tracer_pos && depth == target) {
+         if (i !== tracer_pos && depth === target) {
             tracer_pos = i;
             return;
          }
          var ty = tracer_items[i].type;
-         if (ty == 'enter_call') {
+         if (ty === 'enter') {
             depth++;
-         } else if (ty == 'exit_call') {
+         } else if (ty === 'exit') {
             depth--;
          }
          i += dir; 
@@ -187,15 +189,16 @@ Reach condition:
    var curfile = '';
 
    var docs = {};
-   for (file in tracer_files) {
-      var txt = tracer_files[file];
+   for (var i = 0; i < tracer_files.length; i++) {
+      var file = tracer_files[i].file;
+      var txt = tracer_files[i].contents;
       docs[file] = CodeMirror.Doc(txt, 'js');
    }
 
    var editor = null;
 
    function viewFile(file) {
-      if (curfile != file) {
+      if (curfile !== file) {
          curfile = file;
          editor.swapDoc(docs[curfile]);
          editor.focus();
@@ -205,7 +208,8 @@ Reach condition:
 
    function updateFileList() {
       var s = '';
-      for (file in tracer_files) {
+      for (var i = 0; i < tracer_files.length; i++) {
+         var file = tracer_files[i].file;
          s += "<span class=\"file_item" + ((curfile == file) ? '_current' : '') + "\" onclick=\"viewFile('" + file + "')\">" + file + "</span> ";
       }
       $('#file_list').html(s);
@@ -219,7 +223,7 @@ Reach condition:
 
       console.log("pos: " + tracer_pos);
       var ty = tracer_items[tracer_pos].type;
-      var color = (ty == 'enter_call') ? '#F3F781' : '#CCCCCC';
+      var color = (ty === 'enter') ? '#F3F781' : '#CCCCCC';
       //console.log("color " + color);
       $('.CodeMirror-selected').css({ background: color });
       $('.CodeMirror-focused .CodeMirror-selected').css({ background: color });
@@ -250,10 +254,10 @@ Reach condition:
       var txt = editor.getLine(line);
       var prefix = "#sec-";
       var pos_start = txt.indexOf(prefix);
-      if (pos_start == -1)
+      if (pos_start === -1)
          return;
       var pos_end = txt.indexOf("*", pos_start);
-      if (pos_end == -1)
+      if (pos_end === -1)
          return;
       var sec = txt.substring(pos_start, pos_end);
       var url = "http://www.ecma-international.org/ecma-262/5.1/" + sec;
