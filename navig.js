@@ -18,32 +18,45 @@ function stepTo(step) {
 // Take a predicate in form of a JavaScript code (string) and returns either true or an error message (string).
 // The predicate can make use of the line or any local variable.
 function goToPred(pred) {
-    var error = 0;
 
-    if (datalog.length === 0)
-        return false;
-
-    for (var i = (tracer_pos + 1) % datalog.length, current = tracer_pos;
-            i !== current;
-            i++, i %= datalog.length){
-        var item = datalog[i];
-        var jsheap = jsheap_of_heap(item.heap);
-        var obj = jsenv_of_env(jsheap, item.env);
-        obj.line = item.line;
-        try {
-          if (check_pred(pred, obj)){
-              stepTo(i);
-              return true;
-          }
-        } catch(e){
-          error++;
-        }
+  function check(i){
+    var item = datalog[i];
+    var jsheap = jsheap_of_heap(item.heap);
+    var obj = {};
+    if (item.ctx !== undefined){
+        obj = jsenv_of_env(jsheap, item.ctx);
+    }
+    obj.line = item.line;
+    try {
+      if (check_pred(pred, obj)){
+          stepTo(i);
+          return true;
+      }
+    } catch(e){
+      error++;
     }
 
-    if (error === datalog.length - 1)
-      return "There was an execution error at every execution of your condition: are you sure that you didn’t made a syntax error?";
+    return false;
+  }
 
-    return "Not found";
+  var error = 0;
+
+  if (datalog.length === 0)
+      return false;
+
+  for (var i = (tracer_pos + 1) % datalog.length, current = tracer_pos;
+       i !== current;
+       i++, i %= datalog.length)
+    if (check(i))
+      return true;
+
+  if (check(tracer_pos))
+    return true;
+
+  if (error === datalog.length)
+    return "There was an execution error at every execution of your condition: is this a valid JavaScript code?";
+
+  return "Not found";
 }
 
 $("#button_reach").click(function() {

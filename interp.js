@@ -257,12 +257,12 @@ function run_trm(t) {
       ctx = ctx_push(ctx, "v1", v1, "value");
       log(9, ctx, "fun");
       env_push(t.name, v1);
-      log_custom({line: 10, type: "env_push"});
+      log(10, ctx, "env_push");
       var res = run_trm_wrap(11, t.t2);
       ctx = ctx_push(ctx, "res", res, "result");
       log(11, ctx, "var");
       env_pop();
-      log_custom({line: 12, type: "env_pop"});
+      log(12, ctx, "env_pop");
       return res;
     });
   case "trm_seq":
@@ -301,7 +301,7 @@ function run_trm(t) {
         ctx = ctx_push(ctx, "arg", arg, "value");
         log(31, ctx, "fun");
         heap_set(loc, t.field, arg);
-        log_custom({line: 32, type: "heap_set"});
+        log(32, ctx, "heap_set");
         return res_val(arg);
       });
     });
