@@ -221,11 +221,11 @@ function env_push(x, v) {
 }
 
 function ctx_empty() {
-  return {};
+  return {tag: "env_nil"};
 }
 
 function ctx_push(ctx, name, value) {
-  return {tail: ctx, name: name, value: value};
+  return {tag: "env_cons", env: ctx, name: name, val: value};
 }
 
 function run_trm_wrap(t) {
@@ -439,6 +439,7 @@ for (var k = 0; k < datalog.length; k++) {
   var item = datalog[k];
   item.heap = jsheap_of_heap(item.heap);
   item.env = jsenv_of_env(item.env);
+  if (item.ctx !== undefined) {
+    item.ctx = jsenv_of_env(item.ctx);
+  }
 }
-
-
