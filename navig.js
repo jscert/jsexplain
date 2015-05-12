@@ -1,11 +1,16 @@
 
+
+var handlers = [];
+
+
+
 (function(check_pred){
 
 tracer_items = datalog;
 var h = null
 
 var tracer_length = tracer_items.length;
-var tracer_pos = 29; 
+var tracer_pos = 78; 
 
 $("#navigation_total").html(tracer_length - 1);
 
@@ -61,7 +66,7 @@ function goToPred(pred) {
   return "Not found";
 }
 
-$("#button_reach").click(function() {
+function button_reach_handler() {
   var pred = $("#text_condition").val();
   var res = goToPred(pred);
   if (res !== true){
@@ -70,7 +75,17 @@ $("#button_reach").click(function() {
         window.setTimeout(function() {
             $("#reach_output").html(""); }, 3000);
   }
+};
+
+$('#text_condition').keypress(function(e){
+	var keycode = (e.keyCode ? e.keyCode : e.which);
+	if (keycode == '13') {
+		button_reach_handler();
+	}
 });
+
+$("#button_reach").click(button_reach_handler());
+
 
 
 $("#navigation_step").change(function(e) {
@@ -202,22 +217,50 @@ function fresh_id() {
   return "fresh_id_" + (next_fresh_id++);
 }
 
-var handlers = [];
-
-function text_of_value(heap, v, target) {
+function show_value(heap, v, target, depth) {
+  var contents_init = $("#" + target).html();
+  var s = "";
   switch (v.tag) {
-  case "val_cst":
-    return text_of_cst(v.cst);
-  case "val_loc":
-    handlers[target] = function() {  
-      
-    };
-    return "<span class='heap_link'><a onclick=\"handlers['" + target + "']()\">&lt;Location&gt;(" + v.loc + ")</a></span>";
-  case "val_abs":
-    return "&lt;Closure&gt;";
-  default:
-    return "<pre style='margin:0; padding: 0; margin-left:1em'>" + JSON.stringify(v, null, 2) + "</pre>";
+    case "val_cst":
+      s = text_of_cst(v.cst);
+      break;
+    case "val_loc":
+      var contents_rest = "<span class='heap_link'><a onclick=\"handlers['" + target + "']()\">&lt;Object&gt;(" + v.loc + ")</a></span>";
+      var contents_default = contents_init + contents_rest;
+      function handler_close() {
+        handlers[target] = handler_open;
+        $("#" + target).html(contents_default);
+        editor.focus();
+      }
+      function handler_open() {
+        handlers[target] = handler_close;
+        var obj = heap.get(v.loc).asReadOnlyArray(); // type object
+        var count = 0;
+        for (var x in obj) {
+          if (obj[x] === undefined) continue; // LATER remove!
+          count++;
+          var targetsub = fresh_id();
+          $("#" + target).append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
+          $("#" + targetsub).html(x + ": ");
+          show_value(heap, obj[x], targetsub, depth-1);
+        }
+        if (count === 0)
+          $("#" + target).append("<div style='margin-left:1em'>(empty object)</div>");
+        editor.focus();
+      };
+      handlers[target] = handler_open;
+      $("#" + target).html(contents_default);
+      if (depth > 0)
+        handler_open();
+      return;
+    case "val_abs":
+      s = "&lt;Closure&gt;";
+      break;
+    default:
+      s = "<pre style='margin:0; padding: 0; margin-left:1em'>" + JSON.stringify(v, null, 2) + "</pre>";
+      break;
   }
+  $("#" + target).append(s);
 }
 
 function updateContext(heap, env) { // env here is the ctx
@@ -225,10 +268,14 @@ function updateContext(heap, env) { // env here is the ctx
   if (env === undefined)
     return;
   // TODO: une fonction de conversion de env vers array
+  if (env === undefined)
+    return;
   while (env.tag === "env_cons") {
     var target = fresh_id();
     $("#disp_context").append("<div id='" + target + "'></div>");
-    $("#" + target).html(env.name + ": " + text_of_value(heap, env.val, target));
+    $("#" + target).html(env.name + ": ");
+    var depth = 1;
+    show_value(heap, env.val, target, depth);
     env = env.env;
   }
 }
@@ -252,7 +299,9 @@ function updateSelection() {
   var head = {line: item.end_line-1, ch: item.end_col };
   editor.setSelection(anchor, head);
   updateFileList();
+  editor.focus();
 }
+
 
 editor = CodeMirror.fromTextArea(document.getElementById('interpreter_code'), {
   mode: 'js',
@@ -269,6 +318,15 @@ editor = CodeMirror.fromTextArea(document.getElementById('interpreter_code'), {
   },
 });
 editor.setSize(600,300);
+
+/* ==> try in new version of codemirror*/
+try {
+  $(editor.getWrapperElement()).resizable({
+    resize: function() {
+      editor.setSize($(this).width(), $(this).height());
+    }
+  }); 
+} catch(e) { }
 
 editor.on('dblclick', function() {
   var line = editor.getCursor().line;
