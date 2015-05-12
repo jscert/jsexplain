@@ -1,11 +1,13 @@
 
+(function(check_pred){
+
 tracer_items = datalog;
 var h = null
 
 var tracer_length = tracer_items.length;
 var tracer_pos = 0; 
 
-$("#navigation_total").html(tracer_length);
+$("#navigation_total").html(tracer_length - 1);
 
 
 function stepTo(step) {
@@ -13,9 +15,52 @@ function stepTo(step) {
   updateSelection();
 }
 
+// Take a predicate in form of a JavaScript code (string) and returns either true or an error message (string).
+// The predicate can make use of the line or any local variable.
+function goToPred(pred) {
+    var error = 0;
+
+    if (datalog.length === 0)
+        return false;
+
+    for (var i = (tracer_pos + 1) % datalog.length, current = tracer_pos;
+            i !== current;
+            i++, i %= datalog.length){
+        var item = datalog[i];
+        var jsheap = jsheap_of_heap(item.heap);
+        var obj = jsenv_of_env(jsheap, item.env);
+        obj.line = item.line;
+        try {
+          if (check_pred(pred, obj)){
+              stepTo(i);
+              return true;
+          }
+        } catch(e){
+          error++;
+        }
+    }
+
+    if (error === datalog.length - 1)
+      return "There was an execution error at every execution of your condition: are you sure that you didn’t made a syntax error?";
+
+    return "Not found";
+}
+
+$("#button_reach").click(function() {
+  var pred = $("#text_condition").val();
+  var res = goToPred(pred);
+  if (res !== true){
+    $("#reach_output").html(res);
+    var timeoutID =
+        window.setTimeout(function() {
+            $("#reach_output").html(""); }, 3000);
+  }
+});
+
+
 $("#navigation_step").change(function(e) {
   var n = + $("#navigation_step").val();
-  n = Math.max(0, Math.min(tracer_length, n));
+  n = Math.max(0, Math.min(tracer_length - 1, n));
   stepTo(n);
 });
 
@@ -36,10 +81,6 @@ $("#button_next").click(function() {
  stepTo(Math.min(tracer_length-1, tracer_pos+1));
 });
 
-$("#button_reach").click(function() {
- $("#reach_output").html("Not found");
- var timeoutID = window.setTimeout(function() { $("#reach_output").html(""); }, 1000);
-});
 
 // Assumes tracer_files to be an array of objects with two field:
 // - file, containing the name of the file,
@@ -198,3 +239,10 @@ item.ctx = jsenv_of_env(jsheap, item.ctx);
 }
 }
 */
+
+}(function check_pred(p, obj) {
+  with (obj){
+    return eval(p)
+  }
+}));
+
