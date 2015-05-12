@@ -335,12 +335,13 @@ function run_trm(t) {
   }
 }
 
-  function run_program(program) {
-    for (var i = 0; i < program.length; i++) {
-      run_trm_wrap(program[i]);
-    }
+function run_program(program) {
+  for (var i = 0; i < program.length; i++) {
+    run_trm_wrap(program[i]);
   }
+}
 
+//----------------smart constructors---------------
 
 function trm_number(n) {
   return { tag: "trm_cst", cst: { tag: "cst_number", number: n } };
@@ -358,6 +359,8 @@ function trm_var(name) {
   return { tag: "trm_var", name: name };
 }
 
+//----------------demo---------------
+
 var trm1 =
       trm_let("x", { tag: "trm_alloc"},
               trm_seq(trm_seq({tag: "trm_set", loc: trm_var("x"), field: "foo", arg: trm_number(12)},
@@ -369,6 +372,9 @@ var trm1 =
 var program = [trm1];
 
 run_program(program);
+
+
+//----------------reporting---------------
 
 function jsheap_of_heap(heap) {
   var jsheap = [];
@@ -454,6 +460,8 @@ function jsenv_of_env(jsheap, env) {
   return obj;
 }
 
+
+/* demo
 var j = jsheap_of_heap(heap);
 
 for (var k = 0; k < datalog.length; k++) {
@@ -466,3 +474,4 @@ for (var k = 0; k < datalog.length; k++) {
   }
 }
 
+*/

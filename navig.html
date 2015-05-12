@@ -6,10 +6,11 @@
 <meta charset="utf-8">
 <title>JavaScript Reference Tracer</title>
 
-<link rel=stylesheet href="codemirror/lib/codemirror.css">
-<script src="codemirror/lib/codemirror.js"></script>
-<script src="codemirror_ocaml.js"></script>
-<script src="jquery-2.1.1.min.js"></script>
+<link rel=stylesheet href="../../interp/tracer/codemirror/lib/codemirror.css">
+<script src="../../interp/tracer/codemirror/lib/codemirror.js"></script>
+<script src="../../interp/tracer/jquery-2.1.1.min.js"></script>
+<script src="sparray.js"></script>
+<script type = "text/javascript" src="demo_trace.js"></script>
 
 <style>
 .source_div {
@@ -18,6 +19,8 @@
 }
 
 #file_list {
+   height: 1em;
+   margin-top: 8px;
    margin-bottom: 8px;
 }
 
@@ -40,6 +43,11 @@
    background-color: #FFCCCC;
 }
 
+#main_table td {
+   vertical-align: top;
+   border: 1px solid black;
+}
+
 .CodeMirror-selected { background: #F3F781; }
 .CodeMirror-focused .CodeMirror-selected { background: #F3F781; }
 
@@ -49,27 +57,81 @@
 </head>
 <body>
 
-<h2>Tracer</h2>
-<p>Instructions: type 'S' for step (next function call), 'N' for next (next call at same level), 'B' for backstep (symmetric to step), 'P' for previous (symmetric to next), 'F' for finish (next call at upper level), 'R' for restart.</p>
+<h2>Mini-ML Interpreter</h2>
+
+<div><textarea id='source_code' style="width: 50em; height: 3em">
+javascript source code here
+</textarea>
+<input type="button" id="button_run" value="RUN" />
+<span id="run_output"></span>
+</div>
+
+<br/>
+<div>
+Navigation:
+<input type="textbox" id='navigation_step' style="width:3em" value="0"/>
+<input type="button" id='button_reset' value="Reset" />
+<input type="button" id='button_prev' value="Prev" />
+<input type="button" id='button_next' value="Next" />
+Reach condition:
+<input type="textbox" id='button_condition' style="width:30em" />
+<input type="button" id='button_reach' value="Reach" />
+<span id="reach_output"></span>
+</div>
+
+<br/>
+
+<div style="font-size:0.8em">Instructions: from console, the variable "h" denotes the current heap.</div>
+
+<div style="font-size:0.8em">Instructions: type 'S' for step (next function call), 'N' for next (next call at same level), 'B' for backstep (symmetric to step), 'P' for previous (symmetric to next), 'F' for finish (next call at upper level), 'R' for restart.</div>
 
 <div id='file_list'></div>
 
 <div class='source_div'>
-<textarea id='source_code' class='source' rows='40'>
-</textarea>
+<table id='main_table'>
+<tr>
+<td><textarea id='interpreter_code' class='source' rows='20' cols='60'></textarea></td>
+<td width='600'><div id='infos'>infos here</div>
+</td>
 </div>
 
-<script type = "text/javascript" src="trace.js"></script>
-
 <script type = "text/javascript">
+
+   var tracer_length = tracer_items.length;
+   var tracer_pos = 0; 
+
+   function stepTo(step) {
+      tracer_pos = step;
+      updateSelection();
+   }
+
+   $("#button_run").click(function() {
+     $("#run_output").html("Run successful !");
+     var timeoutID = window.setTimeout(function() { $("#run_output").html(""); }, 1000);
+   });
+
+   $("#button_reset").click(function() {
+     stepTo(0);
+   });
+
+   $("#button_prev").click(function() {
+     stepTo(Math.max(0, tracer_pos-1));
+   });
+
+   $("#button_next").click(function() {
+     stepTo(Math.min(tracer_length-1, tracer_pos+1));
+   });
+
+   $("#button_reach").click(function() {
+     $("#reach_output").html("Not found");
+     var timeoutID = window.setTimeout(function() { $("#reach_output").html(""); }, 1000);
+   });
+
    // Assumes tracer_files to be a string containing the source code
 
    // Assumes tracer_items to be an array with items, e.g.:
    // { type: 'enter_call', file: 'foo.ml', start_line: 4, start_col: 0, end_line: 5, end_col: 10 },
    // { type: 'exit_call', file: 'foo.ml', start_line: 4, start_col: 0, end_line: 5, end_col: 10 },
-
-   var tracer_length = tracer_items.length;
-   var tracer_pos = 0; 
 
    function tracer_valid_pos(i) {
       return (i >= 0 && i < tracer_length);
@@ -120,14 +182,14 @@
    function backstep() { shared_step(-1); }
    function next() { shared_next(+1, 0); }
    function previous() { shared_next(-1, 0); }
-   function finish() { next(+1, -1); } 
+   function finish() { shared_next(+1, -1); } 
 
    var curfile = '';
 
    var docs = {};
    for (file in tracer_files) {
       var txt = tracer_files[file];
-      docs[file] = CodeMirror.Doc(txt, 'ocaml');
+      docs[file] = CodeMirror.Doc(txt, 'js');
    }
 
    var editor = null;
@@ -149,7 +211,7 @@
       $('#file_list').html(s);
    }
 
-   function updateSelection(cm) {
+   function updateSelection() {
       var item = tracer_items[tracer_pos];
       viewFile(item.file);
       var anchor = {line: item.start_line-1, ch: item.start_col};
@@ -161,25 +223,27 @@
       //console.log("color " + color);
       $('.CodeMirror-selected').css({ background: color });
       $('.CodeMirror-focused .CodeMirror-selected').css({ background: color });
-      cm.setSelection(anchor, head);
+      $("#infos").html("type = " + ty);
+      $("#navigation_step").val(tracer_pos);
+      editor.setSelection(anchor, head);
       updateFileList();
    }
 
-   editor = CodeMirror.fromTextArea(document.getElementById('source_code'), {
-      mode: 'ocaml',
+   editor = CodeMirror.fromTextArea(document.getElementById('interpreter_code'), {
+      mode: 'js',
       lineNumbers: true,
       lineWrapping: true,
       readOnly: true,
       extraKeys: {
-         'R': function(cm) { restart(); updateSelection(cm); },
-         'S': function(cm) { step(); updateSelection(cm); },
-         'B': function(cm) { backstep(); updateSelection(cm); },
-         'N': function(cm) { next(); updateSelection(cm); },
-         'P': function(cm) { previous(); updateSelection(cm); },
-         'F': function(cm) { finish(); updateSelection(cm); },
+         'R': function(cm) { restart(); updateSelection(); },
+         'S': function(cm) { step(); updateSelection(); },
+         'B': function(cm) { backstep(); updateSelection(); },
+         'N': function(cm) { next(); updateSelection(); },
+         'P': function(cm) { previous(); updateSelection(); },
+         'F': function(cm) { finish(); updateSelection(); },
       },
    });
-   editor.setSize(800,600);
+   editor.setSize(400,300);
 
    editor.on('dblclick', function() {
       var line = editor.getCursor().line;
