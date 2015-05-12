@@ -105,13 +105,18 @@ var env = { tag: "env_nil" };
 var datalog = [];
 
 function log_custom(arg) {
+  arg.file = "interp.js"
   arg.heap = heap;
   arg.env = env;
+  arg.start_line = arg.line;
+  arg.start_col = 0;
+  arg.end_line = arg.line;
+  arg.end_col = 1000;
   datalog.push(arg);
 }
 
 function log(line, ctx, type) {
-  log_custom({line: line, ctx: ctx, type: type});
+  log_custom({line: line, ctx: ctx, type: type });
 }
 
 function stuck(msg) {
@@ -205,19 +210,16 @@ function heap_set(loc, field, arg) {
     stuck("unbound loc " + loc);
   var objnew = obj.copyAndSet(field, arg);
   heap = heap.copyAndSet(loc.loc, objnew);
-  log_custom({type: "heap_set"});
 }
 
 function env_pop() {
   if (env.tag !== "env_cons")
     stuck("pop from empty env");
   env = env.env;
-  log_custom({type: "env_pop"});
 }
 
 function env_push(x, v) {
   env = { tag: "env_cons", env: env, name: x, val: v, valkind: "value" };
-  log_custom({type: "env_push"});
 }
 
 function ctx_empty() {
@@ -228,103 +230,105 @@ function ctx_push(ctx, name, value, typeoption) {
   return {tag: "env_cons", env: ctx, name: name, val: value, valkind: typeoption};
 }
 
-function run_trm_wrap(t) {
-  log_custom({type: "enter"});
+function run_trm_wrap(line, t) {
+  log_custom({line: line, type: "enter"});
   var res = run_trm(t);
-  log_custom({type: "exit"});
+  log_custom({line: line, type: "exit"});
   return res;
 }
 
 function run_trm(t) {
-  var run_trm = run_trm_wrap;
   var ctx = ctx_empty();
   ctx = ctx_push(ctx, "t", t, "term");
   log(1, ctx, "run_trm");
   switch (t.tag) {
   case "trm_var":
-    log(2, ctx, "case");
+    log(3, ctx, "case");
     var v = lookup_var(t.name);
     ctx = ctx_push(ctx, "v", v, "value");
-    log(2.5, ctx, "var");
+    log(4, ctx, "var");
     return res_val(v);
   case "trm_cst":
-    log(3, ctx, "case");
+    log(6, ctx, "case");
     return res_val({ tag: "val_cst", cst: t.cst });
   case "trm_let":
-    log(4, ctx, "case");
-    return if_success(run_trm(t.t1), function(v1) {
+    log(8, ctx, "case");
+    return if_success(run_trm_wrap(9, t.t1), function(v1) {
       ctx = ctx_push(ctx, "v1", v1, "value");
-      log(5, ctx, "fun");
+      log(9, ctx, "fun");
       env_push(t.name, v1);
-      var res = run_trm(t.t2);
+      log_custom({line: 10, type: "env_push"});
+      var res = run_trm_wrap(11, t.t2);
       ctx = ctx_push(ctx, "res", res, "result");
-      log(6, ctx, "var");
+      log(11, ctx, "var");
       env_pop();
+      log_custom({line: 12, type: "env_pop"});
       return res;
     });
   case "trm_seq":
-    log(6.5, ctx, "case");
-    return if_success(run_trm(t.t1), function(v1) {
+    log(15, ctx, "case");
+    return if_success(run_trm_wrap(16, t.t1), function(v1) {
       ctx = ctx_push(ctx, "v1", v1, "value");
-      log(7, ctx, "fun");
-      return if_success(run_trm(t.t2), function (v2) {
+      log(16, ctx, "fun");
+      return if_success(run_trm_wrap(17, t.t2), function (v2) {
         ctx = ctx_push(ctx, "v2", v2, "value");
-        log(8, ctx, "fun");
+        log(17, ctx, "fun");
         return(res_val(v2));        
       });
     });
   case "trm_alloc":
-    log(8.5, ctx, "case");
+    log(21, ctx, "case");
     var loc = heap_alloc();
     ctx = ctx_push(ctx, "loc", loc);
-    log(9, ctx, "var");
+    log(22, ctx, "var");
     return res_val({ tag: "val_loc", loc: loc });
   case "trm_get":
-    log(9.5, ctx, "case");
-    return if_success(run_trm(t.loc), function(loc) {
+    log(24, ctx, "case");
+    return if_success(run_trm_wrap(25, t.loc), function(loc) {
       ctx = ctx_push(ctx, "loc", loc, "value");
-      log(10, ctx, "fun");
+      log(25, ctx, "fun");
       var v = heap_get(loc, t.field);
       ctx = ctx_push(ctx, "v", v, "value");
-      log(11, ctx, "var");
+      log(26, ctx, "var");
       return res_val(v);
     });
   case "trm_set":
-    log(11.5, ctx, "case");
-    return if_success(run_trm(t.loc), function(loc) {
+    log(29, ctx, "case");
+    return if_success(run_trm_wrap(30, t.loc), function(loc) {
       ctx = ctx_push(ctx, "loc", loc, "value");
-      log(12, ctx, "fun");
-      return if_success(run_trm(t.arg), function(arg) {
+      log(30, ctx, "fun");
+      return if_success(run_trm_wrap(31, t.arg), function(arg) {
         ctx = ctx_push(ctx, "arg", arg, "value");
-        log(13, ctx, "fun");
+        log(31, ctx, "fun");
         heap_set(loc, t.field, arg);
+        log_custom({line: 32, type: "heap_set"});
         return res_val(arg);
       });
     });
   case "trm_if":
-    log(13.2, ctx, "case");
-    return if_success(run_trm(t.cond), function(cond) {
+    log(36, ctx, "case");
+    return if_success(run_trm_wrap(37, t.cond), function(cond) {
       ctx = ctx_push(ctx, "cond", cond, "value");
-      log(14, ctx, "fun");
+      log(37, ctx, "fun");
       return if_bool(cond, function(b) {
         ctx = ctx_push(ctx, "b", b);
-        log(15, ctx, "fun");
+        log(38, ctx, "fun");
         if (b) {
-          log(15.5, ctx, "case");
-          return if_success(run_trm(t.then), function(v) {
+          log(39, ctx, "case");
+          return if_success(run_trm_wrap(40, t.then), function(v) {
             ctx = ctx_push(ctx, "v", v, "value");
-            log(16, ctx, "fun");
+            log(40, ctx, "fun");
             return res_val(v);
           });
         } else if (t.else_option !== undefined) {
-          log(16.5, ctx, "case");
-          return if_success(run_trm(t.else), function(v) {
+          log(43, ctx, "case");
+          return if_success(run_trm_wrap(44, t.else), function(v) {
             ctx = ctx_push(ctx, "v", v, "value");
-            log(17, ctx, "fun");
+            log(44, ctx, "fun");
             return res_val(v);
           });
         } else {
-          log(18, ctx, "case");
+          log(47, ctx, "case");
           // res_unit
           return res_val({tag:"val_cst", cst:{tag:"cst_bool", bool:true}});
         }
@@ -335,9 +339,69 @@ function run_trm(t) {
   }
 }
 
+/* same as above, without logging 
+
+
+function run_trm(t) {
+  switch (t.tag) {
+  case "trm_var":
+    var v = lookup_var(t.name);
+    return res_val(v);
+  case "trm_cst":
+    return res_val({ tag: "val_cst", cst: t.cst });
+  case "trm_let":
+    return if_success(run_trm(t.t1), function(v1) {
+      env_push(t.name, v1);
+      var res = run_trm(t.t2);
+      env_pop();
+      return res;
+    });
+  case "trm_seq":
+    return if_success(run_trm(t.t1), function(v1) {
+      return if_success(run_trm(t.t2), function (v2) {
+        return(res_val(v2));        
+      });
+    });
+  case "trm_alloc":
+    var loc = heap_alloc();
+    return res_val({ tag: "val_loc", loc: loc });
+  case "trm_get":
+    return if_success(run_trm(t.loc), function(loc) {
+      var v = heap_get(loc, t.field);
+      return res_val(v);
+    });
+  case "trm_set":
+    return if_success(run_trm(t.loc), function(loc) {
+      return if_success(run_trm(t.arg), function(arg) {
+        heap_set(loc, t.field, arg);
+        return res_val(arg);
+      });
+    });
+  case "trm_if":
+    return if_success(run_trm(t.cond), function(cond) {
+      return if_bool(cond, function(b) {
+        if (b) {
+          return if_success(run_trm(t.then), function(v) {
+            return res_val(v);
+          });
+        } else if (t.else_option !== undefined) {
+          return if_success(run_trm(t.else), function(v) {
+            return res_val(v);
+          });
+        } else {
+          return res_val({tag:"val_cst", cst:{tag:"cst_bool", bool:true}});
+        }
+      });
+    });
+  }
+}
+
+*/
+
+
 function run_program(program) {
   for (var i = 0; i < program.length; i++) {
-    run_trm_wrap(program[i]);
+    run_trm_wrap(0, program[i]);
   }
 }
 
