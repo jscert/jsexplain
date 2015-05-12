@@ -19,6 +19,10 @@
    border-bottom: 1px solid black;
 }
 
+.heap_link {
+   color: black;
+}
+
 #file_list {
    height: 1em;
    margin-top: 8px;
@@ -90,11 +94,17 @@ Reach condition:
 <div id='file_list'></div>
 
 <div class='source_div'>
-<table id='main_table'>
-<tr>
-<td><textarea id='interpreter_code' class='source' rows='20' cols='60'></textarea></td>
-<td width='600'><div id='infos'>infos here</div>
+<table id='main_table'><tr>
+<td>
+   <textarea id='interpreter_code' class='source' rows='20' cols='60'></textarea>
 </td>
+<td width='600'>
+
+   <div id='disp_infos' style="height:1em">infos here</div>
+   
+   <div id='disp_context'>ctx here</div>
+</td>
+</tr></table>
 </div>
 
 
