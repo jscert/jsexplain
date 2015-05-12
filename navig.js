@@ -16,7 +16,7 @@ function stepTo(step) {
 }
 
 // Take a predicate in form of a JavaScript code (string) and returns either true or an error message (string).
-// The predicate can make use of the line or any local variable.
+// The predicate can make use of the line, the event type, , the heap, or any local variable of the context ctx.
 function goToPred(pred) {
 
   function check(i){
@@ -27,6 +27,8 @@ function goToPred(pred) {
         obj = jsenv_of_env(jsheap, item.ctx);
     }
     obj.line = item.line;
+    obj.type = item.type;
+    obj.heap = jsheap;
     try {
       if (check_pred(pred, obj)){
           stepTo(i);
@@ -54,7 +56,7 @@ function goToPred(pred) {
     return true;
 
   if (error === datalog.length)
-    return "There was an execution error at every execution of your condition: is this a valid JavaScript code?";
+    return "There was an execution error at every execution of your condition: are you sure that this is a valid JavaScript code?";
 
   return "Not found";
 }
@@ -220,6 +222,8 @@ function text_of_value(heap, v, target) {
 
 function updateContext(heap, env) { // env here is the ctx
   $("#disp_context").html("");
+  if (env === undefined)
+    return;
   // TODO: une fonction de conversion de env vers array
   while (env.tag === "env_cons") {
     var target = fresh_id();

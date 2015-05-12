@@ -91,6 +91,13 @@ Reach condition:
 
 <div style="font-size:0.8em">Instructions: type 'S' for step (next function call), 'N' for next (next call at same level), 'B' for backstep (symmetric to step), 'P' for previous (symmetric to next), 'F' for finish (next call at upper level), 'R' for restart.</div>
 
+<div style="font-size:0.8em">Examples of conditions:
+    <ul>
+        <li><pre style = "display:inline">type === "fun" && (v1, true)</pre> (we are at the beginning of a function and v1 is defined)</li>
+        <li><pre style = "display:inline">line === 32 && t.field === "bar"</pre> (we are at line 32 and we are setting the field “bar” of the current location)</li>
+        <li><pre style = "display:inline">heap[0].bar === 12</pre> (the first cell of the heap has a field “bar” defined equal to 12)</li>
+    </ul></div>
+
 <div id='file_list'></div>
 
 <div class='source_div'>
