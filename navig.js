@@ -96,7 +96,7 @@ $("#navigation_step").change(function(e) {
 
 $("#button_run").click(function() {
  parsedTree = esprima.parse($("#source_code").val(), {loc:true});
- // console.log(parsedTree);
+ console.log(parsedTree);
  program = program; // TODO: program = translateAST(parsedTree)
  run();
  $("#run_output").html("Run successful !");
