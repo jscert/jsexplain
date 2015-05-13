@@ -22,39 +22,55 @@ let string_of_lident idt =
 
 let string_of_constant = function
   | Const_int n -> string_of_int n
-  | Const_char c -> String.make 1 c
-  | Const_string (s, _) -> s
+  (*| Const_char c -> String.make 1 c
+  | Const_string (s, _) -> "\"" ^ s ^ "\"" *)
   | Const_float f -> f
-  | Const_int32 _ -> unsupported "int32 type"
+  (*| Const_int32 _ -> unsupported "int32 type"
   | Const_int64 _ -> unsupported "int64 type"
-  | Const_nativeint _ -> unsupported "native int type"
+  | Const_nativeint _ -> unsupported "native int type"*)
+  | _ -> unsupported "constant"
 
+(*
 let string_of_recflag = function
   | Nonrecursive -> ""
   | Recursive -> " rec" 
-
+*)
 
 
 (*#########################################################################*)
 (* ** Printing of items *)
 
+(*
 let string_of_typed_var s t =
    sprintf "(%s : %s)" s (string_of_type_exp t)
+*)
 
+(*
 let string_of_path p = 
    Path.name p
+*)
 
 let show_string s = 
   s
 
 (*#########################################################################*)
+(* ** Some Contexts *)
+
+let create_context l = l
+
+
+(*#########################################################################*)
 (* ** Printing of patterns *)
 
-let string_of_pattern par p =
+let string_of_pattern matchedexpr par p =
+    (* It also returns a context of expressions to be substituted. *)
    let rec aux par p =
      match p.pat_desc with
-     | Tpat_any -> "_"
-     | Tpat_var (id,_) -> string_of_typed_var (string_of_ident id) p.pat_type
+     | Tpat_any -> "default",
+        create_context []
+     | Tpat_var (id,_) -> "default", 
+         create_context [id, matchedexpr]
+     (*
      | Tpat_alias (p, ak, _) -> unsupported "alias patterns"
        (* let sp = aux false p in
          begin match ak with 
@@ -62,10 +78,18 @@ let string_of_pattern par p =
          | TPat_constraint _ -> sp
          | TPat_type pp -> sp (* ignore type *)
          end  *)
+      *)
      | Tpat_constant c -> 
-         sprintf "%s" (string_of_constant c)
+         sprintf "case %s" (string_of_constant c),
+         create_context []
      | Tpat_tuple l -> 
-         show_par true (sprintf "%s" (show_list (aux false) "," l))
+         "default",
+         let li = List.length l in
+         create_context
+            (List.flatten (List.mapi (fun i -> function
+                | Tpat_any -> []
+                | Tpat_var (id, _) ->
+                    [id, "proj_" ^ string_of_int i ^ "_" ^ string_of_int li ^ "(" ^ matchedexpr ^ ")"]) l))
      | Tpat_construct (p,cd,ps) -> unsupported "construct patterns" 
         (*
          let c = string_of_path p in
@@ -75,13 +99,14 @@ let string_of_pattern par p =
             then show_par par (c ^ " " ^ aux true (List.hd ps))
          else
             show_par par (sprintf "%s (%s)" c (show_list (aux false) "," ps)) *)
-     | Tpat_or (p1,p2,_) -> 
+     (*| Tpat_or (p1,p2,_) -> 
          show_par par (sprintf "%s | %s" (aux false p1) (aux false p2))
      | Tpat_lazy p1 -> 
         show_par par (sprintf "lazy %s" (aux true p1))
      | Tpat_variant (_,_,_) -> unsupported "variant patterns"
      | Tpat_record _ -> unsupported "record patterns"
-     | Tpat_array pats -> unsupported "array patterns"
+     | Tpat_array pats -> unsupported "array patterns"*)
+     | _ -> unsupported "pattern"
      in
   aux false p
 
