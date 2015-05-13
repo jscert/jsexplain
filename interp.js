@@ -407,31 +407,31 @@ function run_program(program) {
 
 //----------------smart constructors---------------
 
-function trm_number(n) {
-  return { tag: "trm_cst", cst: { tag: "cst_number", number: n } };
+function trm_number(line,  n) {
+  return { tag: "trm_cst", cst: { tag: "cst_number", number: n }, line: line };
 }
 
-function trm_let(name, t1, t2) {
-  return { tag: "trm_let", name: name, t1: t1, t2: t2 };
+function trm_let(line, name, t1, t2) {
+  return { tag: "trm_let", name: name, t1: t1, t2: t2, line: line };
 }
 
-function trm_seq(t1, t2) {
-  return { tag: "trm_seq", t1: t1, t2: t2 };
+function trm_seq(line, t1, t2) {
+  return { tag: "trm_seq", t1: t1, t2: t2, line: line };
 }
 
-function trm_var(name) {
-  return { tag: "trm_var", name: name };
+function trm_var(line, name) {
+  return { tag: "trm_var", name: name, line: line };
 }
 
 //----------------demo---------------
 
 var trm1 =
-      trm_let("x", { tag: "trm_alloc"},
-              trm_seq(trm_seq({tag: "trm_set", loc: trm_var("x"), field: "foo", arg: trm_number(12)},
-                      {tag: "trm_set", loc: trm_var("x"), field: "bar",
-                       arg: {tag:"trm_get", loc: trm_var("x"), field: "foo"}}),
-                      {tag: "trm_set", loc: trm_var("x"), field: "cycle",
-                       arg: trm_var("x")}));
+      trm_let(1, "x", { line: 1, tag: "trm_alloc" },
+              trm_seq(1, trm_seq(2, {line: 2, tag: "trm_set", loc: trm_var(2, "x"), field: "foo", arg: trm_number(2, 12)},
+                      {line:3, tag: "trm_set", loc: trm_var(3, "x"), field: "bar",
+                       arg: {line:3, tag:"trm_get", loc: trm_var("x"), field: "foo"}}),
+                      {line:4, tag: "trm_set", loc: trm_var(4, "x"), field: "cycle",
+                       arg: trm_var(4, "x")}));
 
 var program = [trm1];
 
