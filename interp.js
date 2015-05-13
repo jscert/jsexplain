@@ -437,6 +437,14 @@ function trm_var(line, name) {
   return { tag: "trm_var", name: name, line: line };
 }
 
+function trm_set(line, loc, field, arg) {
+  return {tag: "trm_set", loc: loc, field: field, arg: arg, line: line};
+}
+
+function trm_get(line, loc, field) {
+  return {tag: "trm_get", loc: loc, field: field, line: line};
+}
+
 //----------------demo---------------
 
 var trm1 =
@@ -530,6 +538,76 @@ function jsenv_of_env(jsheap, env) {
   return obj;
 }
 
+//----------------AST conversion---------------
+
+function isNumeric(num) {
+  return !isNaN(num);
+}
+  
+
+function esprimaExprToAST(expr) {
+  switch (expr.type) {
+  case "Literal":
+    var value = expr.value;
+    if (!isNumeric(value)) throw ("Literal not a number: " + value);
+    return trm_number(expr.loc.start.line, expr.value);
+  case "Identifier":
+    return trm_var(expr.loc.start.line, expr.name);
+  case "AssignmentExpression":
+    if (expr.operator !== "=") throw ("AssignmentExpression NI: " + expr.operator);
+    if (expr.left.type !== "MemberExpression") throw ("Expected MemberExpression");
+    if (expr.left.property.type !== "Identifier") throw ("Expected Identifier");
+    return trm_set(expr.loc.start.line,
+                   esprimaExprToAST(expr.left.object),
+                   expr.left.property.name,
+                   esprimaExprToAST(expr.right));
+  case "MemberExpression":
+    if (expr.property.type !== "Identifier") throw ("Expected Identifier");
+    return trm_get(expr.loc.start.line,
+                   esprimaExprToAST(expr.object),
+                   expr.property.name);
+  default: return "Expr NI";
+  }
+}
+
+function esprimaSeqToAST(stats) {
+  var state = {prog: stats, index: 0};
+  var res = esprimaStatsToAST(state);
+  var next;
+  while (state.index < state.prog.length) {
+    next = esprimaStatsToAST(state);
+    res = trm_seq(next.line, res, next);
+  }
+  return res;
+}
+
+function esprimaStatsToAST(state) {
+  var stat = state.prog[state.index];
+  state.index++;
+  switch (stat.type) {
+  case "VariableDeclaration":
+    var decl = stat.declarations[0];
+    var next = state.prog[state.index];
+    state.index++;
+    if (next.type !== "BlockStatement") throw ("Blarg Syntax Error: " + next.type);
+    return trm_let(decl.loc.start.line,
+                   decl.id.name,
+                   esprimaExprToAST(decl.init),
+                   esprimaSeqToAST(next.body));
+  case "ExpressionStatement":
+    return esprimaExprToAST(stat.expression);
+  default: return "Stat NI";
+  }
+}
+
+function esprimaToAST(prog) {
+  var conv = [];
+  var state = {prog: prog.body, index: 0};
+  while (state.index < state.prog.length) {
+    conv.push(esprimaStatsToAST(state));
+  }
+  return conv;
+}
 
 /* demo
 var j = jsheap_of_heap(heap);
