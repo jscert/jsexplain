@@ -87,7 +87,6 @@ $('#text_condition').keypress(function(e){
 $("#button_reach").click(button_reach_handler);
 
 
-
 $("#navigation_step").change(function(e) {
   var n = + $("#navigation_step").val();
   n = Math.max(0, Math.min(tracer_length - 1, n));

@@ -352,7 +352,7 @@ function run_trm(t) {
   }
 }
 
-/* Un
+/* Same as above
    Used in "trace.js"   
 
 function run_trm(t) {
