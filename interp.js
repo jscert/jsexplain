@@ -597,14 +597,19 @@ function esprimaExprToAST(expr) {
 
 function esprimaSeqToAST(stats) {
   var state = {prog: stats, index: 0};
-  var res = esprimaStatsToAST(state);
-  var start = res.start;
-  var next;
+  var seql = [];
+  var prev;
   while (state.index < state.prog.length) {
-    next = esprimaStatsToAST(state);
-    res = trm_seq(next.line, res, next);
-    res.start = start;
-    res.end = next.end;
+    seql.push(esprimaStatsToAST(state));
+  }
+  if (seql.length === 0) throw "Empty block";
+  var res = seql.pop();
+  var end = res.end;
+  while (seql.length > 0) {
+    prev = seql.pop();
+    res = trm_seq(prev.line, prev, res);
+    res.start = prev.start;
+    res.end = end;
   }
   return res;
 }
