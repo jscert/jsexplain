@@ -3,7 +3,6 @@
 var handlers = [];
 
 
-
 (function(check_pred){
 
 tracer_items = datalog;

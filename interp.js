@@ -408,7 +408,7 @@ function run_program(program) {
 //----------------smart constructors---------------
 
 function trm_number(line,  n) {
-  return { tag: "trm_cst", cst: { tag: "cst_number", number: n }, line: line };
+  return { tag: "trm_cst", cst: { tag: "cst_number", number: n, line: line }, line: line };
 }
 
 function trm_let(line, name, t1, t2) {
@@ -429,14 +429,15 @@ var trm1 =
       trm_let(1, "x", { line: 1, tag: "trm_alloc" },
               trm_seq(1, trm_seq(2, {line: 2, tag: "trm_set", loc: trm_var(2, "x"), field: "foo", arg: trm_number(2, 12)},
                       {line:3, tag: "trm_set", loc: trm_var(3, "x"), field: "bar",
-                       arg: {line:3, tag:"trm_get", loc: trm_var("x"), field: "foo"}}),
+                       arg: {line:3, tag:"trm_get", loc: trm_var(3, "x"), field: "foo"}}),
                       {line:4, tag: "trm_set", loc: trm_var(4, "x"), field: "cycle",
                        arg: trm_var(4, "x")}));
 
 var program = [trm1];
 
-run_program(program);
 
+run_program(program);
+/**/
 
 //----------------reporting---------------
 
