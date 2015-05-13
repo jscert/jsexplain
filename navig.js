@@ -96,8 +96,9 @@ $("#navigation_step").change(function(e) {
 $("#button_run").click(function() {
   try {
     parsedTree = esprima.parse($("#source_code").val(), {loc:true});
-    console.log(parsedTree);
-    program = program; // TODO: program = translateAST(parsedTree)
+    // console.log(parsedTree);
+    program = esprimaToAST(parsedTree);
+    console.log(program);
     run();
     $("#action_output").html("Run successful!");
   } catch(_){
@@ -188,6 +189,7 @@ for (var i = 0; i < tracer_files.length; i++) {
 }
 
 var editor = null;
+var source = null;
 
 function viewFile(file) {
   if (curfile !== file) {
@@ -283,30 +285,68 @@ function updateContext(targetid, heap, env) {
   });
 }
 
+
+var source_select = undefined;
+
+function updateSourceSelection() {
+  if (source_select === undefined) {
+    return; 
+  }
+  // TODO: rename column into col
+  var anchor = {line: source_select.start.line-1 , ch: source_select.start.column };
+  var head = {line: source_select.end.line-1, ch: source_select.end.column };
+  source.setSelection(anchor, head);
+  /* deprecated:
+  var anchor = {line: source_select-1, ch: 0 };
+  var head = {line: source_select-1, ch: 100 } */;
+}
+
 function updateSelection() {
   var item = tracer_items[tracer_pos];
+  source.setSelection({line: 0, ch:0}, {line: 0, ch:0}); // TODO: fct reset
+
   if (item !== undefined) {
-    viewFile(item.file);
-    //console.log("pos: " + tracer_pos);
-    var color = (item.type === 'enter') ? '#F3F781' : '#CCCCCC';
-    //console.log("color " + color);
-    $('.CodeMirror-selected').css({ background: color });
-    $('.CodeMirror-focused .CodeMirror-selected').css({ background: color });
+    // console.log(item);
+    // $("#disp_infos").html();
     if (item.line === undefined)
       alert("missing line in log event");
+
+    // source panel
+    source_select = item.source_select;
+    console.log(item);
+    console.log(source_select);
+    updateSourceSelection();
+
+    // ctx panel
     updateContext("#disp_ctx", item.heap, item.ctx);
-    updateContext("#disp_env", item.heap, item.env);
-    // $("#disp_infos").html();
-    $("#navigation_step").val(tracer_pos);
-    // console.log(item);
+
+    // file panel
+    viewFile(item.file);
+    //console.log("pos: " + tracer_pos);
+    // var color = (item.type === 'enter') ? '#F3F781' : '#CCCCCC';
+    var color = '#F3F781';
+    $('.CodeMirror-selected').css({ background: color });
+    $('.CodeMirror-focused .CodeMirror-selected').css({ background: color });
     var anchor = {line: item.start_line-1 , ch: item.start_col };
     var head = {line: item.end_line-1, ch: item.end_col };
     editor.setSelection(anchor, head);
+
+    // env panel
+    updateContext("#disp_env", item.heap, item.env);
+
+    // navig panel
+    $("#navigation_step").val(tracer_pos);
   }
   updateFileList();
   editor.focus();
 }
 
+source = CodeMirror.fromTextArea(document.getElementById('source_code'), {
+  mode: 'js',
+  lineNumbers: true,
+  lineWrapping: true,
+});
+source.setSize(300, 150);
 
 editor = CodeMirror.fromTextArea(document.getElementById('interpreter_code'), {
   mode: 'js',
@@ -322,7 +362,7 @@ editor = CodeMirror.fromTextArea(document.getElementById('interpreter_code'), {
      'F': function(cm) { finish(); updateSelection(); },
   },
 });
-editor.setSize(600,300);
+editor.setSize(600,250);
 
 /* ==> try in new version of codemirror*/
 try {
@@ -350,8 +390,34 @@ editor.on('dblclick', function() {
 
 editor.focus();
 
+
+
+// used to ensure that most events have an associated term
+function completeTermsInDatalog(items) {
+  var last = undefined;
+  for (var k = 0; k < datalog.length; k++) {
+    var item = datalog[k];
+    item.source_select = last;
+    if (item.ctx !== undefined) {
+      var ctx_as_array = array_of_env(item.ctx);
+      if (ctx_as_array.length > 0 && ctx_as_array[0].name === "t") {
+        var t = ctx_as_array[0].val;
+        console.log(t);
+        if (! (t === undefined || t.start === undefined || t.end === undefined)) {
+          item.source_select = { start: t.start, end: t.end };
+          // TODO: avoir un t.location
+          last = t;
+        }
+      } 
+    }
+  }   
+}
+
+
+
 function run() {
   run_program(program);
+  completeTermsInDatalog(datalog);
   tracer_items = datalog;
   tracer_length = tracer_items.length
   $("#navigation_total").html(tracer_length - 1);

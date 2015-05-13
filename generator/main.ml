@@ -1,5 +1,6 @@
 open Format
 open Mytools
+open Parse_type
 
 (*#########################################################################*)
 
@@ -17,6 +18,9 @@ let outputfile = ref None
 (*#########################################################################*)
 
 let _ =
+
+   (* disable loading of stdlib *)
+   Clflags.nopervasives := true;
 
    (*---------------------------------------------------*)
    (* parsing of command line *)
@@ -47,10 +51,10 @@ let _ =
    (*---------------------------------------------------*)
    (* "reading and typing source file" *)
    let (opt,inputfile) = process_implementation_file ppf sourcefile in
-   let parsetree1 : Parsetree.structure =
+   let ((parsetree1 : Parsetree.structure), typedtree1) =
       match opt with
       | None -> failwith "Could not read and typecheck input file"
-      | Some (parsetree1, (typedtree1,_)) -> parsetree1
+      | Some (parsetree1, (typedtree1,_)) -> parsetree1, typedtree1
       in
    
    file_put_contents outputfile (Print_tast.string_of_structure typedtree1) 
