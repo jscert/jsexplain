@@ -94,12 +94,16 @@ $("#navigation_step").change(function(e) {
 });
 
 $("#button_run").click(function() {
- parsedTree = esprima.parse($("#source_code").val(), {loc:true});
- console.log(parsedTree);
- program = program; // TODO: program = translateAST(parsedTree)
- run();
- $("#action_output").html("Run successful !");
- var timeoutID = window.setTimeout(function() { $("#run_output").html(""); }, 1000);
+  try {
+    parsedTree = esprima.parse($("#source_code").val(), {loc:true});
+    console.log(parsedTree);
+    program = program; // TODO: program = translateAST(parsedTree)
+    run();
+    $("#action_output").html("Run successful!");
+  } catch(_){
+    $("#action_output").html("Error during the run.");
+  };
+  var timeoutID = window.setTimeout(function() { $("#run_output").html(""); }, 1000);
 });
 
 $("#button_reset").click(function() {
