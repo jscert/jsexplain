@@ -6,16 +6,12 @@ var parsedTree;
 
 (function(check_pred){
 
-tracer_items = datalog;
-var h = null
+var tracer_items = [];
 
-var tracer_length = tracer_items.length;
-var tracer_pos = 78; 
-
-$("#navigation_total").html(tracer_length - 1);
+var tracer_length = 0;
+var tracer_pos = 0; 
 
 $("#source_code").val(source_file);
-
 
 
 function stepTo(step) {
@@ -99,7 +95,10 @@ $("#navigation_step").change(function(e) {
 });
 
 $("#button_run").click(function() {
- parsedTree = esprima.parse($("#source_code").val(), {loc:true});   
+ parsedTree = esprima.parse($("#source_code").val(), {loc:true});
+ // console.log(parsedTree);
+ program = program; // TODO: program = translateAST(parsedTree)
+ run();
  $("#run_output").html("Run successful !");
  var timeoutID = window.setTimeout(function() { $("#run_output").html(""); }, 1000);
 });
@@ -283,23 +282,24 @@ function updateContext(targetid, heap, env) {
 
 function updateSelection() {
   var item = tracer_items[tracer_pos];
-  h = jsheap_of_heap(item.heap); // export for client
-  viewFile(item.file);
-  //console.log("pos: " + tracer_pos);
-  var color = (item.type === 'enter') ? '#F3F781' : '#CCCCCC';
-  //console.log("color " + color);
-  $('.CodeMirror-selected').css({ background: color });
-  $('.CodeMirror-focused .CodeMirror-selected').css({ background: color });
-  if (item.line === undefined)
-    alert("missing line in log event");
-  updateContext("#disp_ctx", item.heap, item.ctx);
-  updateContext("#disp_env", item.heap, item.env);
-  // $("#disp_infos").html();
-  $("#navigation_step").val(tracer_pos);
-  // console.log(item);
-  var anchor = {line: item.start_line-1 , ch: item.start_col };
-  var head = {line: item.end_line-1, ch: item.end_col };
-  editor.setSelection(anchor, head);
+  if (item !== undefined) {
+    viewFile(item.file);
+    //console.log("pos: " + tracer_pos);
+    var color = (item.type === 'enter') ? '#F3F781' : '#CCCCCC';
+    //console.log("color " + color);
+    $('.CodeMirror-selected').css({ background: color });
+    $('.CodeMirror-focused .CodeMirror-selected').css({ background: color });
+    if (item.line === undefined)
+      alert("missing line in log event");
+    updateContext("#disp_ctx", item.heap, item.ctx);
+    updateContext("#disp_env", item.heap, item.env);
+    // $("#disp_infos").html();
+    $("#navigation_step").val(tracer_pos);
+    // console.log(item);
+    var anchor = {line: item.start_line-1 , ch: item.start_col };
+    var head = {line: item.end_line-1, ch: item.end_col };
+    editor.setSelection(anchor, head);
+  }
   updateFileList();
   editor.focus();
 }
@@ -346,7 +346,19 @@ editor.on('dblclick', function() {
 });
 
 editor.focus();
-updateSelection(editor);
+
+function run() {
+  run_program(program);
+  tracer_items = datalog;
+  tracer_length = tracer_items.length
+  $("#navigation_total").html(tracer_length - 1);
+  stepTo(0); // calls updateSelection(); 
+}
+
+
+// Note: for the demo
+run();
+stepTo(78);
 
 
 

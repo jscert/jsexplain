@@ -104,6 +104,10 @@ var env = { tag: "env_nil" };
 
 var datalog = [];
 
+function log_reset() {
+  datalog = [];
+}
+
 function log_custom(arg) {
   arg.file = "interp.js"
   arg.heap = heap;
@@ -347,8 +351,8 @@ function run_trm(t) {
   }
 }
 
-/* same as above, without logging 
-
+/* Un
+   Used in "trace.js"   
 
 function run_trm(t) {
   switch (t.tag) {
@@ -408,6 +412,7 @@ function run_trm(t) {
 
 
 function run_program(program) {
+  log_reset();
   for (var i = 0; i < program.length; i++) {
     run_trm_wrap(0, program[i]);
   }
@@ -443,9 +448,6 @@ var trm1 =
 
 var program = [trm1];
 
-
-run_program(program);
-/**/
 
 //----------------reporting---------------
 
