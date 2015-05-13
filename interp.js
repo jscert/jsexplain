@@ -550,29 +550,47 @@ function isNumeric(num) {
   
 
 function esprimaExprToAST(expr) {
+  var res;
   switch (expr.type) {
   case "Literal":
     var value = expr.value;
     if (!isNumeric(value)) throw ("Literal not a number: " + value);
-    return trm_number(expr.loc.start.line, expr.value);
+    res = trm_number(expr.loc.start.line, expr.value);
+    res.start = expr.loc.start;
+    res.end = expr.loc.end;
+    return res;
   case "Identifier":
     switch (expr.name) {
-    case "alloc": return trm_alloc(expr.loc.start.line);
-    default: return trm_var(expr.loc.start.line, expr.name);
+    case "alloc":
+      res = trm_alloc(expr.loc.start.line);
+      res.start = expr.loc.start;
+      res.end = expr.loc.end;
+      return res;
+    default:
+      res = trm_var(expr.loc.start.line, expr.name);
+      res.start = expr.loc.start;
+      res.end = expr.loc.end;
+      return res;
     }
   case "AssignmentExpression":
     if (expr.operator !== "=") throw ("AssignmentExpression NI: " + expr.operator);
     if (expr.left.type !== "MemberExpression") throw ("Expected MemberExpression");
     if (expr.left.property.type !== "Identifier") throw ("Expected Identifier");
-    return trm_set(expr.loc.start.line,
-                   esprimaExprToAST(expr.left.object),
-                   expr.left.property.name,
-                   esprimaExprToAST(expr.right));
+    res = trm_set(expr.loc.start.line,
+                  esprimaExprToAST(expr.left.object),
+                  expr.left.property.name,
+                  esprimaExprToAST(expr.right));
+    res.start = expr.loc.start;
+    res.end = expr.loc.end;    
+    return res;
   case "MemberExpression":
     if (expr.property.type !== "Identifier") throw ("Expected Identifier");
-    return trm_get(expr.loc.start.line,
+    res =  trm_get(expr.loc.start.line,
                    esprimaExprToAST(expr.object),
                    expr.property.name);
+    res.start = expr.loc.start;
+    res.end = expr.loc.end;    
+    return res;
   default: return "Expr NI";
   }
 }
@@ -580,10 +598,13 @@ function esprimaExprToAST(expr) {
 function esprimaSeqToAST(stats) {
   var state = {prog: stats, index: 0};
   var res = esprimaStatsToAST(state);
+  var start = res.start;
   var next;
   while (state.index < state.prog.length) {
     next = esprimaStatsToAST(state);
     res = trm_seq(next.line, res, next);
+    res.start = start;
+    res.end = next.end;
   }
   return res;
 }
@@ -591,18 +612,25 @@ function esprimaSeqToAST(stats) {
 function esprimaStatsToAST(state) {
   var stat = state.prog[state.index];
   state.index++;
+  var res;
   switch (stat.type) {
   case "VariableDeclaration":
     var decl = stat.declarations[0];
     var next = state.prog[state.index];
     state.index++;
-    if (next.type !== "BlockStatement") throw ("Blarg Syntax Error: " + next.type);
-    return trm_let(decl.loc.start.line,
-                   decl.id.name,
-                   esprimaExprToAST(decl.init),
-                   esprimaSeqToAST(next.body));
+    if (next.type !== "BlockStatement") throw ("Expected Block, got: " + next.type);
+    res = trm_let(decl.loc.start.line,
+                  decl.id.name,
+                  esprimaExprToAST(decl.init),
+                  esprimaSeqToAST(next.body));
+    res.start = stat.loc.start;
+    res.end = next.loc.end;
+    return res;
   case "ExpressionStatement":
-    return esprimaExprToAST(stat.expression);
+    res = esprimaExprToAST(stat.expression);
+    res.start = stat.loc.start;
+    res.end = stat.loc.end;
+    return res;
   default: return "Stat NI";
   }
 }
