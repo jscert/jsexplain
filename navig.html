@@ -113,7 +113,7 @@
 <span id="run_output"></span>
 Navigation:
 <input type="textbox" id='navigation_step' style="width:3em" value="0"/>
-/<span id="navigation_total"></span>
+/ <span id="navigation_total"></span>
 <input type="button" id='button_reset' value="Reset" />
 <input type="button" id='button_prev' value="Prev" />
 <input type="button" id='button_next' value="Next" />
@@ -155,11 +155,11 @@ $(function() {
 
 <div style="font-size:0.8em">Examples of conditions:
     <ul>
-        <li><pre style = "display:inline">type === "fun" && (v1, true)</pre> (we are at the beginning of a function and v1 is defined)</li>
-        <li><pre style = "display:inline">line === 32 && t.field === "bar"</pre> (we are at line 32 and we are setting the field “bar” of the current location)</li>
-        <li><pre style = "display:inline">heap[0].bar === 12</pre> (the first cell of the heap has a field “bar” defined equal to 12)</li>
+        <li><pre style = "display:inline">X.type === "fun" && (X.v1, true)</pre> (we are at the beginning of a function and v1 is defined in the local interpreter context),</li>
+        <li><pre style = "display:inline">X.line === 32 && X.t.tag === "trm_set" && X.t.field === "bar"</pre> (we are at line 32 and we are setting the field “bar” of the current location),</li>
+        <li><pre style = "display:inline">x.foo === 12</pre> (the program variable has field “foo” equals to 12),</li>
+        <li><pre style = "display:inline">X.heap[0].bar === 12</pre> (the first cell of the heap has a field “bar” defined equal to 12).</li>
     </ul></div>
-
 
 
 </body>
