@@ -181,11 +181,12 @@ function array_of_env(env) {
 }
 
 function lookup_var(x) {
-  array_of_env(env).map(function (e){
-    if (e.name === x) {
-      return e.val;
+  var ae = array_of_env(env);
+  for (var i = 0; i < ae.length; i++){
+    if (ae[i].name === x) {
+      return ae[i].val;
     }
-  });
+  }
   stuck("unbound variable " + x);
 }
 
