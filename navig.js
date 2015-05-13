@@ -95,10 +95,12 @@ $("#navigation_step").change(function(e) {
 
 $("#button_run").click(function() {
   try {
-    parsedTree = esprima.parse($("#source_code").val(), {loc:true});
+    var code = source.getValue();
+    // console.log(code);
+    parsedTree = esprima.parse(code, {loc:true});
     // console.log(parsedTree);
     program = esprimaToAST(parsedTree);
-    console.log(program);
+    // console.log(program);
     run();
     $("#action_output").html("Run successful!");
   } catch(_){
@@ -313,8 +315,7 @@ function updateSelection() {
 
     // source panel
     source_select = item.source_select;
-    console.log(item);
-    console.log(source_select);
+    // console.log(source_select);
     updateSourceSelection();
 
     // ctx panel
@@ -402,7 +403,6 @@ function completeTermsInDatalog(items) {
       var ctx_as_array = array_of_env(item.ctx);
       if (ctx_as_array.length > 0 && ctx_as_array[0].name === "t") {
         var t = ctx_as_array[0].val;
-        console.log(t);
         if (! (t === undefined || t.start === undefined || t.end === undefined)) {
           item.source_select = { start: t.start, end: t.end };
           // TODO: avoir un t.location
