@@ -70,10 +70,10 @@ function button_reach_handler() {
   var pred = $("#text_condition").val();
   var res = goToPred(pred);
   if (res !== true){
-    $("#reach_output").html(res);
+    $("#action_output").html(res);
     var timeoutID =
         window.setTimeout(function() {
-            $("#reach_output").html(""); }, 3000);
+            $("#action_output").html(""); }, 3000);
   }
 };
 
@@ -99,7 +99,7 @@ $("#button_run").click(function() {
  console.log(parsedTree);
  program = program; // TODO: program = translateAST(parsedTree)
  run();
- $("#run_output").html("Run successful !");
+ $("#action_output").html("Run successful !");
  var timeoutID = window.setTimeout(function() { $("#run_output").html(""); }, 1000);
 });
 

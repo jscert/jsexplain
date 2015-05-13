@@ -1,6 +1,6 @@
 
 // Source file loaded initially
-var source_file = 'var x = alloc;\nx.foo = 12;\nx.bar = x.foo;\nx.cycle = x;\n';
+var source_file = 'var x = alloc;\n{ x.foo = 12;\n  x.bar = x.foo;\n  x.cycle = x; }\n';
 
 // Source code for the interpreter
 // This code was generated from the code placed in comments in "interp.js",
