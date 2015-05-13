@@ -9,8 +9,21 @@
 <link rel=stylesheet href="../../interp/tracer/codemirror/lib/codemirror.css">
 <script src="../../interp/tracer/codemirror/lib/codemirror.js"></script>
 <script src="../../interp/tracer/jquery-2.1.1.min.js"></script>
+
+<!--
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+-->
+
+<link rel="stylesheet" href="jquery-ui-1.11.4.custom/jquery-ui.css">
+<script src="jquery-ui-1.11.4.custom/jquery-ui.js"></script>
+
+<!-- styles needed by jScrollPane - include in your own sites -->
+<link type="text/css" href="jquery_scroll/jquery.jscrollpane.css" rel="stylesheet" media="all" />
+<!-- the mousewheel plugin -->
+<script type="text/javascript" src="jquery_scroll/jquery.mousewheel.js"></script>
+<!-- the jScrollPane script -->
+<script type="text/javascript" src="jquery_scroll/jquery.jscrollpane.min.js"></script>
 
 
 <script src="sparray.js"></script>
@@ -30,8 +43,9 @@
 
 #file_list {
    height: 1em;
-   margin-top: 8px;
-   margin-bottom: 8px;
+   padding-top: 8px;
+   padding-bottom: 8px;
+   border-bottom: 1px solid black;
 }
 
 .file_item, .file_item_current {
@@ -61,6 +75,13 @@
 .CodeMirror-selected { background: #F3F781; }
 .CodeMirror-focused .CodeMirror-selected { background: #F3F781; }
 
+
+.scroll-pane
+{
+	width: 100%;
+	height: 200px;
+	overflow: auto;
+}
 </style>
 
 
@@ -69,15 +90,27 @@
 
 <h2>Mini-ML Interpreter</h2>
 
-<div><textarea id='source_code' style="width: 50em; height: 3em">
-javascript source code here
-</textarea>
-<input type="button" id="button_run" value="RUN" />
-<span id="run_output"></span>
+
+<div class='source_div'>
+
+<table id='main_table'><tr>
+<td>
+   <textarea id='source_code' class='source' rows='6' cols='60'>source code here</textarea>
+</td>
+<td width='600'>
+   <div class="scroll-pane" style="height: 6em">
+   <div id='disp_env'>ctx here<br>ctx here<br>ctx here<br>ctx here<br>ctx here<br>ctx here<br>ctx here<br>ctx here<br>ctx here<br>ctx here<br>ctx here<br>ctx here<br>ctx here<br>ctx here<br>ctx here</div>
+   </div>
+</td>
+</tr></table>
 </div>
+
+
 
 <br/>
 <div>
+<input type="button" id="button_run" value="RUN" />
+<span id="run_output"></span>
 Navigation:
 <input type="textbox" id='navigation_step' style="width:3em" value="0"/>
 /<span id="navigation_total"></span>
@@ -92,6 +125,30 @@ Reach condition:
 
 <br/>
 
+<div class='source_div'>
+
+<table id='main_table'><tr>
+<td>
+   <div id='file_list'></div>
+   <textarea id='interpreter_code' class='source' rows='20' cols='60'></textarea>
+</td>
+<td width='600'>
+   <div id='disp_infos'></div>
+   <div id='disp_ctx'>ctx here</div>
+</td>
+</tr></table>
+</div>
+
+
+<script src="navig.js"></script>
+
+<script language="javascript">
+$(function() {
+	$('.scroll-pane').jScrollPane();
+});
+</script>
+
+
 <div style="font-size:0.8em">Instructions: from console, the variable "h" denotes the current heap.</div>
 
 <div style="font-size:0.8em">Instructions: type 'S' for step (next function call), 'N' for next (next call at same level), 'B' for backstep (symmetric to step), 'P' for previous (symmetric to next), 'F' for finish (next call at upper level), 'R' for restart.</div>
@@ -103,24 +160,6 @@ Reach condition:
         <li><pre style = "display:inline">heap[0].bar === 12</pre> (the first cell of the heap has a field “bar” defined equal to 12)</li>
     </ul></div>
 
-<div id='file_list'></div>
-
-<div class='source_div'>
-<table id='main_table'><tr>
-<td>
-   <textarea id='interpreter_code' class='source' rows='20' cols='60'></textarea>
-</td>
-<td width='600'>
-
-   <div id='disp_infos' style="height:1em">infos here</div>
-   
-   <div id='disp_context'>ctx here</div>
-</td>
-</tr></table>
-</div>
-
-
-<script src="navig.js"></script>
 
 
 </body>

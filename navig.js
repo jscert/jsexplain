@@ -14,6 +14,9 @@ var tracer_pos = 78;
 
 $("#navigation_total").html(tracer_length - 1);
 
+$("#source_code").val(source_file);
+
+
 
 function stepTo(step) {
   tracer_pos = step;
@@ -264,7 +267,7 @@ function show_value(heap, v, target, depth) {
 }
 
 function updateContext(heap, env) { // env here is the ctx
-  $("#disp_context").html("");
+  $("#disp_ctx").html("");
   if (env === undefined)
     return;
   // TODO: une fonction de conversion de env vers array
@@ -272,7 +275,7 @@ function updateContext(heap, env) { // env here is the ctx
     return;
   while (env.tag === "env_cons") {
     var target = fresh_id();
-    $("#disp_context").append("<div id='" + target + "'></div>");
+    $("#disp_ctx").append("<div id='" + target + "'></div>");
     $("#" + target).html(env.name + ": ");
     var depth = 1;
     show_value(heap, env.val, target, depth);
@@ -291,8 +294,8 @@ function updateSelection() {
   $('.CodeMirror-focused .CodeMirror-selected').css({ background: color });
   if (item.line === undefined)
     alert("missing line in log event");
-  $("#disp_infos").html("type = " + item.type);
   updateContext(item.heap, item.ctx);
+  // $("#disp_infos").html();
   $("#navigation_step").val(tracer_pos);
   // console.log(item);
   var anchor = {line: item.start_line-1 , ch: item.start_col };
