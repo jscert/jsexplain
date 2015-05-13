@@ -2,6 +2,7 @@
 
 var handlers = [];
 
+var parsedTree;
 
 (function(check_pred){
 
@@ -98,6 +99,7 @@ $("#navigation_step").change(function(e) {
 });
 
 $("#button_run").click(function() {
+ parsedTree = esprima.parse($("#source_code").val(), {loc:true});   
  $("#run_output").html("Run successful !");
  var timeoutID = window.setTimeout(function() { $("#run_output").html(""); }, 1000);
 });
