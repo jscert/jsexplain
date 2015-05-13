@@ -1,0 +1,204 @@
+
+* build_error
+
+** Coq
+
+Definition build_error S vproto vmsg : result :=
+  let O := object_new vproto "Error" in
+  let '(l, S') := object_alloc S O in
+  ifb vmsg = undef then out_ter S' l
+  else result_not_yet_implemented.
+
+** ML
+
+let build_error S vproto vmsg =
+  let O = object_new vproto "Error" in
+  let (l, S') := object_alloc S O in
+  if value_compare vmsg undef then out_ter S' l
+  else result_not_yet_implemented
+
+** JS
+
+function build_error(S, vproto, vmsg) {
+  var O = object_new(vproto, "Error");
+  var l = object_alloc(S, O).first;
+  var S2 = object_alloc(S, O).second;
+  if (value_compare(vmsg, undef) {
+    return out_ter(S2, l);
+  } else {
+    return result_not_yet_implemented;
+  }
+}
+
+** JS, with log
+
+function build_error(S, vproto, vmsg) {
+  log_custom({line: line, type: "enter"});
+  var res = build_error__body(S, vproto, vmsg);
+  var ctx = ctx_empty();
+  ctx = ctx_push(ctx, "res", res, "result");
+  log_custom({line: line, type: "exit", ctx: ctx});
+  return res;
+}
+
+function build_error__body(S, vproto, vmsg) {
+  var ctx = ctx_empty();
+  ctx = ctx_push(ctx, "S", S, "state");
+  ctx = ctx_push(ctx, "vproto", vproto, "value");
+  ctx = ctx_push(ctx, "vmsg", vmsg, "value");
+  log(1, ctx, "build_error");
+  var O = object_new(vproto, "Error");
+  ctx = ctx_push(ctx, "O", O, "object");
+  log(2, ctx, "var");
+  var l = object_alloc(S, O).first;
+  var S2 = object_alloc(S, O).second;
+  ctx = ctx_push(ctx, "l", l, "location");
+  ctx = ctx_push(ctx, "S2", S2, "state");
+  log(3, ctx, "var");
+  if (value_compare(vmsg, undef) {
+    log(4, ctx, "case");
+    return out_ter(S2, l);
+  } else {
+    log(5, ctx, "case");
+    return result_not_yet_implemented;
+  }
+}
+
+
+* run_error
+
+** Coq
+
+Definition run_error T S ne : specres T :=
+  if_object (build_error S (prealloc_native_error_proto ne) undef) (fun S' l =>
+    result_some (specret_out (out_ter S' (res_throw l)))).
+
+** ML
+
+let run_error (*T*) S ne =
+  if_object (build_error S (prealloc_native_error_proto ne) undef) (fun S' l ->
+    result_some (specret_out (out_ter S' (res_throw l))))
+
+** JS
+
+function run_error(S, ne) {
+  return if_object(build_error(S, prealloc_native_error_proto(ne), undef), function (S2, l) {
+    return result_some(specret_out(out_ter(S2, (res_throw(l)))))});
+}
+
+
+** JS, with log
+
+function run_error(S, ne) {
+  log_custom({line: line, type: "enter"});
+  var res = run_error__body(S, ne);
+  var ctx = ctx_empty();
+  ctx = ctx_push(ctx, "res", res, "result");
+  log_custom({line: line, type: "exit", ctx: ctx});
+  return res;
+}
+
+function run_error__body(S, ne) {
+  var ctx = ctx_empty();
+  ctx = ctx_push(ctx, "S", S, "state");
+  ctx = ctx_push(ctx, "ne", ne, "error");
+  log(1, ctx, "run_error");
+  return if_object(build_error(S, prealloc_native_error_proto(ne), undef), function (S2, l) {
+    ctx = ctx_push(ctx, "S2", S2, "state");
+    ctx = ctx_push(ctx, "l", l, "location");
+    log(2, ctx, "fun");
+    return result_some(specret_out(out_ter(S2, (res_throw(l)))))});
+}
+
+* object_proto_is_prototype_of
+
+** Coq
+
+Definition object_proto_is_prototype_of runs S l0 l : result :=
+  if_some (run_object_method object_proto_ S l) (fun B =>
+    match B return result with
+    | null => out_ter S false
+    | value_object l' =>
+      ifb l' = l0
+        then out_ter S true
+        else runs_type_object_proto_is_prototype_of runs S l0 l'
+    | value_prim _ =>
+      impossible_with_heap_because S "[run_object_method] returned a primitive in [object_proto_is_prototype_of_body]."
+    end).
+
+** ML
+
+let object_proto_is_prototype_of S l0 l =
+  if_some (run_object_method object_proto_ S l) (fun B ->
+    match B with
+    | null -> out_ter S false
+    | value_object l' ->
+      if loc_compare l' l0
+        then out_ter S true
+        else runs_type_object_proto_is_prototype_of S l0 l'
+    | value_prim _ ->
+      impossible_with_heap_because S "[run_object_method] returned a primitive in [object_proto_is_prototype_of_body]."
+    end)
+
+** JS
+
+function object_proto_is_prototype_of(S, l0, l) {
+  return if_some (run_object_method(object_proto_, S, l), function (B) {
+    switch (B.tag) {
+    case "null": // "prim"?
+      return out_ter(S, false);
+    case "value_object":
+      var l2 = B.l;
+      if (loc_compare (l2, l0)) {
+        return out_ter(S, true);
+      } else {
+    	  return runs_type_object_proto_is_prototype_of(S, l0, l2);
+    	}
+    case "value_prim":
+      return impossible_with_heap_because(S, "[run_object_method] returned a primitive in [object_proto_is_prototype_of_body].");
+    }
+  });
+}
+
+** JS, with log
+
+function object_proto_is_prototype_of(S, l0, l) {
+  log_custom({line: line, type: "enter"});
+  var res = object_proto_is_prototype_of__body(S, l0, l);
+  var ctx = ctx_empty();
+  ctx = ctx_push(ctx, "res", res, "result");
+  log_custom({line: line, type: "exit", ctx: ctx});
+  return res;
+}
+
+function object_proto_is_prototype_of__body(S, l0, l) {
+  var ctx = ctx_empty();
+  ctx = ctx_push(ctx, "S", S, "state");
+  ctx = ctx_push(ctx, "l0", l0, "location");
+  ctx = ctx_push(ctx, "l", l, "location");
+  log(1, ctx, "object_proto_is_prototype_of");
+  return if_some (run_object_method(object_proto_, S, l), function (B) {
+    ctx = ctx_push(ctx, "B", B);
+    log(2, ctx, "fun");
+    switch (B.tag) {
+    case "null": // "prim"?
+      log(3, ctx, "case");
+      return out_ter(S, false);
+    case "value_object":
+      var l2 = B.l;
+      ctx = ctx_push(ctx, "l2", l2);
+      log(3, ctx, "case");
+      if (loc_compare (l2, l0)) {
+        log(4, ctx, "case");
+        return out_ter(S, true);
+      } else {
+        log(5, ctx, "case");
+    	return runs_type_object_proto_is_prototype_of(S, l0, l2);
+      }
+    case "value_prim":
+      log(6, ctx, "case");
+      return impossible_with_heap_because(S, "[run_object_method] returned a primitive in [object_proto_is_prototype_of_body].");
+    }
+  });
+}
+
