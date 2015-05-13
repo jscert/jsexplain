@@ -445,6 +445,10 @@ function trm_get(line, loc, field) {
   return {tag: "trm_get", loc: loc, field: field, line: line};
 }
 
+function trm_alloc(line) {
+  return {tag: "trm_alloc", line: line};
+}
+
 //----------------demo---------------
 
 var trm1 =
@@ -552,7 +556,10 @@ function esprimaExprToAST(expr) {
     if (!isNumeric(value)) throw ("Literal not a number: " + value);
     return trm_number(expr.loc.start.line, expr.value);
   case "Identifier":
-    return trm_var(expr.loc.start.line, expr.name);
+    switch (expr.name) {
+    case "alloc": return trm_alloc(expr.loc.start.line);
+    default: return trm_var(expr.loc.start.line, expr.name);
+    }
   case "AssignmentExpression":
     if (expr.operator !== "=") throw ("AssignmentExpression NI: " + expr.operator);
     if (expr.left.type !== "MemberExpression") throw ("Expected MemberExpression");
