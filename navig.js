@@ -23,19 +23,20 @@ function stepTo(step) {
 }
 
 // Take a predicate in form of a JavaScript code (string) and returns either true or an error message (string).
-// The predicate can make use of the line, the event type, , the heap, or any local variable of the context ctx.
 function goToPred(pred) {
 
   function check(i){
     var item = datalog[i];
     var jsheap = jsheap_of_heap(item.heap);
-    var obj = {};
+    var obj = jsenv_of_env(jsheap, item.env);
+    var objX = {};
     if (item.ctx !== undefined){
-        obj = jsenv_of_env(jsheap, item.ctx);
+        objX = jsenv_of_env(jsheap, item.ctx);
     }
-    obj.line = item.line;
-    obj.type = item.type;
-    obj.heap = jsheap;
+    objX.line = item.line;
+    objX.type = item.type;
+    objX.heap = jsheap;
+    obj.X = objX; // If we want to change the “X” identifier, just change this line.
     try {
       if (check_pred(pred, obj)){
           stepTo(i);
@@ -86,7 +87,7 @@ $('#text_condition').keypress(function(e){
 	}
 });
 
-$("#button_reach").click(button_reach_handler());
+$("#button_reach").click(button_reach_handler);
 
 
 
