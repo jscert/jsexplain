@@ -268,21 +268,17 @@ function show_value(heap, v, target, depth) {
   $("#" + target).append(s);
 }
 
-function updateContext(heap, env) { // env here is the ctx
-  $("#disp_ctx").html("");
+function updateContext(targetid, heap, env) {
+  $(targetid).html("");
   if (env === undefined)
     return;
-  // TODO: une fonction de conversion de env vers array
-  if (env === undefined)
-    return;
-  while (env.tag === "env_cons") {
+  array_of_env(env).map(function(env){
     var target = fresh_id();
-    $("#disp_ctx").append("<div id='" + target + "'></div>");
+    $(targetid).append("<div id='" + target + "'></div>");
     $("#" + target).html(env.name + ": ");
     var depth = 1;
     show_value(heap, env.val, target, depth);
-    env = env.env;
-  }
+  });
 }
 
 function updateSelection() {
@@ -296,7 +292,8 @@ function updateSelection() {
   $('.CodeMirror-focused .CodeMirror-selected').css({ background: color });
   if (item.line === undefined)
     alert("missing line in log event");
-  updateContext(item.heap, item.ctx);
+  updateContext("#disp_ctx", item.heap, item.ctx);
+  updateContext("#disp_env", item.heap, item.env);
   // $("#disp_infos").html();
   $("#navigation_step").val(tracer_pos);
   // console.log(item);

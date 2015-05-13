@@ -169,15 +169,23 @@ function if_success_bool_cases(res, K1, K2) {
   });
 }
 
+function array_of_env(env) {
+  var a = [];
+
+  while (env.tag === "env_cons") {
+    a.push(env);
+    env = env.env;
+  }
+
+  return a;
+}
 
 function lookup_var(x) {
-  var e = env;
-  while (e.tag === "env_cons") {
+  array_of_env(env).map(function (e){
     if (e.name === x) {
       return e.val;
     }
-    e = e.env;
-  }
+  });
   stuck("unbound variable " + x);
 }
 
@@ -498,11 +506,7 @@ function jsresult_of_result(jsheap, res) {
 
 function jsenv_of_env(jsheap, env) {
   var obj = {};
-  var stack = [];
-  while (env.tag === "env_cons") {
-    stack.push(env);
-    env = env.env;
-  }
+  var stack = array_of_env(env);
   while (stack.length > 0) {
     var iv = stack.pop();
     switch (iv.valkind) {
