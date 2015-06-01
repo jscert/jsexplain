@@ -109,7 +109,7 @@ function log_reset() {
 }
 
 function log_custom(arg) {
-  arg.file = "interp.js"
+  arg.file = "interp.js";
   arg.heap = heap;
   arg.env = env;
   arg.start_line = arg.line;
