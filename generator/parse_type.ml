@@ -26,7 +26,7 @@ let init_path () =
 let initial_env () =
   try
     if !Clflags.nopervasives
-    then Env.initial_unsafe_string
+    then Env.open_pers_signature "Stdlib" Env.initial_unsafe_string
     else Env.open_pers_signature "Pervasives" Env.initial_unsafe_string
   with Not_found ->
     fatal_error "cannot open pervasives"

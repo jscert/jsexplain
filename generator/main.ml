@@ -26,7 +26,7 @@ let _ =
    (* parsing of command line *)
 
    let files = ref [] in
-   Arg.parse  
+   Arg.parse
      [ ("-I", Arg.String (fun i -> Clflags.include_dirs := i::!Clflags.include_dirs), 
                       "includes a directory where to look for interface files");
        ("-myflag", Arg.Set myflag, "example of a flag"); 
@@ -47,7 +47,7 @@ let _ =
      | None -> Filename.concat dirname ((String.capitalize basename) ^ ".js")
      | Some f -> f
    in
-  
+
    (*---------------------------------------------------*)
    (* "reading and typing source file" *)
    let (opt,inputfile) = process_implementation_file ppf sourcefile in
@@ -56,8 +56,8 @@ let _ =
       | None -> failwith "Could not read and typecheck input file"
       | Some (parsetree1, (typedtree1,_)) -> parsetree1, typedtree1
       in
-   
-   file_put_contents outputfile (Print_tast.string_of_structure typedtree1) 
+
+   file_put_contents outputfile (Js_of_ast.js_of_structure typedtree1) 
 
    (* file_put_contents ("_parsed_file.ml") (Print_past.string_of_structure parsetree1);  *)
 

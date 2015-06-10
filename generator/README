@@ -1,3 +1,2 @@
-
-- Folders were copied from OCaml 4.02.1.
-
+All-in-one command:
+$ touch a.cmi && rm *.cm* && make && ocamlc -c stdlib.mli
