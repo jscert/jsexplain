@@ -18,6 +18,7 @@ and out_of_scope s =
 and error s =
     failwith ("error: " ^ s ^ ".")
 
+let rec range i j acc = if i <= j then range i (j - 1) (j :: acc) else acc
 
 let show_list_f f sep l = l
  |> List.map f
@@ -39,8 +40,18 @@ let js_of_longident loc =
   let res = String.concat "." @@ Longident.flatten loc.txt in
   if res = "()" then "" else res
 
-let js_of_let_pattern pat = match pat.pat_desc with
-  | Tpat_var (id, _) -> (Ident.name id, string_of_type_exp pat.pat_type)
+let js_of_let_pattern pat sexpr = match pat.pat_desc with
+  | Tpat_var (id, _) -> Format.sprintf "var %s = {tag: \"%s\", val: %s};\n"
+          (Ident.name id) (string_of_type_exp pat.pat_type) sexpr
+  | Tpat_tuple (pat_l) | Tpat_array (pat_l) ->
+      let l = List.map (function pat -> match pat.pat_desc with
+        | Tpat_var (id, _) -> (Ident.name id, string_of_type_exp pat.pat_type)
+        | _ -> out_of_scope "pattern-matching in arrays") pat_l in
+      Format.sprintf "var __%s = %s;\n " "array" sexpr ^
+      List.fold_left2 (fun acc (name, exp_type) y ->
+          acc ^ Format.sprintf "var %s = {tag: \"%s\", val: __%s[%d]};\n"
+          name exp_type "array" y)
+      "" l @@ range 0 (List.length l - 1) []
   | _ -> error "let can't deconstruct values"
 
 
@@ -56,10 +67,11 @@ let rec js_of_pattern pat = match pat.pat_desc with
   | Tpat_tuple (_) -> out_of_scope "tuple matching"
   | Tpat_construct (loc, cd, el) ->
       let c = js_of_longident loc in
-        if el = [] then c
-        else if List.length el = 1 then (c ^ " " ^ js_of_pattern (List.hd el))
+        if el = [] then "case \"" ^ c ^ "\" "
+        else if List.length el = 1 then ("case \"" ^ string_of_type_exp (List.hd el).pat_type ^ "\"" )
         else Format.sprintf "%s (%s)" c @@ show_list_f js_of_pattern ", " el
-  | Tpat_variant (label, None, _) -> "\"" ^ label ^ "\""
+  | Tpat_variant (label, None, _) -> "case \"" ^ label ^ "\""
+  | Tpat_variant (label, Some _, _) -> failwith "not implemented yet"
   | Tpat_array (_) -> out_of_scope "array-match"
   | Tpat_record (_,_) -> out_of_scope "record"
   | Tpat_or (_,_,_) -> failwith "not implemented yet"
@@ -69,15 +81,12 @@ and js_of_expression (e:expression) =
   let js_of_branch b =
     let spat = js_of_pattern b.c_lhs in
     let se = js_of_expression b.c_rhs in
-    Format.sprintf "%s : %s; break;" spat se in
+    Format.sprintf "%s : return %s" spat se in
   match e.exp_desc with
   | Texp_ident (_, loc, _) -> js_of_longident loc
   | Texp_constant c -> js_of_constant c
   | Texp_let (_, vb_l, e) ->
-      let show_val vb =
-        let id, id_type = js_of_let_pattern vb.vb_pat in
-        let expr = js_of_expression vb.vb_expr in
-        Format.sprintf "var %s = {tag: \"%s\", val: %s};" id id_type expr in
+      let show_val vb = js_of_let_pattern vb.vb_pat (js_of_expression vb.vb_expr) in
       let sd = String.concat "\n" @@ List.map show_val @@ vb_l in
       let se = js_of_expression e in
       Format.sprintf
@@ -100,7 +109,7 @@ and js_of_expression (e:expression) =
             return %s;
         }
         " names body
-  | Texp_function (_, _, Partial) -> out_of_scope "partial functions"
+  | Texp_function (_, _, _) -> out_of_scope "powered-up functions"
   | Texp_apply (f, exp_l) ->
      let sl = exp_l
           |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope "optional apply arguments" | Some ei -> js_of_expression ei)
@@ -110,23 +119,40 @@ and js_of_expression (e:expression) =
   | Texp_match (exp, l, [], Total) ->
      let se = js_of_expression exp in
      let sb = List.fold_left (fun acc x -> acc ^ js_of_branch x ^ ";") "" l in
-    Format.sprintf "switch (%s.tag) {
-        %s;
-     }" se sb
+    Format.sprintf "(function () {
+        switch (%s.tag) {
+            %s
+        }
+     })()" se sb
   | Texp_match (_, _, _, _) -> out_of_scope "exception branches or partial matching"
   | Texp_try (_, _) -> out_of_scope "exceptions"
-  | Texp_tuple (_) -> failwith "not implemented yet"
+  | Texp_tuple (tl) ->
+      "["  ^ show_list_f js_of_expression ", " tl ^ "]"
   | Texp_construct (loc, cd, el) ->
       let c = js_of_longident loc in
-      if el = [] then c
-      else if List.length el = 1 then (c ^ " " ^ js_of_expression (List.hd el))
+      if el = [] then "\"" ^ c ^ "\""
+      else if List.length el = 1 then (js_of_expression (List.hd el))
       else Format.sprintf "%s (%s)" c @@ show_list_f js_of_expression ", " el
   | Texp_variant (_,_) -> ""(* Nothing to do *)
-  | Texp_record (_, _) -> failwith "rnot implemented yet"
-  | Texp_field (_,_,_) -> failwith "fnot implemented yet"
+  | Texp_record (_, _) -> failwith "not implemented yet"
+  | Texp_field (_,_,_) -> failwith "not implemented yet"
   | Texp_setfield (_,_,_,_) -> failwith "not implemented yet"
-  | Texp_array (_) -> out_of_scope "arrays"
-  | Texp_ifthenelse (_, _, _) -> failwith "not implemented yet"
+  | Texp_array (exp_l) -> 
+      "["  ^ show_list_f js_of_expression ", " exp_l ^ "]"
+  | Texp_ifthenelse (e1, e2, None) -> Format.sprintf
+      "(function () {
+          if (%s) {
+              return  %s;
+          }
+      })()" (js_of_expression e1) (js_of_expression e2)
+  | Texp_ifthenelse (e1, e2, Some e3) -> Format.sprintf
+      "(function () {
+          if (%s) {
+              return %s;
+          } else {
+              return %s;
+          }
+      })()" (js_of_expression e1) (js_of_expression e2) (js_of_expression e3)
   | Texp_sequence (_, _) -> unsupported "sequences"
   | Texp_while (_, _) -> unsupported "while loops"
   | Texp_for (_,_,_,_,_,_) -> unsupported "for loops"
@@ -144,12 +170,8 @@ let rec js_of_structure s = show_list_f js_of_structure_item "\n\n" s.str_items
 and js_of_structure_item s = match s.str_desc with
   | Tstr_eval (e, _) -> Format.sprintf "%s" @@ js_of_expression e
   | Tstr_value (_, vb_l)  ->
-    let show_val vb =
-        let id, id_type = js_of_let_pattern vb.vb_pat in
-        let expr = js_of_expression vb.vb_expr in
-        Format.sprintf "var %s = {tag: \"%s\", val: %s};" id id_type expr in
-    let s = List.map show_val vb_l in
-    show_list "\n\n" s
+    let show_val vb = js_of_let_pattern vb.vb_pat (js_of_expression vb.vb_expr) in
+    String.concat "\n\n" @@ List.map show_val @@ vb_l
   | Tstr_type (_)         -> "" (* Nothing to do; tag rules *)
   | Tstr_primitive (_)    -> out_of_scope "primitive functions"
   | Tstr_typext (_)       -> out_of_scope "type extensions"
