@@ -12,19 +12,13 @@ open Lexing
 let hashtlb_size = 256
 let default_value = ["", [""]]
 let type_tbl = Hashtbl.create hashtlb_size;;
-(*Hashtbl.add type_tbl "" default_value;;*)
 
 let print_tbl () =
-    let rec print_elem = function
-      | [] -> ""
-      | (cstr, params) :: [] -> Format.sprintf {|"%s": [%s]|} cstr (print_str_list params)
-      | (cstr, params) :: xs -> (Format.sprintf {|"%s": [%s], |} cstr (print_str_list params)) ^ print_elem xs
-    and print_str_list = function
+    let rec print_str_list = function
       | [] -> ""
       | x :: [] -> (Format.sprintf {|"%s"|} x)
       | x :: xs -> (Format.sprintf {|"%s", |} x) ^ print_str_list xs
-    in Hashtbl.iter (fun key elem -> Printf.printf {|"%s" -> [%s]
-|} key (print_elem elem)) type_tbl; ()
+    in Hashtbl.iter (fun cstr elems -> Printf.printf ({|"%s" : %s -> [%s]|} ^^ "\n") cstr (snd elems) (print_str_list (fst elems))) type_tbl; ()
 
 let unsupported s =
     failwith ("unsupported language construction: " ^ s ^ ".")
@@ -67,11 +61,15 @@ let ident_of_pat pat = match pat.pat_desc with
 let rec js_of_let_pattern pat expr = 
   let expr_type pat expr = match expr.exp_desc with
     | Texp_construct (loc, cd, el) ->
+        let value = js_of_longident loc in
         if el = [] then
-            let value = js_of_longident loc in
-            if value = "true" || value = "false" then value
-            else Format.sprintf "{tag: \"%s\", val: \"%s\"}" value value
-        else out_of_scope "Constructor with more than one value"
+            if value = "true" || value = "false" then value else Format.sprintf {|{tag: "%s"}|} value
+        else let rec expand_constructor_list fields exprs = match fields, exprs with
+          | [], [] -> []
+          | [], x :: xs | x :: xs , [] -> failwith "argument lists should have the same length."
+          | x :: xs, y :: ys -> Format.sprintf {|%s: %s|} x y :: expand_constructor_list xs ys
+        in let names, typ = Hashtbl.find type_tbl value
+        in Format.sprintf {|{tag: "%s", %s}|} value (show_list ", " (expand_constructor_list names (List.map js_of_expression el)))
     | _ -> string_of_type_exp pat.pat_type in
   let sexpr = js_of_expression expr in
   match pat.pat_desc with
@@ -158,10 +156,15 @@ and js_of_expression (e:expression) =
   | Texp_tuple (tl) ->
       "["  ^ show_list_f js_of_expression ", " tl ^ "]"
   | Texp_construct (loc, cd, el) -> (*TODO: Modifs*)
-      let c = js_of_longident loc in
-      if el = [] then "\"" ^ c ^ "\""
-      else if List.length el = 1 then (js_of_expression (List.hd el))
-      else Format.sprintf "%s (%s)" c @@ show_list_f js_of_expression ", " el
+        let value = js_of_longident loc in
+        if el = [] then
+            if value = "true" || value = "false" then value else Format.sprintf {|{tag: "%s"}|} value
+        else let rec expand_constructor_list fields exprs = match fields, exprs with
+          | [], [] -> []
+          | [], x :: xs | x :: xs , [] -> failwith "argument lists should have the same length."
+          | x :: xs, y :: ys -> (if y = "" then Format.sprintf {|%s|} x else Format.sprintf {|%s: %s|} x y) :: expand_constructor_list xs ys
+        in let names, typ = Hashtbl.find type_tbl value
+        in Format.sprintf {|{tag: "%s", %s}|} value (show_list ", " (expand_constructor_list names (List.map js_of_expression el)))
   | Texp_variant (_,_) -> ""(* Nothing to do *)
   | Texp_record (_, _) -> failwith "not implemented yet"
   | Texp_field (_,_,_) -> failwith "not implemented yet"
@@ -225,14 +228,14 @@ and js_of_structure_item s = match s.str_desc with
         | Ttype_variant cdl ->
             let rec explore_cstrs = function
               | [] -> []
-              | x :: xs -> let extract_attrs = function
+              | y :: ys -> let extract_attrs = function
                             | [] -> [""]
-                            | x :: [] -> extract_payload (snd x)
-                            | x :: xs -> out_of_scope "multiples attributes on type declarations" in
-                        (Ident.name x.cd_id, extract_attrs x.cd_attributes) :: explore_cstrs xs
+                            | z :: [] -> extract_payload (snd z)
+                            | z :: zs -> out_of_scope "multiples attributes on type declarations" in
+                           Hashtbl.add type_tbl (Ident.name y.cd_id) ((extract_attrs y.cd_attributes), Ident.name x.typ_id); explore_cstrs ys;
             in explore_cstrs cdl
         | _ -> unsupported "records") in
-    List.iter (fun elt -> Hashtbl.add type_tbl (Ident.name elt.typ_id) (explore_type tl)) tl; print_tbl (); ""
+    explore_type tl; print_tbl (); ""
   | Tstr_primitive _    -> out_of_scope "primitive functions"
   | Tstr_typext _       -> out_of_scope "type extensions"
   | Tstr_exception _    -> out_of_scope "exceptions"
