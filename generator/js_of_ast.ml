@@ -9,6 +9,23 @@ open Print_type
 open Location
 open Lexing
 
+let hashtlb_size = 256
+let default_value = ["", [""]]
+let type_tbl = Hashtbl.create hashtlb_size;;
+(*Hashtbl.add type_tbl "" default_value;;*)
+
+let print_tbl () =
+    let rec print_elem = function
+      | [] -> ""
+      | (cstr, params) :: [] -> Format.sprintf {|"%s": [%s]|} cstr (print_str_list params)
+      | (cstr, params) :: xs -> (Format.sprintf {|"%s": [%s], |} cstr (print_str_list params)) ^ print_elem xs
+    and print_str_list = function
+      | [] -> ""
+      | x :: [] -> (Format.sprintf {|"%s"|} x)
+      | x :: xs -> (Format.sprintf {|"%s", |} x) ^ print_str_list xs
+    in Hashtbl.iter (fun key elem -> Printf.printf {|"%s" -> [%s]
+|} key (print_elem elem)) type_tbl; ()
+
 let unsupported s =
     failwith ("unsupported language construction: " ^ s ^ ".")
 
@@ -40,26 +57,38 @@ let js_of_longident loc =
   let res = String.concat "." @@ Longident.flatten loc.txt in
   if res = "()" then "" else res
 
-let js_of_let_pattern pat sexpr = match pat.pat_desc with
-  | Tpat_var (id, _) -> Format.sprintf "var %s = {tag: \"%s\", val: %s};\n"
-          (Ident.name id) (string_of_type_exp pat.pat_type) sexpr
-  | Tpat_tuple (pat_l) | Tpat_array (pat_l) ->
-      let l = List.map (function pat -> match pat.pat_desc with
-        | Tpat_var (id, _) -> (Ident.name id, string_of_type_exp pat.pat_type)
-        | _ -> out_of_scope "pattern-matching in arrays") pat_l in
-      Format.sprintf "var __%s = %s;\n " "array" sexpr ^
-      List.fold_left2 (fun acc (name, exp_type) y ->
-          acc ^ Format.sprintf "var %s = {tag: \"%s\", val: __%s[%d]};\n"
-          name exp_type "array" y)
-      "" l @@ range 0 (List.length l - 1) []
-  | _ -> error "let can't deconstruct values"
 
 
 let ident_of_pat pat = match pat.pat_desc with
   | Tpat_var (id, _) -> Ident.name id
   | _ -> error "functions can't deconstruct values"
 
-let rec js_of_pattern pat = match pat.pat_desc with
+
+let rec js_of_let_pattern pat expr = 
+  let expr_type pat expr = match expr.exp_desc with
+    | Texp_construct (loc, cd, el) ->
+        if el = [] then
+            let value = js_of_longident loc in
+            if value = "true" || value = "false" then value
+            else Format.sprintf "{tag: \"%s\", val: \"%s\"}" value value
+        else out_of_scope "Constructor with more than one value"
+    | _ -> string_of_type_exp pat.pat_type in
+  let sexpr = js_of_expression expr in
+  match pat.pat_desc with
+  | Tpat_var (id, _) -> Format.sprintf "var %s = %s;\n"
+          (Ident.name id) sexpr
+  | Tpat_tuple (pat_l) | Tpat_array (pat_l) ->
+      let l = List.map (function pat -> match pat.pat_desc with
+        | Tpat_var (id, _) -> (Ident.name id, string_of_type_exp pat.pat_type)
+        | _ -> out_of_scope "pattern-matching in arrays") pat_l in
+      Format.sprintf "var __%s = %s;\n " "array" sexpr ^
+      List.fold_left2 (fun acc (name, exp_type) y ->
+          acc ^ Format.sprintf "var %s = __%s[%d];\n"
+          name "array" y)
+      "" l @@ range 0 (List.length l - 1) []
+  | _ -> error "let can't deconstruct values"
+
+and js_of_pattern pat = match pat.pat_desc with
   | Tpat_any -> "default"
   | Tpat_constant c -> js_of_constant c
   | Tpat_var (id, _) -> "case " ^ Ident.name id
@@ -67,9 +96,9 @@ let rec js_of_pattern pat = match pat.pat_desc with
   | Tpat_tuple (_) -> out_of_scope "tuple matching"
   | Tpat_construct (loc, cd, el) ->
       let c = js_of_longident loc in
-        if el = [] then "case \"" ^ c ^ "\" "
-        else if List.length el = 1 then ("case \"" ^ string_of_type_exp (List.hd el).pat_type ^ "\"" )
-        else Format.sprintf "%s (%s)" c @@ show_list_f js_of_pattern ", " el
+        if el = [] then "case \"" ^ c ^ "\""
+        else if List.length el = 1 then ("case \"" ^ c ^ "\"" )
+        else out_of_scope "Constructor with more than one value"
   | Tpat_variant (label, None, _) -> "case \"" ^ label ^ "\""
   | Tpat_variant (label, Some _, _) -> failwith "not implemented yet"
   | Tpat_array (_) -> out_of_scope "array-match"
@@ -81,12 +110,12 @@ and js_of_expression (e:expression) =
   let js_of_branch b =
     let spat = js_of_pattern b.c_lhs in
     let se = js_of_expression b.c_rhs in
-    Format.sprintf "%s : return %s" spat se in
+    Format.sprintf "%s: return %s" spat se in
   match e.exp_desc with
   | Texp_ident (_, loc, _) -> js_of_longident loc
   | Texp_constant c -> js_of_constant c
   | Texp_let (_, vb_l, e) ->
-      let show_val vb = js_of_let_pattern vb.vb_pat (js_of_expression vb.vb_expr) in
+      let show_val vb = js_of_let_pattern vb.vb_pat vb.vb_expr in
       let sd = String.concat "\n" @@ List.map show_val @@ vb_l in
       let se = js_of_expression e in
       Format.sprintf
@@ -128,7 +157,7 @@ and js_of_expression (e:expression) =
   | Texp_try (_, _) -> out_of_scope "exceptions"
   | Texp_tuple (tl) ->
       "["  ^ show_list_f js_of_expression ", " tl ^ "]"
-  | Texp_construct (loc, cd, el) ->
+  | Texp_construct (loc, cd, el) -> (*TODO: Modifs*)
       let c = js_of_longident loc in
       if el = [] then "\"" ^ c ^ "\""
       else if List.length el = 1 then (js_of_expression (List.hd el))
@@ -137,7 +166,7 @@ and js_of_expression (e:expression) =
   | Texp_record (_, _) -> failwith "not implemented yet"
   | Texp_field (_,_,_) -> failwith "not implemented yet"
   | Texp_setfield (_,_,_,_) -> failwith "not implemented yet"
-  | Texp_array (exp_l) -> 
+  | Texp_array (exp_l) ->
       "["  ^ show_list_f js_of_expression ", " exp_l ^ "]"
   | Texp_ifthenelse (e1, e2, None) -> Format.sprintf
       "(function () {
@@ -162,25 +191,56 @@ and js_of_expression (e:expression) =
   | Texp_setinstvar (_,_,_,_) -> out_of_scope "objects"
   | Texp_override (_,_) -> out_of_scope "objects"
   | Texp_letmodule (_,_,_,_) -> out_of_scope "local modules"
-  | Texp_assert (_) -> out_of_scope "assert"
-  | Texp_lazy (_) -> out_of_scope "lazy expressions"
+  | Texp_assert _ -> out_of_scope "assert"
+  | Texp_lazy _ -> out_of_scope "lazy expressions"
   | Texp_object (_, _) -> out_of_scope "objects"
-  | Texp_pack (_) -> out_of_scope "packing"
+  | Texp_pack _ -> out_of_scope "packing"
 let rec js_of_structure s = show_list_f js_of_structure_item "\n\n" s.str_items
 and js_of_structure_item s = match s.str_desc with
   | Tstr_eval (e, _) -> Format.sprintf "%s" @@ js_of_expression e
   | Tstr_value (_, vb_l)  ->
-    let show_val vb = js_of_let_pattern vb.vb_pat (js_of_expression vb.vb_expr) in
+    let show_val vb = js_of_let_pattern vb.vb_pat vb.vb_expr in
     String.concat "\n\n" @@ List.map show_val @@ vb_l
-  | Tstr_type (_)         -> "" (* Nothing to do; tag rules *)
-  | Tstr_primitive (_)    -> out_of_scope "primitive functions"
-  | Tstr_typext (_)       -> out_of_scope "type extensions"
-  | Tstr_exception (_)    -> out_of_scope "exceptions"
-  | Tstr_module (_)       -> out_of_scope "modules"
-  | Tstr_recmodule (_)    -> out_of_scope "recursive modules"
-  | Tstr_modtype (_)      -> out_of_scope "module type"
-  | Tstr_open (_)         -> out_of_scope "open statements"
-  | Tstr_class (_)        -> out_of_scope "objects"
-  | Tstr_class_type (_)   -> out_of_scope "class types"
-  | Tstr_include (_)      -> out_of_scope "includes"
-  | Tstr_attribute (_)    -> out_of_scope "attributes"
+  | Tstr_type tl ->
+    let rec extract_names = function
+      | [] -> []
+      | (Parsetree.Pexp_ident x) :: xs -> (js_of_longident x) :: extract_names xs
+      | _ -> unsupported "this attribute type"
+    and extract_ctrs (s : Parsetree.structure_item) = match s.pstr_desc with
+      | Parsetree.Pstr_eval (exp, _) -> (match exp.pexp_desc with
+        | Parsetree.Pexp_tuple (exp_l) -> extract_names @@ List.map (fun (x : Parsetree.expression) -> x.pexp_desc) @@ exp_l
+        | Parsetree.Pexp_ident x -> [js_of_longident x]
+        | _ -> unsupported "attributes")
+      | _ -> unsupported "attributes"
+    and extract_payload = function
+      | Parsetree.PStr s ->
+        (match s with
+          | [] -> invalid_arg "empty list"
+          | x :: [] -> extract_ctrs x
+          | x :: xs -> unsupported "multiples attributes")
+      | _ -> unsupported "attributes"
+    and explore_type = function
+      | [] -> []
+      | x :: xs -> (match x.typ_kind with
+        | Ttype_variant cdl ->
+            let rec explore_cstrs = function
+              | [] -> []
+              | x :: xs -> let extract_attrs = function
+                            | [] -> [""]
+                            | x :: [] -> extract_payload (snd x)
+                            | x :: xs -> out_of_scope "multiples attributes on type declarations" in
+                        (Ident.name x.cd_id, extract_attrs x.cd_attributes) :: explore_cstrs xs
+            in explore_cstrs cdl
+        | _ -> unsupported "records") in
+    List.iter (fun elt -> Hashtbl.add type_tbl (Ident.name elt.typ_id) (explore_type tl)) tl; print_tbl (); ""
+  | Tstr_primitive _    -> out_of_scope "primitive functions"
+  | Tstr_typext _       -> out_of_scope "type extensions"
+  | Tstr_exception _    -> out_of_scope "exceptions"
+  | Tstr_module _       -> out_of_scope "modules"
+  | Tstr_recmodule _    -> out_of_scope "recursive modules"
+  | Tstr_modtype _      -> out_of_scope "module type"
+  | Tstr_open _         -> out_of_scope "open statements"
+  | Tstr_class _        -> out_of_scope "objects"
+  | Tstr_class_type _   -> out_of_scope "class types"
+  | Tstr_include _      -> out_of_scope "includes"
+  | Tstr_attribute _    -> out_of_scope "attributes"
