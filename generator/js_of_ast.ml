@@ -86,29 +86,31 @@ let rec js_of_let_pattern pat expr =
       "" l @@ range 0 (List.length l - 1) []
   | _ -> error "let can't deconstruct values"
 
-and js_of_pattern pat = match pat.pat_desc with
-  | Tpat_any -> "default"
-  | Tpat_constant c -> js_of_constant c
-  | Tpat_var (id, _) -> "case " ^ Ident.name id
+and js_of_pattern pat obj = match pat.pat_desc with
+  | Tpat_any -> "default", ""
+  | Tpat_constant c -> js_of_constant c, ""
+  | Tpat_var (id, _) -> Ident.name id, ""
   | Tpat_alias (_,_,_) -> out_of_scope "alias-pattern"
   | Tpat_tuple (_) -> out_of_scope "tuple matching"
   | Tpat_construct (loc, cd, el) ->
       let c = js_of_longident loc in
-        if el = [] then "case \"" ^ c ^ "\""
-        else if List.length el = 1 then ("case \"" ^ c ^ "\"" )
-        else out_of_scope "Constructor with more than one value"
-  | Tpat_variant (label, None, _) -> "case \"" ^ label ^ "\""
-  | Tpat_variant (label, Some _, _) -> failwith "not implemented yet"
+      let spat = {|case "|} ^ c ^ {|"|}  in
+      let params = fst (Hashtbl.find type_tbl c) in
+      let binders =
+        if List.length el = 0 then ""
+        else "var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern x obj)) el) params) ^ ";" in
+      spat, binders
+  | Tpat_variant (_,_,_) -> out_of_scope "polymorphic variants in pattern matching"
   | Tpat_array (_) -> out_of_scope "array-match"
   | Tpat_record (_,_) -> out_of_scope "record"
   | Tpat_or (_,_,_) -> failwith "not implemented yet"
   | Tpat_lazy (_) -> out_of_scope "lazy-pattern"
 
 and js_of_expression (e:expression) =
-  let js_of_branch b =
-    let spat = js_of_pattern b.c_lhs in
+  let js_of_branch b obj =
+    let spat, binders = js_of_pattern b.c_lhs obj in
     let se = js_of_expression b.c_rhs in
-    Format.sprintf "%s: return %s" spat se in
+    Format.sprintf "%s: @ %s @  return %s" spat binders se in
   match e.exp_desc with
   | Texp_ident (_, loc, _) -> js_of_longident loc
   | Texp_constant c -> js_of_constant c
@@ -134,24 +136,24 @@ and js_of_expression (e:expression) =
       Format.sprintf
         "function (%s) {
             return %s;
-        }
-        " names body
+        }" names body
   | Texp_function (_, _, _) -> out_of_scope "powered-up functions"
   | Texp_apply (f, exp_l) ->
      let sl = exp_l
           |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope "optional apply arguments" | Some ei -> js_of_expression ei)
           |> String.concat ", " in
      let se = js_of_expression f in
-     Format.sprintf "%s.val(%s);" se sl
+     Format.sprintf "%s(%s)" se sl
   | Texp_match (exp, l, [], Total) ->
      let se = js_of_expression exp in
-     let sb = List.fold_left (fun acc x -> acc ^ js_of_branch x ^ ";") "" l in
+     let sb = List.fold_left (fun acc x -> acc ^ js_of_branch x se ^ ";") "" l in
     Format.sprintf "(function () {
         switch (%s.tag) {
             %s
         }
      })()" se sb
-  | Texp_match (_, _, _, _) -> out_of_scope "exception branches or partial matching"
+  | Texp_match (_, _, _, Partial) -> out_of_scope "partial matching"
+  | Texp_match (_,_,_,_) -> out_of_scope "matching with exception branches"
   | Texp_try (_, _) -> out_of_scope "exceptions"
   | Texp_tuple (tl) ->
       "["  ^ show_list_f js_of_expression ", " tl ^ "]"
@@ -165,7 +167,7 @@ and js_of_expression (e:expression) =
           | x :: xs, y :: ys -> (if y = "" then Format.sprintf {|%s|} x else Format.sprintf {|%s: %s|} x y) :: expand_constructor_list xs ys
         in let names, typ = Hashtbl.find type_tbl value
         in Format.sprintf {|{tag: "%s", %s}|} value (show_list ", " (expand_constructor_list names (List.map js_of_expression el)))
-  | Texp_variant (_,_) -> ""(* Nothing to do *)
+  | Texp_variant (_,_) -> out_of_scope "polymorphic variant"
   | Texp_record (_, _) -> failwith "not implemented yet"
   | Texp_field (_,_,_) -> failwith "not implemented yet"
   | Texp_setfield (_,_,_,_) -> failwith "not implemented yet"
