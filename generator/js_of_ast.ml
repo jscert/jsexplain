@@ -2,7 +2,6 @@ open Misc
 open Asttypes
 open Types
 open Typedtree
-open Mytools
 open Longident
 open Format
 open Print_type
@@ -13,15 +12,8 @@ let hashtlb_size = 256
 let default_value = ["", [""]]
 let type_tbl = Hashtbl.create hashtlb_size;;
 
-let print_tbl () =
-    let rec print_str_list = function
-      | [] -> ""
-      | x :: [] -> (Format.sprintf {|"%s"|} x)
-      | x :: xs -> (Format.sprintf {|"%s", |} x) ^ print_str_list xs
-    in Hashtbl.iter (fun cstr elems -> Printf.printf ({|"%s" : %s -> [%s]|} ^^ "\n") cstr (snd elems) (print_str_list (fst elems))) type_tbl; ()
-
 let unsupported s =
-    failwith ("unsupported language construction: " ^ s ^ ".")
+  failwith ("unsupported language construction: " ^ s ^ ".")
 
 and out_of_scope s =
     failwith (s ^ " are and will not be supported.")
@@ -32,11 +24,11 @@ and error s =
 let rec range i j acc = if i <= j then range i (j - 1) (j :: acc) else acc
 
 let show_list_f f sep l = l
- |> List.map f
- |> List.fold_left (fun acc x -> acc ^ (if acc = "" then "" else sep) ^ x) ""
+  |> List.map f
+  |> List.fold_left (fun acc x -> acc ^ (if acc = "" then "" else sep) ^ x) ""
 
 let show_list sep l =
- List.fold_left (fun acc x -> acc ^ (if acc = "" then "" else sep) ^ x) "" l
+  List.fold_left (fun acc x -> acc ^ (if acc = "" then "" else sep) ^ x) "" l
 
 let js_of_constant = function
   | Const_int n -> string_of_int n
@@ -51,39 +43,35 @@ let js_of_longident loc =
   let res = String.concat "." @@ Longident.flatten loc.txt in
   if res = "()" then "" else res
 
-
-
 let ident_of_pat pat = match pat.pat_desc with
   | Tpat_var (id, _) -> Ident.name id
   | _ -> error "functions can't deconstruct values"
 
-
 let rec js_of_let_pattern pat expr = 
   let expr_type pat expr = match expr.exp_desc with
     | Texp_construct (loc, cd, el) ->
-        let value = js_of_longident loc in
-        if el = [] then
-            if value = "true" || value = "false" then value else Format.sprintf {|{tag: "%s"}|} value
-        else let rec expand_constructor_list fields exprs = match fields, exprs with
-          | [], [] -> []
-          | [], x :: xs | x :: xs , [] -> failwith "argument lists should have the same length."
-          | x :: xs, y :: ys -> Format.sprintf {|%s: %s|} x y :: expand_constructor_list xs ys
-        in let names, typ = Hashtbl.find type_tbl value
-        in Format.sprintf {|{tag: "%s", %s}|} value (show_list ", " (expand_constructor_list names (List.map js_of_expression el)))
+       let value = js_of_longident loc in
+       if el = [] then
+         if value = "true" || value = "false" then value else Format.sprintf "{type: \"%s}\"" value
+       else let rec expand_constructor_list fields exprs = match fields, exprs with
+              | [], [] -> []
+              | [], x :: xs | x :: xs , [] -> failwith "argument lists should have the same length."
+              | x :: xs, y :: ys -> Format.sprintf "@[%s:@,%s@]" x y :: expand_constructor_list xs ys
+            in let names, typ = Hashtbl.find type_tbl value
+            in Format.sprintf "{type: \"%s\",@, %s}" value (show_list ", " (expand_constructor_list names (List.map js_of_expression el)))
     | _ -> string_of_type_exp pat.pat_type in
   let sexpr = js_of_expression expr in
   match pat.pat_desc with
-  | Tpat_var (id, _) -> Format.sprintf "var %s = %s;\n"
-          (Ident.name id) sexpr
-  | Tpat_tuple (pat_l) | Tpat_array (pat_l) ->
-      let l = List.map (function pat -> match pat.pat_desc with
-        | Tpat_var (id, _) -> (Ident.name id, string_of_type_exp pat.pat_type)
-        | _ -> out_of_scope "pattern-matching in arrays") pat_l in
-      Format.sprintf "var __%s = %s;\n " "array" sexpr ^
-      List.fold_left2 (fun acc (name, exp_type) y ->
-          acc ^ Format.sprintf "var %s = __%s[%d];\n"
-          name "array" y)
-      "" l @@ range 0 (List.length l - 1) []
+  | Tpat_var (id, _) ->
+     Format.sprintf "@[<v 0>var %s = %s;@,@]" (Ident.name id) sexpr
+  | Tpat_tuple (pat_l)
+  | Tpat_array (pat_l) ->
+     let l = List.map (function pat -> match pat.pat_desc with
+                                       | Tpat_var (id, _) -> (Ident.name id, string_of_type_exp pat.pat_type)
+                                       | _ -> out_of_scope "pattern-matching in arrays") pat_l in
+     Format.sprintf "@[<v 0>var __%s = %s;@,@]" "array" sexpr ^
+       List.fold_left2 (fun acc (name, exp_type) y -> acc ^ Format.sprintf "@[<v 0>var %s = __%s[%d];@,@]" name "array" y)
+                       "" l @@ range 0 (List.length l - 1) []
   | _ -> error "let can't deconstruct values"
 
 and js_of_pattern pat obj = match pat.pat_desc with
@@ -93,13 +81,13 @@ and js_of_pattern pat obj = match pat.pat_desc with
   | Tpat_alias (_,_,_) -> out_of_scope "alias-pattern"
   | Tpat_tuple (_) -> out_of_scope "tuple matching"
   | Tpat_construct (loc, cd, el) ->
-      let c = js_of_longident loc in
-      let spat = {|case "|} ^ c ^ {|"|}  in
-      let params = fst (Hashtbl.find type_tbl c) in
-      let binders =
-        if List.length el = 0 then ""
-        else "var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern x obj)) el) params) ^ ";" in
-      spat, binders
+     let c = js_of_longident loc in
+     let spat = Format.sprintf "%s" ("case \"" ^ c ^ "\"") in
+     let params = fst (Hashtbl.find type_tbl c) in
+     let binders =
+       if List.length el = 0 then Format.sprintf ""
+       else Format.sprintf "%s@," ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern x obj)) el) params) ^ ";") in
+     spat, binders
   | Tpat_variant (_,_,_) -> out_of_scope "polymorphic variants in pattern matching"
   | Tpat_array (_) -> out_of_scope "array-match"
   | Tpat_record (_,_) -> out_of_scope "record"
@@ -110,20 +98,16 @@ and js_of_expression (e:expression) =
   let js_of_branch b obj =
     let spat, binders = js_of_pattern b.c_lhs obj in
     let se = js_of_expression b.c_rhs in
-    Format.sprintf "%s: @ %s @  return %s" spat binders se in
+    Format.sprintf "@[<v 2>%s: @[<v 4>%s@,return %s;@]@,@]" spat binders se in
   match e.exp_desc with
   | Texp_ident (_, loc, _) -> js_of_longident loc
   | Texp_constant c -> js_of_constant c
   | Texp_let (_, vb_l, e) ->
-      let show_val vb = js_of_let_pattern vb.vb_pat vb.vb_expr in
-      let sd = String.concat "\n" @@ List.map show_val @@ vb_l in
-      let se = js_of_expression e in
-      Format.sprintf
-        "(function () {
-            %s
-
-            return %s;
-        })()" sd se
+     let show_val vb = js_of_let_pattern vb.vb_pat vb.vb_expr in
+     let sd = String.concat "\n" @@ List.map show_val @@ vb_l in
+     let se = js_of_expression e in
+     Format.sprintf
+       "@[<v 0>(function () {@,@[<v 4>@,%s@,@,return %s;@,@]@,})()@]" sd se
   | Texp_function (_, c :: [], Total) ->
       let rec explore pats e = match e.exp_desc with
         | Texp_function (_, c :: [], Total) ->
@@ -134,24 +118,18 @@ and js_of_expression (e:expression) =
                js_of_expression e in
       let names, body = explore [c.c_lhs] c.c_rhs in
       Format.sprintf
-        "function (%s) {
-            return %s;
-        }" names body
+        "@[function (%s) {@,@[<v 4>@,return %s;@,@]@,}@]" names body
   | Texp_function (_, _, _) -> out_of_scope "powered-up functions"
   | Texp_apply (f, exp_l) ->
      let sl = exp_l
           |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope "optional apply arguments" | Some ei -> js_of_expression ei)
           |> String.concat ", " in
      let se = js_of_expression f in
-     Format.sprintf "%s(%s)" se sl
+     Format.sprintf "@[<v 0>%s(%s)@]" se sl
   | Texp_match (exp, l, [], Total) ->
      let se = js_of_expression exp in
-     let sb = List.fold_left (fun acc x -> acc ^ js_of_branch x se ^ ";") "" l in
-    Format.sprintf "(function () {
-        switch (%s.tag) {
-            %s
-        }
-     })()" se sb
+     let sb = List.fold_left (fun acc x -> acc ^ js_of_branch x se) "" l in
+    Format.sprintf "@[<v 0>(function () {@,@[<v 4>@,switch (%s.type) {@,@[<v 4>@,%s@,@]@,}@]@,})()@]" se sb
   | Texp_match (_, _, _, Partial) -> out_of_scope "partial matching"
   | Texp_match (_,_,_,_) -> out_of_scope "matching with exception branches"
   | Texp_try (_, _) -> out_of_scope "exceptions"
@@ -160,13 +138,13 @@ and js_of_expression (e:expression) =
   | Texp_construct (loc, cd, el) -> (*TODO: Modifs*)
         let value = js_of_longident loc in
         if el = [] then
-            if value = "true" || value = "false" then value else Format.sprintf {|{tag: "%s"}|} value
+            if value = "true" || value = "false" then value else Format.sprintf "{type: \"%s\"}" value
         else let rec expand_constructor_list fields exprs = match fields, exprs with
           | [], [] -> []
           | [], x :: xs | x :: xs , [] -> failwith "argument lists should have the same length."
-          | x :: xs, y :: ys -> (if y = "" then Format.sprintf {|%s|} x else Format.sprintf {|%s: %s|} x y) :: expand_constructor_list xs ys
+          | x :: xs, y :: ys -> (if y = "" then Format.sprintf "%s" x else Format.sprintf "%s: %s" x y) :: expand_constructor_list xs ys
         in let names, typ = Hashtbl.find type_tbl value
-        in Format.sprintf {|{tag: "%s", %s}|} value (show_list ", " (expand_constructor_list names (List.map js_of_expression el)))
+        in Format.sprintf "{type: \"%s\", %s}" value (show_list ", " (expand_constructor_list names (List.map js_of_expression el)))
   | Texp_variant (_,_) -> out_of_scope "polymorphic variant"
   | Texp_record (_, _) -> failwith "not implemented yet"
   | Texp_field (_,_,_) -> failwith "not implemented yet"
@@ -174,19 +152,10 @@ and js_of_expression (e:expression) =
   | Texp_array (exp_l) ->
       "["  ^ show_list_f js_of_expression ", " exp_l ^ "]"
   | Texp_ifthenelse (e1, e2, None) -> Format.sprintf
-      "(function () {
-          if (%s) {
-              return  %s;
-          }
-      })()" (js_of_expression e1) (js_of_expression e2)
+      "@[<v 0>(function () {@,@[<v 4>@,if (%s) {@,@[<v 4>@,return  %s;@]@,}@]@,})()@]" (js_of_expression e1) (js_of_expression e2)
   | Texp_ifthenelse (e1, e2, Some e3) -> Format.sprintf
-      "(function () {
-          if (%s) {
-              return %s;
-          } else {
-              return %s;
-          }
-      })()" (js_of_expression e1) (js_of_expression e2) (js_of_expression e3)
+     "@[<v 0>(function () {@,@[<v 4>@,if (%s) {@,@[<v 4>@,return  %s;@]@,} else {@,@[<v 4>@,return  %s;@]@,}@]@]@,})()@]"
+      (js_of_expression e1) (js_of_expression e2) (js_of_expression e3)
   | Texp_sequence (_, _) -> unsupported "sequences"
   | Texp_while (_, _) -> unsupported "while loops"
   | Texp_for (_,_,_,_,_,_) -> unsupported "for loops"
@@ -237,7 +206,7 @@ and js_of_structure_item s = match s.str_desc with
                            Hashtbl.add type_tbl (Ident.name y.cd_id) ((extract_attrs y.cd_attributes), Ident.name x.typ_id); explore_cstrs ys;
             in explore_cstrs cdl
         | _ -> unsupported "records") in
-    explore_type tl; print_tbl (); ""
+    explore_type tl; ""
   | Tstr_primitive _    -> out_of_scope "primitive functions"
   | Tstr_typext _       -> out_of_scope "type extensions"
   | Tstr_exception _    -> out_of_scope "exceptions"

@@ -1,2 +1,0 @@
-All-in-one command:
-$ touch a.cmi && rm *.cm* && make && ocamlc -c stdlib.mli

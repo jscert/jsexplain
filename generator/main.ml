@@ -5,11 +5,7 @@ open Parse_type
 (*#########################################################################*)
 
 let debug = ref false
-
-let myflag = ref false
-
 let ppf = Format.std_formatter
-
 let outputfile = ref None
 
 (* err_formatter *)
@@ -18,21 +14,21 @@ let outputfile = ref None
 (*#########################################################################*)
 
 let _ =
-
+  
    (* disable loading of stdlib *)
-   Clflags.nopervasives := true;
+   Clflags.nopervasives := false;
 
    (*---------------------------------------------------*)
    (* parsing of command line *)
 
    let files = ref [] in
    Arg.parse
-     [ ("-I", Arg.String (fun i -> Clflags.include_dirs := i::!Clflags.include_dirs), 
+     [ ("-I", Arg.String (fun i -> Clflags.include_dirs := i :: !Clflags.include_dirs), 
                       "includes a directory where to look for interface files");
-       ("-myflag", Arg.Set myflag, "example of a flag"); 
        ("-o", Arg.String (fun s -> outputfile := Some s), "set the output file name");
-       ("-debug", Arg.Set debug, "trace the various steps") ]
-     (fun f -> files := f::!files)
+       ("-debug", Arg.Set debug, "trace the various steps")
+     ]
+     (fun f -> files := f :: !files)
      ("usage: [-I dir] [..other options..] file.ml");
 
    if List.length !files <> 1 then
@@ -44,13 +40,13 @@ let _ =
    let dirname = Filename.dirname sourcefile in
    let outputfile : string =
      match !outputfile with
-     | None -> Filename.concat dirname ((String.capitalize basename) ^ ".js")
+     | None -> Filename.concat dirname (basename ^ ".js")
      | Some f -> f
    in
 
    (*---------------------------------------------------*)
    (* "reading and typing source file" *)
-   let (opt,inputfile) = process_implementation_file ppf sourcefile in
+   let (opt, inputfile) = process_implementation_file ppf sourcefile in
    let ((parsetree1 : Parsetree.structure), typedtree1) =
       match opt with
       | None -> failwith "Could not read and typecheck input file"
@@ -58,16 +54,3 @@ let _ =
       in
 
    file_put_contents outputfile (Js_of_ast.js_of_structure typedtree1) 
-
-   (* file_put_contents ("_parsed_file.ml") (Print_past.string_of_structure parsetree1);  *)
-
-   (*---------------------------------------------------*)
-   (* typing normalized code
-   let (typedtree2, _ : Typedtree.structure * Typedtree.module_coercion) = 
-      match typecheck_implementation_file ppf sourcefile parsetree2 with
-      | None -> failwith "Could not typecheck the normalized source code\nCheck out the file output/_normalized.ml." 
-      | Some typedtree2 -> typedtree2
-      in
-   file_put_contents (debugdirBase ^ "_normalized_typed.ml") (Print_tast.string_of_structure typedtree2); 
-   ignore (typedtree2);
-   *)

@@ -6,8 +6,14 @@
 # OCAMLBIN=~/shared/ocamleasy/bin/
 # OCAMLLIB=~/shared/ocamleasy/lib
 
-ML_DIRS    := lex parsing tools typing utils
-OCAMLBUILD := ocamlbuild -r -j 4 -classic-display \
+ML_DIRS     := lex parsing tools typing utils stdlib_ml
+STD_DIR	    := stdlib_ml
+TEST_DIR    := tests
+TEST_DIR_JS := tests/js
+ML_TESTS    := $(wildcard $(TEST_DIR)/*.ml)
+
+CC          := ocamlc -c
+OCAMLBUILD  := ocamlbuild -r -j 4 -classic-display \
 	           $(addprefix -I ,$(ML_DIRS)) \
 
 all: main.byte
@@ -18,14 +24,22 @@ main.byte:
 native:
 	$(OCAMLBUILD) main.native
 
-test: main.byte
-	./main.byte _test.ml
+stdlib:
+	$(CC) stdlib_ml/stdlib.mli
 
-interp: main.byte
-	./main.byte _interp.ml
+tests: main.byte stdlib
+	$(foreach mlfile, $(ML_TESTS), ./main.byte $(mlfile);)
+	mv $(TEST_DIR)/*.js $(TEST_DIR_JS)
+
+clean_stdlib:
+	rm -f $(STD_DIR)/*.cmi
+
+clean_tests:
+	rm -f $(TEST_DIR)/*.cmi
+	rm -f $(TEST_DIR_JS)/*.js
 
 clean:
 	rm -rf _build
 	rm -f *.native *.byte
 
-#	rm -f *~
+cleanall: clean clean_tests clean_stdlib

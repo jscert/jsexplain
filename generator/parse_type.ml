@@ -18,7 +18,7 @@ open Typedtree
 
 let init_path () =
   load_path :=
-    "" :: List.rev (Config.standard_library :: !Clflags.include_dirs);
+    "stdlib_ml" :: List.rev (Config.standard_library :: !Clflags.include_dirs);
   Env.reset_cache ()
 
 (** Return the initial environment in which compilation proceeds. *)
@@ -27,7 +27,7 @@ let initial_env () =
   try
     if !Clflags.nopervasives
     then Env.open_pers_signature "Stdlib" Env.initial_unsafe_string
-    else Env.open_pers_signature "Pervasives" Env.initial_unsafe_string
+    else Env.open_pers_signature "Stdlib" Env.initial_unsafe_string
   with Not_found ->
     fatal_error "cannot open pervasives"
 

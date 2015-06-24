@@ -1,0 +1,62 @@
+* Js_of_ocaml bis
+
+** Why bis? & Purpose
+
+   Because, there is already a tool named `js_of_ocaml` whose job is
+   to produce efficient Javascript from OCaml bytecode.
+
+   Here, we try to translate OCaml syntax to ECMAScript5 syntax, the
+   purpose of it is to generate readable ECMAScript code, so that it
+   could later be use in a step-by-step ECMAScript interpreter.
+
+** Dependencies
+
+   - `node.js` and the `esprima` package. In order to get the esprima
+     package the more convenient way is to get `npm` (/node package
+     manager/) and run `npm install esprima`.
+   - ocaml 4.02.1
+
+** How to run it
+
+#+BEGIN_src
+make
+make tests
+./run tests/js/the_file_you_want_to_run.js
+#+END_src
+
+** How does it work?
+
+   In order to get the statically typed abstract syntax tree (STAST) of
+   OCaml we usethe same files that are used in the compiler of OCaml
+   4.02.1 (hence the dependency).
+
+   On top, of this STAST, there is a custom back-end that
+   transliterate OCaml to ECMAScript. The code written in OCaml cannot
+   rely on code from the typical standard library. Therefore a
+   file named `stdlib.mli` (found in the directory `stdlib_ml`) contains
+   all the required definitions for the exemples to work. This file as
+   a twin which is `stdlib.js` found in `stdlib_js`, in this file the
+   functions whose prototype is in `stdlib.mli` are defined here.
+
+** About the subset of OCaml supported
+
+   * ==Let (rec) == declarations, except `let () = ` and `let _ =`.
+   * ==If then else== statements, as excepted `if then else`
+     statements return a value.
+   * ==Pattern matching==, only one level of pattern matching over
+     arbitrary types.
+   * ==Types declarations==, if a constructor take arguments (one or
+     more), you should add an annotations to provide default names for
+     the parameters. See example below.
+
+#+BEGIN_src
+
+type 'a tree =
+  | Leaf [@f value] of `a
+  | Node [@f left, value, right] of `a tree * `a * `a tree          
+
+#+END_src
+
+Special note: from OCaml 4.02.2 annotations do not have the same
+syntax, but for now we work with OCaml 4.02.1 so the code above
+works and is recommended.
