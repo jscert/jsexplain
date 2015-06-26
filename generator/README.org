@@ -21,9 +21,16 @@
 #+BEGIN_src
 make
 make tests
-./run tests/js/the_file_you_want_to_run.js
+./run.sh tests/js/the_file_you_want_to_run.js
 #+END_src
 
+   I you run into any error about *.cmi files that should not be
+   present run the following command:
+
+#+BEGIN_src
+make cleanall
+#+END_src
+   
 ** How does it work?
 
    In order to get the statically typed abstract syntax tree (STAST) of
@@ -40,12 +47,12 @@ make tests
 
 ** About the subset of OCaml supported
 
-   * ==Let (rec) == declarations, except `let () = ` and `let _ =`.
-   * ==If then else== statements, as excepted `if then else`
+   * *Let (rec)* declarations, except `let () = ` and `let _ =`.
+   * *If then else* statements, as excepted `if then else`
      statements return a value.
-   * ==Pattern matching==, only one level of pattern matching over
+   * *Pattern matching*, only one level of pattern matching over
      arbitrary types.
-   * ==Types declarations==, if a constructor take arguments (one or
+   * *Types declarations*, if a constructor take arguments (one or
      more), you should add an annotations to provide default names for
      the parameters. See example below.
 

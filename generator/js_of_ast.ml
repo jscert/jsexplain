@@ -7,21 +7,18 @@ open Format
 open Print_type
 open Location
 open Lexing
+open Mytools
+open Attributes
 
 let hashtlb_size = 256
-let default_value = ["", [""]]
 let type_tbl = Hashtbl.create hashtlb_size;;
 
-let unsupported s =
-  failwith ("unsupported language construction: " ^ s ^ ".")
-
-and out_of_scope s =
-    failwith (s ^ " are and will not be supported.")
-
-and error s =
-    failwith ("error: " ^ s ^ ".")
-
-let rec range i j acc = if i <= j then range i (j - 1) (j :: acc) else acc
+let print_tbl () =
+  let rec print_str_list = function
+    | [] -> ""
+    | x :: [] -> (Format.sprintf {|"%s"|} x)
+    | x :: xs -> (Format.sprintf {|"%s", |} x) ^ print_str_list xs
+  in Hashtbl.iter (fun cstr elems -> Printf.printf ({|%s -> [%s]|} ^^ "\n") cstr (print_str_list elems)) type_tbl; ()
 
 let show_list_f f sep l = l
   |> List.map f
@@ -53,12 +50,13 @@ let rec js_of_let_pattern pat expr =
        let value = js_of_longident loc in
        if el = [] then
          if value = "true" || value = "false" then value else Format.sprintf "{type: \"%s}\"" value
-       else let rec expand_constructor_list fields exprs = match fields, exprs with
-              | [], [] -> []
-              | [], x :: xs | x :: xs , [] -> failwith "argument lists should have the same length."
-              | x :: xs, y :: ys -> Format.sprintf "@[%s:@,%s@]" x y :: expand_constructor_list xs ys
-            in let names, typ = Hashtbl.find type_tbl value
-            in Format.sprintf "{type: \"%s\",@, %s}" value (show_list ", " (expand_constructor_list names (List.map js_of_expression el)))
+       else
+         let rec expand_constructor_list fields exprs = match fields, exprs with
+           | [], [] -> []
+           | [], x :: xs | x :: xs , [] -> failwith "argument lists should have the same length."
+           | x :: xs, y :: ys -> Format.sprintf "@[%s:@,%s@]" x y :: expand_constructor_list xs ys in
+         let names = Hashtbl.find type_tbl value
+         in Format.sprintf "{type: \"%s\",@, %s}" value (show_list ", " (expand_constructor_list names (List.map js_of_expression el)))
     | _ -> string_of_type_exp pat.pat_type in
   let sexpr = js_of_expression expr in
   match pat.pat_desc with
@@ -71,7 +69,7 @@ let rec js_of_let_pattern pat expr =
                                        | _ -> out_of_scope "pattern-matching in arrays") pat_l in
      Format.sprintf "@[<v 0>var __%s = %s;@,@]" "array" sexpr ^
        List.fold_left2 (fun acc (name, exp_type) y -> acc ^ Format.sprintf "@[<v 0>var %s = __%s[%d];@,@]" name "array" y)
-                       "" l @@ range 0 (List.length l - 1) []
+                       "" l @@ range 0 (List.length l - 1)
   | _ -> error "let can't deconstruct values"
 
 and js_of_pattern pat obj = match pat.pat_desc with
@@ -83,7 +81,7 @@ and js_of_pattern pat obj = match pat.pat_desc with
   | Tpat_construct (loc, cd, el) ->
      let c = js_of_longident loc in
      let spat = Format.sprintf "%s" ("case \"" ^ c ^ "\"") in
-     let params = fst (Hashtbl.find type_tbl c) in
+     let params = Hashtbl.find type_tbl c in
      let binders =
        if List.length el = 0 then Format.sprintf ""
        else Format.sprintf "%s@," ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern x obj)) el) params) ^ ";") in
@@ -143,7 +141,7 @@ and js_of_expression (e:expression) =
           | [], [] -> []
           | [], x :: xs | x :: xs , [] -> failwith "argument lists should have the same length."
           | x :: xs, y :: ys -> (if y = "" then Format.sprintf "%s" x else Format.sprintf "%s: %s" x y) :: expand_constructor_list xs ys
-        in let names, typ = Hashtbl.find type_tbl value
+        in let names = Hashtbl.find type_tbl value
         in Format.sprintf "{type: \"%s\", %s}" value (show_list ", " (expand_constructor_list names (List.map js_of_expression el)))
   | Texp_variant (_,_) -> out_of_scope "polymorphic variant"
   | Texp_record (_, _) -> failwith "not implemented yet"
@@ -176,37 +174,14 @@ and js_of_structure_item s = match s.str_desc with
     let show_val vb = js_of_let_pattern vb.vb_pat vb.vb_expr in
     String.concat "\n\n" @@ List.map show_val @@ vb_l
   | Tstr_type tl ->
-    let rec extract_names = function
-      | [] -> []
-      | (Parsetree.Pexp_ident x) :: xs -> (js_of_longident x) :: extract_names xs
-      | _ -> unsupported "this attribute type"
-    and extract_ctrs (s : Parsetree.structure_item) = match s.pstr_desc with
-      | Parsetree.Pstr_eval (exp, _) -> (match exp.pexp_desc with
-        | Parsetree.Pexp_tuple (exp_l) -> extract_names @@ List.map (fun (x : Parsetree.expression) -> x.pexp_desc) @@ exp_l
-        | Parsetree.Pexp_ident x -> [js_of_longident x]
-        | _ -> unsupported "attributes")
-      | _ -> unsupported "attributes"
-    and extract_payload = function
-      | Parsetree.PStr s ->
-        (match s with
-          | [] -> invalid_arg "empty list"
-          | x :: [] -> extract_ctrs x
-          | x :: xs -> unsupported "multiples attributes")
-      | _ -> unsupported "attributes"
-    and explore_type = function
-      | [] -> []
+   let explore_type = function
+      | [] -> ()
       | x :: xs -> (match x.typ_kind with
         | Ttype_variant cdl ->
-            let rec explore_cstrs = function
-              | [] -> []
-              | y :: ys -> let extract_attrs = function
-                            | [] -> [""]
-                            | z :: [] -> extract_payload (snd z)
-                            | z :: zs -> out_of_scope "multiples attributes on type declarations" in
-                           Hashtbl.add type_tbl (Ident.name y.cd_id) ((extract_attrs y.cd_attributes), Ident.name x.typ_id); explore_cstrs ys;
-            in explore_cstrs cdl
-        | _ -> unsupported "records") in
-    explore_type tl; ""
+          let cl = List.map (fun cstr -> extract_cstr_attrs cstr) cdl in
+          List.iter (fun (name, cstrs_name) -> Hashtbl.add type_tbl name cstrs_name) cl
+        | _ -> unsupported "open types, record and abstract type")
+   in explore_type tl; print_tbl (); ""
   | Tstr_primitive _    -> out_of_scope "primitive functions"
   | Tstr_typext _       -> out_of_scope "type extensions"
   | Tstr_exception _    -> out_of_scope "exceptions"
