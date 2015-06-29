@@ -47,26 +47,29 @@ let list_mapi f l =
     in
   aux 0 l
 
+let range i j =
+  let rec aux j acc =
+    if i <= j then aux (j - 1) (j :: acc) else acc in
+  aux j []
+    
 let list_nat n = (* for n >= 0 *)
-  let rec aux i = 
-    if i = 0 then [] else (i-1)::(aux (i-1)) in
-  List.rev (aux n)
+  range 0 n
     
 let rec list_separ sep = function 
   | [] -> []
-  | a::[] -> a::[]
-  | a::l -> a::sep::(list_separ sep l)
+  | a :: [] -> a :: []
+  | a :: l -> a :: sep :: list_separ sep l
 
 let rec filter_somes = function
   | [] -> []
-  | None::l -> filter_somes l
+  | None :: l -> filter_somes l
   | (Some x) :: l -> x :: filter_somes l
 
 let list_unique l =
    let rec aux acc = function
       | [] -> acc
-      | a::q -> 
-         if List.mem a acc then aux acc q else aux (a::acc) q
+      | a :: q -> 
+         if List.mem a acc then aux acc q else aux (a :: acc) q
       in
    aux [] l
 
@@ -113,7 +116,7 @@ let list_index k l =
 (**************************************************************)
 (** String manipulation functions *)
 
-let str_cmp (s1:string) (s2:string) =
+let str_cmp (s1 : string) (s2 : string) =
   if s1 < s2 then -1 else if s1 = s2 then 0 else 1
 
 let str_starts_with p s = 
@@ -220,5 +223,12 @@ let warning s =
   Printf.printf "### WARNING: %s\n" s
 
 let unsupported s =
-   failwith ("Unsupported language construction : " ^ s)
+  failwith ("Unsupported language construction: " ^ s ^ ".")
+
+let out_of_scope s =
+    failwith (s ^ " are and will not be supported.")
+
+let error s =
+    failwith ("error: " ^ s ^ ".")
+
 
