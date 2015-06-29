@@ -110,11 +110,38 @@ let ppf_single_cstrs typ =
 let ppf_multiple_cstrs typ rest =
   Format.sprintf "{type: \"%s\", %s}"
     typ rest
+
+(**
+ * Log Part
+ *)
+
+module Log :
+sig
+  val status : unit -> bool
+  val init_log : unit -> unit
+  val toggle : string -> unit
+end
+  =
+struct
+  let s = ref false
+
+  let status () = !s
+  let init_log () = s := false
+  let toggle update = match update with
+    | "logged"   ->  s := true;
+    | "unlogged" ->  s := false;
+    | _          ->  ();
+end
     
 (**
  * Main part
  *)
-    
+
+(*let to_javascript typedtree =
+  js_of_structure typedtree
+(** + Log related post processing **)
+*)
+  
 let rec show_value_binding vb =
   js_of_let_pattern vb.vb_pat vb.vb_expr
     
@@ -145,7 +172,12 @@ and js_of_structure_item s = match s.str_desc with
   | Tstr_class      _ -> out_of_scope "objects"
   | Tstr_class_type _ -> out_of_scope "class types"
   | Tstr_include    _ -> out_of_scope "includes"
-  | Tstr_attribute  _ -> out_of_scope "attributes"
+  | Tstr_attribute  attrs ->
+    let log_status =
+      match extract_attr attrs with
+      | [] -> ""
+      | x :: xs -> x
+    in Log.toggle log_status; ""
 
 and js_of_branch b obj =
   let spat, binders = js_of_pattern b.c_lhs obj in

@@ -29,7 +29,7 @@ let initial_env () =
     then Env.open_pers_signature "Stdlib" Env.initial_unsafe_string
     else Env.open_pers_signature "Stdlib" Env.initial_unsafe_string
   with Not_found ->
-    fatal_error "cannot open pervasives"
+    fatal_error "cannot open stdlib"
 
 (** Optionally preprocess a source file *)
 let preprocess sourcefile =

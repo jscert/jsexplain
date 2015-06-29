@@ -3,13 +3,21 @@ open Parsetree
 open Typedtree
 open Mytools
 
-let rec extract_cstr_attrs (cstr : Typedtree.constructor_declaration) : string * string list =
+let rec extract_cstr_attrs (cstr : Typedtree.constructor_declaration)  =
   let cstr_name   = Ident.name cstr.cd_id in
-  let cstr_params = cstr.cd_attributes
-  |> List.map (fun (_, pl) -> extract_payload pl)
-  |> List.flatten
+  let cstr_params = extract_attrs cstr.cd_attributes
   in (cstr_name, cstr_params) 
 
+and extract_vb_attrs (vb : Typedtree.value_binding) =
+  extract_attrs vb.vb_attributes
+
+and extract_attrs attrs =
+  attrs
+    |> List.map extract_attr
+    |> List.flatten
+
+and extract_attr (_, pl) = extract_payload pl
+      
 and extract_payload = function
   | PStr  s    -> extract_structure s
   | PTyp  _    -> error "Type found. A tuple or a single value was expected"
