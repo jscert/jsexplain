@@ -10,14 +10,15 @@ open Lexing
 open Mytools
 open Attributes
 
-let hashtlb_size = 256
-let type_tbl = Hashtbl.create hashtlb_size
-
+let hashtbl_size = 256
+let type_tbl   = Hashtbl.create hashtbl_size
+let record_tbl = Hashtbl.create hashtbl_size
+  
 (**
  * Debug-purpose functions
  *)
   
-let print_tbl () =
+let print_type_tbl () =
   let rec print_str_list = function
     | [] -> ""
     | x :: [] -> (Format.sprintf {|"%s"|} x)
@@ -41,14 +42,19 @@ let is_sbool x = List.mem x ["true" ; "false"]
  * Before-hand definitions of Pretty-Printer-Format for converting ocaml
  * to ECMAScript, therefore all of them are in a single place.
  *)
-    
+
+let ppf_lambda_wrap s =
+  Format.sprintf "@[<v 0>function () {@,@[<v 4>@,%s@]@,}()@]" s
+  
 let ppf_branch case binders expr =
   Format.sprintf "@[<v 2>%s: @[<v 4>%s@,return %s;@]@,@]"
     case binders expr
 
 let ppf_let_in decl exp =
-  Format.sprintf "@[<v 0>(function () {@,@[<v 4>@,%s@,@,return %s;@,@]@,})()@]"
-    decl exp
+  let s =
+    Format.sprintf "%s@,@,return %s;"
+      decl exp
+  in ppf_lambda_wrap s
 
 let ppf_function args body=
   Format.sprintf "@[function (%s) {@,@[<v 4>@,return %s;@,@]@,}@]"
@@ -59,8 +65,13 @@ let ppf_apply f args =
     f args
 
 let ppf_match value cases =
-  Format.sprintf "@[<v 0>(function () {@,@[<v 4>@,switch (%s.type) {@,@[<v 4>@,%s@,@]@,}@]@,})()@]"
-    value cases
+  let s =
+    Format.sprintf "switch (%s.type) {@,@[<v 4>@,%s@,@]@,}@]@,}"
+      value cases
+  in ppf_lambda_wrap s
+
+(*  Format.sprintf "@[<v 0>(function () {@,@[<v 4>@,switch (%s.type) {@,@[<v 4>@,%s@,@]@,}@]@,})()@]"
+    value cases*)
 
 let ppf_array values =
   Format.sprintf "[%s]"
@@ -105,12 +116,18 @@ let ppf_cstr tag value =
 let ppf_single_cstrs typ =
    Format.sprintf "{type: \"%s\"}"
      typ
-  
-    
+      
 let ppf_multiple_cstrs typ rest =
   Format.sprintf "{type: \"%s\", %s}"
     typ rest
 
+let ppf_record llde =
+  let rec aux acc = function
+    | []               -> Format.sprintf "@[<v 0>{@,@[<v 4>@,%s@,@]}@]" acc
+    | (lbl, exp) :: [] -> aux (acc ^ Format.sprintf "%s: %s" lbl exp) []
+    | (lbl, exp) :: xs -> aux (acc ^ Format.sprintf "%s: %s,@," lbl exp) xs
+  in aux "" llde
+    
 (**
  * Log Part
  *)
@@ -137,12 +154,11 @@ end
  * Main part
  *)
 
-(*let to_javascript typedtree =
+let rec to_javascript typedtree =
   js_of_structure typedtree
 (** + Log related post processing **)
-*)
   
-let rec show_value_binding vb =
+and show_value_binding vb =
   js_of_let_pattern vb.vb_pat vb.vb_expr
     
 and js_of_structure s =
@@ -159,16 +175,19 @@ and js_of_structure_item s = match s.str_desc with
         | Ttype_variant cdl ->
           let cl = List.map (fun cstr -> extract_cstr_attrs cstr) cdl in
           List.iter (fun (name, cstrs_name) -> Hashtbl.add type_tbl name cstrs_name) cl
+        | Ttype_record ldl ->
+          (* Beware silent shadowing for record labels *)
+          List.iter (fun lbl -> Hashtbl.replace record_tbl (Ident.name lbl.ld_id) (Ident.name x.typ_id)) ldl
         | _ -> unsupported "open types, record and abstract type"
         )
    in explore_type tl; ""
+  | Tstr_open       _ -> "" (* Just ignore open statement; OCaml resolves names for us. *)
   | Tstr_primitive  _ -> out_of_scope "primitive functions"
   | Tstr_typext     _ -> out_of_scope "type extensions"
   | Tstr_exception  _ -> out_of_scope "exceptions"
   | Tstr_module     _ -> out_of_scope "modules"
   | Tstr_recmodule  _ -> out_of_scope "recursive modules"
   | Tstr_modtype    _ -> out_of_scope "module type"
-  | Tstr_open       _ -> out_of_scope "open statements"
   | Tstr_class      _ -> out_of_scope "objects"
   | Tstr_class_type _ -> out_of_scope "class types"
   | Tstr_include    _ -> out_of_scope "includes"
@@ -230,12 +249,12 @@ and js_of_expression e = match e.exp_desc with
   | Texp_sequence   (e1, e2)          -> ppf_sequence (js_of_expression e1) (js_of_expression e2)
   | Texp_while      (cd, body)        -> ppf_while (js_of_expression cd) (js_of_expression body)
   | Texp_for        (id, _, st, ed, fl, body) -> ppf_for (Ident.name id) (js_of_expression st) (js_of_expression ed) fl (js_of_expression body)
+  | Texp_record     (llde,_)          -> ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, js_of_expression exp)) llde)
   | Texp_match      (_,_,_, Partial)  -> out_of_scope "partial matching"
   | Texp_match      (_,_,_,_)         -> out_of_scope "matching with exception branches"
   | Texp_try        (_,_)             -> out_of_scope "exceptions"
   | Texp_function   (_,_,_)           -> out_of_scope "powered-up functions"
   | Texp_variant    (_,_)             -> out_of_scope "polymorphic variant"
-  | Texp_record     (_, _)            -> out_of_scope "records"
   | Texp_field      (_,_,_)           -> out_of_scope "accessing field"
   | Texp_setfield   (_,_,_,_)         -> out_of_scope "setting field"
   | Texp_send       (_,_,_)           -> out_of_scope "objects"
