@@ -53,4 +53,4 @@ let _ =
       | Some (parsetree1, (typedtree1,_)) -> parsetree1, typedtree1
       in
 
-   file_put_contents outputfile (Js_of_ast.js_of_structure typedtree1) 
+   file_put_contents outputfile (Js_of_ast.to_javascript typedtree1) 
