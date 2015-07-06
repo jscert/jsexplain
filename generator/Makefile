@@ -7,6 +7,7 @@
 # OCAMLLIB=~/shared/ocamleasy/lib
 
 ML_DIRS     := lex parsing tools typing utils stdlib_ml
+LIB_DEP	    := str.cma
 STD_DIR	    := stdlib_ml
 TEST_DIR    := tests
 TEST_DIR_JS := tests/js
@@ -14,6 +15,7 @@ ML_TESTS    := $(wildcard $(TEST_DIR)/*.ml)
 
 CC          := ocamlc -c
 OCAMLBUILD  := ocamlbuild -r -j 4 -classic-display \
+	           $(addprefix -lflag , $(LIB_DEP)) \
 	           $(addprefix -I ,$(ML_DIRS)) \
 
 all: main.byte

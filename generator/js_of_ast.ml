@@ -9,10 +9,12 @@ open Location
 open Lexing
 open Mytools
 open Attributes
+open Log
 
 let hashtbl_size = 256
 let type_tbl   = Hashtbl.create hashtbl_size
 let record_tbl = Hashtbl.create hashtbl_size
+module L = Logged (Token_generator) (struct let size = 256 end)
   
 (**
  * Debug-purpose functions
@@ -21,8 +23,8 @@ let record_tbl = Hashtbl.create hashtbl_size
 let print_type_tbl () =
   let rec print_str_list = function
     | [] -> ""
-    | x :: [] -> (Format.sprintf {|"%s"|} x)
-    | x :: xs -> (Format.sprintf {|"%s", |} x) ^ print_str_list xs
+    | x :: [] -> (Printf.sprintf {|"%s"|} x)
+    | x :: xs -> (Printf.sprintf {|"%s", |} x) ^ print_str_list xs
   in Hashtbl.iter (fun cstr elems -> Printf.printf ({|%s -> [%s]|} ^^ "\n") cstr (print_str_list elems)) type_tbl; ()
 
 (**
@@ -44,55 +46,55 @@ let is_sbool x = List.mem x ["true" ; "false"]
  *)
 
 let ppf_lambda_wrap s =
-  Format.sprintf "@[<v 0>function () {@,@[<v 4>@,%s@]@,}()@]" s
+  Printf.sprintf "@[<v 0>function () {@,@[<v 2>@,%s@]@,}()@]" s
   
 let ppf_branch case binders expr =
-  Format.sprintf "@[<v 2>%s: @[<v 4>%s@,return %s;@]@,@]"
+  Printf.sprintf "@[<v 1>%s: @[<v 2>%s@,return %s;@]@,@]"
     case binders expr
 
 let ppf_let_in decl exp =
   let s =
-    Format.sprintf "%s@,@,return %s;"
+    Printf.sprintf "%s@,@,return %s;"
       decl exp
   in ppf_lambda_wrap s
 
 let ppf_function args body=
-  Format.sprintf "@[function (%s) {@,@[<v 4>@,return %s;@,@]@,}@]"
+  Printf.sprintf "@[function (%s) {@,@[<v 2>@,return %s;@,@]@,}@]"
     args body
 
 let ppf_apply f args =
-  Format.sprintf "@[<v 0>%s(%s)@]"
+  Printf.sprintf "@[<v 0>%s(%s)@]"
     f args
 
 let ppf_match value cases =
   let s =
-    Format.sprintf "switch (%s.type) {@,@[<v 4>@,%s@,@]@,}@]@,}"
+    Printf.sprintf "switch (%s.type) {@,@[<v 2>@,%s@,@]@,}"
       value cases
   in ppf_lambda_wrap s
 
-(*  Format.sprintf "@[<v 0>(function () {@,@[<v 4>@,switch (%s.type) {@,@[<v 4>@,%s@,@]@,}@]@,})()@]"
+(*  Format.sprintf "@[<v 0>(function () {@,@[<v 2>@,switch (%s.type) {@,@[<v 2>@,%s@,@]@,}@]@,})()@]"
     value cases*)
 
 let ppf_array values =
-  Format.sprintf "[%s]"
+  Printf.sprintf "[%s]"
     values
 
 let ppf_tuple = ppf_array
     
 let ppf_ifthen cond iftrue =
-  Format.sprintf "@[<v 0>(function () {@,@[<v 4>@,if (%s) {@,@[<v 4>@,return  %s;@]@,}@]@,})()@]"
+  Printf.sprintf "@[<v 0>(function () {@,@[<v 2>@,if (%s) {@,@[<v 2>@,return  %s;@]@,}@]@,})()@]"
     cond iftrue
 
 let ppf_ifthenelse cond iftrue iffalse =
-  Format.sprintf "@[<v 0>(function () {@,@[<v 4>@,if (%s) {@,@[<v 4>@,return  %s;@]@,} else {@,@[<v 4>@,return  %s;@]@,}@]@]@,})()@]"
+  Printf.sprintf "@[<v 0>(function () {@,@[<v 2>@,if (%s) {@,@[<v 2>@,return  %s;@]@,} else {@,@[<v 2>@,return  %s;@]@,}@]@]@,})()@]"
     cond iftrue iffalse
 
 let ppf_sequence exp1 exp2 =
-  Format.sprintf "@[<v 0>return %s,@,%s@]"
+  Printf.sprintf "@[<v 0>return %s,@,%s@]"
     exp1 exp2
 
 let ppf_while cd body =
-  Format.sprintf "@[<v 0> function () {@,@[<v 3>@,while(%s) {@,@[<v 4>@,%s@]@]@,@]}@,)()@]"
+  Printf.sprintf "@[<v 0> function () {@,@[<v 1>@,while(%s) {@,@[<v 2>@,%s@]@]@,@]}@,)()@]"
     cd body
     
 let ppf_for id start ed flag body =
@@ -102,61 +104,40 @@ let ppf_for id start ed flag body =
   let fl_to_symbl = function
     | Upto   -> "<="
     | Downto -> ">="
-  in Format.sprintf "@[<v 0>(function () {@,@[<v 3>@,for (%s = %s ; %s %s %s ; %s%s) {@,@[@,%s @]@,} @,@]})() @]"
+  in Printf.sprintf "@[<v 0>(function () {@,@[<v 3>@,for (%s = %s ; %s %s %s ; %s%s) {@,@[@,%s @]@,} @,@]})() @]"
   id start id (fl_to_symbl flag) ed (fl_to_string flag)  id body
 
 let ppf_single_cstr tag =
-  Format.sprintf "%s"
+  Printf.sprintf "%s"
     tag
 
 let ppf_cstr tag value =
-  Format.sprintf "%s: %s"
+  Printf.sprintf "%s: %s"
     tag value
 
 let ppf_single_cstrs typ =
-   Format.sprintf "{type: \"%s\"}"
+   Printf.sprintf "{type: \"%s\"}"
      typ
       
 let ppf_multiple_cstrs typ rest =
-  Format.sprintf "{type: \"%s\", %s}"
+  Printf.sprintf "{type: \"%s\", %s}"
     typ rest
 
 let ppf_record llde =
   let rec aux acc = function
-    | []               -> Format.sprintf "@[<v 0>{@,@[<v 4>@,%s@,@]}@]" acc
-    | (lbl, exp) :: [] -> aux (acc ^ Format.sprintf "%s: %s" lbl exp) []
-    | (lbl, exp) :: xs -> aux (acc ^ Format.sprintf "%s: %s,@," lbl exp) xs
+    | []               -> Printf.sprintf "@[<v 0>{@,@[<v 2>@,%s@,@]}@]" acc
+    | (lbl, exp) :: [] -> aux (acc ^ Printf.sprintf "%s: %s" lbl exp) []
+    | (lbl, exp) :: xs -> aux (acc ^ Printf.sprintf "%s: %s,@," lbl exp) xs
   in aux "" llde
-    
-(**
- * Log Part
- *)
-
-module Log :
-sig
-  val status : unit -> bool
-  val init_log : unit -> unit
-  val toggle : string -> unit
-end
-  =
-struct
-  let s = ref false
-
-  let status () = !s
-  let init_log () = s := false
-  let toggle update = match update with
-    | "logged"   ->  s := true;
-    | "unlogged" ->  s := false;
-    | _          ->  ();
-end
     
 (**
  * Main part
  *)
 
 let rec to_javascript typedtree =
-  js_of_structure typedtree
-(** + Log related post processing **)
+  let pre_res = js_of_structure typedtree in
+  L.logged_output pre_res
+                                           
   
 and show_value_binding vb =
   js_of_let_pattern vb.vb_pat vb.vb_expr
@@ -165,7 +146,7 @@ and js_of_structure s =
   show_list_f js_of_structure_item lin2 s.str_items
     
 and js_of_structure_item s = match s.str_desc with
-  | Tstr_eval (e, _)     -> Format.sprintf "%s" @@ js_of_expression e
+  | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression e
   | Tstr_value (_, vb_l) -> String.concat lin2 @@ List.map show_value_binding @@ vb_l
   | Tstr_type tl ->
    let explore_type = function
@@ -191,12 +172,7 @@ and js_of_structure_item s = match s.str_desc with
   | Tstr_class      _ -> out_of_scope "objects"
   | Tstr_class_type _ -> out_of_scope "class types"
   | Tstr_include    _ -> out_of_scope "includes"
-  | Tstr_attribute  attrs ->
-    let log_status =
-      match extract_attr attrs with
-      | [] -> ""
-      | x :: xs -> x
-    in Log.toggle log_status; ""
+  | Tstr_attribute  attrs -> out_of_scope "attributes"
 
 and js_of_branch b obj =
   let spat, binders = js_of_pattern b.c_lhs obj in
@@ -302,14 +278,14 @@ and js_of_let_pattern pat expr =
   let sexpr = js_of_expression expr in
   match pat.pat_desc with
   | Tpat_var (id, _) ->
-     Format.sprintf "@[<v 0>var %s = %s;@,@]" (Ident.name id) sexpr
+     Printf.sprintf "@[<v 0>var %s = %s;@,@]" (Ident.name id) sexpr
   | Tpat_tuple (pat_l)
   | Tpat_array (pat_l) ->
      let l = List.map (function pat -> match pat.pat_desc with
                                        | Tpat_var (id, _) -> (Ident.name id, string_of_type_exp pat.pat_type)
                                        | _ -> out_of_scope "pattern-matching in arrays") pat_l in
-     Format.sprintf "@[<v 0>var __%s = %s;@,@]" "array" sexpr ^
-       List.fold_left2 (fun acc (name, exp_type) y -> acc ^ Format.sprintf "@[<v 0>var %s = __%s[%d];@,@]" name "array" y)
+     Printf.sprintf "@[<v 0>var __%s = %s;@,@]" "array" sexpr ^
+       List.fold_left2 (fun acc (name, exp_type) y -> acc ^ Printf.sprintf "@[<v 0>var %s = __%s[%d];@,@]" name "array" y)
                        "" l @@ range 0 (List.length l - 1)
   | _ -> error "let can't deconstruct values"
 
@@ -321,11 +297,11 @@ and js_of_pattern pat obj = match pat.pat_desc with
   | Tpat_tuple (_) -> out_of_scope "tuple matching"
   | Tpat_construct (loc, cd, el) ->
      let c = js_of_longident loc in
-     let spat = Format.sprintf "%s" ("case \"" ^ c ^ "\"") in
+     let spat = Printf.sprintf "%s" ("case \"" ^ c ^ "\"") in
      let params = Hashtbl.find type_tbl c in
      let binders =
-       if List.length el = 0 then Format.sprintf ""
-       else Format.sprintf "%s@," ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern x obj)) el) params) ^ ";") in
+       if List.length el = 0 then Printf.sprintf ""
+       else Printf.sprintf "%s@," ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern x obj)) el) params) ^ ";") in
      spat, binders
   | Tpat_variant (_,_,_) -> out_of_scope "polymorphic variants in pattern matching"
   | Tpat_array (_) -> out_of_scope "array-match"
