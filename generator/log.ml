@@ -121,9 +121,9 @@ struct
       | (None, str)   :: xs -> Buffer.add_string buf str;
                                aux xs                   
       | (Some x, str) :: xs -> let log_info = match Hashtbl.find info_tbl x with
-                                 | Add x   -> "print (\"Variable x has been introduced with value: \"); print(x);@,"
-                                 | Redef x -> "print (\"Variable x has been redefined with value: \"); print(x);@,"
-                                 | Del x   -> "print (\"Variable x has been deleted from the context \");@,"
+                                 | Add x   -> "@[<v 0>@,print (\"Variable " ^ x ^ " has been introduced with value: \");@,print("^ x ^");@,@]"
+                                 | Redef x -> "print (\"Variable " ^ x ^ " has been redefined with value: \"); print("^ x ^");@,"
+                                 | Del x   -> "print (\"Variable " ^ x ^ " has been deleted from the context \");@,"
                                in Buffer.add_string buf str;
                                   Buffer.add_string buf log_info;
                                   aux xs

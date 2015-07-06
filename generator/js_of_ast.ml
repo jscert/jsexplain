@@ -11,6 +11,7 @@ open Mytools
 open Attributes
 open Log
 
+  
 let hashtbl_size = 256
 let type_tbl   = Hashtbl.create hashtbl_size
 let record_tbl = Hashtbl.create hashtbl_size
@@ -28,7 +29,7 @@ let print_type_tbl () =
   in Hashtbl.iter (fun cstr elems -> Printf.printf ({|%s -> [%s]|} ^^ "\n") cstr (print_str_list elems)) type_tbl; ()
 
 (**
- * Useful functions (shadow show_list from Mytools)
+ * Useful functions (Warning: shadows `show_list' from Mytools)
  *)
     
 let show_list_f f sep l = l
@@ -39,7 +40,15 @@ let show_list sep l =
   List.fold_left (fun acc x -> acc ^ (if acc = "" then "" else sep) ^ x) "" l
 
 let is_sbool x = List.mem x ["true" ; "false"] 
-    
+
+let is_infix f args = match args with
+  | _ :: [] | [] -> false
+  | x :: xs ->
+     let open Location in
+     let f_loc = (f.exp_loc.loc_start, f.exp_loc.loc_end) in
+     let args_loc = (x.exp_loc.loc_start, x.exp_loc.loc_end) in
+     if fst args_loc < fst f_loc then true else false
+                                               
 (**
  * Before-hand definitions of Pretty-Printer-Format for converting ocaml
  * to ECMAScript, therefore all of them are in a single place.
@@ -66,6 +75,10 @@ let ppf_apply f args =
   Printf.sprintf "@[<v 0>%s(%s)@]"
     f args
 
+let ppf_apply_infix f arg1 arg2 =
+  Printf.sprintf "@[<v 0>%s %s %s@]"
+                 arg1 f arg2
+    
 let ppf_match value cases =
   let s =
     Printf.sprintf "switch (%s.type) {@,@[<v 2>@,%s@,@]@,}"
@@ -196,11 +209,14 @@ and js_of_expression e = match e.exp_desc with
     let args, body = explore [c.c_lhs] c.c_rhs
     in ppf_function args body
   | Texp_apply (f, exp_l)                 ->
-    let sl = exp_l
-          |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope "optional apply arguments" | Some ei -> js_of_expression ei)
-          |> String.concat ", " in
-     let se = js_of_expression f in
-     ppf_apply se sl
+     let sl' = exp_l
+               |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope "optional apply arguments" | Some ei -> ei) in
+     let sl = exp_l
+              |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope "optional apply arguments" | Some ei -> js_of_expression ei) in
+    let se = js_of_expression f in
+    if is_infix f sl' && List.length exp_l = 2
+    then ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
+    else ppf_apply se (String.concat ", " sl)
   | Texp_match (exp, l, [], Total) ->
      let se = js_of_expression exp in
      let sb = List.fold_left (fun acc x -> acc ^ js_of_branch x se) "" l in
@@ -278,7 +294,7 @@ and js_of_let_pattern pat expr =
   let sexpr = js_of_expression expr in
   match pat.pat_desc with
   | Tpat_var (id, _) ->
-     Printf.sprintf "@[<v 0>var %s = %s;@,@]" (Ident.name id) sexpr
+     L.log_line (Printf.sprintf "@[<v 0>var %s = %s;@,@]" (Ident.name id) sexpr) (L.Add (Ident.name id))
   | Tpat_tuple (pat_l)
   | Tpat_array (pat_l) ->
      let l = List.map (function pat -> match pat.pat_desc with
