@@ -53,4 +53,7 @@ let _ =
       | Some (parsetree1, (typedtree1,_)) -> parsetree1, typedtree1
       in
 
-   file_put_contents outputfile (Js_of_ast.to_javascript typedtree1) 
+      let (logged, unlogged, pre) = Js_of_ast.to_javascript typedtree1 in
+      file_put_contents outputfile unlogged
+      
+                                    

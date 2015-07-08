@@ -52,14 +52,14 @@ struct
   type token_info = ctx_operation
                                   
   let info_tbl = Hashtbl.create Sz.size
-  let token_delim = "%"
+  let token_delim = "|"
 
   let token_re =
     regexp (token_delim ^ "[0-9]+" ^ token_delim)
   let endline_re =
-    regexp "@,"
-  let dbl_lf =
-    regexp "\n\ *\n"
+    regexp "\n"
+  let lfs =
+    regexp "\n\\(\\( \\)*\n\\)*"
 
   let free_token = G.withdraw
            
@@ -68,7 +68,7 @@ struct
     let endline =
       let rec aux i =
         if i < len - 1 then
-          if str.[i] = '@' && str.[i + 1] = ','
+          if str.[i] = '\n'
           then i
           else aux (i + 1)
         else len
@@ -81,11 +81,11 @@ struct
   let token_from_line l =
     let len = String.length l in
     let rec extract i acc = match l.[i] with
-      | '%' -> G.build acc
+      | '|' -> G.build acc
       | '0'..'9' -> extract (i - 1) (int_of_char l.[i] * 10 + acc)
       | _ -> None
     in
-    if l.[len - 1] = '%' then extract (len - 2) 0
+    if l.[len - 1] = '|' then extract (len - 2) 0
     else None
 
   let log_line str ctx =
@@ -101,7 +101,7 @@ struct
       List.fold_left
         (fun acc x -> match search_forward token_re x 0 with
                       | exception Not_found -> (None, x) :: acc
-                      | _  -> let m = matched_string x in
+                      | _  ->  let m = matched_string x in
                               let m_len = String.length m
                               in (Some (G.token_of_string (String.sub m 1 (m_len - 2))) , String.sub x 0 (String.length x - m_len)) :: acc
         ) [] lines in
@@ -109,39 +109,38 @@ struct
       let rec build start = match (search_forward endline_re s start) with
         | n -> n :: build (n + 1)
         | exception not_Found -> []
-                    in build 0 in
+      in build 0 in
     let lines_list = snd @@ List.fold_left (fun (st, acc) ed -> (ed, String.sub s st (ed - st) :: acc)) (0, []) (end_line_markers s)
-    in append_token lines_list  
-                                                         
+    in append_token lines_list
+                    
   let add_log_info s =
     let buf = Buffer.create 16 in
     let ls = lines s in
-    let rec aux = function
+    let rec aux i = function
       | [] -> ()
       | (None, str)   :: xs -> Buffer.add_string buf str;
-                               aux xs                   
-      | (Some x, str) :: xs -> let log_info = match Hashtbl.find info_tbl x with
-                                 | Add x   -> "@[<v 0>@,print (\"Variable " ^ x ^ " has been introduced with value: \");@,print("^ x ^");@,@]"
-                                 | Redef x -> "print (\"Variable " ^ x ^ " has been redefined with value: \"); print("^ x ^");@,"
-                                 | Del x   -> "print (\"Variable " ^ x ^ " has been deleted from the context \");@,"
-                               in Buffer.add_string buf str;
-                                  Buffer.add_string buf log_info;
-                                  aux xs
-    in aux ls; Buffer.contents buf
-
+                               aux (i + 1) xs
+      | (Some l, str) :: xs -> let log_info = match Hashtbl.find info_tbl l with
+                                 | Add x   -> "\nprint (" ^ string_of_int i ^ " + \": Variable\" " ^ x ^ ");\n"
+                                 | Redef x -> "o"
+                                 | Del x   -> "a"
+                               in Buffer.add_string buf str; Buffer.add_string buf log_info;
+                                  aux (i + 1) xs
+    in aux 1 ls; Buffer.contents buf
+                                 
   let logged_output s =
     let str_ppf = Format.str_formatter in
-    let logged_info = add_log_info s in
-    Format.fprintf str_ppf (Scanf.format_from_string logged_info "");
+    Format.fprintf str_ppf (Scanf.format_from_string s "");
     let bad_output = Format.flush_str_formatter () in
-    global_replace dbl_lf "\n" bad_output
+    let pretty_output = global_replace lfs "\n" bad_output in
+    add_log_info pretty_output
 
   let unlogged_output s =
     let str_ppf = Format.str_formatter in
     let unlogged_info = strip_log_info s in
     Format.fprintf str_ppf (Scanf.format_from_string unlogged_info "");
     let bad_output = Format.flush_str_formatter () in
-    global_replace dbl_lf "\n" bad_output
+    global_replace lfs "\n" bad_output
     
     
 end

@@ -1,15 +1,16 @@
-open Misc
 open Asttypes
+open Attributes
+open Env
+open Format
+open Lexing
+open Location
+open Log
+open Longident
+open Misc
+open Mytools
+open Print_type
 open Types
 open Typedtree
-open Longident
-open Format
-open Print_type
-open Location
-open Lexing
-open Mytools
-open Attributes
-open Log
 
   
 let hashtbl_size = 256
@@ -28,6 +29,9 @@ let print_type_tbl () =
     | x :: xs -> (Printf.sprintf {|"%s", |} x) ^ print_str_list xs
   in Hashtbl.iter (fun cstr elems -> Printf.printf ({|%s -> [%s]|} ^^ "\n") cstr (print_str_list elems)) type_tbl; ()
 
+let env_diff_names env1 env2 =
+  List.map Ident.name (Env.diff env1 env2)
+                                                                                                                     
 (**
  * Useful functions (Warning: shadows `show_list' from Mytools)
  *)
@@ -55,20 +59,20 @@ let is_infix f args = match args with
  *)
 
 let ppf_lambda_wrap s =
-  Printf.sprintf "@[<v 0>function () {@,@[<v 2>@,%s@]@,}()@]" s
+  Printf.sprintf "@[<v 0>function () {@,%s@,}()@]" s
   
 let ppf_branch case binders expr =
-  Printf.sprintf "@[<v 1>%s: @[<v 2>%s@,return %s;@]@,@]"
+  Printf.sprintf "@[<v 1>%s: @[<v 2>%s@,return %s;@,@]@,@,@]"
     case binders expr
 
 let ppf_let_in decl exp =
   let s =
-    Printf.sprintf "%s@,@,return %s;"
+    Printf.sprintf "@[<v 2>%s@,@,return %s;@]"
       decl exp
   in ppf_lambda_wrap s
 
 let ppf_function args body=
-  Printf.sprintf "@[function (%s) {@,@[<v 2>@,return %s;@,@]@,}@]"
+  Printf.sprintf "@[<v 0>function (%s) {@,@[<v 2>@,return %s;@,@]@,}@]"
     args body
 
 let ppf_apply f args =
@@ -148,19 +152,21 @@ let ppf_record llde =
  *)
 
 let rec to_javascript typedtree =
-  let pre_res = js_of_structure typedtree in
-  L.logged_output pre_res
+  let pre_res = js_of_structure Env.empty typedtree in
+  L.logged_output pre_res, L.unlogged_output pre_res, pre_res
                                            
   
-and show_value_binding vb =
-  js_of_let_pattern vb.vb_pat vb.vb_expr
+and show_value_binding old_env vb =
+  js_of_let_pattern old_env vb.vb_pat vb.vb_expr
     
-and js_of_structure s =
-  show_list_f js_of_structure_item lin2 s.str_items
+and js_of_structure old_env s =
+  show_list_f (fun strct -> js_of_structure_item old_env strct) lin2 s.str_items
     
-and js_of_structure_item s = match s.str_desc with
-  | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression e
-  | Tstr_value (_, vb_l) -> String.concat lin2 @@ List.map show_value_binding @@ vb_l
+and js_of_structure_item old_env s =
+  let new_env = s.str_env in
+  match s.str_desc with
+  | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression new_env e
+  | Tstr_value (_, vb_l) -> String.concat lin2 @@ List.map (fun vb -> show_value_binding new_env vb) @@ vb_l
   | Tstr_type tl ->
    let explore_type = function
       | [] -> ()
@@ -187,17 +193,19 @@ and js_of_structure_item s = match s.str_desc with
   | Tstr_include    _ -> out_of_scope "includes"
   | Tstr_attribute  attrs -> out_of_scope "attributes"
 
-and js_of_branch b obj =
+and js_of_branch old_env b obj =
   let spat, binders = js_of_pattern b.c_lhs obj in
-  let se = js_of_expression b.c_rhs in
+  let se = js_of_expression old_env b.c_rhs in
   ppf_branch spat binders se
     
-and js_of_expression e = match e.exp_desc with
+and js_of_expression old_env e =
+  let new_env = e.exp_env in
+  match e.exp_desc with
   | Texp_ident (_, loc,  _)           -> js_of_longident loc
   | Texp_constant c                   -> js_of_constant c
   | Texp_let   (_, vb_l, e)           ->
-    let sd = String.concat lin1 @@ List.map show_value_binding @@ vb_l in
-    let se = js_of_expression e
+    let sd = String.concat lin1 @@ List.map (fun vb -> show_value_binding new_env vb) @@ vb_l in
+    let se = js_of_expression new_env e
     in ppf_let_in sd se
   | Texp_function (_, c :: [], Total) ->
     let rec explore pats e = match e.exp_desc with
@@ -205,23 +213,23 @@ and js_of_expression e = match e.exp_desc with
         let p, e = c.c_lhs, c.c_rhs
         in explore (p :: pats) e
       | _                                 ->
-        String.concat ", " @@ List.map ident_of_pat @@ List.rev @@ pats, js_of_expression e in
+        String.concat ", " @@ List.map ident_of_pat @@ List.rev @@ pats, js_of_expression new_env e in
     let args, body = explore [c.c_lhs] c.c_rhs
     in ppf_function args body
   | Texp_apply (f, exp_l)                 ->
      let sl' = exp_l
                |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope "optional apply arguments" | Some ei -> ei) in
      let sl = exp_l
-              |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope "optional apply arguments" | Some ei -> js_of_expression ei) in
-    let se = js_of_expression f in
+              |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope "optional apply arguments" | Some ei -> js_of_expression new_env ei) in
+    let se = js_of_expression new_env f in
     if is_infix f sl' && List.length exp_l = 2
     then ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
     else ppf_apply se (String.concat ", " sl)
   | Texp_match (exp, l, [], Total) ->
-     let se = js_of_expression exp in
-     let sb = List.fold_left (fun acc x -> acc ^ js_of_branch x se) "" l in
+     let se = js_of_expression new_env exp in
+     let sb = List.fold_left (fun acc x -> acc ^ js_of_branch old_env x se) "" l in
      ppf_match se sb
-  | Texp_tuple (tl)               -> ppf_tuple @@ show_list_f js_of_expression ", " tl
+  | Texp_tuple (tl)               -> ppf_tuple @@ show_list_f (fun exp -> js_of_expression new_env exp) ", " tl
   | Texp_construct (loc, cd, el) ->
         let value = js_of_longident loc in
         if el = [] then
@@ -234,14 +242,14 @@ and js_of_expression e = match e.exp_desc with
             | [], x :: xs | x :: xs , [] -> failwith "argument lists should have the same length."
             | x :: xs, y :: ys -> (if y = "" then ppf_single_cstr x else ppf_cstr x y) :: expand_constructor_list xs ys in
           let names = Hashtbl.find type_tbl value
-             in ppf_multiple_cstrs value (show_list ", " (expand_constructor_list names (List.map js_of_expression el)))
-  | Texp_array      (exp_l)           -> ppf_array @@ show_list_f js_of_expression ", " exp_l
-  | Texp_ifthenelse (e1, e2, None)    -> ppf_ifthen (js_of_expression e1) (js_of_expression e2)
-  | Texp_ifthenelse (e1, e2, Some e3) -> ppf_ifthenelse (js_of_expression e1) (js_of_expression e2) (js_of_expression e3)
-  | Texp_sequence   (e1, e2)          -> ppf_sequence (js_of_expression e1) (js_of_expression e2)
-  | Texp_while      (cd, body)        -> ppf_while (js_of_expression cd) (js_of_expression body)
-  | Texp_for        (id, _, st, ed, fl, body) -> ppf_for (Ident.name id) (js_of_expression st) (js_of_expression ed) fl (js_of_expression body)
-  | Texp_record     (llde,_)          -> ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, js_of_expression exp)) llde)
+             in ppf_multiple_cstrs value (show_list ", " (expand_constructor_list names (List.map (fun exp -> js_of_expression new_env exp) el)))
+  | Texp_array      (exp_l)           -> ppf_array @@ show_list_f (fun exp -> js_of_expression new_env exp) ", " exp_l
+  | Texp_ifthenelse (e1, e2, None)    -> ppf_ifthen (js_of_expression new_env e1) (js_of_expression new_env e2)
+  | Texp_ifthenelse (e1, e2, Some e3) -> ppf_ifthenelse (js_of_expression new_env e1) (js_of_expression new_env e2) (js_of_expression new_env e3)
+  | Texp_sequence   (e1, e2)          -> ppf_sequence (js_of_expression new_env e1) (js_of_expression new_env e2)
+  | Texp_while      (cd, body)        -> ppf_while (js_of_expression new_env cd) (js_of_expression new_env body)
+  | Texp_for        (id, _, st, ed, fl, body) -> ppf_for (Ident.name id) (js_of_expression new_env st) (js_of_expression new_env ed) fl (js_of_expression new_env body)
+  | Texp_record     (llde,_)          -> ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, js_of_expression new_env exp)) llde)
   | Texp_match      (_,_,_, Partial)  -> out_of_scope "partial matching"
   | Texp_match      (_,_,_,_)         -> out_of_scope "matching with exception branches"
   | Texp_try        (_,_)             -> out_of_scope "exceptions"
@@ -277,7 +285,7 @@ and ident_of_pat pat = match pat.pat_desc with
   | Tpat_var (id, _) -> Ident.name id
   | _ -> error "functions can't deconstruct values"
     
-and js_of_let_pattern pat expr = 
+and js_of_let_pattern old_env pat expr =
   let expr_type pat expr = match expr.exp_desc with
     | Texp_construct (loc, cd, el) ->
        let value = js_of_longident loc in
@@ -289,12 +297,12 @@ and js_of_let_pattern pat expr =
            | [], x :: xs | x :: xs , [] -> failwith "argument lists should have the same length."
            | x :: xs, y :: ys ->  ppf_cstr  x y :: expand_constructor_list xs ys in
          let names = Hashtbl.find type_tbl value
-         in ppf_multiple_cstrs value (show_list ", " (expand_constructor_list names (List.map js_of_expression el)))
+         in ppf_multiple_cstrs value (show_list ", " (expand_constructor_list names (List.map (fun exp -> js_of_expression old_env exp) el)))
     | _ -> string_of_type_exp pat.pat_type in
-  let sexpr = js_of_expression expr in
+  let sexpr = js_of_expression old_env expr in
   match pat.pat_desc with
   | Tpat_var (id, _) ->
-     L.log_line (Printf.sprintf "@[<v 0>var %s = %s;@,@]" (Ident.name id) sexpr) (L.Add (Ident.name id))
+     Printf.sprintf "@[<v 0>var %s = %s;@,@]" (Ident.name id) sexpr
   | Tpat_tuple (pat_l)
   | Tpat_array (pat_l) ->
      let l = List.map (function pat -> match pat.pat_desc with
@@ -316,7 +324,7 @@ and js_of_pattern pat obj = match pat.pat_desc with
      let spat = Printf.sprintf "%s" ("case \"" ^ c ^ "\"") in
      let params = Hashtbl.find type_tbl c in
      let binders =
-       if List.length el = 0 then Printf.sprintf ""
+       if List.length el = 0 then ""
        else Printf.sprintf "%s@," ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern x obj)) el) params) ^ ";") in
      spat, binders
   | Tpat_variant (_,_,_) -> out_of_scope "polymorphic variants in pattern matching"
