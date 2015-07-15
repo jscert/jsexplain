@@ -1,3 +1,5 @@
+open Stack
+
 type expr =
   | Const [@f value] of int
   | Add [@f left, right] of expr * expr
