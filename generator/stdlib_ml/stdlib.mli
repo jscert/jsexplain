@@ -21,5 +21,6 @@ val ( >= ) : 'a -> 'a -> 'a
 
 val print : 'a -> unit
 
+val stuck : string -> 'a 
 val to_string : 'a -> string
 val parse : 'a -> 'b

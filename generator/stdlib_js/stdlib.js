@@ -12,6 +12,8 @@ var geq = function (a, b) { return a >= b }
 
 var print = function (x) { console.log(x) }
 
+var stuck = function (msg) { throw {type:'stuck', msg:msg} }
+
 var to_string = function (x) { return String(x) }
 
 var parse = function (source) {

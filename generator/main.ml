@@ -44,6 +44,8 @@ let _ =
      | Some f -> f
    in
 
+   Printf.printf "sf: %s\n" sourcefile;
+
    (*---------------------------------------------------*)
    (* "reading and typing source file" *)
    let (opt, inputfile) = process_implementation_file ppf sourcefile in
@@ -55,5 +57,3 @@ let _ =
 
       let (logged, unlogged, pre) = Js_of_ast.to_javascript typedtree1 in
       file_put_contents outputfile unlogged
-      
-                                    
