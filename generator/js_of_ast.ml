@@ -14,8 +14,9 @@ open Typedtree
 
   
 let hashtbl_size = 256
-let type_tbl   = Hashtbl.create hashtbl_size
-let record_tbl = Hashtbl.create hashtbl_size
+let type_tbl     = Hashtbl.create hashtbl_size
+let record_tbl   = Hashtbl.create hashtbl_size
+let module_list  = ref []
 module L = Logged (Token_generator) (struct let size = 256 end)
   
 (**
@@ -48,50 +49,6 @@ let rec list_of_ident_from_summary = function
   | Env_cltype (sum,_,_)
   | Env_open (sum,_)
   | Env_functor_arg (sum,_) -> list_of_ident_from_summary sum
-           
-(** Those functions might be deleted 
-         
-type 'a diff =
-    'a list (* Removed from the reference *)
-    * 'a list (* Added to the reference *)
-
-let rec set_inter set1 set2 =
-  (** Set are supposed sorted **)
-  match set1, set2 with
-  | [], [] | _, [] | [], _ -> []
-  | x :: xs, y :: ys ->
-     if x = y then x :: set_inter xs ys
-     else if x < y then set_inter xs set2
-     else set_inter set1 ys
-
-let rec set_minus set_ref min =
-  (** Set are supposed sorted **)
-  match set_ref, min with
-  | [], _ -> []
-  | xs, [] -> xs
-  | x :: xs, y :: ys ->
-     if x = y then set_minus xs ys
-     else if x < y then x :: set_minus xs min
-     else set_minus set_ref ys
-                    
-let env_diff env_ref env : string diff =
-  let sum_ref = Env.summary env_ref in
-  let sum_new = Env.summary env in
-  let ident_ref = list_of_ident_from_summary sum_ref
-                  |> List.map Ident.unique_name
-                  |> List.sort compare in
-  let ident_new = list_of_ident_from_summary sum_new
-                  |> List.map Ident.unique_name
-                  |> List.sort compare in
-  let inter = set_inter ident_ref ident_new in
-  let del = set_minus ident_ref inter in
-  let ins = set_minus ident_new inter in
-  (del, ins)
-
-  let print_diff env1 env2 =
-    let (del, ins) = env_diff env1 env2 in
-    Printf.printf "del: %s ; ins: %s\n" (print_name_list del) (print_name_list ins)
- *)
 
 let print_name_list l =
   let rec aux = function
@@ -134,7 +91,7 @@ let is_infix f args = match args with
  *)
 
 let ppf_lambda_wrap s =
-  Printf.sprintf "@[<v 0>function () {@,%s@,}()@]" s
+  Printf.sprintf "function () {@,%s@,}()" s
   
 let ppf_branch case binders expr =
   Printf.sprintf "@[<v 1>%s: @[<v 2>%s@,return %s;@,@]@,@,@]"
@@ -147,7 +104,7 @@ let ppf_let_in decl exp =
   in ppf_lambda_wrap s
 
 let ppf_function args body=
-  Printf.sprintf "@[<v 0>function (%s) {@,@[<v 2>@,return %s;@,@]@,}@]"
+  Printf.sprintf "function (%s) {@,@,@[<v 2>@,return %s;@,@]@,}"
                  args body
 
 let ppf_apply f args =
@@ -171,15 +128,15 @@ let ppf_array values =
 let ppf_tuple = ppf_array
     
 let ppf_ifthen cond iftrue =
-  Printf.sprintf "@[<v 0>(function () {@,@[<v 2>@,if (%s) {@,@[<v 2>@,return  %s;@]@,}@]@,})()@]"
+  Printf.sprintf "(function () {@,@,@[<v 2>@,if (%s) {@,@[<v 2>@,return  %s;@]@,}@]@,})()"
                  cond iftrue
 
 let ppf_ifthenelse cond iftrue iffalse =
-  Printf.sprintf "@[<v 0>(function () {@,@[<v 2>@,if (%s) {@,@[<v 2>@,return  %s;@]@,} else {@,@[<v 2>@,return  %s;@]@,}@]@,})()@]"
+  Printf.sprintf "(function () {@,@,@[<v 2>@,if (%s) {@,@[<v 2>@,return  %s;@]@,} else {@,@[<v 2>@,return  %s;@]@,}@]@,})()"
                  cond iftrue iffalse
 
 let ppf_sequence exp1 exp2 =
-  Printf.sprintf "@[<v 0>return %s,@,%s@]"
+  Printf.sprintf "return %s,@,%s"
                  exp1 exp2
 
 let ppf_while cd body =
@@ -223,9 +180,10 @@ let ppf_record llde =
     | (lbl, exp) :: xs -> aux (acc ^ Printf.sprintf "%s: %s,@," lbl exp) xs
   in aux "" llde
 
-let ppf_decl id expr =
-  Printf.sprintf "@[<v 0>var %s = %s;@,@]" 
-                 id expr
+let ppf_decl ?mod_gen:(mod_gen=false) id expr =
+  let assign_op, decl_kw = if mod_gen = false then "=", "var" else ":","" in 
+  Printf.sprintf "@[<v 0>%s %s %s %s;@,@]" 
+                 decl_kw id assign_op expr
 
 let ppf_pat_array id_list array_expr =
   Printf.sprintf "@[<v 0>var __%s = %s;@,@]" "array" array_expr ^
@@ -238,20 +196,32 @@ let ppf_pat_array id_list array_expr =
 
 let rec to_javascript typedtree =
   let pre_res = js_of_structure Env.empty typedtree in
-  L.logged_output pre_res, L.unlogged_output pre_res, pre_res                                           
-  
-and show_value_binding old_env vb =
-  js_of_let_pattern old_env vb.vb_pat vb.vb_expr
+  let logged, unlogged, pre = L.logged_output pre_res, L.unlogged_output pre_res, pre_res in
+  List.iter (fun (x, y) -> Printf.printf "%s:%s\n" x y) !module_list; 
+  logged, unlogged, pre
+(*  let modules = 
+   let (opt, inputfile) = process_implementation_file ppf sourcefile in
+   let ((parsetree1 : Parsetree.structure), typedtree1) =
+      match opt with
+      | None -> failwith "Could not read and typecheck input file"
+      | Some (parsetree1, (typedtree1,_)) -> parsetree1, typedtree1
+      in
+
+      let (logged, unlogged, pre) = Js_of_ast.to_javascript typedtree1 in
+      file_put_contents outputfile unlogged
+*)
+and show_value_binding vb =
+  js_of_let_pattern vb.vb_pat vb.vb_expr
     
-and js_of_structure old_env s =
+and js_of_structure ?mod_gen:(mod_gen=false) old_env s =
   let new_env = s.str_final_env in
   show_list_f (fun strct -> js_of_structure_item new_env strct) lin2 s.str_items
     
-and js_of_structure_item old_env s =
+and js_of_structure_item ?mod_gen:(mod_gen=false) old_env s =
   let new_env = s.str_env in
   match s.str_desc with
   | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression new_env e
-  | Tstr_value (_, vb_l) -> String.concat lin2 @@ List.map (fun vb -> show_value_binding new_env vb) @@ vb_l
+  | Tstr_value (_, vb_l) -> String.concat lin2 @@ List.map show_value_binding @@ vb_l
   | Tstr_type tl ->
    let explore_type = function
       | [] -> ()
@@ -266,30 +236,34 @@ and js_of_structure_item old_env s =
         | _ -> unsupported "open types, record and abstract type"
         )
    in explore_type tl; ""
-  | Tstr_open       _ -> "" (* Just ignore open statement; OCaml resolves names for us. *)
-  | Tstr_primitive  _ -> out_of_scope "primitive functions"
-  | Tstr_typext     _ -> out_of_scope "type extensions"
-  | Tstr_exception  _ -> out_of_scope "exceptions"
-  | Tstr_module     _ -> out_of_scope "modules"
-  | Tstr_recmodule  _ -> out_of_scope "recursive modules"
-  | Tstr_modtype    _ -> out_of_scope "module type"
-  | Tstr_class      _ -> out_of_scope "objects"
-  | Tstr_class_type _ -> out_of_scope "class types"
-  | Tstr_include    _ -> out_of_scope "includes"
+  | Tstr_open       od -> 
+    let (path, name) = (fun od -> if od.open_override = Fresh then Path.name od.open_path, js_of_longident od.open_txt else ("", "")) od in
+    if (path, name) <> ("", "") then
+      module_list := (path, name) :: !module_list; 
+    "" 
+  | Tstr_primitive  _  -> out_of_scope "primitive functions"
+  | Tstr_typext     _  -> out_of_scope "type extensions"
+  | Tstr_exception  _  -> out_of_scope "exceptions"
+  | Tstr_module     _  -> out_of_scope "modules"
+  | Tstr_recmodule  _  -> out_of_scope "recursive modules"
+  | Tstr_modtype    _  -> out_of_scope "module type"
+  | Tstr_class      _  -> out_of_scope "objects"
+  | Tstr_class_type _  -> out_of_scope "class types"
+  | Tstr_include    _  -> out_of_scope "includes"
   | Tstr_attribute  attrs -> out_of_scope "attributes"
 
-and js_of_branch old_env b obj =
-  let spat, binders = js_of_pattern old_env b.c_lhs obj in
+and js_of_branch ?mod_gen:(mod_gen=false) old_env b obj =
+  let spat, binders = js_of_pattern b.c_lhs obj in
   let se = js_of_expression old_env b.c_rhs in
   L.log_line (ppf_branch spat binders se) (L.Add binders)
     
-and js_of_expression old_env e =
+and js_of_expression ?mod_gen:(mod_gen=false) old_env e =
   let new_env = e.exp_env in
   match e.exp_desc with
   | Texp_ident (_, loc,  _)           -> js_of_longident loc
   | Texp_constant c                   -> js_of_constant c
   | Texp_let   (_, vb_l, e)           ->
-    let sd = String.concat lin1 @@ List.map (fun vb -> show_value_binding new_env vb) @@ vb_l in
+    let sd = String.concat lin1 @@ List.map show_value_binding @@ vb_l in
     let se = js_of_expression new_env e
     in ppf_let_in sd se
   | Texp_function (_, c :: [], Total) ->
@@ -370,24 +344,11 @@ and ident_of_pat pat = match pat.pat_desc with
   | Tpat_var (id, _) -> Ident.name id
   | _ -> error "functions can't deconstruct values"
     
-and js_of_let_pattern old_env pat expr =
+and js_of_let_pattern ?mod_gen:(m=false) pat expr =
   let new_env = pat.pat_env in
-  (*let expr_type pat expr = match expr.exp_desc with
-    | Texp_construct (loc, cd, el) ->
-       let value = js_of_longident loc in
-       if el = [] then
-         if is_sbool value then value else ppf_single_cstr value
-       else
-         let rec expand_constructor_list fields exprs = match fields, exprs with
-           | [], [] -> []
-           | [], x :: xs | x :: xs , [] -> failwith "argument lists should have the same length."
-           | x :: xs, y :: ys -> ppf_cstr  x y :: expand_constructor_list xs ys in
-         let names = Hashtbl.find type_tbl value
-         in ppf_multiple_cstrs value (show_list ", " (expand_constructor_list names (List.map (fun exp -> js_of_expression new_env exp) el)))
-    | _ -> string_of_type_exp pat.pat_type in*)
   let sexpr = js_of_expression new_env expr in
   match pat.pat_desc with
-  | Tpat_var (id, _) -> ppf_decl (Ident.name id) sexpr
+  | Tpat_var (id, _) -> ppf_decl ~mod_gen:m (Ident.name id) sexpr
   | Tpat_tuple (pat_l)
   | Tpat_array (pat_l) ->
      let l = List.map
@@ -399,8 +360,7 @@ and js_of_let_pattern old_env pat expr =
      ppf_pat_array l sexpr
   | _ -> error "let can't deconstruct values"
 
-and js_of_pattern old_env pat obj =
- let new_env = pat.pat_env in
+and js_of_pattern pat obj =
   match pat.pat_desc with
   | Tpat_any                     -> "default", ""
   | Tpat_constant   c            -> js_of_constant c, ""
@@ -412,11 +372,11 @@ and js_of_pattern old_env pat obj =
      let binders =
        if List.length el = 0 then ""
        else Printf.sprintf "@[<v 0>%s@,@]"
-          ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern new_env x obj)) el) params) ^ ";") in
+          ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern x obj)) el) params) ^ ";") in
      spat, binders
-  | Tpat_tuple el -> out_of_scope "tuple matching"
-  | Tpat_array el -> out_of_scope "array-match"
-  | Tpat_record (_,_) -> out_of_scope "record"
+  | Tpat_tuple el -> unsupported "tuple matching"
+  | Tpat_array el -> unsupported "array-match"
+  | Tpat_record (_,_) -> unsupported "record"
   | Tpat_or (_,_,_) -> failwith "not implemented yet"
   | Tpat_alias (_,_,_) -> out_of_scope "alias-pattern"
   | Tpat_variant (_,_,_) -> out_of_scope "polymorphic variants in pattern matching"

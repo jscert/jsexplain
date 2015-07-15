@@ -52,14 +52,12 @@ struct
   type token_info = ctx_operation
                                   
   let info_tbl = Hashtbl.create Sz.size
+                                
+  let new_margin  = 700
   let token_delim = "|"
-
-  let token_re =
-    regexp (token_delim ^ "[0-9]+" ^ token_delim)
-  let endline_re =
-    regexp "\n"
-  let lfs =
-    regexp "\n\\(\\( \\)*\n\\)*"
+  let token_re    = regexp (token_delim ^ "[0-9]+" ^ token_delim)
+  let endline_re  = regexp "\n"
+  let lfs         = regexp "\n\\(\\( \\)*\n\\)*"
 
   let free_token = G.withdraw
            
@@ -131,15 +129,21 @@ struct
   let logged_output s =
     let str_ppf = Format.str_formatter in
     Format.fprintf str_ppf (Scanf.format_from_string s "");
+    let m = Format.get_margin () in
+    Format.set_margin new_margin;
     let bad_output = Format.flush_str_formatter () in
+    Format.set_margin m;
     let pretty_output = global_replace lfs "\n" bad_output in
     add_log_info pretty_output
-
+                 
   let unlogged_output s =
     let str_ppf = Format.str_formatter in
     let unlogged_info = strip_log_info s in
     Format.fprintf str_ppf (Scanf.format_from_string unlogged_info "");
+    let m = Format.get_margin () in
+    Format.set_margin new_margin;
     let bad_output = Format.flush_str_formatter () in
+    Format.set_margin m;
     global_replace lfs "\n" bad_output
     
     
