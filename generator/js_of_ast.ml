@@ -29,9 +29,84 @@ let print_type_tbl () =
     | x :: xs -> (Printf.sprintf {|"%s", |} x) ^ print_str_list xs
   in Hashtbl.iter (fun cstr elems -> Printf.printf ({|%s -> [%s]|} ^^ "\n") cstr (print_str_list elems)) type_tbl; ()
 
+  
 let env_diff_names env1 env2 =
-  List.map Ident.name (Env.diff env1 env2)
-                                                                                                                     
+  List.map Ident.unique_name (Env.diff env1 env2)
+
+(**
+ *  Functions to work with environment
+ **)
+
+let rec list_of_ident_from_summary = function
+  | Env_empty -> []
+  | Env_value (sum, id, vd) -> id :: list_of_ident_from_summary sum
+  | Env_type (sum,_,_)
+  | Env_extension (sum,_,_)
+  | Env_module (sum,_,_)
+  | Env_modtype (sum,_,_)
+  | Env_class (sum,_,_)
+  | Env_cltype (sum,_,_)
+  | Env_open (sum,_)
+  | Env_functor_arg (sum,_) -> list_of_ident_from_summary sum
+           
+(** Those functions might be deleted 
+         
+type 'a diff =
+    'a list (* Removed from the reference *)
+    * 'a list (* Added to the reference *)
+
+let rec set_inter set1 set2 =
+  (** Set are supposed sorted **)
+  match set1, set2 with
+  | [], [] | _, [] | [], _ -> []
+  | x :: xs, y :: ys ->
+     if x = y then x :: set_inter xs ys
+     else if x < y then set_inter xs set2
+     else set_inter set1 ys
+
+let rec set_minus set_ref min =
+  (** Set are supposed sorted **)
+  match set_ref, min with
+  | [], _ -> []
+  | xs, [] -> xs
+  | x :: xs, y :: ys ->
+     if x = y then set_minus xs ys
+     else if x < y then x :: set_minus xs min
+     else set_minus set_ref ys
+                    
+let env_diff env_ref env : string diff =
+  let sum_ref = Env.summary env_ref in
+  let sum_new = Env.summary env in
+  let ident_ref = list_of_ident_from_summary sum_ref
+                  |> List.map Ident.unique_name
+                  |> List.sort compare in
+  let ident_new = list_of_ident_from_summary sum_new
+                  |> List.map Ident.unique_name
+                  |> List.sort compare in
+  let inter = set_inter ident_ref ident_new in
+  let del = set_minus ident_ref inter in
+  let ins = set_minus ident_new inter in
+  (del, ins)
+
+  let print_diff env1 env2 =
+    let (del, ins) = env_diff env1 env2 in
+    Printf.printf "del: %s ; ins: %s\n" (print_name_list del) (print_name_list ins)
+ *)
+
+let print_name_list l =
+  let rec aux = function
+    | [] -> ""
+    | x :: [] -> x
+    | x :: xs -> x ^ ", " ^ aux xs
+  in "[ " ^ aux l ^ " ]"
+
+let print_env env =
+  let idents = env
+               |> Env.summary
+               |> list_of_ident_from_summary
+               |> List.map Ident.name in
+  Printf.printf "env: %s\n" (print_name_list idents)
+                            
 (**
  * Useful functions (Warning: shadows `show_list' from Mytools)
  *)
@@ -63,21 +138,21 @@ let ppf_lambda_wrap s =
   
 let ppf_branch case binders expr =
   Printf.sprintf "@[<v 1>%s: @[<v 2>%s@,return %s;@,@]@,@,@]"
-    case binders expr
+                 case binders expr
 
 let ppf_let_in decl exp =
   let s =
-    Printf.sprintf "@[<v 2>%s@,@,return %s;@]"
-      decl exp
+    Printf.sprintf "@[<v 0>%s@,@,return %s;@]"
+                   decl exp
   in ppf_lambda_wrap s
 
 let ppf_function args body=
   Printf.sprintf "@[<v 0>function (%s) {@,@[<v 2>@,return %s;@,@]@,}@]"
-    args body
+                 args body
 
 let ppf_apply f args =
   Printf.sprintf "@[<v 0>%s(%s)@]"
-    f args
+                 f args
 
 let ppf_apply_infix f arg1 arg2 =
   Printf.sprintf "@[<v 0>%s %s %s@]"
@@ -85,44 +160,45 @@ let ppf_apply_infix f arg1 arg2 =
     
 let ppf_match value cases =
   let s =
-    Printf.sprintf "switch (%s.type) {@,@[<v 2>@,%s@,@]@,}"
-      value cases
+    Printf.sprintf "@[<v 0>switch (%s.type) {@,@[<v 2>@,%s@,@]@,}@]"
+                   value cases
   in ppf_lambda_wrap s
 
-(*  Format.sprintf "@[<v 0>(function () {@,@[<v 2>@,switch (%s.type) {@,@[<v 2>@,%s@,@]@,}@]@,})()@]"
-    value cases*)
-
 let ppf_array values =
-  Printf.sprintf "[%s]"
-    values
-
+  Printf.sprintf "@[<v 0>[%s]@]"
+                 values
+                 
 let ppf_tuple = ppf_array
     
 let ppf_ifthen cond iftrue =
   Printf.sprintf "@[<v 0>(function () {@,@[<v 2>@,if (%s) {@,@[<v 2>@,return  %s;@]@,}@]@,})()@]"
-    cond iftrue
+                 cond iftrue
 
 let ppf_ifthenelse cond iftrue iffalse =
-  Printf.sprintf "@[<v 0>(function () {@,@[<v 2>@,if (%s) {@,@[<v 2>@,return  %s;@]@,} else {@,@[<v 2>@,return  %s;@]@,}@]@]@,})()@]"
-    cond iftrue iffalse
+  Printf.sprintf "@[<v 0>(function () {@,@[<v 2>@,if (%s) {@,@[<v 2>@,return  %s;@]@,} else {@,@[<v 2>@,return  %s;@]@,}@]@,})()@]"
+                 cond iftrue iffalse
 
 let ppf_sequence exp1 exp2 =
   Printf.sprintf "@[<v 0>return %s,@,%s@]"
-    exp1 exp2
+                 exp1 exp2
 
 let ppf_while cd body =
-  Printf.sprintf "@[<v 0> function () {@,@[<v 1>@,while(%s) {@,@[<v 2>@,%s@]@]@,@]}@,)()@]"
-    cd body
-    
+  let s =
+    Printf.sprintf "@[<v 0>@,while(%s) {@,@[<v 2>@,%s@]@,}@]"
+                   cd body
+  in ppf_lambda_wrap s
+                     
 let ppf_for id start ed flag body =
   let fl_to_string = function
     | Upto   -> "++"
     | Downto -> "--" in
   let fl_to_symbl = function
     | Upto   -> "<="
-    | Downto -> ">="
-  in Printf.sprintf "@[<v 0>(function () {@,@[<v 3>@,for (%s = %s ; %s %s %s ; %s%s) {@,@[@,%s @]@,} @,@]})() @]"
-  id start id (fl_to_symbl flag) ed (fl_to_string flag)  id body
+    | Downto -> ">=" in
+  let s =
+    Printf.sprintf "[<v 0>@,for (%s = %s ; %s %s %s ; %s%s) {@,@[<v 2>@,%s @]@,}@]"
+                   id start id (fl_to_symbl flag) ed (fl_to_string flag) id body
+  in ppf_lambda_wrap s
 
 let ppf_single_cstr tag =
   Printf.sprintf "%s"
@@ -133,11 +209,11 @@ let ppf_cstr tag value =
     tag value
 
 let ppf_single_cstrs typ =
-   Printf.sprintf "{type: \"%s\"}"
+   Printf.sprintf "@[<v 0>{type: \"%s\"}@]"
      typ
       
 let ppf_multiple_cstrs typ rest =
-  Printf.sprintf "{type: \"%s\", %s}"
+  Printf.sprintf "@[<v 0>{type: \"%s\", @[<v 2>%s@]}@]"
     typ rest
 
 let ppf_record llde =
@@ -146,21 +222,30 @@ let ppf_record llde =
     | (lbl, exp) :: [] -> aux (acc ^ Printf.sprintf "%s: %s" lbl exp) []
     | (lbl, exp) :: xs -> aux (acc ^ Printf.sprintf "%s: %s,@," lbl exp) xs
   in aux "" llde
-    
+
+let ppf_decl id expr =
+  Printf.sprintf "@[<v 0>var %s = %s;@,@]" 
+                 id expr
+
+let ppf_pat_array id_list array_expr =
+  Printf.sprintf "@[<v 0>var __%s = %s;@,@]" "array" array_expr ^
+    List.fold_left2 (fun acc (name, exp_type) y -> acc ^ Printf.sprintf "@[<v 0>var %s = __%s[%d];@,@]" name "array" y)
+                    "" id_list @@ range 0 (List.length id_list - 1)
+                 
 (**
  * Main part
  *)
 
 let rec to_javascript typedtree =
   let pre_res = js_of_structure Env.empty typedtree in
-  L.logged_output pre_res, L.unlogged_output pre_res, pre_res
-                                           
+  L.logged_output pre_res, L.unlogged_output pre_res, pre_res                                           
   
 and show_value_binding old_env vb =
   js_of_let_pattern old_env vb.vb_pat vb.vb_expr
     
 and js_of_structure old_env s =
-  show_list_f (fun strct -> js_of_structure_item old_env strct) lin2 s.str_items
+  let new_env = s.str_final_env in
+  show_list_f (fun strct -> js_of_structure_item new_env strct) lin2 s.str_items
     
 and js_of_structure_item old_env s =
   let new_env = s.str_env in
@@ -194,9 +279,9 @@ and js_of_structure_item old_env s =
   | Tstr_attribute  attrs -> out_of_scope "attributes"
 
 and js_of_branch old_env b obj =
-  let spat, binders = js_of_pattern b.c_lhs obj in
+  let spat, binders = js_of_pattern old_env b.c_lhs obj in
   let se = js_of_expression old_env b.c_rhs in
-  ppf_branch spat binders se
+  L.log_line (ppf_branch spat binders se) (L.Add binders)
     
 and js_of_expression old_env e =
   let new_env = e.exp_env in
@@ -286,7 +371,8 @@ and ident_of_pat pat = match pat.pat_desc with
   | _ -> error "functions can't deconstruct values"
     
 and js_of_let_pattern old_env pat expr =
-  let expr_type pat expr = match expr.exp_desc with
+  let new_env = pat.pat_env in
+  (*let expr_type pat expr = match expr.exp_desc with
     | Texp_construct (loc, cd, el) ->
        let value = js_of_longident loc in
        if el = [] then
@@ -295,40 +381,43 @@ and js_of_let_pattern old_env pat expr =
          let rec expand_constructor_list fields exprs = match fields, exprs with
            | [], [] -> []
            | [], x :: xs | x :: xs , [] -> failwith "argument lists should have the same length."
-           | x :: xs, y :: ys ->  ppf_cstr  x y :: expand_constructor_list xs ys in
+           | x :: xs, y :: ys -> ppf_cstr  x y :: expand_constructor_list xs ys in
          let names = Hashtbl.find type_tbl value
-         in ppf_multiple_cstrs value (show_list ", " (expand_constructor_list names (List.map (fun exp -> js_of_expression old_env exp) el)))
-    | _ -> string_of_type_exp pat.pat_type in
-  let sexpr = js_of_expression old_env expr in
+         in ppf_multiple_cstrs value (show_list ", " (expand_constructor_list names (List.map (fun exp -> js_of_expression new_env exp) el)))
+    | _ -> string_of_type_exp pat.pat_type in*)
+  let sexpr = js_of_expression new_env expr in
   match pat.pat_desc with
-  | Tpat_var (id, _) ->
-     Printf.sprintf "@[<v 0>var %s = %s;@,@]" (Ident.name id) sexpr
+  | Tpat_var (id, _) -> ppf_decl (Ident.name id) sexpr
   | Tpat_tuple (pat_l)
   | Tpat_array (pat_l) ->
-     let l = List.map (function pat -> match pat.pat_desc with
-                                       | Tpat_var (id, _) -> (Ident.name id, string_of_type_exp pat.pat_type)
-                                       | _ -> out_of_scope "pattern-matching in arrays") pat_l in
-     Printf.sprintf "@[<v 0>var __%s = %s;@,@]" "array" sexpr ^
-       List.fold_left2 (fun acc (name, exp_type) y -> acc ^ Printf.sprintf "@[<v 0>var %s = __%s[%d];@,@]" name "array" y)
-                       "" l @@ range 0 (List.length l - 1)
+     let l = List.map
+               (function pat ->
+                         match pat.pat_desc with
+                         | Tpat_var (id, _) -> (Ident.name id, string_of_type_exp pat.pat_type)
+                         | _ -> out_of_scope "pattern-matching in arrays"
+               ) pat_l in
+     ppf_pat_array l sexpr
   | _ -> error "let can't deconstruct values"
 
-and js_of_pattern pat obj = match pat.pat_desc with
-  | Tpat_any -> "default", ""
-  | Tpat_constant c -> js_of_constant c, ""
-  | Tpat_var (id, _) -> Ident.name id, ""
-  | Tpat_alias (_,_,_) -> out_of_scope "alias-pattern"
-  | Tpat_tuple (_) -> out_of_scope "tuple matching"
+and js_of_pattern old_env pat obj =
+ let new_env = pat.pat_env in
+  match pat.pat_desc with
+  | Tpat_any                     -> "default", ""
+  | Tpat_constant   c            -> js_of_constant c, ""
+  | Tpat_var       (id, _)       -> Ident.name id, ""
   | Tpat_construct (loc, cd, el) ->
      let c = js_of_longident loc in
      let spat = Printf.sprintf "%s" ("case \"" ^ c ^ "\"") in
      let params = Hashtbl.find type_tbl c in
      let binders =
        if List.length el = 0 then ""
-       else Printf.sprintf "%s@," ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern x obj)) el) params) ^ ";") in
+       else Printf.sprintf "@[<v 0>%s@,@]"
+          ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern new_env x obj)) el) params) ^ ";") in
      spat, binders
-  | Tpat_variant (_,_,_) -> out_of_scope "polymorphic variants in pattern matching"
-  | Tpat_array (_) -> out_of_scope "array-match"
+  | Tpat_tuple el -> out_of_scope "tuple matching"
+  | Tpat_array el -> out_of_scope "array-match"
   | Tpat_record (_,_) -> out_of_scope "record"
   | Tpat_or (_,_,_) -> failwith "not implemented yet"
-  | Tpat_lazy (_) -> out_of_scope "lazy-pattern"
+  | Tpat_alias (_,_,_) -> out_of_scope "alias-pattern"
+  | Tpat_variant (_,_,_) -> out_of_scope "polymorphic variants in pattern matching"
+  | Tpat_lazy _ -> out_of_scope "lazy-pattern"
