@@ -91,20 +91,20 @@ let is_infix f args = match args with
  *)
 
 let ppf_lambda_wrap s =
-  Printf.sprintf "function () {@,%s@,}()" s
+  Printf.sprintf "(function () {@;<1 2>@[<v 0>%s@]@,}())" s
   
 let ppf_branch case binders expr =
-  Printf.sprintf "@[<v 1>%s: @[<v 2>%s@,return %s;@,@]@,@,@]"
+  Printf.sprintf "%s: @[<v 0>%s@,return %s;@]"
                  case binders expr
 
 let ppf_let_in decl exp =
   let s =
-    Printf.sprintf "@[<v 0>%s@,@,return %s;@]"
+    Printf.sprintf "%s@,return %s;"
                    decl exp
   in ppf_lambda_wrap s
 
 let ppf_function args body=
-  Printf.sprintf "function (%s) {@,@,@[<v 2>@,return %s;@,@]@,}"
+  Printf.sprintf "function (%s) {@;<1 2>@[<v 0>return %s;@]@,}"
                  args body
 
 let ppf_apply f args =
@@ -117,7 +117,7 @@ let ppf_apply_infix f arg1 arg2 =
     
 let ppf_match value cases =
   let s =
-    Printf.sprintf "@[<v 0>switch (%s.type) {@,@[<v 2>@,%s@,@]@,}@]"
+    Printf.sprintf "switch (%s.type) {@,@[<v 0>%s@]@,}"
                    value cases
   in ppf_lambda_wrap s
 
@@ -215,13 +215,13 @@ and show_value_binding vb =
     
 and js_of_structure ?mod_gen:(mod_gen=false) old_env s =
   let new_env = s.str_final_env in
-  show_list_f (fun strct -> js_of_structure_item new_env strct) lin2 s.str_items
+  show_list_f (fun strct -> js_of_structure_item new_env strct) "@,@," s.str_items
     
 and js_of_structure_item ?mod_gen:(mod_gen=false) old_env s =
   let new_env = s.str_env in
   match s.str_desc with
   | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression new_env e
-  | Tstr_value (_, vb_l) -> String.concat lin2 @@ List.map show_value_binding @@ vb_l
+  | Tstr_value (_, vb_l) -> String.concat "@,@," @@ List.map show_value_binding @@ vb_l
   | Tstr_type tl ->
    let explore_type = function
       | [] -> ()
@@ -286,7 +286,7 @@ and js_of_expression ?mod_gen:(mod_gen=false) old_env e =
     else ppf_apply se (String.concat ", " sl)
   | Texp_match (exp, l, [], Total) ->
      let se = js_of_expression new_env exp in
-     let sb = List.fold_left (fun acc x -> acc ^ js_of_branch old_env x se) "" l in
+     let sb = String.concat "@," (List.map (fun x -> js_of_branch old_env x se) l) in
      ppf_match se sb
   | Texp_tuple (tl)               -> ppf_tuple @@ show_list_f (fun exp -> js_of_expression new_env exp) ", " tl
   | Texp_construct (loc, cd, el) ->
@@ -371,7 +371,7 @@ and js_of_pattern pat obj =
      let params = Hashtbl.find type_tbl c in
      let binders =
        if List.length el = 0 then ""
-       else Printf.sprintf "@[<v 0>%s@,@]"
+       else Printf.sprintf "@[<v 0>%s@]"
           ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern x obj)) el) params) ^ ";") in
      spat, binders
   | Tpat_tuple el -> unsupported "tuple matching"

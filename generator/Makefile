@@ -6,7 +6,7 @@
 # OCAMLBIN=~/shared/ocamleasy/bin/
 # OCAMLLIB=~/shared/ocamleasy/lib
 
-ML_DIRS     := lex parsing tools typing utils stdlib_ml
+ML_DIRS     := parsing typing utils stdlib_ml
 LIB_DEP	    := str.cma
 STD_DIR	    := stdlib_ml
 TEST_DIR    := tests

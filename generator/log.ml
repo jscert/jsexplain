@@ -129,22 +129,16 @@ struct
   let logged_output s =
     let str_ppf = Format.str_formatter in
     Format.fprintf str_ppf (Scanf.format_from_string s "");
-    let m = Format.get_margin () in
-    Format.set_margin new_margin;
-    let bad_output = Format.flush_str_formatter () in
-    Format.set_margin m;
-    let pretty_output = global_replace lfs "\n" bad_output in
-    add_log_info pretty_output
-                 
+    add_log_info (Format.flush_str_formatter ())
+  (* let bad_output = Format.flush_str_formatter () in *)
+  (* let pretty_output = global_replace lfs "\n" bad_output in *)
+  (* add_log_info pretty_output *)
+
   let unlogged_output s =
     let str_ppf = Format.str_formatter in
     let unlogged_info = strip_log_info s in
     Format.fprintf str_ppf (Scanf.format_from_string unlogged_info "");
-    let m = Format.get_margin () in
-    Format.set_margin new_margin;
-    let bad_output = Format.flush_str_formatter () in
-    Format.set_margin m;
-    global_replace lfs "\n" bad_output
-    
-    
+    Format.flush_str_formatter ()
+  (* let bad_output = Format.flush_str_formatter () in *)
+  (*     global_replace lfs "\n" bad_output *)
 end
