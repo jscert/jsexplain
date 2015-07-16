@@ -17,6 +17,7 @@ let hashtbl_size = 256
 let type_tbl     = Hashtbl.create hashtbl_size
 let record_tbl   = Hashtbl.create hashtbl_size
 let module_list  = ref []
+let module_code  = ref []
 module L = Logged (Token_generator) (struct let size = 256 end)
   
 (**
@@ -191,10 +192,10 @@ let ppf_record llde =
     | (lbl, exp) :: xs -> aux (acc ^ Printf.sprintf "%s: %s,@," lbl exp) xs
   in aux "" llde
 
-let ppf_decl ?mod_gen:(mod_gen=false) id expr =
-  let assign_op, decl_kw = if mod_gen = false then "=", "var" else ":","" in 
-  Printf.sprintf "@[<v 0>%s %s %s %s;@,@]" 
-                 decl_kw id assign_op expr
+let ppf_decl ?(mod_gen="") id expr =
+  let assign_op, decl_kw, end_mark = if mod_gen = "" then " = ", "var ", ";" else ": ", "", "," in 
+  Printf.sprintf "@[<v 0>%s%s%s%s%s@,@]" 
+                 decl_kw id assign_op expr end_mark
 
 let ppf_pat_array id_list array_expr =
   Printf.sprintf "@[<v 0>var __%s = %s;@,@]" "array" array_expr ^
@@ -234,33 +235,31 @@ let rec parse_modules = function
       | None -> failwith "Could not read and typecheck input file"
       | Some (parsetree1, (typedtree1, _)) -> parsetree1, typedtree1
       in
-   let (_, unlogged, _) = to_javascript typedtree1 in
+   let (_, unlogged, _) = to_javascript ~mod_gen:name typedtree1 in
    Printf.sprintf "%s = {\n%s\n}" name unlogged :: parse_modules xs
     
 (**
  * Main part
  *)
 
-and to_javascript ?(mod_gen=false) typedtree =
+and to_javascript ?(mod_gen="") typedtree =
   let pre_res = js_of_structure ~mod_gen Env.empty typedtree in
   let logged, unlogged, pre = L.logged_output pre_res, L.unlogged_output pre_res, pre_res in
-  Printf.printf "start%!";
-  let module_code = String.concat "\n" (parse_modules @@ find_module_path @@ !module_list) in
-  Printf.printf "end%!";
-  (logged, module_code ^ "\n" ^ unlogged, pre)
+  let mod_code = String.concat "\n" !module_code in
+  (logged, mod_code ^ "\n" ^ unlogged, pre)
 
-and show_value_binding vb =
-  js_of_let_pattern vb.vb_pat vb.vb_expr
+and show_value_binding ?(mod_gen="") vb =
+  js_of_let_pattern ~mod_gen vb.vb_pat vb.vb_expr
     
-and js_of_structure ?(mod_gen=false) old_env s =
+and js_of_structure ?(mod_gen="") old_env s =
   let new_env = s.str_final_env in
   show_list_f (fun strct -> js_of_structure_item ~mod_gen new_env strct) "@,@," s.str_items
     
-and js_of_structure_item ?(mod_gen=false) old_env s =
+and js_of_structure_item ?(mod_gen="") old_env s =
   let new_env = s.str_env in
   match s.str_desc with
   | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression ~mod_gen new_env e
-  | Tstr_value (_, vb_l) -> String.concat "@,@," @@ List.map show_value_binding @@ vb_l
+  | Tstr_value (_, vb_l) -> String.concat "@,@," @@ List.map (fun vb -> show_value_binding ~mod_gen vb) @@ vb_l
   | Tstr_type tl ->
    let explore_type = function
       | [] -> ()
@@ -268,7 +267,8 @@ and js_of_structure_item ?(mod_gen=false) old_env s =
         (match x.typ_kind with
         | Ttype_variant cdl ->
           let cl = List.map (fun cstr -> extract_cstr_attrs cstr) cdl in
-          List.iter (fun (name, cstrs_name) -> Hashtbl.add type_tbl name cstrs_name) cl
+          List.iter (fun (name, cstrs_name) -> Hashtbl.add type_tbl (if mod_gen <> "" then (*mod_gen ^ "." ^*) name else name) cstrs_name) cl;
+          print_type_tbl ()
         | Ttype_record ldl ->
           (* Beware silent shadowing for record labels *)
           List.iter (fun lbl -> Hashtbl.replace record_tbl (Ident.name lbl.ld_id) (Ident.name x.typ_id)) ldl
@@ -278,7 +278,8 @@ and js_of_structure_item ?(mod_gen=false) old_env s =
   | Tstr_open       od -> 
     let name = (fun od -> if od.open_override = Fresh then js_of_longident od.open_txt else "") od in
     if name <> "" then
-      module_list := name :: !module_list; 
+      module_list := name :: !module_list;
+      module_code := parse_modules @@ find_module_path @@ !module_list @ !module_code;
     "" 
   | Tstr_primitive  _  -> out_of_scope "primitive functions"
   | Tstr_typext     _  -> out_of_scope "type extensions"
@@ -291,18 +292,18 @@ and js_of_structure_item ?(mod_gen=false) old_env s =
   | Tstr_include    _  -> out_of_scope "includes"
   | Tstr_attribute  attrs -> out_of_scope "attributes"
 
-and js_of_branch ?(mod_gen=false) old_env b obj =
+and js_of_branch ?(mod_gen="") old_env b obj =
   let spat, binders = js_of_pattern b.c_lhs obj in
   let se = js_of_expression ~mod_gen old_env b.c_rhs in
   L.log_line (ppf_branch spat binders se) (L.Add binders)
     
-and js_of_expression ?(mod_gen=false) old_env e =
+and js_of_expression ?(mod_gen="") old_env e =
   let new_env = e.exp_env in
   match e.exp_desc with
   | Texp_ident (_, loc,  _)           -> js_of_longident loc
   | Texp_constant c                   -> js_of_constant c
   | Texp_let   (_, vb_l, e)           ->
-    let sd = String.concat lin1 @@ List.map show_value_binding @@ vb_l in
+    let sd = String.concat lin1 @@ List.map (fun vb -> show_value_binding ~mod_gen vb) @@ vb_l in
     let se = js_of_expression ~mod_gen new_env e
     in ppf_let_in sd se
   | Texp_function (_, c :: [], Total) ->
@@ -383,7 +384,7 @@ and ident_of_pat pat = match pat.pat_desc with
   | Tpat_var (id, _) -> Ident.name id
   | _ -> error "functions can't deconstruct values"
     
-and js_of_let_pattern ?(mod_gen=false) pat expr =
+and js_of_let_pattern ?(mod_gen="") pat expr =
   let new_env = pat.pat_env in
   let sexpr = js_of_expression ~mod_gen new_env expr in
   match pat.pat_desc with
