@@ -44,4 +44,5 @@ clean:
 	rm -rf _build
 	rm -f *.native *.byte
 
-cleanall: clean clean_tests clean_stdlib
+clean_cmi: clean_tests clean_stdlib
+cleanall: clean clean_cmi
