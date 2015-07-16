@@ -44,8 +44,6 @@ let _ =
      | Some f -> f
    in
 
-   Printf.printf "sf: %s\n" sourcefile;
-
    (*---------------------------------------------------*)
    (* "reading and typing source file" *)
    let (opt, inputfile) = process_implementation_file ppf sourcefile in
