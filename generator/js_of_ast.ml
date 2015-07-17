@@ -169,10 +169,10 @@ let ppf_for id start ed flag body =
                    id start id (fl_to_symbl flag) ed (fl_to_string flag) id body
   in ppf_lambda_wrap s
 
-let ppf_single_cstr tag =
+(*let ppf_single_cstr tag =
   Printf.sprintf "%s"
     tag
-
+*)
 let ppf_cstr tag value =
   Printf.sprintf "%s: %s"
     tag value
@@ -228,7 +228,6 @@ let rec parse_modules = function
   | [] -> []
   | (name, path) :: xs ->
    let ppf = Format.std_formatter in
-   Printf.printf "%s%!" name;
    let (opt, inputfile) = process_implementation_file ppf path in
    let ((parsetree1 : Parsetree.structure), typedtree1) =
       match opt with
@@ -267,7 +266,7 @@ and js_of_structure_item ?(mod_gen="") old_env s =
         (match x.typ_kind with
         | Ttype_variant cdl ->
           let cl = List.map (fun cstr -> extract_cstr_attrs cstr) cdl in
-          List.iter (fun (name, cstrs_name) -> Hashtbl.add type_tbl (if mod_gen <> "" then (*mod_gen ^ "." ^*) name else name) cstrs_name) cl;
+          List.iter (fun (name, cstrs_name) -> Hashtbl.add type_tbl (if mod_gen <> "" then mod_gen ^ "." ^ name else name) cstrs_name) cl;
           print_type_tbl ()
         | Ttype_record ldl ->
           (* Beware silent shadowing for record labels *)
@@ -293,7 +292,7 @@ and js_of_structure_item ?(mod_gen="") old_env s =
   | Tstr_attribute  attrs -> out_of_scope "attributes"
 
 and js_of_branch ?(mod_gen="") old_env b obj =
-  let spat, binders = js_of_pattern b.c_lhs obj in
+  let spat, binders = js_of_pattern ~mod_gen b.c_lhs obj in
   let se = js_of_expression ~mod_gen old_env b.c_rhs in
   L.log_line (ppf_branch spat binders se) (L.Add binders)
     
@@ -334,13 +333,13 @@ and js_of_expression ?(mod_gen="") old_env e =
         if el = [] then
           if is_sbool value
           then value
-          else ppf_single_cstr value
+          else ppf_single_cstrs value
         else
           let rec expand_constructor_list fields exprs = match fields, exprs with
             | [], [] -> []
             | [], x :: xs | x :: xs , [] -> failwith "argument lists should have the same length."
-            | x :: xs, y :: ys -> (if y = "" then ppf_single_cstr x else ppf_cstr x y) :: expand_constructor_list xs ys in
-          let names = Hashtbl.find type_tbl value
+            | x :: xs, y :: ys -> (if y = "" then ppf_single_cstrs x else ppf_cstr x y) :: expand_constructor_list xs ys in
+          let names = Hashtbl.find type_tbl (if mod_gen <> "" then mod_gen ^ "." ^ value else value)
              in ppf_multiple_cstrs value (show_list ", " (expand_constructor_list names (List.map (fun exp -> js_of_expression ~mod_gen new_env exp) el)))
   | Texp_array      (exp_l)           -> ppf_array @@ show_list_f (fun exp -> js_of_expression ~mod_gen new_env exp) ", " exp_l
   | Texp_ifthenelse (e1, e2, None)    -> ppf_ifthen (js_of_expression ~mod_gen new_env e1) (js_of_expression ~mod_gen new_env e2)
@@ -400,7 +399,7 @@ and js_of_let_pattern ?(mod_gen="") pat expr =
      ppf_pat_array l sexpr
   | _ -> error "let can't deconstruct values"
 
-and js_of_pattern pat obj =
+and js_of_pattern ?(mod_gen="") pat obj =
   match pat.pat_desc with
   | Tpat_any                     -> "default", ""
   | Tpat_constant   c            -> js_of_constant c, ""
@@ -408,11 +407,11 @@ and js_of_pattern pat obj =
   | Tpat_construct (loc, cd, el) ->
      let c = js_of_longident loc in
      let spat = Printf.sprintf "%s" ("case \"" ^ c ^ "\"") in
-     let params = Hashtbl.find type_tbl c in
+     let params = Hashtbl.find type_tbl (if mod_gen <> "" then mod_gen ^ "." ^ c else c) in
      let binders =
        if List.length el = 0 then ""
        else Printf.sprintf "@[<v 0>%s@]"
-          ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern x obj)) el) params) ^ ";") in
+          ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern ~mod_gen x obj)) el) params) ^ ";") in
      spat, binders
   | Tpat_tuple el -> unsupported "tuple matching"
   | Tpat_array el -> unsupported "array-match"

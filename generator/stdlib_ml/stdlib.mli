@@ -1,5 +1,5 @@
-val add : 'a -> 'a -> 'a
-val ( + ) : 'a -> 'a -> 'a
+val add : 'a -> 'b -> 'c
+val ( + ) : 'a -> 'b -> 'c
 val sub : 'a -> 'a -> 'a
 val ( - ) : 'a -> 'a -> 'a
 val mul : 'a -> 'a -> 'a
