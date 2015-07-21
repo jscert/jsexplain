@@ -8,16 +8,16 @@ val div : 'a -> 'a -> 'a
 val ( / ) : 'a -> 'a -> 'a
                  
 val eq : 'a -> 'a -> bool
-val ( === ) : 'a -> 'a -> 'a
+val ( === ) : 'a -> 'a -> bool
 val le : 'a -> 'a -> bool
-val ( < ) : 'a -> 'a -> 'a
+val ( < ) : 'a -> 'a -> bool
 val ge : 'a -> 'a -> bool
-val ( > ) : 'a -> 'a -> 'a
+val ( > ) : 'a -> 'a -> bool
 
 val leq : 'a -> 'a -> bool
-val ( <= ) : 'a -> 'a -> 'a
+val ( <= ) : 'a -> 'a -> bool 
 val geq : 'a -> 'a -> bool
-val ( >= ) : 'a -> 'a -> 'a
+val ( >= ) : 'a -> 'a -> bool
 
 val print : 'a -> unit
 
