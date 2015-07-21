@@ -38,10 +38,12 @@ let _ =
      failwith "The file name must be of the form *.ml";
    let basename = Filename.chop_suffix (Filename.basename sourcefile) ".ml" in
    let dirname = Filename.dirname sourcefile in
-   let outputfile : string =
+   let log_output, unlog_output, pre_output =
      match !outputfile with
-     | None -> Filename.concat dirname (basename ^ ".js")
-     | Some f -> f
+     | None -> Filename.concat dirname (basename ^ ".log.js"),
+               Filename.concat dirname (basename ^ "unlog.js"),
+               Filename.concat dirname (basename ^ ".js.pre")
+     | Some f -> f ^ ".log.js", f ^ ".unlog.js", f ^ ".js.pre"
    in
 
    (*---------------------------------------------------*)
@@ -54,4 +56,6 @@ let _ =
       in
 
       let (logged, unlogged, pre) = Js_of_ast.to_javascript typedtree1 in
-      file_put_contents outputfile unlogged
+      file_put_contents log_output logged;
+      file_put_contents unlog_output unlogged;
+      file_put_contents pre_output pre;

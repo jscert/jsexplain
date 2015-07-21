@@ -35,6 +35,7 @@ sig
     | Del of ident
 
   val log_line : string -> ctx_operation -> string
+  val strip_log_info : string -> string
   val logged_output : string -> string
   val unlogged_output : string -> string
 end
@@ -119,7 +120,7 @@ struct
       | (None, str)   :: xs -> Buffer.add_string buf str;
                                aux (i + 1) xs
       | (Some l, str) :: xs -> let log_info = match Hashtbl.find info_tbl l with
-                                 | Add x   -> "\nprint (" ^ string_of_int i ^ " + \": Variable\" " ^ x ^ ");\n"
+                                 | Add x   -> "\nprint (" ^ string_of_int i ^ " + \": Variable\" +" ^ x ^ ");\n"
                                  | Redef x -> "o"
                                  | Del x   -> "a"
                                in Buffer.add_string buf str; Buffer.add_string buf log_info;
