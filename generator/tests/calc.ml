@@ -22,5 +22,6 @@ let rec print_expr expr = match expr with
   | Div (ls, rs) -> "(" + (print_expr ls) + ")" + " / " + (print_expr rs)
 
 let f =
+    let rec bli = Stack.C(1, Stack.N) in
     let source = parse "((1972 / 29) / 2) + 8" in
     print ((print_expr source) + " = " + to_string (eval_ source))

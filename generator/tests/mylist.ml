@@ -32,10 +32,11 @@ let rec fold_right f l acc = match l with
 
 let rev_map f l = fold_left (fun acc x -> Cons(f x, acc)) Nil l
 let map f l = fold_right (fun acc x -> Cons(f x, acc)) l Nil
+let rev l = fold_left (fun acc x -> Cons(x, acc)) Nil l
 
 let length l = fold_left (fun acc x -> incr acc) 0 l
 
-let rec range i j acc = if le i j then range (incr i) j (Cons (i, acc)) else acc
+let rec range i j acc = if i <= j then range (incr i) j (Cons (i, acc)) else acc
 
 (* Test *)
 
@@ -43,11 +44,18 @@ let list0 = Nil
 let list1 = range 0 1 Nil
 let list2 = range 1 5 Nil
 
-let sqr x = mul x x;;
+let sqr x = mul x x
 
-length list0;;
-length list1;;
-length list2;;
-map sqr list0;;
-map sqr list1;;
-map sqr list2;;
+let print_list l = 
+  let rec aux acc l = match l with
+    | Nil -> acc
+    | Cons (x, xs) -> print xs; if xs === Nil then aux (x + acc) xs else aux (x + "," + acc) xs
+  in "[" + aux "" (rev l) + "]"
+;; 
+let f = 1 in 
+  print (length list0);
+  print (length list1);
+  print (length list2);
+  print (print_list (map sqr list0));
+  print (print_list (map sqr list1));
+  print (print_list (map sqr list2));
