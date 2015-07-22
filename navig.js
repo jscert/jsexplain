@@ -96,10 +96,10 @@ $("#navigation_step").change(function(e) {
 $("#button_run").click(function() {
   try {
     var code = source.getValue();
-    // console.log(code);
-    parsedTree = esprima.parse(code, {loc:true});
+    console.log(code);
+    //parsedTree = esprima.parse(code, {loc:true});
     // console.log(parsedTree);
-    program = esprimaToAST(parsedTree);
+    program = parse(code);
     // console.log(program);
     run();
     $("#action_output").html("Run successful!");

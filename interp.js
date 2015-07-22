@@ -250,107 +250,46 @@ function run_trm_wrap(line, t) {
   return res;
 }
 
-function run_trm(t) {
+function run_trm(expr) {
   var ctx = ctx_empty();
-  ctx = ctx_push(ctx, "t", t, "term");
+  ctx = ctx_push(ctx, "expr", expr, "term");
   log(1, ctx, "run_trm");
-  switch (t.tag) {
-  case "trm_var":
-    log(3, ctx, "case");
-    var v = lookup_var(t.name);
-    ctx = ctx_push(ctx, "v", v, "value");
-    log(4, ctx, "var");
-    return res_val(v);
-  case "trm_cst":
-    log(6, ctx, "case");
-    return res_val({ tag: "val_cst", cst: t.cst });
-  case "trm_let":
-    log(8, ctx, "case");
-    return if_success(run_trm_wrap(9, t.t1), function(v1) {
-      ctx = ctx_push(ctx, "v1", v1, "value");
-      log(9, ctx, "fun");
-      env_push(t.name, v1);
-      log(10, ctx, "env_push");
-      var res = run_trm_wrap(11, t.t2);
-      ctx = ctx_push(ctx, "res", res, "result");
-      log(11, ctx, "var");
-      env_pop();
-      log(12, ctx, "env_pop");
-      return res;
-    });
-  case "trm_seq":
-    log(15, ctx, "case");
-    return if_success(run_trm_wrap(16, t.t1), function(v1) {
-      ctx = ctx_push(ctx, "v1", v1, "value");
-      log(16, ctx, "fun");
-      return if_success(run_trm_wrap(17, t.t2), function (v2) {
-        ctx = ctx_push(ctx, "v2", v2, "value");
-        log(17, ctx, "fun");
-        return(res_val(v2));        
-      });
-    });
-  case "trm_alloc":
-    log(21, ctx, "case");
-    var loc = heap_alloc();
-    ctx = ctx_push(ctx, "loc", loc);
-    log(22, ctx, "var");
-    return res_val({ tag: "val_loc", loc: loc });
-  case "trm_get":
-    log(24, ctx, "case");
-    return if_success(run_trm_wrap(25, t.loc), function(loc) {
-      ctx = ctx_push(ctx, "loc", loc, "value");
-      log(25, ctx, "fun");
-      var v = heap_get(loc, t.field);
-      ctx = ctx_push(ctx, "v", v, "value");
-      log(26, ctx, "var");
-      return res_val(v);
-    });
-  case "trm_set":
-    log(29, ctx, "case");
-    return if_success(run_trm_wrap(30, t.loc), function(loc) {
-      ctx = ctx_push(ctx, "loc", loc, "value");
-      log(30, ctx, "fun");
-      return if_success(run_trm_wrap(31, t.arg), function(arg) {
-        ctx = ctx_push(ctx, "arg", arg, "value");
-        log(31, ctx, "fun");
-        heap_set(loc, t.field, arg);
-        log(32, ctx, "heap_set");
-        return res_val(arg);
-      });
-    });
-  case "trm_if":
-    log(36, ctx, "case");
-    return if_success(run_trm_wrap(37, t.cond), function(cond) {
-      ctx = ctx_push(ctx, "cond", cond, "value");
-      log(37, ctx, "fun");
-      return if_bool(cond, function(b) {
-        ctx = ctx_push(ctx, "b", b);
-        log(38, ctx, "fun");
-        if (b) {
-          log(39, ctx, "case");
-          return if_success(run_trm_wrap(40, t.then), function(v) {
-            ctx = ctx_push(ctx, "v", v, "value");
-            log(40, ctx, "fun");
-            return res_val(v);
-          });
-        } else if (t.else_option !== undefined) {
-          log(43, ctx, "case");
-          return if_success(run_trm_wrap(44, t.else), function(v) {
-            ctx = ctx_push(ctx, "v", v, "value");
-            log(44, ctx, "fun");
-            return res_val(v);
-          });
-        } else {
-          log(47, ctx, "case");
-          // res_unit
-          return res_val({tag:"val_cst", cst:{tag:"cst_bool", bool:true}});
-        }
-      });
-    });
-  default:
-    stuck("invalid trm tag");
-  }
-}
+     return (function () {
+       switch (expr.type) {
+       case "Const": var n = expr.value;
+                     ctx_push(ctx, "n", n, "value");
+                     log(5 , ctx, "Const");
+
+                     return n;
+       case "Add": var ls = expr.left, rs = expr.right;
+                   ctx_push(ctx, "ls", ls, "value");
+                   ctx_push(ctx, "rs", rs, "value");
+                   log(8 , ctx, "Add");
+
+                   return run_trm_wrap(10, ls) + run_trm_wrap(10, rs);
+       case "Sub": var ls = expr.left, rs = expr.right;
+                   ctx_push(ctx, "ls", ls, "value");
+                   ctx_push(ctx, "rs", rs, "value");
+                   log(11 , ctx, "Sub");
+
+                   return run_trm_wrap(13, ls) - run_trm_wrap(13, rs);
+       case "Mul": var ls = expr.left, rs = expr.right;
+                   ctx_push(ctx, "ls", ls, "value");
+                   ctx_push(ctx, "rs", rs, "value");
+                   log(14 , ctx, "Mul");
+
+                   return run_trm_wrap(16, ls) * run_trm_wrap(13, rs);
+       case "Div": var ls = expr.left, rs = expr.right;
+                   ctx_push(ctx, "ls", ls, "value");
+                   ctx_push(ctx, "rs", rs, "value");
+                   log(17 , ctx, "Div");
+
+                   return run_trm_wrap(19, ls) / run_trm_wrap(19, rs);
+       }
+     }())
+     ;
+   };
+
 
 /* Same as above
    Used in "trace.js"   
@@ -419,45 +358,43 @@ function run_program(program) {
   }
 }
 
-//----------------smart constructors---------------
-
-function trm_number(line,  n) {
-  return { tag: "trm_cst", cst: { tag: "cst_number", number: n, line: line }, line: line };
-}
-
-function trm_let(line, name, t1, t2) {
-  return { tag: "trm_let", name: name, t1: t1, t2: t2, line: line };
-}
-
-function trm_seq(line, t1, t2) {
-  return { tag: "trm_seq", t1: t1, t2: t2, line: line };
-}
-
-function trm_var(line, name) {
-  return { tag: "trm_var", name: name, line: line };
-}
-
-function trm_set(line, loc, field, arg) {
-  return {tag: "trm_set", loc: loc, field: field, arg: arg, line: line};
-}
-
-function trm_get(line, loc, field) {
-  return {tag: "trm_get", loc: loc, field: field, line: line};
-}
-
-function trm_alloc(line) {
-  return {tag: "trm_alloc", line: line};
-}
-
 //----------------demo---------------
 
-var trm1 =
-      trm_let(1, "x", { line: 1, tag: "trm_alloc" },
-              trm_seq(1, trm_seq(2, {line: 2, tag: "trm_set", loc: trm_var(2, "x"), field: "foo", arg: trm_number(2, 12)},
-                      {line:3, tag: "trm_set", loc: trm_var(3, "x"), field: "bar",
-                       arg: {line:3, tag:"trm_get", loc: trm_var(3, "x"), field: "foo"}}),
-                      {line:4, tag: "trm_set", loc: trm_var(4, "x"), field: "cycle",
-                       arg: trm_var(4, "x")}));
+
+var parse = function (source) {
+    var ast = esprima.parse(source).body[0].expression;
+
+    function transform (tree) {
+        if (tree === undefined) {
+        } else {
+            switch (tree.operator) {
+                case '+':
+                    tree.type = "Add"; tree.operator = undefined; break;
+                case '-':
+                    tree.type = "Sub"; tree.operator = undefined; break;
+                case "*":
+                    tree.type = "Mul"; tree.operator = undefined; break;
+                case "/":
+                    tree.type = "Div"; tree.operator = undefined; break;
+                default: break;
+            }
+
+            switch (tree.type) {
+                case "Literal":
+                    tree.type = "Const"; break;
+                default: break;
+            }
+
+            if (tree.left !== undefined) tree.left = transform(tree.left);
+            if (tree.right !== undefined) tree.right = transform(tree.right);
+            return tree;
+        }
+    }
+
+    return transform(ast);
+}
+
+var trm1 = parse("((1972 / 29) / 2) + 8");
 
 var program = [trm1];
 

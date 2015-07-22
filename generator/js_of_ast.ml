@@ -144,7 +144,7 @@ let ppf_let_in decl exp =
   in ppf_lambda_wrap s
 
 let ppf_function args body=
-  Printf.sprintf "function (%s) {@;<1 2>@[<v 0>return %s;@]@,}@,"
+  Printf.sprintf "function (%s) {@;<1 2>@[<v 0>return %s;@]@,}"
                  args body
 
 let ppf_apply f args =
@@ -222,8 +222,8 @@ let ppf_record llde =
 
 let ppf_decl ?(mod_gen=[]) id expr =
   let assign_op, decl_kw, end_mark = if mod_gen = [] then " = ", "var ", ";" else ": ", "", "," in 
-  L.log_line (Printf.sprintf "@[<v 0>%s%s%s%s%s@,@]" 
-                 decl_kw id assign_op expr end_mark) (L.Add id)
+  Printf.sprintf "@[<v 0>%s%s%s%s%s@,@]" 
+    decl_kw id assign_op expr end_mark
 
 let ppf_pat_array id_list array_expr =
   Printf.sprintf "var __%s = %s;@," "array" array_expr ^
@@ -261,7 +261,7 @@ let find_type name =
     | x :: xs, y :: ys -> if x = y then filter_on_prefixes xs ys else false in
   let tmp = Hashtbl.find_all type_tbl short_name in
   let candidates = if List.length tmp = 1 then tmp else List.filter (fun (x, _) -> filter_on_prefixes prefixes (short_name :: x)) tmp in
-    print_string @@ print_candidates @@ (Hashtbl.find_all type_tbl short_name); print_newline ();
+    (* print_string @@ print_candidates @@ (Hashtbl.find_all type_tbl short_name); print_newline (); *)
   if List.length candidates = 1
   then snd @@ List.hd candidates
   else failwith ("ambiguity when applying constructor " ^ name)
@@ -332,7 +332,7 @@ and js_of_structure_item ?(mod_gen=[]) old_env s =
         | Ttype_variant cdl ->
           let cl = List.map (fun cstr -> extract_cstr_attrs cstr) cdl in
           List.iter (fun (name, cstrs_name) -> add_type mod_gen name cstrs_name) cl;
-          print_type_tbl ()
+          () (*print_type_tbl ()*)
         | Ttype_record ldl ->
           (* Beware silent shadowing for record labels *)
           List.iter (fun lbl -> Hashtbl.replace record_tbl (Ident.name lbl.ld_id) (Ident.name x.typ_id)) ldl
@@ -359,7 +359,12 @@ and js_of_structure_item ?(mod_gen=[]) old_env s =
 and js_of_branch ?(mod_gen=[]) old_env b obj =
   let spat, binders = js_of_pattern ~mod_gen b.c_lhs obj in
   let se = js_of_expression ~mod_gen old_env b.c_rhs in
-  L.log_line (ppf_branch spat binders se) (L.Add binders)
+  if binders = "" then ppf_branch spat binders se
+  else
+    let typ = match List.rev (Str.split (Str.regexp " ") spat) with
+      | [] -> assert false
+      | x :: xs -> String.sub x 0 (String.length x)
+    in L.log_line (ppf_branch spat binders se) (L.Add (binders, typ))
     
 and js_of_expression ?(mod_gen=[]) old_env e =
   let new_env = e.exp_env in

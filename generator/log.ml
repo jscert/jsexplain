@@ -28,11 +28,12 @@ sig
   type token
   type token_info
   type ident = string
+  type typ = string
          
   type ctx_operation =
-    | Add of ident
-    | Redef of ident
-    | Del of ident
+    | Add of ident * typ
+    | Redef of ident * typ
+    | Del of ident * typ
 
   val log_line : string -> ctx_operation -> string
   val strip_log_info : string -> string
@@ -44,11 +45,12 @@ struct
   open Str
   type token = G.token
   type ident = string
+  type typ = string 
 
   type ctx_operation =
-    | Add of ident
-    | Redef of ident
-    | Del of ident
+    | Add of ident * typ
+    | Redef of ident * typ
+    | Del of ident * typ
                  
   type token_info = ctx_operation
                                   
@@ -59,6 +61,9 @@ struct
   let token_re    = regexp (token_delim ^ "[0-9]+" ^ token_delim)
   let endline_re  = regexp "\n"
   let lfs         = regexp "\n\\(\\( \\)*\n\\)*"
+
+  let to_format s =
+    Scanf.format_from_string s ""
 
   let free_token = G.withdraw
            
@@ -117,15 +122,34 @@ struct
     let ls = lines s in
     let rec aux i = function
       | [] -> ()
-      | (None, str)   :: xs -> Buffer.add_string buf str;
-                               aux (i + 1) xs
-      | (Some l, str) :: xs -> let log_info = match Hashtbl.find info_tbl l with
-                                 | Add x   -> "\nprint (" ^ string_of_int i ^ " + \": Variable\" +" ^ x ^ ");\n"
-                                 | Redef x -> "o"
-                                 | Del x   -> "a"
-                               in Buffer.add_string buf str; Buffer.add_string buf log_info;
+      | (None, str)   :: xs ->
+          Buffer.add_string buf str;
+          aux (i + 1) xs
+      | (Some l, str) :: xs -> let log_info =
+          let pad = 
+            let len = String.length str in
+            let rec repeat n x = if n = 0 then "" else x ^ repeat (n - 1) x in
+            let rec aux i =
+              if i < len then
+                if str.[i] = ' ' then aux (i + 1)
+                else i - 1
+              else len 
+            in repeat (aux 1) " " in
+        match Hashtbl.find info_tbl l with
+          | Add (id, typ)   -> 
+              let ctx_processing id =
+                 let rec aux = function
+                   | [] -> ""
+                   | x :: xs -> "\n" ^ pad ^ "ctx_push(ctx, \"" ^ x ^  "\", " ^ x ^ ", \"value\");" ^ aux xs
+                 in id |> to_format |> Format.sprintf
+                       |> global_replace (regexp "var ") "" |> split (regexp ", ") |> List.map (fun x -> List.hd (split (regexp " = ") x))
+                       |> aux
+              in ctx_processing id ^ "\n" ^ pad ^ "log("^ string_of_int i ^" , ctx, " ^ typ ^ ");\n"
+          | Redef _ -> "" (* Actually not used *)
+          | Del   _ -> "" (* Actually not used *)
+        in Buffer.add_string buf log_info; Buffer.add_string buf str;
                                   aux (i + 1) xs
-    in aux 1 ls; Buffer.contents buf
+    in aux 0 ls; Buffer.contents buf
                                  
   let logged_output s =
     let str_ppf = Format.str_formatter in
@@ -138,7 +162,7 @@ struct
   let unlogged_output s =
     let str_ppf = Format.str_formatter in
     let unlogged_info = strip_log_info s in
-    Format.fprintf str_ppf (Scanf.format_from_string unlogged_info "");
+    Format.fprintf str_ppf (to_format unlogged_info);
     Format.flush_str_formatter ()
   (* let bad_output = Format.flush_str_formatter () in *)
   (*     global_replace lfs "\n" bad_output *)

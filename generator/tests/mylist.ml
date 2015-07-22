@@ -56,6 +56,6 @@ let f = 1 in
   print (length list0);
   print (length list1);
   print (length list2);
-  print (print_list (map sqr list0));
+  print (print_list (map (fun x -> x * x) list0));
   print (print_list (map sqr list1));
   print (print_list (map sqr list2));

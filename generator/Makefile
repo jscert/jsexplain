@@ -15,7 +15,7 @@ ML_TESTS    := $(wildcard $(TEST_DIR)/*.ml)
 
 CC          := ocamlc -c
 OCAMLBUILD  := ocamlbuild -r -j 4 -classic-display \
-	           $(addprefix -lflag , $(LIB_DEP)) \
+	           $(addprefix -lflag , $(LIB_DEP) -g) \
 	           $(addprefix -I ,$(ML_DIRS)) \
 
 all: main.byte
@@ -30,7 +30,10 @@ stdlib:
 	$(CC) stdlib_ml/stdlib.mli
 
 tests: main.byte stdlib
-	$(foreach mlfile, $(ML_TESTS), ./main.byte $(mlfile);)
+	#TODO: Remove the first line
+	./main.byte tests/stack.ml
+	$(foreach mlfile, $(ML_TESTS), ./main.byte -I tests $(mlfile);)
+	mkdir -p $(TEST_DIR_JS) 
 	mv $(TEST_DIR)/*.js $(TEST_DIR_JS)
 
 clean_stdlib:
