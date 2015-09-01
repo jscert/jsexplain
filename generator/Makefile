@@ -20,7 +20,7 @@ OCAMLBUILD  := ocamlbuild -r -j 4 -classic-display \
 
 all: main.byte
 
-main.byte:
+main.byte: js_of_ast.ml
 	$(OCAMLBUILD) main.byte
 
 native:
@@ -28,6 +28,10 @@ native:
 
 stdlib:
 	$(CC) stdlib_ml/stdlib.mli
+
+%.inferred.mli:
+	$(OCAMLBUILD) $@
+	cp _build/%@ .
 
 tests: main.byte stdlib
 	#TODO: Remove the first line

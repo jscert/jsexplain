@@ -247,6 +247,8 @@ let short_type_name name =
 let add_type mod_gen name cstrs_name =
   Hashtbl.add type_tbl (short_type_name name) (mod_gen, cstrs_name)
 
+(* string -> string list
+ * Appears to return the name annotations of a type definition *)
 let find_type name =
   let short_name = short_type_name name in
   let find_points name = 
