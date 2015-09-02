@@ -11,7 +11,7 @@ and sexpr =
   | Emp
   | Push [@f value, stack] of expr * sexpr
 
-let rec eval_ (expr:expr) = match expr with
+let rec eval_ expr = match expr with
   | Const n -> n
   | Add (ls, rs) -> eval_ ls + eval_ rs
   | Sub (ls, rs) -> eval_ ls - eval_ rs
@@ -22,7 +22,7 @@ and evals sexpr = match sexpr with
   | Emp -> Stack.N
   | Push (v, s) -> Stack.push (eval_ v) (evals s)
 
-let rec print_expr (expr:expr) = match expr with
+let rec print_expr expr = match expr with
   | Const n -> to_string n
   | Add (ls, rs) -> "(" + (print_expr ls) + ")" + " + " + (print_expr rs)
   | Sub (ls, rs) -> "(" + (print_expr ls) + ")" + " - " + (print_expr rs)
@@ -37,5 +37,5 @@ and print_sexpr sexpr = match sexpr with
 let f =
     (*let bli = Stack.C(1, Stack.N) in
     let blii = (Stack.push 2 bli) in*)
-    let source = parse "Pop(Push(2, Push(1972 / 29, N)) + 8" in
+    let source = parse "Pop(Emp)" in
     print ((print_expr source) + " = " + to_string (eval_ source))

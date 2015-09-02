@@ -20,8 +20,10 @@ OCAMLBUILD  := ocamlbuild -r -j 4 -classic-display \
 
 all: main.byte
 
-main.byte: js_of_ast.ml
-	$(OCAMLBUILD) main.byte
+debug: main.d.byte
+
+%.byte: *.ml
+	$(OCAMLBUILD) $@
 
 native:
 	$(OCAMLBUILD) main.native
