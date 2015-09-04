@@ -8,7 +8,7 @@ type expr =
   | Div [@f left, right] of expr * expr
   | Pop [@f stack] of sexpr
 and sexpr =
-  | Emp
+  | Emp [@f]
   | Push [@f value, stack] of expr * sexpr
 
 let rec eval_ expr = match expr with

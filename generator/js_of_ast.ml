@@ -327,20 +327,17 @@ and js_of_structure_item ?(mod_gen=[]) old_env s =
   | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression ~mod_gen new_env e
   | Tstr_value (_, vb_l) -> String.concat "@,@," @@ List.map (fun vb -> show_value_binding ~mod_gen vb) @@ vb_l
   | Tstr_type tl ->
-   let explore_type = function
-      | [] -> ()
-      | x :: xs ->
-        (match x.typ_kind with
+   let create_type x =
+      (match x.typ_kind with
         | Ttype_variant cdl ->
           let cl = List.map (fun cstr -> extract_cstr_attrs cstr) cdl in
           List.iter (fun (name, cstrs_name) -> add_type mod_gen name cstrs_name) cl;
-          () (*print_type_tbl ()*)
+          (* print_type_tbl () *)
         | Ttype_record ldl ->
           (* Beware silent shadowing for record labels *)
           List.iter (fun lbl -> Hashtbl.replace record_tbl (Ident.name lbl.ld_id) (Ident.name x.typ_id)) ldl
-        | _ -> unsupported "open types, record and abstract type"
-        )
-   in explore_type tl; ""
+        | _ -> unsupported "open types, record and abstract type")
+   in List.iter create_type tl; ""
   | Tstr_open       od -> 
     let name = (fun od -> if od.open_override = Fresh then js_of_longident od.open_txt else "") od in
     if name <> "" then

@@ -33,7 +33,7 @@ stdlib:
 
 %.inferred.mli:
 	$(OCAMLBUILD) $@
-	cp _build/%@ .
+	cp _build/$@ .
 
 tests: main.byte stdlib
 	#TODO: Remove the first line
