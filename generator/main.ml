@@ -41,7 +41,7 @@ let _ =
    let log_output, unlog_output, pre_output =
      match !outputfile with
      | None -> Filename.concat dirname (basename ^ ".log.js"),
-               Filename.concat dirname (basename ^ "unlog.js"),
+               Filename.concat dirname (basename ^ ".unlog.js"),
                Filename.concat dirname (basename ^ ".js.pre")
      | Some f -> f ^ ".log.js", f ^ ".unlog.js", f ^ ".js.pre"
    in
