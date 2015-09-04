@@ -289,7 +289,15 @@ let find_module_path mod_list =
   let res = zip mod_list (prune @@ expand_names @@ mod_list)
   in module_list := []; res
 
-let rec parse_modules ?(mod_gen=[]) = function
+(**
+ * Main part
+ *)
+
+let rec js_of_structure ?(mod_gen=[]) old_env s =
+  let new_env = s.str_final_env in
+  show_list_f (fun strct -> js_of_structure_item ~mod_gen new_env strct) "@,@," s.str_items
+
+and parse_modules ?(mod_gen=[]) = function
   | [] -> []
   | (name, path) :: xs ->
    let ppf = Format.std_formatter in
@@ -299,28 +307,12 @@ let rec parse_modules ?(mod_gen=[]) = function
       | None -> failwith ("Could not read and typecheck " ^ inputfile)
       | Some (parsetree1, (typedtree1, _)) -> parsetree1, typedtree1
       in
-   let (_, _, pre) = to_javascript ~mod_gen:(name :: mod_gen) typedtree1 in
+   let pre = js_of_structure ~mod_gen:(name :: mod_gen) Env.empty typedtree1 in
    Printf.sprintf "%s = {\n%s\n}" name pre :: parse_modules ~mod_gen xs
-
-(**
- * Main part
- *)
-
-and to_javascript ?(mod_gen=[]) typedtree =
-  let pre_res = js_of_structure ~mod_gen Env.empty typedtree in
-  let mod_code = String.concat "" (List.map L.strip_log_info !module_code) in
-  let logged, unlogged, pre = L.logged_output (mod_code ^ "\n" ^ pre_res),
-                              L.unlogged_output (mod_code ^ "\n" ^ pre_res),
-                              (mod_code ^ "\n" ^ pre_res) in
-  (logged, unlogged, pre)
 
 and show_value_binding ?(mod_gen=[]) vb =
   js_of_let_pattern ~mod_gen vb.vb_pat vb.vb_expr
-    
-and js_of_structure ?(mod_gen=[]) old_env s =
-  let new_env = s.str_final_env in
-  show_list_f (fun strct -> js_of_structure_item ~mod_gen new_env strct) "@,@," s.str_items
-    
+
 and js_of_structure_item ?(mod_gen=[]) old_env s =
   let new_env = s.str_env in
   match s.str_desc with
@@ -342,7 +334,7 @@ and js_of_structure_item ?(mod_gen=[]) old_env s =
     let name = (fun od -> if od.open_override = Fresh then js_of_longident od.open_txt else "") od in
     if name <> "" then
       module_list := name :: !module_list;
-      module_code := ((fun modules -> parse_modules ~mod_gen modules) @@ find_module_path @@ !module_list) @ !module_code;
+      module_code := (((fun modules -> parse_modules ~mod_gen modules) @@ find_module_path @@ !module_list) @ (!module_code));
     "" 
   | Tstr_primitive  _  -> out_of_scope "primitive functions"
   | Tstr_typext     _  -> out_of_scope "type extensions"
@@ -489,3 +481,12 @@ and js_of_pattern ?(mod_gen=[]) pat obj =
   | Tpat_alias (_,_,_) -> out_of_scope "alias-pattern"
   | Tpat_variant (_,_,_) -> out_of_scope "polymorphic variants in pattern matching"
   | Tpat_lazy _ -> out_of_scope "lazy-pattern"
+
+let to_javascript typedtree =
+  let pre_res = js_of_structure Env.empty typedtree in
+  let mod_code = String.concat "" (List.map L.strip_log_info !module_code) in
+  let logged, unlogged, pre = L.logged_output (mod_code ^ "\n(*logged sep*)\n" ^ pre_res),
+                              L.unlogged_output (mod_code ^ "\n(*unlogged sep*)\n" ^ pre_res),
+                              (mod_code ^ "\n(*pre sep*)" ^ pre_res) in
+  (logged, unlogged, pre)
+
