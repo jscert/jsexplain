@@ -36,8 +36,6 @@ stdlib:
 	cp _build/$@ .
 
 tests: main.byte stdlib
-	#TODO: Remove the first line
-	./main.byte tests/stack.ml
 	$(foreach mlfile, $(ML_TESTS), ./main.byte -I tests $(mlfile);)
 	mkdir -p $(TEST_DIR_JS) 
 	mv $(TEST_DIR)/*.js $(TEST_DIR_JS)
