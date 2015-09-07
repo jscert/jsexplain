@@ -334,7 +334,8 @@ and js_of_structure_item ?(mod_gen=[]) old_env s =
     let name = (fun od -> if od.open_override = Fresh then js_of_longident od.open_txt else "") od in
     if name <> "" then
       module_list := name :: !module_list;
-      module_code := (((fun modules -> parse_modules ~mod_gen modules) @@ find_module_path @@ !module_list) @ (!module_code));
+      let new_mod = parse_modules ~mod_gen @@ find_module_path @@ !module_list in
+      module_code := new_mod @ (!module_code);
     "" 
   | Tstr_primitive  _  -> out_of_scope "primitive functions"
   | Tstr_typext     _  -> out_of_scope "type extensions"
@@ -484,9 +485,9 @@ and js_of_pattern ?(mod_gen=[]) pat obj =
 
 let to_javascript typedtree =
   let pre_res = js_of_structure Env.empty typedtree in
-  let mod_code = String.concat "" (List.map L.strip_log_info !module_code) in
-  let logged, unlogged, pre = L.logged_output (mod_code ^ "\n(*logged sep*)\n" ^ pre_res),
-                              L.unlogged_output (mod_code ^ "\n(*unlogged sep*)\n" ^ pre_res),
-                              (mod_code ^ "\n(*pre sep*)" ^ pre_res) in
+  let mod_code = String.concat "\n\n" (List.map L.strip_log_info !module_code) in
+  let logged, unlogged, pre = L.logged_output (mod_code ^ "\n" ^ pre_res),
+                              L.unlogged_output (mod_code ^ "\n" ^ pre_res),
+                              (mod_code ^ "\n" ^ pre_res) in
   (logged, unlogged, pre)
 
