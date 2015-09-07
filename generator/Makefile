@@ -45,6 +45,7 @@ clean_stdlib:
 
 clean_tests:
 	rm -f $(TEST_DIR)/*.cmi
+	rm -f $(TEST_DIR)/*.js.pre
 	rm -f $(TEST_DIR_JS)/*.js
 
 clean:
