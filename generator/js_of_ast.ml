@@ -18,6 +18,7 @@ let type_tbl     = Hashtbl.create hashtbl_size
 let record_tbl   = Hashtbl.create hashtbl_size
 let module_list  = ref []
 let module_code  = ref []
+let module_created = ref []
 module L = Logged (Token_generator) (struct let size = 256 end)
   
 (**
@@ -335,7 +336,8 @@ and js_of_structure_item ?(mod_gen=[]) old_env s =
     if name <> "" then
       module_list := name :: !module_list;
       let new_mod = parse_modules ~mod_gen @@ find_module_path @@ !module_list in
-      module_code := new_mod @ (!module_code);
+      module_created := name :: !module_created;
+      module_code := new_mod @ !module_code;
     "" 
   | Tstr_primitive  _  -> out_of_scope "primitive functions"
   | Tstr_typext     _  -> out_of_scope "type extensions"

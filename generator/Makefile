@@ -36,6 +36,11 @@ stdlib:
 	cp _build/$@ .
 
 tests: main.byte stdlib
+	# TODO: Figure out why dependencies required to be translated first
+	./main.byte -I tests tests/stack.ml
+	./main.byte -I tests tests/calc.ml
+	./main.byte -I tests tests/cascade.ml
+	# Delete the above once figured out.
 	$(foreach mlfile, $(ML_TESTS), ./main.byte -I tests $(mlfile);)
 	mkdir -p $(TEST_DIR_JS) 
 	mv $(TEST_DIR)/*.js $(TEST_DIR_JS)
@@ -46,6 +51,8 @@ clean_stdlib:
 clean_tests:
 	rm -f $(TEST_DIR)/*.cmi
 	rm -f $(TEST_DIR)/*.js.pre
+	# Temp rule to remove artifacts during manual/debug creation
+	rm -f $(TEST_DIR)/*.js
 	rm -f $(TEST_DIR_JS)/*.js
 
 clean:
