@@ -1,0 +1,7 @@
+true: package(str)
+<parsing>: include
+<typing>: include
+<utils>: include
+
+<tests>: precious
+<stdlib_ml>: precious
