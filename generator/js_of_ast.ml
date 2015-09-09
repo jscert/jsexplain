@@ -290,6 +290,9 @@ let find_module_path mod_list =
   let res = zip mod_list (prune @@ expand_names @@ mod_list)
   in module_list := []; res
 
+and not_already_created mod_name =
+  not @@ List.exists (fun x -> x == mod_name) !module_created
+
 (**
  * Main part
  *)
@@ -333,7 +336,7 @@ and js_of_structure_item ?(mod_gen=[]) old_env s =
    in List.iter create_type tl; ""
   | Tstr_open       od -> 
     let name = (fun od -> if od.open_override = Fresh then js_of_longident od.open_txt else "") od in
-    if name <> "" then
+    if (name <> "" & not_already_created name) then
       module_list := name :: !module_list;
       let new_mod = parse_modules ~mod_gen @@ find_module_path @@ !module_list in
       module_created := name :: !module_created;
