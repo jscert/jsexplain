@@ -291,7 +291,7 @@ let find_module_path mod_list =
   in module_list := []; res
 
 and not_already_created mod_name =
-  not @@ List.exists (fun x -> x == mod_name) !module_created
+  not @@ List.exists ((=) mod_name) !module_created
 
 (**
  * Main part
