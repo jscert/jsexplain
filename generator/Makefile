@@ -35,7 +35,6 @@ tests: main.byte stdlib
 	# TODO: Figure out why dependencies required to be translated first
 	./main.byte -I tests tests/stack.ml
 	./main.byte -I tests tests/calc.ml
-	./main.byte -I tests tests/cascade.ml
 	# Delete the above once figured out.
 	$(foreach mlfile, $(ML_TESTS), ./main.byte -I tests $(mlfile);)
 	mkdir -p $(TEST_DIR_JS) 
