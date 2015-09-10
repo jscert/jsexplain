@@ -8,11 +8,14 @@
 
 STD_DIR	    := stdlib_ml
 TEST_DIR    := tests
-TEST_DIR_JS := tests/js
 ML_TESTS    := $(wildcard $(TEST_DIR)/*.ml)
 
-CC          := ocamlc -c
 OCAMLBUILD  := ocamlbuild -j 4 -classic-display -use-ocamlfind
+
+# Used for stdlib and generator dependency generation
+CC          := ocamlc -c
+OCAMLDEP    := ocamldep -one-line
+DEPSED      := sed -e "s/cmo/log.js/; s/cmo/cmi/g; /cmx/ d"
 
 all: main.byte
 
@@ -31,14 +34,22 @@ stdlib:
 	$(OCAMLBUILD) $@
 	cp _build/$@ .
 
-tests: main.byte stdlib
-	# TODO: Figure out why dependencies required to be translated first
-	./main.byte -I tests tests/stack.ml
-	./main.byte -I tests tests/calc.ml
-	# Delete the above once figured out.
-	$(foreach mlfile, $(ML_TESTS), ./main.byte -I tests $(mlfile);)
-	mkdir -p $(TEST_DIR_JS) 
-	mv $(TEST_DIR)/*.js $(TEST_DIR_JS)
+.PRECIOUS: tests/%.ml
+tests/%.ml tests/%.ml.d: tests/%.v
+	$(MAKE) -C $(CURDIR)/../../../lib/tlc/src
+	cd $(<D) && coqc -I $(CURDIR)/../../../lib/tlc/src $(<F)
+	cd $(<D) && rm *.mli
+	$(OCAMLDEP) -I $(<D) $(<D)/*.ml | $(DEPSED) > tests/$*.ml.d
+
+tests/%.ml.d: tests/%.ml
+	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
+
+tests/%.cmi tests/%.log.js tests/%.unlog.js: tests/%.ml main.byte stdlib
+	./main.byte -I $(<D) $<
+
+tests: $(ML_TESTS:.ml=.log.js)
+
+tests/lambda: tests/lambda/Lambda.log.js
 
 clean_stdlib:
 	rm -f $(STD_DIR)/*.cmi
@@ -46,9 +57,9 @@ clean_stdlib:
 clean_tests:
 	rm -f $(TEST_DIR)/*.cmi
 	rm -f $(TEST_DIR)/*.js.pre
-	# Temp rule to remove artifacts during manual/debug creation
 	rm -f $(TEST_DIR)/*.js
-	rm -f $(TEST_DIR_JS)/*.js
+	rm -f $(TEST_DIR)/*.d
+	rm -f $(TEST_DIR)/lambda/*.{ml,mli,glob,vo,d}
 
 clean:
 	rm -rf _build
@@ -56,3 +67,11 @@ clean:
 
 clean_cmi: clean_tests clean_stdlib
 cleanall: clean clean_cmi
+
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)
+-include $(ML_TESTS:.ml=.ml.d)
+endif
+
+ifeq ($(MAKECMDGOALS),tests/lambda)
+-include tests/lambda/Lambda.ml.d
+endif
