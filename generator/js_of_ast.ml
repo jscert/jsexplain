@@ -338,7 +338,16 @@ and js_of_structure_item ?(mod_gen=[]) old_env s =
     let name = (fun od -> if od.open_override = Fresh then js_of_longident od.open_txt else "") od in
     if (name <> "" & not_already_created name) then
       module_list := name :: !module_list;
+
+      (* Disable writing of .cmi files for modules we're opening to avoid automatically over-writing existing signature
+       * with an inconsistent one *)
+      let old_dont_write_files = !Clflags.dont_write_files in
+      Clflags.dont_write_files := true;
+
       let new_mod = parse_modules ~mod_gen @@ find_module_path @@ !module_list in
+
+      Clflags.dont_write_files := old_dont_write_files;
+
       module_created := name :: !module_created;
       module_code := new_mod @ !module_code;
     "" 

@@ -102,8 +102,7 @@ let process_implementation_file ppf sourcefile =
   Env.set_unit_name modulename;
   let inputfile = preprocess sourcefile in
   try
-  let env = initial_env () in
-
+    let env = initial_env () in
     let parsetree = parse_file inputfile Parse.implementation ast_impl_magic_number in
     let typedtree = Typemod.type_implementation sourcefile prefixname modulename env parsetree in
     (Some (parsetree, typedtree), inputfile)
