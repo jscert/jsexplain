@@ -34,12 +34,12 @@ stdlib:
 	$(OCAMLBUILD) $@
 	cp _build/$@ .
 
+# In case we want to rebuild any .v, but we're likely to be modifying the resulting .mls now anyway...
 .PRECIOUS: tests/%.ml
-tests/%.ml tests/%.ml.d: tests/%.v
+tests/%.ml: tests/%.v
 	$(MAKE) -C $(CURDIR)/../../../lib/tlc/src
 	cd $(<D) && coqc -I $(CURDIR)/../../../lib/tlc/src $(<F)
 	cd $(<D) && rm *.mli
-	$(OCAMLDEP) -I $(<D) $(<D)/*.ml | $(DEPSED) > tests/$*.ml.d
 
 tests/%.ml.d: tests/%.ml
 	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
@@ -54,12 +54,10 @@ tests/lambda: tests/lambda/Lambda.log.js
 clean_stdlib:
 	rm -f $(STD_DIR)/*.cmi
 
+DIRTY_EXTS := cmi,js.pre,js,d
 clean_tests:
-	rm -f $(TEST_DIR)/*.cmi
-	rm -f $(TEST_DIR)/*.js.pre
-	rm -f $(TEST_DIR)/*.js
-	rm -f $(TEST_DIR)/*.d
-	rm -f $(TEST_DIR)/lambda/*.{ml,mli,glob,vo,d}
+	rm -f $(TEST_DIR)/*.{$(DIRTY_EXTS)}
+	rm -f $(TEST_DIR)/lambda/*.{$(DIRTY_EXTS),glob,vo,d}
 
 clean:
 	rm -rf _build
