@@ -5,16 +5,16 @@ open LibVar
 open Specif
 
 type coq_val =
-| Coq_val_int of coq_Z
-| Coq_val_clo of Variables.var * trm
-| Coq_val_err
+| Coq_val_int  [@f label0] of coq_Z (** Auto Generated Attributes **)
+| Coq_val_clo  [@f label0 label1] of Variables.var * trm (** Auto Generated Attributes **)
+| Coq_val_err [@f]  (** Auto Generated Attributes **)
 and trm =
-| Coq_trm_val of coq_val
-| Coq_trm_var of Variables.var
-| Coq_trm_abs of Variables.var * trm
-| Coq_trm_app of trm * trm
-| Coq_trm_try of trm * trm
-| Coq_trm_raise of trm
+| Coq_trm_val  [@f label0] of coq_val (** Auto Generated Attributes **)
+| Coq_trm_var  [@f label0] of Variables.var (** Auto Generated Attributes **)
+| Coq_trm_abs  [@f label0 label1] of Variables.var * trm (** Auto Generated Attributes **)
+| Coq_trm_app  [@f label0 label1] of trm * trm (** Auto Generated Attributes **)
+| Coq_trm_try  [@f label0 label1] of trm * trm (** Auto Generated Attributes **)
+| Coq_trm_raise  [@f label0] of trm (** Auto Generated Attributes **)
 
 (** val subst : Variables.var -> coq_val -> trm -> trm **)
 
@@ -36,13 +36,13 @@ let rec subst x v t =
    | Coq_trm_raise t1 -> Coq_trm_raise (s t1))
 
 type beh =
-| Coq_beh_ret of coq_val
-| Coq_beh_exn of coq_val
-| Coq_beh_err
+| Coq_beh_ret  [@f label0] of coq_val (** Auto Generated Attributes **)
+| Coq_beh_exn  [@f label0] of coq_val (** Auto Generated Attributes **)
+| Coq_beh_err [@f]  (** Auto Generated Attributes **)
 
 type res =
-| Coq_res_return of beh
-| Coq_res_bottom
+| Coq_res_return  [@f label0] of beh (** Auto Generated Attributes **)
+| Coq_res_bottom [@f]  (** Auto Generated Attributes **)
 
 (** val if_success : res -> (coq_val -> res) -> res **)
 

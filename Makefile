@@ -7,3 +7,4 @@ fresh_interp:
 	$(MAKE) -C .. extract_interpreter
 	cp ../interp/src/*.ml{,i} ../interp/src/extract/*.ml{,i} src
 	./convert-ml-strings.pl -i.bak src/*
+	./ml-add-cstr-annots.pl src/*.ml
