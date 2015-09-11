@@ -129,8 +129,6 @@ Fixpoint run (n:nat) (t:trm) : res :=
    (otherwise, useless errors will be launched). *)
 Extraction Inline classicT LibEpsilon.Inhab_witness LibEpsilon.epsilon LibEpsilon.epsilon_def indefinite_description.
 
-Extract Constant nat_comparable => "(=)".
-
 Set Extraction AccessOpaque.
 Unset Extraction Optimize.
 Unset Extraction KeepSingleton.
