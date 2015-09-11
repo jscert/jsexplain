@@ -3,6 +3,6 @@ type 'a coq_sig =
   (* singleton inductive, whose constructor was exist *)
 
 type sumbool =
-| Coq_left
-| Coq_right
+| Coq_left [@f]  (** Auto Generated Attributes **)
+| Coq_right [@f]  (** Auto Generated Attributes **)
 

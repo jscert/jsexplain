@@ -1,8 +1,9 @@
 open BinNums
 open Datatypes
-open LibLogic
 open LibVar
 open Specif
+
+let __ = let rec f _ = Obj.repr f in Obj.repr f
 
 type coq_val =
 | Coq_val_int  [@f label0] of coq_Z (** Auto Generated Attributes **)
@@ -23,12 +24,18 @@ let rec subst x v t =
   (match t with
    | Coq_trm_val v0 -> t
    | Coq_trm_var y ->
-     (match classicT with
+     (match let h = failwith "AXIOM TO BE REALIZED" in
+            (match h with
+             | Coq_true -> (fun _ -> Coq_left)
+             | Coq_false -> (fun _ -> Coq_right)) __ with
       | Coq_left -> Coq_trm_val v
       | Coq_right -> t)
    | Coq_trm_abs (y, t3) ->
      Coq_trm_abs (y,
-       (match classicT with
+       (match let h = failwith "AXIOM TO BE REALIZED" in
+              (match h with
+               | Coq_true -> (fun _ -> Coq_left)
+               | Coq_false -> (fun _ -> Coq_right)) __ with
         | Coq_left -> t3
         | Coq_right -> s t3))
    | Coq_trm_app (t1, t2) -> Coq_trm_app ((s t1), (s t2))

@@ -1,10 +1,10 @@
 open Datatypes
-open LibEpsilon
 open LibFset
 open LibList
 open LibNat
 open LibReflect
 open Peano
+open Specif
 
 let __ = let rec f _ = Obj.repr f in Obj.repr f
 
@@ -47,7 +47,16 @@ module Variables =
   (** val var_gen : vars -> var **)
   
   let var_gen e =
-    var_gen_list (epsilon __)
+    var_gen_list
+      (let s =
+         let h = failwith "AXIOM TO BE REALIZED" in
+         (match h with
+          | Coq_true -> (fun _ -> Coq_left)
+          | Coq_false -> (fun _ -> Coq_right)) __
+       in
+       match s with
+       | Coq_left -> failwith "AXIOM TO BE REALIZED"
+       | Coq_right -> failwith "AXIOM TO BE REALIZED")
   
   (** val var_fresh : vars -> var **)
   

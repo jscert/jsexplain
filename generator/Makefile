@@ -40,6 +40,7 @@ tests/%.ml: tests/%.v
 	$(MAKE) -C $(CURDIR)/../../../lib/tlc/src
 	cd $(<D) && coqc -I $(CURDIR)/../../../lib/tlc/src $(<F)
 	cd $(<D) && rm *.mli
+	cd $(<D) && $(CURDIR)/../../ml-add-cstr-annots.pl *.ml
 
 tests/%.ml.d: tests/%.ml
 	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
@@ -57,7 +58,7 @@ clean_stdlib:
 DIRTY_EXTS := cmi,js.pre,js,d
 clean_tests:
 	rm -f $(TEST_DIR)/*.{$(DIRTY_EXTS)}
-	rm -f $(TEST_DIR)/lambda/*.{$(DIRTY_EXTS),glob,vo,d}
+	rm -f $(TEST_DIR)/lambda/*.{$(DIRTY_EXTS),glob,vo,d,ml}
 
 clean:
 	rm -rf _build
