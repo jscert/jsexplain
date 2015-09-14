@@ -15,7 +15,7 @@ OCAMLBUILD  := ocamlbuild -j 4 -classic-display -use-ocamlfind
 # Used for stdlib and generator dependency generation
 CC          := ocamlc -c
 OCAMLDEP    := ocamldep -one-line
-DEPSED      := sed -e "s/cmo/log.js/; s/cmo/cmi/g; /cmx/ d"
+DEPSED      := sed -e "s/cmo/log.js/; s/cmo/cmi/g; s/cmx/cmi/g"
 
 all: main.byte
 
