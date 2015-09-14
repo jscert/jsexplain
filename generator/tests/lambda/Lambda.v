@@ -36,8 +36,8 @@ Fixpoint subst (x:var) (v:val) (t:trm) : trm :=
   let s := subst x v in
   match t with
   | trm_val v => t
-  | trm_var y => If x = y then trm_val v else t
-  | trm_abs y t3 => trm_abs y (If x = y then t3 else s t3)
+  | trm_var y => ifb x = y then trm_val v else t
+  | trm_abs y t3 => trm_abs y (ifb x = y then t3 else s t3)
   | trm_app t1 t2 => trm_app (s t1) (s t2)  
   | trm_try t1 t2 => trm_try (s t1) (s t2) 
   | trm_raise t1 => trm_raise (s t1)
@@ -125,9 +125,13 @@ Fixpoint run (n:nat) (t:trm) : res :=
     end
   end.
 
+Extraction Inline nat_comparable var_comp var_comparable.
 (* As classical logic statements are now unused, they should not be extracted
    (otherwise, useless errors will be launched). *)
 Extraction Inline classicT LibEpsilon.Inhab_witness LibEpsilon.epsilon LibEpsilon.epsilon_def indefinite_description.
+
+(* Suppress dependency on Specif.ml... *)
+Extract Constant var_gen => "failwith ""AXIOM NOT REALISED""".
 
 Set Extraction AccessOpaque.
 Unset Extraction Optimize.

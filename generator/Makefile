@@ -42,6 +42,9 @@ tests/%.ml: tests/%.v
 	cd $(<D) && rm *.mli
 	cd $(<D) && $(CURDIR)/../../ml-add-cstr-annots.pl *.ml
 
+tests/lambda/Lambda.ml.d: tests/lambda/Lambda.ml
+	$(OCAMLDEP) -I $(<D) $(<D)/*.ml | $(DEPSED) > $@
+
 tests/%.ml.d: tests/%.ml
 	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
 
