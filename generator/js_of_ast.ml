@@ -325,6 +325,7 @@ and js_of_structure_item ?(mod_gen=[]) old_env s =
         | Ttype_record ldl ->
           (* Beware silent shadowing for record labels *)
           List.iter (fun lbl -> Hashtbl.replace record_tbl (Ident.name lbl.ld_id) (Ident.name x.typ_id)) ldl
+        | Ttype_abstract -> ()
         | _ -> unsupported "open types, record and abstract type")
    in List.iter create_type tl; ""
   | Tstr_open       od -> 
