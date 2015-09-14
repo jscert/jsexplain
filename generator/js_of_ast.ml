@@ -273,23 +273,16 @@ let find_type name =
  * Module managment part
  *)
 
+(** Return tuple of module name and path to module **)
 let find_module_path mod_list =
   let open Config in
-  let rec expand_names = function
-    | [] -> []
-    | x :: xs -> List.map (fun path -> Filename.concat path ((String.lowercase x) ^ ".ml")) !load_path 
-                 :: expand_names xs in
-  let first_valid paths = match List.filter Sys.file_exists paths with
-    | [] -> None
-    | x :: xs -> Some x in
-  let rec prune = function
-    | [] -> []
-    | x :: xs -> match first_valid x with
-        | None -> failwith "Unbound module"
-        | Some m -> m :: prune xs in
-  let res = zip mod_list (prune @@ expand_names @@ mod_list)
-  in module_list := []; res
+  let check_path name = find_in_path_uncap !load_path (name ^ ".ml") in
+  try
+    module_list := [];
+    zip mod_list (List.map check_path mod_list)
+  with Not_found -> failwith "Unbound module"
 
+(** Return bool of whether a module has bee ncreated already **)
 and not_already_created mod_name =
   not @@ List.exists ((=) mod_name) !module_created
 
