@@ -11,7 +11,10 @@ foreach $fname (@ARGV) {
 			$no = split(/\*/, $3);
 			$annot = " [\@f";
 			for (my $i=0; $i < $no; $i++) {
-				$annot = $annot . " label" . $i . "";
+				$annot = $annot . " label" . $i;
+				if ($i < $no -1) {
+					$annot = $annot . ",";
+				}
 			}
 			$annot = $annot . "] ";
 			print NEW $1 . $annot . $2 . " (** Auto Generated Attributes **)\n";

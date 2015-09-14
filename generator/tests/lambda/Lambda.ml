@@ -5,14 +5,14 @@ open LibVar
 
 type coq_val =
 | Coq_val_int  [@f label0] of coq_Z (** Auto Generated Attributes **)
-| Coq_val_clo  [@f label0 label1] of Variables.var * trm (** Auto Generated Attributes **)
+| Coq_val_clo  [@f label0, label1] of Variables.var * trm (** Auto Generated Attributes **)
 | Coq_val_err [@f]  (** Auto Generated Attributes **)
 and trm =
 | Coq_trm_val  [@f label0] of coq_val (** Auto Generated Attributes **)
 | Coq_trm_var  [@f label0] of Variables.var (** Auto Generated Attributes **)
-| Coq_trm_abs  [@f label0 label1] of Variables.var * trm (** Auto Generated Attributes **)
-| Coq_trm_app  [@f label0 label1] of trm * trm (** Auto Generated Attributes **)
-| Coq_trm_try  [@f label0 label1] of trm * trm (** Auto Generated Attributes **)
+| Coq_trm_abs  [@f label0, label1] of Variables.var * trm (** Auto Generated Attributes **)
+| Coq_trm_app  [@f label0, label1] of trm * trm (** Auto Generated Attributes **)
+| Coq_trm_try  [@f label0, label1] of trm * trm (** Auto Generated Attributes **)
 | Coq_trm_raise  [@f label0] of trm (** Auto Generated Attributes **)
 
 (** val subst : Variables.var -> coq_val -> trm -> trm **)

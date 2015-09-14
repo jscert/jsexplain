@@ -8,5 +8,5 @@ type nat =
 
 type 'a list =
 | Coq_nil [@f]  (** Auto Generated Attributes **)
-| Coq_cons  [@f label0 label1] of 'a * 'a list (** Auto Generated Attributes **)
+| Coq_cons  [@f label0, label1] of 'a * 'a list (** Auto Generated Attributes **)
 
