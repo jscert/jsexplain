@@ -130,9 +130,6 @@ Extraction Inline nat_comparable var_comp var_comparable.
    (otherwise, useless errors will be launched). *)
 Extraction Inline classicT LibEpsilon.Inhab_witness LibEpsilon.epsilon LibEpsilon.epsilon_def indefinite_description.
 
-(* Suppress dependency on Specif.ml... *)
-Extract Constant var_gen => "failwith ""AXIOM NOT REALISED""".
-
 Set Extraction AccessOpaque.
 Unset Extraction Optimize.
 Unset Extraction KeepSingleton.
