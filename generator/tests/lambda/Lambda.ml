@@ -16,16 +16,14 @@ and trm =
 
 (** val subst : var -> coq_val -> trm -> trm **)
 
-let rec subst x v t =
-  let s = subst x v in
-  (match t with
-   | Coq_trm_val v0 -> t
-   | Coq_trm_var y -> if var_comp x y then Coq_trm_val v else t
-   | Coq_trm_abs (y, t3) ->
-     Coq_trm_abs (y, (if var_comp x y then t3 else s t3))
-   | Coq_trm_app (t1, t2) -> Coq_trm_app ((s t1), (s t2))
-   | Coq_trm_try (t1, t2) -> Coq_trm_try ((s t1), (s t2))
-   | Coq_trm_raise t1 -> Coq_trm_raise (s t1))
+let rec subst x v t = match t with
+| Coq_trm_val v0 -> t
+| Coq_trm_var y -> if var_comp x y then Coq_trm_val v else t
+| Coq_trm_abs (y, t3) ->
+  Coq_trm_abs (y, (if var_comp x y then t3 else subst x v t3))
+| Coq_trm_app (t1, t2) -> Coq_trm_app ((subst x v t1), (subst x v t2))
+| Coq_trm_try (t1, t2) -> Coq_trm_try ((subst x v t1), (subst x v t2))
+| Coq_trm_raise t1 -> Coq_trm_raise (subst x v t1)
 
 type beh =
 | Coq_beh_ret  [@f label0] of coq_val (** Auto Generated Attributes **)
