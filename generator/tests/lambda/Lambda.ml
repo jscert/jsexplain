@@ -21,15 +21,9 @@ let rec subst x v t =
   let s = subst x v in
   (match t with
    | Coq_trm_val v0 -> t
-   | Coq_trm_var y ->
-     (match nat_compare x y with
-      | Coq_true -> Coq_trm_val v
-      | Coq_false -> t)
+   | Coq_trm_var y -> if nat_compare x y then Coq_trm_val v else t
    | Coq_trm_abs (y, t3) ->
-     Coq_trm_abs (y,
-       (match nat_compare x y with
-        | Coq_true -> t3
-        | Coq_false -> s t3))
+     Coq_trm_abs (y, (if nat_compare x y then t3 else s t3))
    | Coq_trm_app (t1, t2) -> Coq_trm_app ((s t1), (s t2))
    | Coq_trm_try (t1, t2) -> Coq_trm_try ((s t1), (s t2))
    | Coq_trm_raise t1 -> Coq_trm_raise (s t1))

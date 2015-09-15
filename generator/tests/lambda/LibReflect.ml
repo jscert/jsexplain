@@ -1,5 +1,3 @@
-open Datatypes
-
 type coq_Decidable =
   bool
   (* singleton inductive, whose constructor was decidable_make *)

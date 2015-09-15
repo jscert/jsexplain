@@ -9,6 +9,7 @@
 STD_DIR	    := stdlib_ml
 TEST_DIR    := tests
 ML_TESTS    := $(wildcard $(TEST_DIR)/*.ml)
+ML_LAMBDA   := $(wildcard $(TEST_DIR)/lambda/*.ml)
 
 OCAMLBUILD  := ocamlbuild -j 4 -classic-display -use-ocamlfind
 
@@ -42,9 +43,6 @@ tests/%.ml: tests/%.v
 	cd $(<D) && rm *.mli
 	cd $(<D) && $(CURDIR)/../../ml-add-cstr-annots.pl *.ml
 
-tests/lambda/Lambda.ml.d: tests/lambda/Lambda.ml
-	$(OCAMLDEP) -I $(<D) $(<D)/*.ml | $(DEPSED) > $@
-
 tests/%.ml.d: tests/%.ml
 	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
 
@@ -61,7 +59,7 @@ clean_stdlib:
 DIRTY_EXTS := cmi,js.pre,js,d
 clean_tests:
 	rm -f $(TEST_DIR)/*.{$(DIRTY_EXTS)}
-	rm -f $(TEST_DIR)/lambda/*.{$(DIRTY_EXTS),glob,vo,d,ml}
+	rm -f $(TEST_DIR)/lambda/*.{$(DIRTY_EXTS)}
 
 clean:
 	rm -rf _build
@@ -75,5 +73,5 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 endif
 
 ifeq ($(MAKECMDGOALS),tests/lambda)
--include tests/lambda/Lambda.ml.d
+-include $(ML_LAMBDA:.ml=.ml.d)
 endif
