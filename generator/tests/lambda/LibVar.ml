@@ -33,8 +33,8 @@ module Variables =
   
   (** val var_comparable : var coq_Comparable **)
   
-  let var_comparable x y =
-    nat_compare x y
+  let var_comparable =
+    var_comp
   
   type vars = var FsetImpl.fset
   

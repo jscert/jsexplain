@@ -127,7 +127,7 @@ Fixpoint run (n:nat) (t:trm) : res :=
 
 Require Import ExtrOcamlBasic.
 
-Extraction Inline nat_comparable var_comp var_comparable.
+Extraction Inline nat_comparable var_comparable.
 (* As classical logic statements are now unused, they should not be extracted
    (otherwise, useless errors will be launched). *)
 Extraction Inline classicT LibEpsilon.Inhab_witness LibEpsilon.epsilon LibEpsilon.epsilon_def indefinite_description.
