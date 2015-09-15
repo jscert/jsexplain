@@ -1,3 +1,9 @@
+(* Following type definition for lists hardcoded into OCaml/generator:
+type 'a list =
+| []
+| :: [@f head, tail] of 'a * 'a list
+*)
+
 val add : 'a -> 'b -> 'c
 val ( + ) : 'a -> 'b -> 'c
 val sub : 'a -> 'a -> 'a

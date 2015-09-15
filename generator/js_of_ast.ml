@@ -14,13 +14,20 @@ open Types
 open Typedtree
   
 let hashtbl_size = 256
+
+(* val type_tbl : (string, string list * string list) Hashtbl.t
+ * Mapping constructor names to a pair of module list and constructor names list *)
 let type_tbl     = Hashtbl.create hashtbl_size
+(* Hard-code the special-syntax of the list datatype *)
+let _            = Hashtbl.add type_tbl "[]" ([], [])
+let _            = Hashtbl.add type_tbl "::" ([], ["head"; "tail"])
+
 let record_tbl   = Hashtbl.create hashtbl_size
 let module_list  = ref []
 let module_code  = ref []
 let module_created = ref []
 module L = Logged (Token_generator) (struct let size = 256 end)
-  
+
 (**
  * Debug-purpose functions
  *)
