@@ -6,10 +6,10 @@ let rec nat_compare x y =
   match x with
   | O ->
     (match y with
-     | O -> Coq_true
-     | S n -> Coq_false)
+     | O -> true
+     | S n -> false)
   | S x' ->
     (match y with
-     | O -> Coq_false
+     | O -> false
      | S y' -> nat_compare x' y')
 

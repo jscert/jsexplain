@@ -14,13 +14,20 @@ open Types
 open Typedtree
   
 let hashtbl_size = 256
+
+(* val type_tbl : (string, string list * string list) Hashtbl.t
+ * Mapping constructor names to a pair of module list and constructor names list *)
 let type_tbl     = Hashtbl.create hashtbl_size
+(* Hard-code the special-syntax of the list datatype *)
+let _            = Hashtbl.add type_tbl "[]" ([], [])
+let _            = Hashtbl.add type_tbl "::" ([], ["head"; "tail"])
+
 let record_tbl   = Hashtbl.create hashtbl_size
 let module_list  = ref []
 let module_code  = ref []
 let module_created = ref []
 module L = Logged (Token_generator) (struct let size = 256 end)
-  
+
 (**
  * Debug-purpose functions
  *)
@@ -131,9 +138,6 @@ let is_infix f args = match args with
  * to ECMAScript, therefore all of them are in a single place.
  *)
 
-(** Remove ' from variables and replace with "prime" **)
-let sanitize_var = Str.global_replace (Str.regexp "'") "prime"
-
 let ppf_lambda_wrap s =
   Printf.sprintf "(function () {@;<1 2>@[<v 0>%s@]@,}())@," s
   
@@ -227,7 +231,7 @@ let ppf_record llde =
 let ppf_decl ?(mod_gen=[]) id expr =
   let assign_op, decl_kw, end_mark = if mod_gen = [] then " = ", "var ", ";" else ": ", "", "," in 
   Printf.sprintf "@[<v 0>%s%s%s%s%s@,@]" 
-    decl_kw (sanitize_var id) assign_op expr end_mark
+    decl_kw id assign_op expr end_mark
 
 let ppf_pat_array id_list array_expr =
   Printf.sprintf "var __%s = %s;@," "array" array_expr ^
@@ -447,10 +451,10 @@ and js_of_constant = function
   | Const_int32     n     -> Int32.to_string n
   | Const_int64     n     -> Int64.to_string n
   | Const_nativeint n     -> Nativeint.to_string n
-
+    
 and js_of_longident loc =
   let res = String.concat "." @@ Longident.flatten loc.txt in
-  if res = "()" then "undefined" else sanitize_var res
+  if res = "()" then "undefined" else res
 
 and ident_of_pat pat = match pat.pat_desc with
   | Tpat_var (id, _) -> Ident.name id
@@ -484,7 +488,7 @@ and js_of_pattern ?(mod_gen=[]) pat obj =
      let binders =
        if List.length el = 0 then ""
        else Printf.sprintf "@[<v 0>%s@]"
-          ("var " ^ show_list ", " (List.map2 (fun x y -> (sanitize_var x) ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern ~mod_gen x obj)) el) params) ^ ";") in
+          ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern ~mod_gen x obj)) el) params) ^ ";") in
      spat, binders
   | Tpat_tuple el -> unsupported "tuple matching"
   | Tpat_array el -> unsupported "array-match"

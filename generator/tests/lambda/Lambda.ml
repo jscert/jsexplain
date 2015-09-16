@@ -1,38 +1,29 @@
 open BinNums
 open Datatypes
-open LibNat
 open LibVar
 
 type coq_val =
 | Coq_val_int  [@f label0] of coq_Z (** Auto Generated Attributes **)
-| Coq_val_clo  [@f label0, label1] of Variables.var * trm (** Auto Generated Attributes **)
+| Coq_val_clo  [@f label0, label1] of var * trm (** Auto Generated Attributes **)
 | Coq_val_err [@f]  (** Auto Generated Attributes **)
 and trm =
 | Coq_trm_val  [@f label0] of coq_val (** Auto Generated Attributes **)
-| Coq_trm_var  [@f label0] of Variables.var (** Auto Generated Attributes **)
-| Coq_trm_abs  [@f label0, label1] of Variables.var * trm (** Auto Generated Attributes **)
+| Coq_trm_var  [@f label0] of var (** Auto Generated Attributes **)
+| Coq_trm_abs  [@f label0, label1] of var * trm (** Auto Generated Attributes **)
 | Coq_trm_app  [@f label0, label1] of trm * trm (** Auto Generated Attributes **)
 | Coq_trm_try  [@f label0, label1] of trm * trm (** Auto Generated Attributes **)
 | Coq_trm_raise  [@f label0] of trm (** Auto Generated Attributes **)
 
-(** val subst : Variables.var -> coq_val -> trm -> trm **)
+(** val subst : var -> coq_val -> trm -> trm **)
 
-let rec subst x v t =
-  let s = subst x v in
-  (match t with
-   | Coq_trm_val v0 -> t
-   | Coq_trm_var y ->
-     (match nat_compare x y with
-      | Coq_true -> Coq_trm_val v
-      | Coq_false -> t)
-   | Coq_trm_abs (y, t3) ->
-     Coq_trm_abs (y,
-       (match nat_compare x y with
-        | Coq_true -> t3
-        | Coq_false -> s t3))
-   | Coq_trm_app (t1, t2) -> Coq_trm_app ((s t1), (s t2))
-   | Coq_trm_try (t1, t2) -> Coq_trm_try ((s t1), (s t2))
-   | Coq_trm_raise t1 -> Coq_trm_raise (s t1))
+let rec subst x v t = match t with
+| Coq_trm_val v0 -> t
+| Coq_trm_var y -> if var_comp x y then Coq_trm_val v else t
+| Coq_trm_abs (y, t3) ->
+  Coq_trm_abs (y, (if var_comp x y then t3 else subst x v t3))
+| Coq_trm_app (t1, t2) -> Coq_trm_app ((subst x v t1), (subst x v t2))
+| Coq_trm_try (t1, t2) -> Coq_trm_try ((subst x v t1), (subst x v t2))
+| Coq_trm_raise t1 -> Coq_trm_raise (subst x v t1)
 
 type beh =
 | Coq_beh_ret  [@f label0] of coq_val (** Auto Generated Attributes **)
@@ -65,7 +56,7 @@ let if_fault r k =
      | Coq_beh_err -> r)
   | Coq_res_bottom -> r
 
-(** val if_isclo : coq_val -> (Variables.var -> trm -> res) -> res **)
+(** val if_isclo : coq_val -> (var -> trm -> res) -> res **)
 
 let if_isclo v k =
   match v with
