@@ -254,39 +254,152 @@ function run_trm(expr) {
   var ctx = ctx_empty();
   ctx = ctx_push(ctx, "expr", expr, "term");
   log(1, ctx, "run_trm");
-     return (function () {
-       switch (expr.type) {
-       case "Const": var n = expr.value;
-                     ctx_push(ctx, "n", n, "value");
-                     log(5 , ctx, "Const");
+     return (function (expr) {
+        var Stack = {
+          is_empty: function (s) {
+            return s === {type: "N"};
+          },
 
-                     return n;
-       case "Add": var ls = expr.left, rs = expr.right;
-                   ctx_push(ctx, "ls", ls, "value");
-                   ctx_push(ctx, "rs", rs, "value");
-                   log(8 , ctx, "Add");
+          push: function (x, stack) {
+            return {type: "C", value: x, stack: stack};
+          },
 
-                   return run_trm_wrap(10, ls) + run_trm_wrap(10, rs);
-       case "Sub": var ls = expr.left, rs = expr.right;
-                   ctx_push(ctx, "ls", ls, "value");
-                   ctx_push(ctx, "rs", rs, "value");
-                   log(11 , ctx, "Sub");
+          pop: function (stack) {
+            return (function () {
+              switch (stack.type) {
+                case "C": var x = stack.value, xs = stack.stack;
+                return x;
+                case "K": var x = stack.value, xs = stack.stack;
+                return x;
+                case "B": 
+                return stuck("Empty list");
+                case "N": 
+                return stuck("Empty list");
+              }
+            }())
+            ;
+          },
 
-                   return run_trm_wrap(13, ls) - run_trm_wrap(13, rs);
-       case "Mul": var ls = expr.left, rs = expr.right;
-                   ctx_push(ctx, "ls", ls, "value");
-                   ctx_push(ctx, "rs", rs, "value");
-                   log(14 , ctx, "Mul");
+        }
 
-                   return run_trm_wrap(16, ls) * run_trm_wrap(13, rs);
-       case "Div": var ls = expr.left, rs = expr.right;
-                   ctx_push(ctx, "ls", ls, "value");
-                   ctx_push(ctx, "rs", rs, "value");
-                   log(17 , ctx, "Div");
+        var eval_ = function (expr) {
+             return (function () {
+               switch (expr.type) {
+               case "Const": var n = expr.value;
+                             ctx_push(ctx, "n", n, "value");
+                             log(30 , ctx, "Const");
 
-                   return run_trm_wrap(19, ls) / run_trm_wrap(19, rs);
-       }
-     }())
+                             return n;
+               case "Add": var ls = expr.left, rs = expr.right;
+                           ctx_push(ctx, "ls", ls, "value");
+                           ctx_push(ctx, "rs", rs, "value");
+                           log(32 , ctx, "Add");
+
+                           return eval_(ls) + eval_(rs);
+               case "Sub": var ls = expr.left, rs = expr.right;
+                           ctx_push(ctx, "ls", ls, "value");
+                           ctx_push(ctx, "rs", rs, "value");
+                           log(34 , ctx, "Sub");
+
+                           return eval_(ls) - eval_(rs);
+               case "Mul": var ls = expr.left, rs = expr.right;
+                           ctx_push(ctx, "ls", ls, "value");
+                           ctx_push(ctx, "rs", rs, "value");
+                           log(36 , ctx, "Mul");
+
+                           return eval_(ls) * eval_(rs);
+               case "Div": var ls = expr.left, rs = expr.right;
+                           ctx_push(ctx, "ls", ls, "value");
+                           ctx_push(ctx, "rs", rs, "value");
+                           log(38 , ctx, "Div");
+
+                           return eval_(ls) / eval_(rs);
+               case "Pop": var s = expr.stack;
+                           ctx_push(ctx, "s", s, "value");
+                           log(40 , ctx, "Pop");
+
+                           return Stack.pop(evals(s));
+               }
+             }())
+             ;
+           };
+           
+        var evals = function (sexpr) {
+          return (function () {
+            switch (sexpr.type) {
+            case "Emp": 
+                        return {type: "Stack.N"};
+            case "Push": var v = sexpr.value, s = sexpr.stack;
+                         ctx_push(ctx, "v", v, "value");
+                         ctx_push(ctx, "s", s, "value");
+                         log(52 , ctx, "Push");
+
+                         return Stack.push(eval_(v), evals(s));
+            }
+          }())
+          ;
+        };
+
+        var print_expr = function (expr) {
+          return (function () {
+            switch (expr.type) {
+            case "Const": var n = expr.value;
+                          ctx_push(ctx, "n", n, "value");
+                          log(62 , ctx, "Const");
+
+                          return to_string(n);
+            case "Add": var ls = expr.left, rs = expr.right;
+                        ctx_push(ctx, "ls", ls, "value");
+                        ctx_push(ctx, "rs", rs, "value");
+                        log(64 , ctx, "Add");
+
+                        return "(" + print_expr(ls) + ")" + " + " + print_expr(rs);
+            case "Sub": var ls = expr.left, rs = expr.right;
+                        ctx_push(ctx, "ls", ls, "value");
+                        ctx_push(ctx, "rs", rs, "value");
+                        log(66 , ctx, "Sub");
+
+                        return "(" + print_expr(ls) + ")" + " - " + print_expr(rs);
+            case "Mul": var ls = expr.left, rs = expr.right;
+                        ctx_push(ctx, "ls", ls, "value");
+                        ctx_push(ctx, "rs", rs, "value");
+                        log(68 , ctx, "Mul");
+
+                        return "(" + print_expr(ls) + ")" + " * " + print_expr(rs);
+            case "Div": var ls = expr.left, rs = expr.right;
+                        ctx_push(ctx, "ls", ls, "value");
+                        ctx_push(ctx, "rs", rs, "value");
+                        log(70 , ctx, "Div");
+
+                        return "(" + print_expr(ls) + ")" + " / " + print_expr(rs);
+            case "Pop": var s = expr.stack;
+                        ctx_push(ctx, "s", s, "value");
+                        log(72 , ctx, "Pop");
+
+                        return "Pop(" + print_sexpr(s) + ")";
+            }
+          }())
+          ;
+        };
+
+        var print_sexpr = function (sexpr) {
+          return (function () {
+            switch (sexpr.type) {
+            case "Emp": 
+                        return "Emp";
+            case "Push": var v = sexpr.value, s = sexpr.stack;
+                         ctx_push(ctx, "v", v, "value");
+                         ctx_push(ctx, "s", s, "value");
+                         log(84 , ctx, "Push");
+
+                         return "Push(" + print_expr(v) + ", " + print_sexpr(s) + ")";
+            }
+          }())
+          ;
+        };
+
+        return eval_(expr);
+     }(expr))
      ;
    };
 
@@ -363,31 +476,58 @@ var parse = function (source) {
     var ast = esprima.parse(source).body[0].expression;
 
     function transform (tree) {
-        if (tree === undefined) {
-        } else {
+      if (tree === undefined) {
+      } else {
+            // Javascript style instructions are well handled with no additional creation.
             switch (tree.operator) {
-                case '+':
-                    tree.type = "Add"; tree.operator = undefined; break;
-                case '-':
-                    tree.type = "Sub"; tree.operator = undefined; break;
-                case "*":
-                    tree.type = "Mul"; tree.operator = undefined; break;
-                case "/":
-                    tree.type = "Div"; tree.operator = undefined; break;
-                default: break;
+              case '+':
+              tree.type = "Add"; tree.operator = undefined; break;
+              case '-':
+              tree.type = "Sub"; tree.operator = undefined; break;
+              case "*":
+              tree.type = "Mul"; tree.operator = undefined; break;
+              case "/":
+              tree.type = "Div"; tree.operator = undefined; break;
+              default: break;
             }
 
-            switch (tree.type) {
-                case "Literal":
-                    tree.type = "Const"; break;
-                default: break;
+            if (tree.type === "Literal") {
+              tree.type = "Const";
             }
 
+            // tree.left and tree.right from parser interpretation
             if (tree.left !== undefined) tree.left = transform(tree.left);
             if (tree.right !== undefined) tree.right = transform(tree.right);
+
+            // Esprima sees these standalone type instructions as Identifiers
+            if (tree.type === "Identifier") {
+              switch (tree.name) {
+                case "Emp":
+                tree.type = "Emp"; break;
+                default: console.log("Unknown ident"); break;
+              }
+            }
+
+            // Esprima generates a function type structure that needs reshaping to the
+            // automatically generated structure, respecting label names!
+            if (tree.type === "CallExpression") {
+              switch (tree.callee.name) {
+                case "Push":
+                tree.type = "Push"; 
+                tree.value = transform(tree.arguments[0]);
+                tree.stack = transform(tree.arguments[1]);
+                break;
+                case "Pop":
+                tree.type = "Pop"; 
+                tree.stack = transform(tree.arguments[0]);
+                break;
+                default: console.log("Unknown callexpr"); break;
+              }   
+            }
+
             return tree;
+          }
         }
-    }
 
     return transform(ast);
 }
