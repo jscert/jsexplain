@@ -19,9 +19,13 @@ var to_string = function (x) { return String(x) }
 var parse = function (source) {
     var ast = require('esprima').parse(source).body[0].expression;
 
+    // Esprima does it's little thing. To be handled by auto generated code we need to 
+    // reshape the tree structure to match the labels and expected content.
+
     function transform (tree) {
         if (tree === undefined) {
         } else {
+            // Javascript style instructions are well handled with no additional creation.
             switch (tree.operator) {
                 case '+':
                     tree.type = "Add"; tree.operator = undefined; break;
@@ -34,14 +38,40 @@ var parse = function (source) {
                 default: break;
             }
 
-            switch (tree.type) {
-                case "Literal":
-                    tree.type = "Const"; break;
-                default: break;
+            if (tree.type === "Literal") {
+                tree.type = "Const";
             }
 
+            // tree.left and tree.right from parser interpretation
             if (tree.left !== undefined) tree.left = transform(tree.left);
             if (tree.right !== undefined) tree.right = transform(tree.right);
+
+            // Esprima sees these standalone type instructions as Identifiers
+            if (tree.type === "Identifier") {
+                switch (tree.name) {
+                    case "Emp":
+                        tree.type = "Emp"; break;
+                    default: console.log("Unknown ident"); break;
+                }
+            }
+
+            // Esprima generates a function type structure that needs reshaping to the
+            // automatically generated structure, respecting label names!
+            if (tree.type === "CallExpression") {
+                switch (tree.callee.name) {
+                    case "Push":
+                        tree.type = "Push"; 
+                        tree.value = transform(tree.arguments[0]);
+                        tree.stack = transform(tree.arguments[1]);
+                        break;
+                    case "Pop":
+                        tree.type = "Pop"; 
+                        tree.stack = transform(tree.arguments[0]);
+                        break;
+                    default: console.log("Unknown callexpr"); break;
+                }   
+            }
+
             return tree;
         }
     }
