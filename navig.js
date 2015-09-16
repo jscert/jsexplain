@@ -425,11 +425,6 @@ function run() {
 }
 
 
-// Note: for the demo
-run();
-stepTo(78);
-
-
 
 /* demo
 var j = jsheap_of_heap(heap);

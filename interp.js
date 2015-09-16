@@ -353,9 +353,7 @@ function run_trm(t) {
 
 function run_program(program) {
   log_reset();
-  for (var i = 0; i < program.length; i++) {
-    run_trm_wrap(0, program[i]);
-  }
+  run_trm_wrap(0, program);
 }
 
 //----------------demo---------------
@@ -394,9 +392,7 @@ var parse = function (source) {
     return transform(ast);
 }
 
-var trm1 = parse("((1972 / 29) / 2) + 8");
-
-var program = [trm1];
+var program;
 
 
 //----------------reporting---------------
