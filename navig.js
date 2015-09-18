@@ -110,7 +110,8 @@ $("#button_run").click(function() {
     // console.log(program);
     run();
     $("#action_output").html("Run successful!");
-  } catch(_){
+  } catch(e){
+    console.log(e);
     $("#action_output").html("Error during the run.");
   };
   var timeoutID = window.setTimeout(function() { $("#run_output").html(""); }, 1000);
