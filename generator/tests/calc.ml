@@ -33,9 +33,3 @@ and print_sexpr sexpr = match sexpr with
   | Emp -> "Emp"
   | Push (v, s) -> "Push(" + (print_expr v) + ", " + (print_sexpr s) + ")"
 
-
-let f =
-    (*let bli = Stack.C(1, Stack.N) in
-    let blii = (Stack.push 2 bli) in*)
-    let source = parse "Pop(Push(1, Push(5, Emp)) - 7" in
-    print ((print_expr source) + " = " + to_string (eval_ source))
