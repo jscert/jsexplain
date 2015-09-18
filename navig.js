@@ -4,7 +4,7 @@ var handlers = [];
 
 var parsedTree;
 
-(function(check_pred){
+
 
 var tracer_items = [];
 
@@ -19,6 +19,7 @@ function stepTo(step) {
   updateSelection();
 }
 
+(function(check_pred){
 // Take a predicate in form of a JavaScript code (string) and returns either true or an error message (string).
 function goToPred(pred) {
 
@@ -65,6 +66,12 @@ function goToPred(pred) {
 
   return "Not found";
 }
+
+}(function check_pred(p, obj) {
+  with (obj){
+    return eval(p)
+  }
+}));
 
 function button_reach_handler() {
   var pred = $("#text_condition").val();
@@ -439,10 +446,4 @@ item.ctx = jsenv_of_env(jsheap, item.ctx);
 }
 }
 */
-
-}(function check_pred(p, obj) {
-  with (obj){
-    return eval(p)
-  }
-}));
 
