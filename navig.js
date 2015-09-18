@@ -14,6 +14,7 @@ var tracer_pos = 0;
 $("#source_code").val(source_file);
 
 
+// Jump the trace to a given position
 function stepTo(step) {
   tracer_pos = step;
   updateSelection();
@@ -73,6 +74,7 @@ function goToPred(pred) {
   }
 }));
 
+// Goes to given breakpoint that matches the given predicate
 function button_reach_handler() {
   var pred = $("#text_condition").val();
   var res = goToPred(pred);
@@ -86,6 +88,7 @@ function button_reach_handler() {
 
 $('#text_condition').keypress(function(e){
 	var keycode = (e.keyCode ? e.keyCode : e.which);
+        // <ENTER>
 	if (keycode == '13') {
 		button_reach_handler();
 	}
@@ -94,12 +97,16 @@ $('#text_condition').keypress(function(e){
 $("#button_reach").click(button_reach_handler);
 
 
+// Move to given trace point
 $("#navigation_step").change(function(e) {
   var n = + $("#navigation_step").val();
   n = Math.max(0, Math.min(tracer_length - 1, n));
   stepTo(n);
 });
 
+// Main entry point
+// Runs the source code
+// Modifies trace
 $("#button_run").click(function() {
   try {
     var code = source.getValue();
@@ -182,6 +189,7 @@ function shared_next(dir, target) {
   }
 }
 
+// Debugger movement operations
 function restart() { tracer_pos = 0; }
 function step() { shared_step(+1); }
 function backstep() { shared_step(-1); }
@@ -236,6 +244,7 @@ function fresh_id() {
   return "fresh_id_" + (next_fresh_id++);
 }
 
+// Produces and outputs html for a value, including magic unfolding on click
 function show_value(heap, v, target, depth) {
   var contents_init = $("#" + target).html();
   var s = "";
@@ -311,7 +320,10 @@ function updateSourceSelection() {
   var head = {line: source_select-1, ch: 100 } */;
 }
 
+// ctx for interpreter
+// file for interpreted code
 function updateSelection() {
+  // Load item to be displayed
   var item = tracer_items[tracer_pos];
   source.setSelection({line: 0, ch:0}, {line: 0, ch:0}); // TODO: fct reset
 
@@ -382,6 +394,7 @@ try {
   }); 
 } catch(e) { }
 
+// On double click of reference to ES, opens definition
 editor.on('dblclick', function() {
   var line = editor.getCursor().line;
   var txt = editor.getLine(line);
@@ -409,6 +422,7 @@ function completeTermsInDatalog(items) {
     item.source_select = last;
     if (item.ctx !== undefined) {
       var ctx_as_array = array_of_env(item.ctx);
+      // FIXME: "t" is a hack!
       if (ctx_as_array.length > 0 && ctx_as_array[0].name === "t") {
         var t = ctx_as_array[0].val;
         if (! (t === undefined || t.start === undefined || t.end === undefined)) {
