@@ -1,4 +1,4 @@
-#!/usr/bin/perl -p
+#!/usr/bin/perl -p -i
 # Converts ml char-array constructions into strings
 # eg: ('a'::('b'::('c'::[]))) => "abc"
 #
@@ -9,6 +9,7 @@
 # substituted for \") onto the result of the previous execution of this expression.
 # $^R isn't cleared between regular expression matches, so we do this manually.
 # The -p operator to Perl wraps this script in a foreach loop that operates over a given file.
+# The -i operator to Perl modifies the file in-place, unfortunately this cannot be passed to the script from the shell
 
 $^R = "";
 s/'([^']|\\(?:\\|"|'|n|r|t|b| |\d{3}|x[0-9a-fA-F]{2}))(?{ $^R.($^N =~ s{^"}{\\"}r) })'::(?:\((?R)\)|\[\])/"$^R"/;
