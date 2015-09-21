@@ -1,7 +1,5 @@
 function run_trm (code) {
 
-var ctx = ctx_empty();
-
 var Stack = {
 is_empty: function (s) {
             return s === {type: "N"};
@@ -16,10 +14,6 @@ pop: function (stack) {
     switch (stack.type) {
     case "C": var x = stack.value, xs = stack.stack;
               return x;
-    case "K": var x = stack.value, xs = stack.stack;
-              return x;
-    case "B": 
-              return stuck("Empty list");
     case "N": 
               return stuck("Empty list");
     }
@@ -28,51 +22,54 @@ pop: function (stack) {
 },
 
 }
+
 var eval_ = function (expr) {
+    var ctx = ctx_empty();
     ctx = ctx_push(ctx, "t", expr, "term");
-    log(1, ctx, "run_trm");
+    log(23, ctx, "eval_");
      return (function () {
        switch (expr.type) {
        case "Const": var n = expr.value;
                      ctx_push(ctx, "n", n, "value");
-                     log(30 , ctx, "Const");
-
+                     log(26 , ctx, "Const");
                      return n;
+
        case "Add": var ls = expr.left, rs = expr.right;
                    ctx_push(ctx, "ls", ls, "value");
                    ctx_push(ctx, "rs", rs, "value");
-                   log(32 , ctx, "Add");
+                   log(28 , ctx, "Add");
+                   return call_wrap(29, ls, eval_) + call_wrap(29, rs, eval_);
 
-                   return eval_(ls) + eval_(rs);
        case "Sub": var ls = expr.left, rs = expr.right;
                    ctx_push(ctx, "ls", ls, "value");
                    ctx_push(ctx, "rs", rs, "value");
-                   log(34 , ctx, "Sub");
+                   log(30 , ctx, "Sub");
+                   return call_wrap(31, ls, eval_) - call_wrap(31, rs, eval_);
 
-                   return eval_(ls) - eval_(rs);
        case "Mul": var ls = expr.left, rs = expr.right;
                    ctx_push(ctx, "ls", ls, "value");
                    ctx_push(ctx, "rs", rs, "value");
-                   log(36 , ctx, "Mul");
+                   log(32 , ctx, "Mul");
+                   return call_wrap(33, line, eval_) * call_wrap(33, rs, eval_);
 
-                   return eval_(ls) * eval_(rs);
        case "Div": var ls = expr.left, rs = expr.right;
                    ctx_push(ctx, "ls", ls, "value");
                    ctx_push(ctx, "rs", rs, "value");
-                   log(38 , ctx, "Div");
+                   log(34 , ctx, "Div");
+                   return call_wrap(35, ls, eval_) / call_wrap(35, rs, eval_);
 
-                   return eval_(ls) / eval_(rs);
        case "Pop": var s = expr.stack;
                    ctx_push(ctx, "s", s, "value");
-                   log(40 , ctx, "Pop");
-
-                   return Stack.pop(evals(s));
+                   log(36 , ctx, "Pop");
+                   return Stack.pop(call_wrap(37, s, evals));
        }
      }())
      ;
    };
    
 var evals = function (sexpr) {
+  var ctx = ctx_empty();
+  
   return (function () {
     switch (sexpr.type) {
     case "Emp": 
@@ -80,67 +77,9 @@ var evals = function (sexpr) {
     case "Push": var v = sexpr.value, s = sexpr.stack;
                  ctx_push(ctx, "v", v, "value");
                  ctx_push(ctx, "s", s, "value");
-                 log(52 , ctx, "Push");
+                 log(48 , ctx, "Push");
+                 return Stack.push(call_wrap(49, v, eval_), call_wrap(49, s, evals));
 
-                 return Stack.push(eval_(v), evals(s));
-    }
-  }())
-  ;
-};
-
-var print_expr = function (expr) {
-  return (function () {
-    switch (expr.type) {
-    case "Const": var n = expr.value;
-                  ctx_push(ctx, "n", n, "value");
-                  log(62 , ctx, "Const");
-
-                  return to_string(n);
-    case "Add": var ls = expr.left, rs = expr.right;
-                ctx_push(ctx, "ls", ls, "value");
-                ctx_push(ctx, "rs", rs, "value");
-                log(64 , ctx, "Add");
-
-                return "(" + print_expr(ls) + ")" + " + " + print_expr(rs);
-    case "Sub": var ls = expr.left, rs = expr.right;
-                ctx_push(ctx, "ls", ls, "value");
-                ctx_push(ctx, "rs", rs, "value");
-                log(66 , ctx, "Sub");
-
-                return "(" + print_expr(ls) + ")" + " - " + print_expr(rs);
-    case "Mul": var ls = expr.left, rs = expr.right;
-                ctx_push(ctx, "ls", ls, "value");
-                ctx_push(ctx, "rs", rs, "value");
-                log(68 , ctx, "Mul");
-
-                return "(" + print_expr(ls) + ")" + " * " + print_expr(rs);
-    case "Div": var ls = expr.left, rs = expr.right;
-                ctx_push(ctx, "ls", ls, "value");
-                ctx_push(ctx, "rs", rs, "value");
-                log(70 , ctx, "Div");
-
-                return "(" + print_expr(ls) + ")" + " / " + print_expr(rs);
-    case "Pop": var s = expr.stack;
-                ctx_push(ctx, "s", s, "value");
-                log(72 , ctx, "Pop");
-
-                return "Pop(" + print_sexpr(s) + ")";
-    }
-  }())
-  ;
-};
-
-var print_sexpr = function (sexpr) {
-  return (function () {
-    switch (sexpr.type) {
-    case "Emp": 
-                return "Emp";
-    case "Push": var v = sexpr.value, s = sexpr.stack;
-                 ctx_push(ctx, "v", v, "value");
-                 ctx_push(ctx, "s", s, "value");
-                 log(84 , ctx, "Push");
-
-                 return "Push(" + print_expr(v) + ", " + print_sexpr(s) + ")";
     }
   }())
   ;

@@ -21,15 +21,3 @@ let rec eval_ expr = match expr with
 and evals sexpr = match sexpr with
   | Emp -> Stack.N
   | Push (v, s) -> Stack.push (eval_ v) (evals s)
-
-let rec print_expr expr = match expr with
-  | Const n -> to_string n
-  | Add (ls, rs) -> "(" + (print_expr ls) + ")" + " + " + (print_expr rs)
-  | Sub (ls, rs) -> "(" + (print_expr ls) + ")" + " - " + (print_expr rs)
-  | Mul (ls, rs) -> "(" + (print_expr ls) + ")" + " * " + (print_expr rs)
-  | Div (ls, rs) -> "(" + (print_expr ls) + ")" + " / " + (print_expr rs)
-  | Pop s -> "Pop(" + print_sexpr s + ")"
-and print_sexpr sexpr = match sexpr with
-  | Emp -> "Emp"
-  | Push (v, s) -> "Push(" + (print_expr v) + ", " + (print_sexpr s) + ")"
-

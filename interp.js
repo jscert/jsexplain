@@ -246,12 +246,14 @@ function ctx_push(ctx, name, value, typeoption) {
   return {tag: "env_cons", env: ctx, name: name, val: value, valkind: typeoption};
 }
 
-function run_trm_wrap(line, t) {
+function call_wrap(line, t, func) {
   log_custom({line: line, type: "enter"});
-  var res = run_trm(t);
+  var res = func(t);
   log_custom({line: line, type: "exit"});
   return res;
 }
+
+
 
 /* Interp.js requires a run_trm() function, included for a script inside the html */
 
@@ -318,7 +320,7 @@ function run_trm(t) {
 
 function run_program(program) {
   log_reset();
-  run_trm_wrap(0, program);
+  call_wrap(0, program, run_trm);
 }
 
 //----------------demo---------------
