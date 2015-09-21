@@ -222,13 +222,18 @@ let output s =
 let warning s =
   Printf.printf "### WARNING: %s\n" s
 
-let unsupported s =
+open Format
+
+let unsupported ?loc s =
+  option_iter (Location.print_error err_formatter) loc;
   failwith ("Unsupported language construction: " ^ s ^ ".")
 
-let out_of_scope s =
-    failwith (s ^ " are and will not be supported.")
+let out_of_scope loc s =
+  Location.print_error err_formatter loc;
+  failwith (s ^ " are and will not be supported.")
 
-let error s =
-    failwith ("error: " ^ s ^ ".")
+let error ?loc s =
+  option_iter (Location.print_error err_formatter) loc;
+  failwith ("error: " ^ s ^ ".")
 
 
