@@ -69,6 +69,8 @@ var eval_ = function (expr) {
    
 var evals = function (sexpr) {
   var ctx = ctx_empty();
+  ctx = ctx_push(ctx, "t", sexpr, "term");
+  log(43, ctx, "evals");
   
   return (function () {
     switch (sexpr.type) {
