@@ -475,7 +475,7 @@ and js_of_let_pattern ?(mod_gen=[]) pat expr =
                          | _ -> out_of_scope pat.pat_loc "pattern-matching in arrays"
                ) pat_l in
      ppf_pat_array l sexpr
-  | _ -> error "let can't deconstruct values"
+  | _ -> error ~loc:pat.pat_loc "let can't deconstruct values"
 
 and js_of_pattern ?(mod_gen=[]) pat obj =
   let locn = pat.pat_loc in
