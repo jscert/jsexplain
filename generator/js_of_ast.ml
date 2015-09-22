@@ -3,7 +3,6 @@ open Attributes
 open Env
 open Format
 open Lexing
-open Location
 open Log
 open Longident
 open Misc
@@ -319,6 +318,7 @@ and show_value_binding ?(mod_gen=[]) vb =
 
 and js_of_structure_item ?(mod_gen=[]) old_env s =
   let new_env = s.str_env in
+  let loc = s.str_loc in
   match s.str_desc with
   | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression ~mod_gen new_env e
   | Tstr_value (_, vb_l) -> String.concat "@,@," @@ List.map (fun vb -> show_value_binding ~mod_gen vb) @@ vb_l
@@ -337,7 +337,7 @@ and js_of_structure_item ?(mod_gen=[]) old_env s =
    in List.iter create_type tl; ""
   | Tstr_open       od -> 
     let name = (fun od -> if od.open_override = Fresh then js_of_longident od.open_txt else "") od in
-    if (name <> "" & not_already_created name) then
+    if (name <> "" && not_already_created name) then
       module_list := name :: !module_list;
 
       (* Disable writing of .cmi files for modules we're opening to avoid automatically over-writing existing signature
@@ -352,16 +352,16 @@ and js_of_structure_item ?(mod_gen=[]) old_env s =
       module_created := name :: !module_created;
       module_code := new_mod @ !module_code;
     "" 
-  | Tstr_primitive  _  -> out_of_scope "primitive functions"
-  | Tstr_typext     _  -> out_of_scope "type extensions"
-  | Tstr_exception  _  -> out_of_scope "exceptions"
-  | Tstr_module     _  -> out_of_scope "modules"
-  | Tstr_recmodule  _  -> out_of_scope "recursive modules"
-  | Tstr_modtype    _  -> out_of_scope "module type"
-  | Tstr_class      _  -> out_of_scope "objects"
-  | Tstr_class_type _  -> out_of_scope "class types"
-  | Tstr_include    _  -> out_of_scope "includes"
-  | Tstr_attribute  attrs -> out_of_scope "attributes"
+  | Tstr_primitive  _  -> out_of_scope loc "primitive functions"
+  | Tstr_typext     _  -> out_of_scope loc "type extensions"
+  | Tstr_exception  _  -> out_of_scope loc "exceptions"
+  | Tstr_module     _  -> out_of_scope loc "modules"
+  | Tstr_recmodule  _  -> out_of_scope loc "recursive modules"
+  | Tstr_modtype    _  -> out_of_scope loc "module type"
+  | Tstr_class      _  -> out_of_scope loc "objects"
+  | Tstr_class_type _  -> out_of_scope loc "class types"
+  | Tstr_include    _  -> out_of_scope loc "includes"
+  | Tstr_attribute  attrs -> out_of_scope loc "attributes"
 
 and js_of_branch ?(mod_gen=[]) old_env b obj =
   let spat, binders = js_of_pattern ~mod_gen b.c_lhs obj in
@@ -374,6 +374,7 @@ and js_of_branch ?(mod_gen=[]) old_env b obj =
     in L.log_line (ppf_branch spat binders se) (L.Add (binders, typ))
     
 and js_of_expression ?(mod_gen=[]) old_env e =
+  let locn = e.exp_loc in
   let new_env = e.exp_env in
   match e.exp_desc with
   | Texp_ident (_, loc,  _)           -> js_of_longident loc
@@ -393,9 +394,9 @@ and js_of_expression ?(mod_gen=[]) old_env e =
     in ppf_function args body
   | Texp_apply (f, exp_l)                 ->
      let sl' = exp_l
-               |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope "optional apply arguments" | Some ei -> ei) in
+               |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope locn "optional apply arguments" | Some ei -> ei) in
      let sl = exp_l
-              |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope "optional apply arguments" | Some ei -> js_of_expression ~mod_gen new_env ei) in
+              |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope locn "optional apply arguments" | Some ei -> js_of_expression ~mod_gen new_env ei) in
     let se = js_of_expression ~mod_gen new_env f in
     if is_infix f sl' && List.length exp_l = 2
     then ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
@@ -414,7 +415,7 @@ and js_of_expression ?(mod_gen=[]) old_env e =
         else
           let rec expand_constructor_list fields exprs = match fields, exprs with
             | [], [] -> []
-            | [], x :: xs | x :: xs , [] -> failwith "argument lists should have the same length."
+            | [], x :: xs | x :: xs , [] -> error ~loc:locn "argument lists should have the same length."
             | x :: xs, y :: ys -> (if y = "" then ppf_single_cstrs x else ppf_cstr x y) :: expand_constructor_list xs ys in
           let names = find_type value
              in ppf_multiple_cstrs value (show_list ", " (expand_constructor_list names (List.map (fun exp -> js_of_expression ~mod_gen new_env exp) el)))
@@ -425,23 +426,23 @@ and js_of_expression ?(mod_gen=[]) old_env e =
   | Texp_while      (cd, body)        -> ppf_while (js_of_expression ~mod_gen new_env cd) (js_of_expression ~mod_gen new_env body)
   | Texp_for        (id, _, st, ed, fl, body) -> ppf_for (Ident.name id) (js_of_expression ~mod_gen new_env st) (js_of_expression ~mod_gen new_env ed) fl (js_of_expression ~mod_gen new_env body)
   | Texp_record     (llde,_)          -> ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, js_of_expression ~mod_gen new_env exp)) llde)
-  | Texp_match      (_,_,_, Partial)  -> out_of_scope "partial matching"
-  | Texp_match      (_,_,_,_)         -> out_of_scope "matching with exception branches"
-  | Texp_try        (_,_)             -> out_of_scope "exceptions"
-  | Texp_function   (_,_,_)           -> out_of_scope "powered-up functions"
-  | Texp_variant    (_,_)             -> out_of_scope "polymorphic variant"
-  | Texp_field      (_,_,_)           -> out_of_scope "accessing field"
-  | Texp_setfield   (_,_,_,_)         -> out_of_scope "setting field"
-  | Texp_send       (_,_,_)           -> out_of_scope "objects"
-  | Texp_new        (_,_,_)           -> out_of_scope "objects"
-  | Texp_instvar    (_,_,_)           -> out_of_scope "objects"
-  | Texp_setinstvar (_,_,_,_)         -> out_of_scope "objects"
-  | Texp_override   (_,_)             -> out_of_scope "objects"
-  | Texp_letmodule  (_,_,_,_)         -> out_of_scope "local modules"
-  | Texp_assert      _                -> out_of_scope "assert"
-  | Texp_lazy        _                -> out_of_scope "lazy expressions"
-  | Texp_object     (_,_)             -> out_of_scope "objects"
-  | Texp_pack        _                -> out_of_scope "packing"
+  | Texp_match      (_,_,_, Partial)  -> out_of_scope locn "partial matching"
+  | Texp_match      (_,_,_,_)         -> out_of_scope locn "matching with exception branches"
+  | Texp_try        (_,_)             -> out_of_scope locn "exceptions"
+  | Texp_function   (_,_,_)           -> out_of_scope locn "powered-up functions"
+  | Texp_variant    (_,_)             -> out_of_scope locn "polymorphic variant"
+  | Texp_field      (_,_,_)           -> out_of_scope locn "accessing field"
+  | Texp_setfield   (_,_,_,_)         -> out_of_scope locn "setting field"
+  | Texp_send       (_,_,_)           -> out_of_scope locn "objects"
+  | Texp_new        (_,_,_)           -> out_of_scope locn "objects"
+  | Texp_instvar    (_,_,_)           -> out_of_scope locn "objects"
+  | Texp_setinstvar (_,_,_,_)         -> out_of_scope locn "objects"
+  | Texp_override   (_,_)             -> out_of_scope locn "objects"
+  | Texp_letmodule  (_,_,_,_)         -> out_of_scope locn "local modules"
+  | Texp_assert      _                -> out_of_scope locn "assert"
+  | Texp_lazy        _                -> out_of_scope locn "lazy expressions"
+  | Texp_object     (_,_)             -> out_of_scope locn "objects"
+  | Texp_pack        _                -> out_of_scope locn "packing"
     
 and js_of_constant = function
   | Const_int       n     -> string_of_int n
@@ -458,7 +459,7 @@ and js_of_longident loc =
 
 and ident_of_pat pat = match pat.pat_desc with
   | Tpat_var (id, _) -> Ident.name id
-  | _ -> error "functions can't deconstruct values"
+  | _ -> error ~loc:pat.pat_loc "functions can't deconstruct values"
     
 and js_of_let_pattern ?(mod_gen=[]) pat expr =
   let new_env = pat.pat_env in
@@ -471,12 +472,13 @@ and js_of_let_pattern ?(mod_gen=[]) pat expr =
                (function pat ->
                          match pat.pat_desc with
                          | Tpat_var (id, _) -> (Ident.name id, string_of_type_exp pat.pat_type)
-                         | _ -> out_of_scope "pattern-matching in arrays"
+                         | _ -> out_of_scope pat.pat_loc "pattern-matching in arrays"
                ) pat_l in
      ppf_pat_array l sexpr
-  | _ -> error "let can't deconstruct values"
+  | _ -> error ~loc:pat.pat_loc "let can't deconstruct values"
 
 and js_of_pattern ?(mod_gen=[]) pat obj =
+  let locn = pat.pat_loc in
   match pat.pat_desc with
   | Tpat_any                     -> "default", ""
   | Tpat_constant   c            -> js_of_constant c, ""
@@ -490,13 +492,13 @@ and js_of_pattern ?(mod_gen=[]) pat obj =
        else Printf.sprintf "@[<v 0>%s@]"
           ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern ~mod_gen x obj)) el) params) ^ ";") in
      spat, binders
-  | Tpat_tuple el -> unsupported "tuple matching"
-  | Tpat_array el -> unsupported "array-match"
-  | Tpat_record (_,_) -> unsupported "record"
-  | Tpat_or (_,_,_) -> failwith "not implemented yet"
-  | Tpat_alias (_,_,_) -> out_of_scope "alias-pattern"
-  | Tpat_variant (_,_,_) -> out_of_scope "polymorphic variants in pattern matching"
-  | Tpat_lazy _ -> out_of_scope "lazy-pattern"
+  | Tpat_tuple el -> unsupported ~loc:locn "tuple matching"
+  | Tpat_array el -> unsupported ~loc:locn "array-match"
+  | Tpat_record (_,_) -> unsupported ~loc:locn "record"
+  | Tpat_or (_,_,_) -> error ~loc:locn "not implemented yet"
+  | Tpat_alias (_,_,_) -> out_of_scope locn "alias-pattern"
+  | Tpat_variant (_,_,_) -> out_of_scope locn "polymorphic variants in pattern matching"
+  | Tpat_lazy _ -> out_of_scope locn "lazy-pattern"
 
 let to_javascript typedtree =
   let pre_res = js_of_structure Env.empty typedtree in

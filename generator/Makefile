@@ -2,14 +2,11 @@
 
 # requires: opam switch 4.02.1; eval `opam config env`
 
-
-# OCAMLBIN=~/shared/ocamleasy/bin/
-# OCAMLLIB=~/shared/ocamleasy/lib
-
 STD_DIR	    := stdlib_ml
 TEST_DIR    := tests
 ML_TESTS    := $(wildcard $(TEST_DIR)/*.ml)
 ML_LAMBDA   := $(wildcard $(TEST_DIR)/lambda/*.ml)
+ML_JSREF    := $(wildcard $(TEST_DIR)/jsref/*.ml)
 
 OCAMLBUILD  := ocamlbuild -j 4 -classic-display -use-ocamlfind
 
@@ -40,8 +37,15 @@ stdlib:
 tests/%.ml: tests/%.v
 	$(MAKE) -C $(CURDIR)/../../../lib/tlc/src
 	cd $(<D) && coqc -I $(CURDIR)/../../../lib/tlc/src $(<F)
-	cd $(<D) && rm *.mli
-	cd $(<D) && $(CURDIR)/../../ml-add-cstr-annots.pl *.ml
+	cd $(@D) && rm *.mli
+	cd $(@D) && $(CURDIR)/../../ml-add-cstr-annots.pl *.ml
+
+.PRECIOUS: tests/jsref/%.ml
+tests/jsref/%.ml:
+	$(MAKE) -C $(CURDIR)/../../.. interpreter
+	cp ../../../interp/src/extract/*.ml tests/jsref/
+	../../convert-ml-strings.pl tests/jsref/*.ml
+	cd $(@D) && $(CURDIR)/../../ml-add-cstr-annots.pl *.ml
 
 tests/%.ml.d: tests/%.ml
 	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
@@ -52,6 +56,7 @@ tests/%.cmi tests/%.log.js tests/%.unlog.js: tests/%.ml main.byte stdlib
 tests: $(ML_TESTS:.ml=.log.js)
 
 tests/lambda: tests/lambda/Lambda.log.js
+tests/jsref: tests/jsref/JsInterpreter.log.js
 
 clean_stdlib:
 	rm -f $(STD_DIR)/*.cmi
@@ -74,4 +79,8 @@ endif
 
 ifeq ($(MAKECMDGOALS),tests/lambda)
 -include $(ML_LAMBDA:.ml=.ml.d)
+endif
+
+ifeq ($(MAKECMDGOALS),tests/jsref)
+-include $(ML_JSREF:.ml=.ml.d)
 endif
