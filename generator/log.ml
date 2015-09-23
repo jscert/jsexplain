@@ -116,7 +116,18 @@ struct
       in build 0 in
     let lines_list = snd @@ List.fold_left (fun (st, acc) ed -> (ed, String.sub s st (ed - st) :: acc)) (0, []) (end_line_markers s)
     in append_token lines_list
-                    
+
+(* Take a String in form of "\n      return somefunctions(sas, ad);" and wrap it in order to allow log of function enter and exit *)
+(* TODO: Handle skipping of case where return does not contain function evaluation. (By regexp? No Brackets?) *)
+let ppf_return_wrap l s =
+  let funccall = List.hd @@ Str.split (Str.regexp "\n?.*return ") s in
+  Format.sprintf "return (function () {@;<1 2>@[<v 1>\
+    log_custom({line: %d, type: \"enter\"});\
+    @,var res = %s\
+    @,log_custom({line: %d, type: \"exit\"});\
+    @,return res;
+    @]@,}());@,@," l funccall l
+
   let add_log_info s =
     let buf = Buffer.create 16 in
     let ls = lines s in
@@ -147,8 +158,9 @@ struct
               in ctx_processing id ^ "\n" ^ pad ^ "log("^ string_of_int i ^" , ctx, " ^ typ ^ ");\n"
           | Redef _ -> "" (* Actually not used *)
           | Del   _ -> "" (* Actually not used *)
-        in Buffer.add_string buf log_info; Buffer.add_string buf str;
-                                  aux (i + 1) xs
+        in Buffer.add_string buf log_info; 
+            Buffer.add_string buf (ppf_return_wrap (i+1) str); (* i is line number of line preceding return *)
+            aux (i + 1) xs
     in aux 0 ls; Buffer.contents buf
                                  
   let logged_output s =

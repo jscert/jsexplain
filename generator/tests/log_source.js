@@ -44,7 +44,12 @@ var eval_ = function (expr) {
                    ctx_push(ctx, "ls", ls, "value");
                    ctx_push(ctx, "rs", rs, "value");
                    log(30 , ctx, "Sub");
-                   return call_wrap(31, ls, eval_) - call_wrap(31, rs, eval_);
+                   return (function() {
+                        log_custom({line: 31, type: "enter"});
+                        var res = eval_(ls) - eval_(rs);
+                        log_custom({line: 31, type: "exit"});
+                        return res;
+                    }());
 
        case "Mul": var ls = expr.left, rs = expr.right;
                    ctx_push(ctx, "ls", ls, "value");
