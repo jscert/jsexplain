@@ -340,7 +340,7 @@ and js_of_expression ?(mod_gen=[]) old_env e =
   | Texp_tuple (tl) -> ppf_tuple @@ show_list_f (fun exp -> js_of_expression ~mod_gen new_env exp) ", " tl
 
   | Texp_construct (loc, cd, el) ->
-    let name = js_of_longident loc in
+    let name = cd.cstr_name in
     if el = [] then (* Constructor has no parameters *)
       if is_sbool name then name (* Special case true/false to their JS natives *)
       else ppf_single_cstrs name
@@ -416,7 +416,7 @@ and js_of_pattern ?(mod_gen=[]) pat obj =
   | Tpat_constant   c            -> js_of_constant c, ""
   | Tpat_var       (id, _)       -> Ident.name id, ""
   | Tpat_construct (loc, cd, el) ->
-     let c = js_of_longident loc in
+     let c = cd.cstr_name in
      let spat = Printf.sprintf "%s" ("case \"" ^ c ^ "\"") in
      let params = extract_attrs cd.cstr_attributes in
      let binders =
