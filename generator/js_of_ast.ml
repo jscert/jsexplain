@@ -14,13 +14,6 @@ open Typedtree
   
 let hashtbl_size = 256
 
-(* val type_tbl : (string, string list * string list) Hashtbl.t
- * Mapping constructor names to a pair of module list and constructor names list *)
-let type_tbl     = Hashtbl.create hashtbl_size
-(* Hard-code the special-syntax of the list datatype *)
-let _            = Hashtbl.add type_tbl "[]" ([], [])
-let _            = Hashtbl.add type_tbl "::" ([], ["head"; "tail"])
-
 let record_tbl   = Hashtbl.create hashtbl_size
 let module_list  = ref []
 let module_code  = ref []
@@ -30,28 +23,6 @@ module L = Logged (Token_generator) (struct let size = 256 end)
 (**
  * Debug-purpose functions
  *)
-  
-let print_type_tbl () =
-  let assemble (l, n) =
-    let rec aux = function
-      | [] -> n
-      | x :: xs -> x ^ "." ^ aux xs
-    in aux l in
-  let rec print_str_list = function
-    | [] -> ""
-    | x :: [] -> (Printf.sprintf {|"%s"|} x)
-    | x :: xs -> (Printf.sprintf {|"%s", |} x) ^ print_str_list xs
-  in Hashtbl.iter (fun cstr (mods, elems) -> Printf.printf ({|%s -> [%s]|} ^^ "\n") (assemble (mods, cstr)) (print_str_list elems)) type_tbl; ()
-
-  
-let print_candidates l =
-let rec print_str_list = function
-  | []      -> ""
-  | x :: xs -> Printf.sprintf "%s " x ^ print_str_list xs in
-let rec aux = function
-  | []         -> ""
-  | (x, y) :: xs -> "[" ^ print_str_list x ^ ", " ^ print_str_list y ^ "]" ^ " ; " ^ aux xs
-in aux l
 
 let env_diff_names env1 env2 =
   List.map Ident.unique_name (Env.diff env1 env2)
@@ -236,45 +207,6 @@ let ppf_pat_array id_list array_expr =
   Printf.sprintf "var __%s = %s;@," "array" array_expr ^
     List.fold_left2 (fun acc (name, exp_type) y -> acc ^ Printf.sprintf "@[<v 0>var %s = __%s[%d];@,@]" name "array" y)
                     "" id_list @@ range 0 (List.length id_list - 1)
-                 
-   
-(**
- * Type managment part
- *)
-
-let short_type_name name =
-  let len = String.length name - 1 in
-  let rec find_last_point i =
-    if i < 0 then 0
-    else if name.[i] = '.' then (succ i)
-    else find_last_point (pred i) in
-  let last_point_pos = find_last_point len in
-  String.sub name last_point_pos (len - last_point_pos + 1)
-
-let add_type mod_gen name cstrs_name =
-  Hashtbl.add type_tbl (short_type_name name) (mod_gen, cstrs_name)
-
-(* string -> string list
- * Appears to return the name annotations of a type definition *)
-let find_type name =
-  let short_name = short_type_name name in
-  let find_points name = 
-    let len = String.length name in
-    string_fold_righti (fun i x acc -> if x = '.' then i :: acc else 
-                                       if i = len - 1 then i + 1 :: acc else acc) name [] in
-  let split_on_rev pos = snd @@ List.fold_left (fun (deb, acc) x -> x + 1, String.sub name deb (x - deb) :: acc) (0, []) pos in
-  let prefixes = split_on_rev @@ find_points @@ name in 
-  let rec filter_on_prefixes l prefixes = match l, prefixes with
-    | _, [] -> true
-    | [], _ -> false
-    | x :: xs, y :: ys -> if x = y then filter_on_prefixes xs ys else false in
-  let tmp = Hashtbl.find_all type_tbl short_name in
-  let candidates = if List.length tmp = 1 then tmp else List.filter (fun (x, _) -> filter_on_prefixes prefixes (short_name :: x)) tmp in
-    (* print_string @@ print_candidates @@ (Hashtbl.find_all type_tbl short_name); print_newline (); *)
-  match candidates with
-  | [] -> print_type_tbl (); failwith ("no options for constructor " ^ name)
-  | c :: [] -> snd c
-  | _ -> print_type_tbl (); failwith ("ambiguity when applying constructor " ^ name)
 
 (**
  * Module managment part
@@ -326,10 +258,7 @@ and js_of_structure_item ?(mod_gen=[]) old_env s =
   | Tstr_type tl ->
    let create_type x =
       (match x.typ_kind with
-        | Ttype_variant cdl ->
-          let cl = List.map (fun cstr -> extract_cstr_attrs cstr) cdl in
-          List.iter (fun (name, cstrs_name) -> add_type mod_gen name cstrs_name) cl;
-          (* print_type_tbl () *)
+        | Ttype_variant cdl -> () (* Do nothing, now using typedtree defs *)
         | Ttype_record ldl ->
           (* Beware silent shadowing for record labels *)
           List.iter (fun lbl -> Hashtbl.replace record_tbl (Ident.name lbl.ld_id) (Ident.name x.typ_id)) ldl
@@ -402,24 +331,26 @@ and js_of_expression ?(mod_gen=[]) old_env e =
     if is_infix f sl' && List.length exp_l = 2
     then ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
     else ppf_apply se (String.concat ", " sl)
+
   | Texp_match (exp, l, [], Total) ->
      let se = js_of_expression ~mod_gen new_env exp in
      let sb = String.concat "@," (List.map (fun x -> js_of_branch ~mod_gen old_env x se) l) in
      ppf_match se sb
-  | Texp_tuple (tl)               -> ppf_tuple @@ show_list_f (fun exp -> js_of_expression ~mod_gen new_env exp) ", " tl
+
+  | Texp_tuple (tl) -> ppf_tuple @@ show_list_f (fun exp -> js_of_expression ~mod_gen new_env exp) ", " tl
+
   | Texp_construct (loc, cd, el) ->
-        let value = js_of_longident loc in
-        if el = [] then
-          if is_sbool value
-          then value
-          else ppf_single_cstrs value
-        else
-          let rec expand_constructor_list fields exprs = match fields, exprs with
-            | [], [] -> []
-            | [], x :: xs | x :: xs , [] -> error ~loc:locn "argument lists should have the same length."
-            | x :: xs, y :: ys -> (if y = "" then ppf_single_cstrs x else ppf_cstr x y) :: expand_constructor_list xs ys in
-          let names = find_type value
-             in ppf_multiple_cstrs value (show_list ", " (expand_constructor_list names (List.map (fun exp -> js_of_expression ~mod_gen new_env exp) el)))
+    let name = js_of_longident loc in
+    if el = [] then (* Constructor has no parameters *)
+      if is_sbool name then name (* Special case true/false to their JS natives *)
+      else ppf_single_cstrs name
+    else (* Constructor has parameters *)
+      let fields = extract_attrs cd.cstr_attributes in
+      let expr_strs = List.map (fun exp -> js_of_expression ~mod_gen new_env exp) el in
+      let expand_constructor_list = List.map2 ppf_cstr in
+      let expanded_constructors = expand_constructor_list fields expr_strs in
+      ppf_multiple_cstrs name (show_list ", " expanded_constructors)
+
   | Texp_array      (exp_l)           -> ppf_array @@ show_list_f (fun exp -> js_of_expression ~mod_gen new_env exp) ", " exp_l
   | Texp_ifthenelse (e1, e2, None)    -> ppf_ifthen (js_of_expression ~mod_gen new_env e1) (js_of_expression ~mod_gen new_env e2)
   | Texp_ifthenelse (e1, e2, Some e3) -> ppf_ifthenelse (js_of_expression ~mod_gen new_env e1) (js_of_expression ~mod_gen new_env e2) (js_of_expression ~mod_gen new_env e3)
@@ -487,7 +418,7 @@ and js_of_pattern ?(mod_gen=[]) pat obj =
   | Tpat_construct (loc, cd, el) ->
      let c = js_of_longident loc in
      let spat = Printf.sprintf "%s" ("case \"" ^ c ^ "\"") in
-     let params = find_type c in
+     let params = extract_attrs cd.cstr_attributes in
      let binders =
        if List.length el = 0 then ""
        else Printf.sprintf "@[<v 0>%s@]"
