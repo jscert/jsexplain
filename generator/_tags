@@ -1,4 +1,8 @@
 true: package(str)
+
+# Generate cmt type information files
+true: bin_annot
+
 <parsing>: include
 <typing>: include
 <utils>: include
