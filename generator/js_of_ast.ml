@@ -271,9 +271,10 @@ let find_type name =
   let tmp = Hashtbl.find_all type_tbl short_name in
   let candidates = if List.length tmp = 1 then tmp else List.filter (fun (x, _) -> filter_on_prefixes prefixes (short_name :: x)) tmp in
     (* print_string @@ print_candidates @@ (Hashtbl.find_all type_tbl short_name); print_newline (); *)
-  if List.length candidates = 1
-  then snd @@ List.hd candidates
-  else failwith ("ambiguity when applying constructor " ^ name)
+  match candidates with
+  | [] -> print_type_tbl (); failwith ("no options for constructor " ^ name)
+  | c :: [] -> snd c
+  | _ -> print_type_tbl (); failwith ("ambiguity when applying constructor " ^ name)
 
 (**
  * Module managment part
