@@ -117,6 +117,11 @@ struct
     let lines_list = snd @@ List.fold_left (fun (st, acc) ed -> (ed, String.sub s st (ed - st) :: acc)) (0, []) (end_line_markers s)
     in append_token lines_list
 
+(* Wrap the entire logged version in a callable run_trm function, and add a call to return run(code). *)
+(* Assumes entry point called run *)
+let ppf_run_wrap s =
+  Format.sprintf "function run_trm(code) {@;<1 2>@[<v 1>@,%s@,return run(code);@,}@]" s
+
 (* Take a String in form of "\n      return somefunctions(sas, ad);" and wrap it in order to allow log of function enter and exit *)
 (* TODO: Handle skipping of case where return does not contain function evaluation. (By regexp? No Brackets?) *)
 let ppf_return_wrap l s =
@@ -126,7 +131,7 @@ let ppf_return_wrap l s =
     @,var res = %s\
     @,log_custom({line: %d, type: \"exit\"});\
     @,return res;
-    @]@,}());@,@," l funccall l
+    @]}());@,@," l funccall l
 
   let add_log_info s =
     let buf = Buffer.create 16 in
@@ -166,7 +171,7 @@ let ppf_return_wrap l s =
   let logged_output s =
     let str_ppf = Format.str_formatter in
     Format.fprintf str_ppf (Scanf.format_from_string s "");
-    add_log_info (Format.flush_str_formatter ())
+    ppf_run_wrap (add_log_info (Format.flush_str_formatter ()))
   (* let bad_output = Format.flush_str_formatter () in *)
   (* let pretty_output = global_replace lfs "\n" bad_output in *)
   (* add_log_info pretty_output *)
