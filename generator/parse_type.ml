@@ -118,21 +118,21 @@ let process_implementation_file ppf sourcefile =
           (*incr Odoc_global.errors ;*)
           None, inputfile, modulename
       (* ADDED *)
-      | Env.Error err -> 
+      | Env.Error err ->
           Env.report_error ppf err;
           print_newline();
           raise e
-      | Typecore.Error (loc,env,err) -> 
+      | Typecore.Error (loc,env,err) ->
           Location.print_error ppf loc;
           Typecore.report_error env ppf err;
           print_newline();
           raise e
-      | Typetexp.Error (loc,env,err) -> 
+      | Typetexp.Error (loc,env,err) ->
           Location.print_error ppf loc;
           Typetexp.report_error env ppf err;
           print_newline();
           raise e
-      | Typemod.Error (loc,env,err) -> 
+      | Typemod.Error (loc,env,err) ->
           Location.print_error ppf loc;
           Typemod.report_error env ppf err;
           print_newline();
@@ -179,21 +179,21 @@ let typecheck_implementation_file ppf sourcefile parsetree =
           prerr_endline s;
           (*incr Odoc_global.errors ;*)
           None
-      | Env.Error err -> 
+      | Env.Error err ->
           Env.report_error ppf err;
           print_newline();
           raise e
-      | Typetexp.Error (loc,env,err) -> 
+      | Typetexp.Error (loc,env,err) ->
           Location.print_error ppf loc;
           Typetexp.report_error env ppf err;
           print_newline();
           raise e
-      | Typecore.Error (loc,env,err) -> 
+      | Typecore.Error (loc,env,err) ->
           Location.print_error ppf loc;
-          Typecore.report_error env ppf err; 
+          Typecore.report_error env ppf err;
           print_newline();
           raise e
-      | Typemod.Error (loc,env,err) -> 
+      | Typemod.Error (loc,env,err) ->
           Location.print_error ppf loc;
           Typemod.report_error env ppf err;
           print_newline();
@@ -224,21 +224,21 @@ let typecheck_interface_file ppf sourcefile output_prefix =
           prerr_endline s;
           (*incr Odoc_global.errors ;*)
           None
-      | Env.Error err -> 
+      | Env.Error err ->
           Env.report_error ppf err;
           print_newline();
           raise e
-      | Typetexp.Error (loc,env,err) -> 
+      | Typetexp.Error (loc,env,err) ->
           Location.print_error ppf loc;
           Typetexp.report_error env ppf err;
           print_newline();
           raise e
-      | Typecore.Error (loc,env,err) -> 
+      | Typecore.Error (loc,env,err) ->
           Location.print_error ppf loc;
-          Typecore.report_error env ppf err; 
+          Typecore.report_error env ppf err;
           print_newline();
           raise e
-      | Typemod.Error (loc,env,err) -> 
+      | Typemod.Error (loc,env,err) ->
           Location.print_error ppf loc;
           Typemod.report_error env ppf err;
           print_newline();

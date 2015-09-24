@@ -17,7 +17,7 @@ module L = Logged (Token_generator) (struct let size = 256 end)
 (**
  * Useful functions (Warning: shadows `show_list' from Mytools)
  *)
-    
+
 let show_list_f f sep l = l
   |> List.map f
   |> List.fold_left (fun acc x -> acc ^ (if acc = "" then "" else sep) ^ x) ""
@@ -25,14 +25,14 @@ let show_list_f f sep l = l
 let show_list sep l =
   List.fold_left (fun acc x -> acc ^ (if acc = "" then "" else sep) ^ x) "" l
 
-let is_sbool x = List.mem x ["true" ; "false"] 
+let is_sbool x = List.mem x ["true" ; "false"]
 
 let rec zip l1 l2 = match l1, l2 with
   | [], x :: xs | x :: xs, [] -> failwith "zip: list must have the same length."
   | [], [] -> []
   | x :: xs, y :: ys -> (x, y) :: zip xs ys
 
-let unzip l = 
+let unzip l =
   let rec aux acc1 acc2 = function
   | [] -> List.rev acc1, List.rev acc2
   | (x, y) :: xs -> aux (x :: acc1) (y :: acc2) xs
@@ -59,7 +59,7 @@ let is_infix f args = match args with
      let f_loc = (f.exp_loc.loc_start, f.exp_loc.loc_end) in
      let args_loc = (x.exp_loc.loc_start, x.exp_loc.loc_end) in
      if fst args_loc < fst f_loc then true else false
-                                               
+
 (**
  * Before-hand definitions of Pretty-Printer-Format for converting ocaml
  * to ECMAScript, therefore all of them are in a single place.
@@ -67,7 +67,7 @@ let is_infix f args = match args with
 
 let ppf_lambda_wrap s =
   Printf.sprintf "(function () {@;<1 2>@[<v 0>%s@]@,}())@," s
-  
+
 let ppf_branch case binders expr =
   Printf.sprintf "%s: @[<v 0>%s@,return %s;@]"
                  case binders expr
@@ -89,7 +89,7 @@ let ppf_apply f args =
 let ppf_apply_infix f arg1 arg2 =
   Printf.sprintf "%s %s %s"
                  arg1 f arg2
-    
+
 let ppf_match value cases =
   let s =
     Printf.sprintf "switch (%s.type) {@,@[<v 0>%s@]@,}"
@@ -99,9 +99,9 @@ let ppf_match value cases =
 let ppf_array values =
   Printf.sprintf "[%s]"
                  values
-                 
+
 let ppf_tuple = ppf_array
-    
+
 let ppf_ifthen cond iftrue =
   Printf.sprintf "(function () {@;<1 2>@[<v 2>@,if (%s) {@,return  %s;@,}@]@,})()"
                  cond iftrue
@@ -119,7 +119,7 @@ let ppf_while cd body =
     Printf.sprintf "@[<v 2>while(%s) {@;<1 2>%s@,@]}"
                    cd body
   in ppf_lambda_wrap s
-                     
+
 let ppf_for id start ed flag body =
   let fl_to_string = function
     | Upto   -> "++"
@@ -137,13 +137,11 @@ let ppf_for id start ed flag body =
     tag
 *)
 let ppf_cstr tag value =
-  Printf.sprintf "%s: %s"
-    tag value
+  Printf.sprintf "%s: %s" tag value
 
 let ppf_single_cstrs typ =
-   Printf.sprintf "@[<v 2>{type: \"%s\"}@]"
-     typ
-      
+   Printf.sprintf "@[<v 2>{type: \"%s\"}@]" typ
+
 let ppf_multiple_cstrs typ rest =
   Printf.sprintf "@[<v 2>{type: \"%s\", %s}@]"
     typ rest
@@ -279,7 +277,7 @@ and js_of_expression e =
   | Texp_lazy        _                -> out_of_scope locn "lazy expressions"
   | Texp_object     (_,_)             -> out_of_scope locn "objects"
   | Texp_pack        _                -> out_of_scope locn "packing"
-    
+
 and js_of_constant = function
   | Const_int       n     -> string_of_int n
   | Const_char      c     -> String.make 1 c
@@ -288,7 +286,7 @@ and js_of_constant = function
   | Const_int32     n     -> Int32.to_string n
   | Const_int64     n     -> Int64.to_string n
   | Const_nativeint n     -> Nativeint.to_string n
-    
+
 and js_of_longident loc =
   let res = String.concat "." @@ Longident.flatten loc.txt in
   if res = "()" then "undefined" else res

@@ -14,7 +14,7 @@ let outputfile = ref None
 (*#########################################################################*)
 
 let _ =
-  
+
    (* disable loading of stdlib *)
    Clflags.nopervasives := false;
 
@@ -23,7 +23,7 @@ let _ =
 
    let files = ref [] in
    Arg.parse
-     [ ("-I", Arg.String (fun i -> Clflags.include_dirs := i :: !Clflags.include_dirs), 
+     [ ("-I", Arg.String (fun i -> Clflags.include_dirs := i :: !Clflags.include_dirs),
                       "includes a directory where to look for interface files");
        ("-o", Arg.String (fun s -> outputfile := Some s), "set the output file name");
        ("-debug", Arg.Set debug, "trace the various steps")
