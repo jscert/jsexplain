@@ -14,7 +14,6 @@ open Typedtree
   
 let hashtbl_size = 256
 
-let record_tbl   = Hashtbl.create hashtbl_size
 let module_list  = ref []
 let module_code  = ref []
 let module_created = ref []
@@ -258,16 +257,7 @@ and js_of_structure_item ?(mod_gen=[]) old_env s =
   match s.str_desc with
   | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression ~mod_gen new_env e
   | Tstr_value (_, vb_l) -> String.concat "@,@," @@ List.map (fun vb -> show_value_binding ~mod_gen vb) @@ vb_l
-  | Tstr_type tl ->
-   let create_type x =
-      (match x.typ_kind with
-        | Ttype_variant cdl -> () (* Do nothing, now using typedtree defs *)
-        | Ttype_record ldl ->
-          (* Beware silent shadowing for record labels *)
-          List.iter (fun lbl -> Hashtbl.replace record_tbl (Ident.name lbl.ld_id) (Ident.name x.typ_id)) ldl
-        | Ttype_abstract -> ()
-        | _ -> unsupported "open types, record and abstract type")
-   in List.iter create_type tl; ""
+  | Tstr_type tl -> "" (* Types have no representation in JS, but the OCaml type checker uses them *)
   | Tstr_open       od -> 
     let name = (fun od -> if od.open_override = Fresh then js_of_longident od.open_txt else "") od in
     if (name <> "" && not_already_created name) then
