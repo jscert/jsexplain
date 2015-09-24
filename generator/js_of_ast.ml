@@ -7,10 +7,7 @@ open Parse_type
 open Print_type
 open Types
 open Typedtree
-  
-let module_list  = ref []
-let module_code  = ref []
-let module_created = ref []
+
 module L = Logged (Token_generator) (struct let size = 256 end)
 
 (**
@@ -158,10 +155,7 @@ let ppf_record llde =
     | (lbl, exp) :: xs -> aux (acc ^ Printf.sprintf "%s: %s,@," lbl exp) xs
   in aux "" llde
 
-let ppf_decl ?(mod_gen=[]) id expr =
-  let assign_op, decl_kw, end_mark = if mod_gen = [] then " = ", "var ", ";" else ": ", "", "," in 
-  Printf.sprintf "@[<v 0>%s%s%s%s%s@,@]" 
-    decl_kw id assign_op expr end_mark
+let ppf_decl id expr = Printf.sprintf "@[<v 0>%s: %s,@,@]" id expr
 
 let ppf_pat_array id_list array_expr =
   Printf.sprintf "var __%s = %s;@," "array" array_expr ^
@@ -171,69 +165,26 @@ let ppf_pat_array id_list array_expr =
 let ppf_field_access expr field =
   Printf.sprintf "%s.%s" expr field
 
-(**
- * Module managment part
- *)
-
-(** Return tuple of module name and path to module **)
-let find_module_path mod_list =
-  let open Config in
-  let check_path name = find_in_path_uncap !load_path (name ^ ".ml") in
-  try
-    module_list := [];
-    zip mod_list (List.map check_path mod_list)
-  with Not_found -> failwith "Unbound module"
-
-(** Return bool of whether a module has bee ncreated already **)
-and not_already_created mod_name =
-  not @@ List.exists ((=) mod_name) !module_created
+let ppf_module_wrap name content =
+  Printf.sprintf "var %s = {@,%s@,};" name content
 
 (**
  * Main part
  *)
 
-let rec js_of_structure ?(mod_gen=[]) s =
-  show_list_f (fun strct -> js_of_structure_item ~mod_gen strct) "@,@," s.str_items
+let rec js_of_structure s =
+  show_list_f (fun strct -> js_of_structure_item strct) "@,@," s.str_items
 
-and parse_modules ?(mod_gen=[]) = function
-  | [] -> []
-  | (name, path) :: xs ->
-   let ppf = Format.std_formatter in
-   let (opt, inputfile) = process_implementation_file ppf path in
-   let ((parsetree1 : Parsetree.structure), typedtree1) =
-      match opt with
-      | None -> failwith ("Could not read and typecheck " ^ inputfile)
-      | Some (parsetree1, (typedtree1, _)) -> parsetree1, typedtree1
-      in
-   let pre = js_of_structure ~mod_gen:(name :: mod_gen) typedtree1 in
-   Printf.sprintf "%s = {\n%s\n}" name pre :: parse_modules ~mod_gen xs
+and show_value_binding vb =
+  js_of_let_pattern vb.vb_pat vb.vb_expr
 
-and show_value_binding ?(mod_gen=[]) vb =
-  js_of_let_pattern ~mod_gen vb.vb_pat vb.vb_expr
-
-and js_of_structure_item ?(mod_gen=[]) s =
+and js_of_structure_item s =
   let loc = s.str_loc in
   match s.str_desc with
-  | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression ~mod_gen e
-  | Tstr_value (_, vb_l) -> String.concat "@,@," @@ List.map (fun vb -> show_value_binding ~mod_gen vb) @@ vb_l
-  | Tstr_type tl -> "" (* Types have no representation in JS, but the OCaml type checker uses them *)
-  | Tstr_open       od -> 
-    let name = (fun od -> if od.open_override = Fresh then js_of_longident od.open_txt else "") od in
-    if (name <> "" && not_already_created name) then
-      module_list := name :: !module_list;
-
-      (* Disable writing of .cmi files for modules we're opening to avoid automatically over-writing existing signature
-       * with an inconsistent one *)
-      let old_dont_write_files = !Clflags.dont_write_files in
-      Clflags.dont_write_files := true;
-
-      let new_mod = parse_modules ~mod_gen @@ find_module_path @@ !module_list in
-
-      Clflags.dont_write_files := old_dont_write_files;
-
-      module_created := name :: !module_created;
-      module_code := new_mod @ !module_code;
-    "" 
+  | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression e
+  | Tstr_value (_, vb_l) -> String.concat "@,@," @@ List.map (fun vb -> show_value_binding vb) @@ vb_l
+  | Tstr_type       _  -> "" (* Types have no representation in JS, but the OCaml type checker uses them *)
+  | Tstr_open       _  -> "" (* Handle modules by use of multiple compilation/linking *)
   | Tstr_primitive  _  -> out_of_scope loc "primitive functions"
   | Tstr_typext     _  -> out_of_scope loc "type extensions"
   | Tstr_exception  _  -> out_of_scope loc "exceptions"
@@ -243,26 +194,26 @@ and js_of_structure_item ?(mod_gen=[]) s =
   | Tstr_class      _  -> out_of_scope loc "objects"
   | Tstr_class_type _  -> out_of_scope loc "class types"
   | Tstr_include    _  -> out_of_scope loc "includes"
-  | Tstr_attribute  attrs -> out_of_scope loc "attributes"
+  | Tstr_attribute  _  -> out_of_scope loc "attributes"
 
-and js_of_branch ?(mod_gen=[]) b obj =
-  let spat, binders = js_of_pattern ~mod_gen b.c_lhs obj in
-  let se = js_of_expression ~mod_gen b.c_rhs in
+and js_of_branch b obj =
+  let spat, binders = js_of_pattern b.c_lhs obj in
+  let se = js_of_expression b.c_rhs in
   if binders = "" then ppf_branch spat binders se
   else
     let typ = match List.rev (Str.split (Str.regexp " ") spat) with
       | [] -> assert false
       | x :: xs -> String.sub x 0 (String.length x)
     in L.log_line (ppf_branch spat binders se) (L.Add (binders, typ))
-    
-and js_of_expression ?(mod_gen=[]) e =
+
+and js_of_expression e =
   let locn = e.exp_loc in
   match e.exp_desc with
   | Texp_ident (_, loc,  _)           -> js_of_longident loc
   | Texp_constant c                   -> js_of_constant c
   | Texp_let   (_, vb_l, e)           ->
-    let sd = String.concat lin1 @@ List.map (fun vb -> show_value_binding ~mod_gen vb) @@ vb_l in
-    let se = js_of_expression ~mod_gen e
+    let sd = String.concat lin1 @@ List.map (fun vb -> show_value_binding vb) @@ vb_l in
+    let se = js_of_expression e
     in ppf_let_in sd se
   | Texp_function (_, c :: [], Total) ->
     let rec explore pats e = match e.exp_desc with
@@ -270,25 +221,25 @@ and js_of_expression ?(mod_gen=[]) e =
         let p, e = c.c_lhs, c.c_rhs
         in explore (p :: pats) e
       | _                                 ->
-        String.concat ", " @@ List.map ident_of_pat @@ List.rev @@ pats, js_of_expression ~mod_gen e in
+        String.concat ", " @@ List.map ident_of_pat @@ List.rev @@ pats, js_of_expression e in
     let args, body = explore [c.c_lhs] c.c_rhs
     in ppf_function args body
   | Texp_apply (f, exp_l)                 ->
      let sl' = exp_l
                |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope locn "optional apply arguments" | Some ei -> ei) in
      let sl = exp_l
-              |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope locn "optional apply arguments" | Some ei -> js_of_expression ~mod_gen ei) in
-    let se = js_of_expression ~mod_gen f in
+              |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope locn "optional apply arguments" | Some ei -> js_of_expression ei) in
+    let se = js_of_expression f in
     if is_infix f sl' && List.length exp_l = 2
     then ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
     else ppf_apply se (String.concat ", " sl)
 
   | Texp_match (exp, l, [], Total) ->
-     let se = js_of_expression ~mod_gen exp in
-     let sb = String.concat "@," (List.map (fun x -> js_of_branch ~mod_gen x se) l) in
+     let se = js_of_expression exp in
+     let sb = String.concat "@," (List.map (fun x -> js_of_branch x se) l) in
      ppf_match se sb
 
-  | Texp_tuple (tl) -> ppf_tuple @@ show_list_f (fun exp -> js_of_expression ~mod_gen exp) ", " tl
+  | Texp_tuple (tl) -> ppf_tuple @@ show_list_f (fun exp -> js_of_expression exp) ", " tl
 
   | Texp_construct (loc, cd, el) ->
     let name = cd.cstr_name in
@@ -297,20 +248,20 @@ and js_of_expression ?(mod_gen=[]) e =
       else ppf_single_cstrs name
     else (* Constructor has parameters *)
       let fields = extract_attrs cd.cstr_attributes in
-      let expr_strs = List.map (fun exp -> js_of_expression ~mod_gen exp) el in
+      let expr_strs = List.map (fun exp -> js_of_expression exp) el in
       let expand_constructor_list = List.map2 ppf_cstr in
       let expanded_constructors = expand_constructor_list fields expr_strs in
       ppf_multiple_cstrs name (show_list ", " expanded_constructors)
 
-  | Texp_array      (exp_l)           -> ppf_array @@ show_list_f (fun exp -> js_of_expression ~mod_gen exp) ", " exp_l
-  | Texp_ifthenelse (e1, e2, None)    -> ppf_ifthen (js_of_expression ~mod_gen e1) (js_of_expression ~mod_gen e2)
-  | Texp_ifthenelse (e1, e2, Some e3) -> ppf_ifthenelse (js_of_expression ~mod_gen e1) (js_of_expression ~mod_gen e2) (js_of_expression ~mod_gen e3)
-  | Texp_sequence   (e1, e2)          -> ppf_sequence (js_of_expression ~mod_gen e1) (js_of_expression ~mod_gen e2)
-  | Texp_while      (cd, body)        -> ppf_while (js_of_expression ~mod_gen cd) (js_of_expression ~mod_gen body)
-  | Texp_for        (id, _, st, ed, fl, body) -> ppf_for (Ident.name id) (js_of_expression ~mod_gen st) (js_of_expression ~mod_gen ed) fl (js_of_expression ~mod_gen body)
-  | Texp_record     (llde,_)          -> ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, js_of_expression ~mod_gen exp)) llde)
+  | Texp_array      (exp_l)           -> ppf_array @@ show_list_f (fun exp -> js_of_expression exp) ", " exp_l
+  | Texp_ifthenelse (e1, e2, None)    -> ppf_ifthen (js_of_expression e1) (js_of_expression e2)
+  | Texp_ifthenelse (e1, e2, Some e3) -> ppf_ifthenelse (js_of_expression e1) (js_of_expression e2) (js_of_expression e3)
+  | Texp_sequence   (e1, e2)          -> ppf_sequence (js_of_expression e1) (js_of_expression e2)
+  | Texp_while      (cd, body)        -> ppf_while (js_of_expression cd) (js_of_expression body)
+  | Texp_for        (id, _, st, ed, fl, body) -> ppf_for (Ident.name id) (js_of_expression st) (js_of_expression ed) fl (js_of_expression body)
+  | Texp_record     (llde,_)          -> ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, js_of_expression exp)) llde)
   | Texp_field      (exp, _, lbl)     ->
-    ppf_field_access (js_of_expression ~mod_gen exp) lbl.lbl_name
+    ppf_field_access (js_of_expression exp) lbl.lbl_name
 
   | Texp_match      (_,_,_, Partial)  -> out_of_scope locn "partial matching"
   | Texp_match      (_,_,_,_)         -> out_of_scope locn "matching with exception branches"
@@ -345,11 +296,11 @@ and js_of_longident loc =
 and ident_of_pat pat = match pat.pat_desc with
   | Tpat_var (id, _) -> Ident.name id
   | _ -> error ~loc:pat.pat_loc "functions can't deconstruct values"
-    
-and js_of_let_pattern ?(mod_gen=[]) pat expr =
-  let sexpr = js_of_expression ~mod_gen expr in
+
+and js_of_let_pattern pat expr =
+  let sexpr = js_of_expression expr in
   match pat.pat_desc with
-  | Tpat_var (id, _) -> ppf_decl ~mod_gen (Ident.name id) sexpr
+  | Tpat_var (id, _) -> ppf_decl (Ident.name id) sexpr
   | Tpat_tuple (pat_l)
   | Tpat_array (pat_l) ->
      let l = List.map
@@ -361,7 +312,7 @@ and js_of_let_pattern ?(mod_gen=[]) pat expr =
      ppf_pat_array l sexpr
   | _ -> error ~loc:pat.pat_loc "let can't deconstruct values"
 
-and js_of_pattern ?(mod_gen=[]) pat obj =
+and js_of_pattern pat obj =
   let locn = pat.pat_loc in
   match pat.pat_desc with
   | Tpat_any                     -> "default", ""
@@ -374,7 +325,7 @@ and js_of_pattern ?(mod_gen=[]) pat obj =
      let binders =
        if List.length el = 0 then ""
        else Printf.sprintf "@[<v 0>%s@]"
-          ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern ~mod_gen x obj)) el) params) ^ ";") in
+          ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern x obj)) el) params) ^ ";") in
      spat, binders
   | Tpat_tuple el -> unsupported ~loc:locn "tuple matching"
   | Tpat_array el -> unsupported ~loc:locn "array-match"
@@ -384,11 +335,8 @@ and js_of_pattern ?(mod_gen=[]) pat obj =
   | Tpat_variant (_,_,_) -> out_of_scope locn "polymorphic variants in pattern matching"
   | Tpat_lazy _ -> out_of_scope locn "lazy-pattern"
 
-let to_javascript typedtree =
-  let pre_res = js_of_structure typedtree in
-  let mod_code = String.concat "\n\n" (List.map L.strip_log_info !module_code) in
-  let logged, unlogged, pre = L.logged_output (mod_code ^ "\n" ^ pre_res),
-                              L.unlogged_output (mod_code ^ "\n" ^ pre_res),
-                              (mod_code ^ "\n" ^ pre_res) in
-  (logged, unlogged, pre)
+let to_javascript module_name typedtree =
+  let content = js_of_structure typedtree in
+  let pre_res = ppf_module_wrap module_name content in
+  (L.logged_output pre_res, L.unlogged_output pre_res, pre_res)
 

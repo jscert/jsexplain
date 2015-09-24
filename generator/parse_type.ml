@@ -105,18 +105,18 @@ let process_implementation_file ppf sourcefile =
     let env = initial_env () in
     let parsetree = parse_file inputfile Parse.implementation ast_impl_magic_number in
     let typedtree = Typemod.type_implementation sourcefile prefixname modulename env parsetree in
-    (Some (parsetree, typedtree), inputfile)
+    (Some (parsetree, typedtree), inputfile, modulename)
   with
     e ->
       match e with
         Syntaxerr.Error err ->
           fprintf Format.err_formatter "@[%a@]@."
             Syntaxerr.report_error err;
-          None, inputfile
+          None, inputfile, modulename
       | Failure s ->
           prerr_endline s;
           (*incr Odoc_global.errors ;*)
-          None, inputfile
+          None, inputfile, modulename
       (* ADDED *)
       | Env.Error err -> 
           Env.report_error ppf err;
