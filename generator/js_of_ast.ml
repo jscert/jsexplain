@@ -1,10 +1,6 @@
 open Asttypes
 open Attributes
-open Env
-open Format
-open Lexing
 open Log
-open Longident
 open Misc
 open Mytools
 open Parse_type
@@ -12,8 +8,6 @@ open Print_type
 open Types
 open Typedtree
   
-let hashtbl_size = 256
-
 let module_list  = ref []
 let module_code  = ref []
 let module_created = ref []
@@ -23,39 +17,6 @@ module L = Logged (Token_generator) (struct let size = 256 end)
  * Debug-purpose functions
  *)
 
-let env_diff_names env1 env2 =
-  List.map Ident.unique_name (Env.diff env1 env2)
-
-(**
- *  Functions to work with environment
- **)
-
-let rec list_of_ident_from_summary = function
-  | Env_empty -> []
-  | Env_value (sum, id, vd) -> id :: list_of_ident_from_summary sum
-  | Env_type (sum,_,_)
-  | Env_extension (sum,_,_)
-  | Env_module (sum,_,_)
-  | Env_modtype (sum,_,_)
-  | Env_class (sum,_,_)
-  | Env_cltype (sum,_,_)
-  | Env_open (sum,_)
-  | Env_functor_arg (sum,_) -> list_of_ident_from_summary sum
-
-let print_name_list l =
-  let rec aux = function
-    | [] -> ""
-    | x :: [] -> x
-    | x :: xs -> x ^ ", " ^ aux xs
-  in "[ " ^ aux l ^ " ]"
-
-let print_env env =
-  let idents = env
-               |> Env.summary
-               |> list_of_ident_from_summary
-               |> List.map Ident.name in
-  Printf.printf "env: %s\n" (print_name_list idents)
-                            
 (**
  * Useful functions (Warning: shadows `show_list' from Mytools)
  *)
