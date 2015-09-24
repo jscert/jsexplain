@@ -1,23 +1,16 @@
 open Asttypes
 open Parsetree
 open Typedtree
+open Types
 open Mytools
 
-let rec extract_cstr_attrs (cstr : Typedtree.constructor_declaration)  =
-  let cstr_name   = Ident.name cstr.cd_id in
-  let cstr_params = extract_attrs cstr.cd_attributes
-  in (cstr_name, cstr_params) 
-
-and extract_vb_attrs (vb : Typedtree.value_binding) =
-  extract_attrs vb.vb_attributes
-
-and extract_attrs attrs =
+let rec extract_attrs attrs =
   attrs
     |> List.map extract_attr
     |> List.flatten
 
 and extract_attr (_, pl) = extract_payload pl
-      
+
 and extract_payload = function
   | PStr  s    -> extract_structure s
   | PTyp  _    -> error "Type found. A tuple or a single value was expected"
@@ -90,3 +83,11 @@ and extract_constant = function
   | Const_int32     _     -> error "A string or a char was expected but a int32 was found"
   | Const_int64     _     -> error "A string or a char was expected but a int64 was found"
   | Const_nativeint _     -> error "A string or a char was expected but a nativeint was found"
+
+let extract_cstr_attrs (cstr : constructor_declaration)  =
+  let cstr_name   = Ident.name cstr.cd_id in
+  let cstr_params = extract_attrs cstr.cd_attributes
+  in (cstr_name, cstr_params)
+
+let extract_vb_attrs (vb : Typedtree.value_binding) =
+  extract_attrs vb.vb_attributes

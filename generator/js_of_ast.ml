@@ -1,10 +1,6 @@
 open Asttypes
 open Attributes
-open Env
-open Format
-open Lexing
 open Log
-open Longident
 open Misc
 open Mytools
 open Parse_type
@@ -12,16 +8,6 @@ open Print_type
 open Types
 open Typedtree
   
-let hashtbl_size = 256
-
-(* val type_tbl : (string, string list * string list) Hashtbl.t
- * Mapping constructor names to a pair of module list and constructor names list *)
-let type_tbl     = Hashtbl.create hashtbl_size
-(* Hard-code the special-syntax of the list datatype *)
-let _            = Hashtbl.add type_tbl "[]" ([], [])
-let _            = Hashtbl.add type_tbl "::" ([], ["head"; "tail"])
-
-let record_tbl   = Hashtbl.create hashtbl_size
 let module_list  = ref []
 let module_code  = ref []
 let module_created = ref []
@@ -30,62 +16,7 @@ module L = Logged (Token_generator) (struct let size = 256 end)
 (**
  * Debug-purpose functions
  *)
-  
-let print_type_tbl () =
-  let assemble (l, n) =
-    let rec aux = function
-      | [] -> n
-      | x :: xs -> x ^ "." ^ aux xs
-    in aux l in
-  let rec print_str_list = function
-    | [] -> ""
-    | x :: [] -> (Printf.sprintf {|"%s"|} x)
-    | x :: xs -> (Printf.sprintf {|"%s", |} x) ^ print_str_list xs
-  in Hashtbl.iter (fun cstr (mods, elems) -> Printf.printf ({|%s -> [%s]|} ^^ "\n") (assemble (mods, cstr)) (print_str_list elems)) type_tbl; ()
 
-  
-let print_candidates l =
-let rec print_str_list = function
-  | []      -> ""
-  | x :: xs -> Printf.sprintf "%s " x ^ print_str_list xs in
-let rec aux = function
-  | []         -> ""
-  | (x, y) :: xs -> "[" ^ print_str_list x ^ ", " ^ print_str_list y ^ "]" ^ " ; " ^ aux xs
-in aux l
-
-let env_diff_names env1 env2 =
-  List.map Ident.unique_name (Env.diff env1 env2)
-
-(**
- *  Functions to work with environment
- **)
-
-let rec list_of_ident_from_summary = function
-  | Env_empty -> []
-  | Env_value (sum, id, vd) -> id :: list_of_ident_from_summary sum
-  | Env_type (sum,_,_)
-  | Env_extension (sum,_,_)
-  | Env_module (sum,_,_)
-  | Env_modtype (sum,_,_)
-  | Env_class (sum,_,_)
-  | Env_cltype (sum,_,_)
-  | Env_open (sum,_)
-  | Env_functor_arg (sum,_) -> list_of_ident_from_summary sum
-
-let print_name_list l =
-  let rec aux = function
-    | [] -> ""
-    | x :: [] -> x
-    | x :: xs -> x ^ ", " ^ aux xs
-  in "[ " ^ aux l ^ " ]"
-
-let print_env env =
-  let idents = env
-               |> Env.summary
-               |> list_of_ident_from_summary
-               |> List.map Ident.name in
-  Printf.printf "env: %s\n" (print_name_list idents)
-                            
 (**
  * Useful functions (Warning: shadows `show_list' from Mytools)
  *)
@@ -236,45 +167,9 @@ let ppf_pat_array id_list array_expr =
   Printf.sprintf "var __%s = %s;@," "array" array_expr ^
     List.fold_left2 (fun acc (name, exp_type) y -> acc ^ Printf.sprintf "@[<v 0>var %s = __%s[%d];@,@]" name "array" y)
                     "" id_list @@ range 0 (List.length id_list - 1)
-                 
-   
-(**
- * Type managment part
- *)
 
-let short_type_name name =
-  let len = String.length name - 1 in
-  let rec find_last_point i =
-    if i < 0 then 0
-    else if name.[i] = '.' then (succ i)
-    else find_last_point (pred i) in
-  let last_point_pos = find_last_point len in
-  String.sub name last_point_pos (len - last_point_pos + 1)
-
-let add_type mod_gen name cstrs_name =
-  Hashtbl.add type_tbl (short_type_name name) (mod_gen, cstrs_name)
-
-(* string -> string list
- * Appears to return the name annotations of a type definition *)
-let find_type name =
-  let short_name = short_type_name name in
-  let find_points name = 
-    let len = String.length name in
-    string_fold_righti (fun i x acc -> if x = '.' then i :: acc else 
-                                       if i = len - 1 then i + 1 :: acc else acc) name [] in
-  let split_on_rev pos = snd @@ List.fold_left (fun (deb, acc) x -> x + 1, String.sub name deb (x - deb) :: acc) (0, []) pos in
-  let prefixes = split_on_rev @@ find_points @@ name in 
-  let rec filter_on_prefixes l prefixes = match l, prefixes with
-    | _, [] -> true
-    | [], _ -> false
-    | x :: xs, y :: ys -> if x = y then filter_on_prefixes xs ys else false in
-  let tmp = Hashtbl.find_all type_tbl short_name in
-  let candidates = if List.length tmp = 1 then tmp else List.filter (fun (x, _) -> filter_on_prefixes prefixes (short_name :: x)) tmp in
-    (* print_string @@ print_candidates @@ (Hashtbl.find_all type_tbl short_name); print_newline (); *)
-  match candidates with
-  | [] -> print_type_tbl (); failwith ("no options for constructor " ^ name)
-  | c :: [] -> snd c
-  | _ -> print_type_tbl (); failwith ("ambiguity when applying constructor " ^ name)
+let ppf_field_access expr field =
+  Printf.sprintf "%s.%s" expr field
 
 (**
  * Module managment part
@@ -297,9 +192,8 @@ and not_already_created mod_name =
  * Main part
  *)
 
-let rec js_of_structure ?(mod_gen=[]) old_env s =
-  let new_env = s.str_final_env in
-  show_list_f (fun strct -> js_of_structure_item ~mod_gen new_env strct) "@,@," s.str_items
+let rec js_of_structure ?(mod_gen=[]) s =
+  show_list_f (fun strct -> js_of_structure_item ~mod_gen strct) "@,@," s.str_items
 
 and parse_modules ?(mod_gen=[]) = function
   | [] -> []
@@ -311,31 +205,18 @@ and parse_modules ?(mod_gen=[]) = function
       | None -> failwith ("Could not read and typecheck " ^ inputfile)
       | Some (parsetree1, (typedtree1, _)) -> parsetree1, typedtree1
       in
-   let pre = js_of_structure ~mod_gen:(name :: mod_gen) Env.empty typedtree1 in
+   let pre = js_of_structure ~mod_gen:(name :: mod_gen) typedtree1 in
    Printf.sprintf "%s = {\n%s\n}" name pre :: parse_modules ~mod_gen xs
 
 and show_value_binding ?(mod_gen=[]) vb =
   js_of_let_pattern ~mod_gen vb.vb_pat vb.vb_expr
 
-and js_of_structure_item ?(mod_gen=[]) old_env s =
-  let new_env = s.str_env in
+and js_of_structure_item ?(mod_gen=[]) s =
   let loc = s.str_loc in
   match s.str_desc with
-  | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression ~mod_gen new_env e
+  | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression ~mod_gen e
   | Tstr_value (_, vb_l) -> String.concat "@,@," @@ List.map (fun vb -> show_value_binding ~mod_gen vb) @@ vb_l
-  | Tstr_type tl ->
-   let create_type x =
-      (match x.typ_kind with
-        | Ttype_variant cdl ->
-          let cl = List.map (fun cstr -> extract_cstr_attrs cstr) cdl in
-          List.iter (fun (name, cstrs_name) -> add_type mod_gen name cstrs_name) cl;
-          (* print_type_tbl () *)
-        | Ttype_record ldl ->
-          (* Beware silent shadowing for record labels *)
-          List.iter (fun lbl -> Hashtbl.replace record_tbl (Ident.name lbl.ld_id) (Ident.name x.typ_id)) ldl
-        | Ttype_abstract -> ()
-        | _ -> unsupported "open types, record and abstract type")
-   in List.iter create_type tl; ""
+  | Tstr_type tl -> "" (* Types have no representation in JS, but the OCaml type checker uses them *)
   | Tstr_open       od -> 
     let name = (fun od -> if od.open_override = Fresh then js_of_longident od.open_txt else "") od in
     if (name <> "" && not_already_created name) then
@@ -364,9 +245,9 @@ and js_of_structure_item ?(mod_gen=[]) old_env s =
   | Tstr_include    _  -> out_of_scope loc "includes"
   | Tstr_attribute  attrs -> out_of_scope loc "attributes"
 
-and js_of_branch ?(mod_gen=[]) old_env b obj =
+and js_of_branch ?(mod_gen=[]) b obj =
   let spat, binders = js_of_pattern ~mod_gen b.c_lhs obj in
-  let se = js_of_expression ~mod_gen old_env b.c_rhs in
+  let se = js_of_expression ~mod_gen b.c_rhs in
   if binders = "" then ppf_branch spat binders se
   else
     let typ = match List.rev (Str.split (Str.regexp " ") spat) with
@@ -374,15 +255,14 @@ and js_of_branch ?(mod_gen=[]) old_env b obj =
       | x :: xs -> String.sub x 0 (String.length x)
     in L.log_line (ppf_branch spat binders se) (L.Add (binders, typ))
     
-and js_of_expression ?(mod_gen=[]) old_env e =
+and js_of_expression ?(mod_gen=[]) e =
   let locn = e.exp_loc in
-  let new_env = e.exp_env in
   match e.exp_desc with
   | Texp_ident (_, loc,  _)           -> js_of_longident loc
   | Texp_constant c                   -> js_of_constant c
   | Texp_let   (_, vb_l, e)           ->
     let sd = String.concat lin1 @@ List.map (fun vb -> show_value_binding ~mod_gen vb) @@ vb_l in
-    let se = js_of_expression ~mod_gen new_env e
+    let se = js_of_expression ~mod_gen e
     in ppf_let_in sd se
   | Texp_function (_, c :: [], Total) ->
     let rec explore pats e = match e.exp_desc with
@@ -390,49 +270,53 @@ and js_of_expression ?(mod_gen=[]) old_env e =
         let p, e = c.c_lhs, c.c_rhs
         in explore (p :: pats) e
       | _                                 ->
-        String.concat ", " @@ List.map ident_of_pat @@ List.rev @@ pats, js_of_expression ~mod_gen new_env e in
+        String.concat ", " @@ List.map ident_of_pat @@ List.rev @@ pats, js_of_expression ~mod_gen e in
     let args, body = explore [c.c_lhs] c.c_rhs
     in ppf_function args body
   | Texp_apply (f, exp_l)                 ->
      let sl' = exp_l
                |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope locn "optional apply arguments" | Some ei -> ei) in
      let sl = exp_l
-              |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope locn "optional apply arguments" | Some ei -> js_of_expression ~mod_gen new_env ei) in
-    let se = js_of_expression ~mod_gen new_env f in
+              |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope locn "optional apply arguments" | Some ei -> js_of_expression ~mod_gen ei) in
+    let se = js_of_expression ~mod_gen f in
     if is_infix f sl' && List.length exp_l = 2
     then ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
     else ppf_apply se (String.concat ", " sl)
+
   | Texp_match (exp, l, [], Total) ->
-     let se = js_of_expression ~mod_gen new_env exp in
-     let sb = String.concat "@," (List.map (fun x -> js_of_branch ~mod_gen old_env x se) l) in
+     let se = js_of_expression ~mod_gen exp in
+     let sb = String.concat "@," (List.map (fun x -> js_of_branch ~mod_gen x se) l) in
      ppf_match se sb
-  | Texp_tuple (tl)               -> ppf_tuple @@ show_list_f (fun exp -> js_of_expression ~mod_gen new_env exp) ", " tl
+
+  | Texp_tuple (tl) -> ppf_tuple @@ show_list_f (fun exp -> js_of_expression ~mod_gen exp) ", " tl
+
   | Texp_construct (loc, cd, el) ->
-        let value = js_of_longident loc in
-        if el = [] then
-          if is_sbool value
-          then value
-          else ppf_single_cstrs value
-        else
-          let rec expand_constructor_list fields exprs = match fields, exprs with
-            | [], [] -> []
-            | [], x :: xs | x :: xs , [] -> error ~loc:locn "argument lists should have the same length."
-            | x :: xs, y :: ys -> (if y = "" then ppf_single_cstrs x else ppf_cstr x y) :: expand_constructor_list xs ys in
-          let names = find_type value
-             in ppf_multiple_cstrs value (show_list ", " (expand_constructor_list names (List.map (fun exp -> js_of_expression ~mod_gen new_env exp) el)))
-  | Texp_array      (exp_l)           -> ppf_array @@ show_list_f (fun exp -> js_of_expression ~mod_gen new_env exp) ", " exp_l
-  | Texp_ifthenelse (e1, e2, None)    -> ppf_ifthen (js_of_expression ~mod_gen new_env e1) (js_of_expression ~mod_gen new_env e2)
-  | Texp_ifthenelse (e1, e2, Some e3) -> ppf_ifthenelse (js_of_expression ~mod_gen new_env e1) (js_of_expression ~mod_gen new_env e2) (js_of_expression ~mod_gen new_env e3)
-  | Texp_sequence   (e1, e2)          -> ppf_sequence (js_of_expression ~mod_gen new_env e1) (js_of_expression ~mod_gen new_env e2)
-  | Texp_while      (cd, body)        -> ppf_while (js_of_expression ~mod_gen new_env cd) (js_of_expression ~mod_gen new_env body)
-  | Texp_for        (id, _, st, ed, fl, body) -> ppf_for (Ident.name id) (js_of_expression ~mod_gen new_env st) (js_of_expression ~mod_gen new_env ed) fl (js_of_expression ~mod_gen new_env body)
-  | Texp_record     (llde,_)          -> ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, js_of_expression ~mod_gen new_env exp)) llde)
+    let name = cd.cstr_name in
+    if el = [] then (* Constructor has no parameters *)
+      if is_sbool name then name (* Special case true/false to their JS natives *)
+      else ppf_single_cstrs name
+    else (* Constructor has parameters *)
+      let fields = extract_attrs cd.cstr_attributes in
+      let expr_strs = List.map (fun exp -> js_of_expression ~mod_gen exp) el in
+      let expand_constructor_list = List.map2 ppf_cstr in
+      let expanded_constructors = expand_constructor_list fields expr_strs in
+      ppf_multiple_cstrs name (show_list ", " expanded_constructors)
+
+  | Texp_array      (exp_l)           -> ppf_array @@ show_list_f (fun exp -> js_of_expression ~mod_gen exp) ", " exp_l
+  | Texp_ifthenelse (e1, e2, None)    -> ppf_ifthen (js_of_expression ~mod_gen e1) (js_of_expression ~mod_gen e2)
+  | Texp_ifthenelse (e1, e2, Some e3) -> ppf_ifthenelse (js_of_expression ~mod_gen e1) (js_of_expression ~mod_gen e2) (js_of_expression ~mod_gen e3)
+  | Texp_sequence   (e1, e2)          -> ppf_sequence (js_of_expression ~mod_gen e1) (js_of_expression ~mod_gen e2)
+  | Texp_while      (cd, body)        -> ppf_while (js_of_expression ~mod_gen cd) (js_of_expression ~mod_gen body)
+  | Texp_for        (id, _, st, ed, fl, body) -> ppf_for (Ident.name id) (js_of_expression ~mod_gen st) (js_of_expression ~mod_gen ed) fl (js_of_expression ~mod_gen body)
+  | Texp_record     (llde,_)          -> ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, js_of_expression ~mod_gen exp)) llde)
+  | Texp_field      (exp, _, lbl)     ->
+    ppf_field_access (js_of_expression ~mod_gen exp) lbl.lbl_name
+
   | Texp_match      (_,_,_, Partial)  -> out_of_scope locn "partial matching"
   | Texp_match      (_,_,_,_)         -> out_of_scope locn "matching with exception branches"
   | Texp_try        (_,_)             -> out_of_scope locn "exceptions"
   | Texp_function   (_,_,_)           -> out_of_scope locn "powered-up functions"
   | Texp_variant    (_,_)             -> out_of_scope locn "polymorphic variant"
-  | Texp_field      (_,_,_)           -> out_of_scope locn "accessing field"
   | Texp_setfield   (_,_,_,_)         -> out_of_scope locn "setting field"
   | Texp_send       (_,_,_)           -> out_of_scope locn "objects"
   | Texp_new        (_,_,_)           -> out_of_scope locn "objects"
@@ -463,8 +347,7 @@ and ident_of_pat pat = match pat.pat_desc with
   | _ -> error ~loc:pat.pat_loc "functions can't deconstruct values"
     
 and js_of_let_pattern ?(mod_gen=[]) pat expr =
-  let new_env = pat.pat_env in
-  let sexpr = js_of_expression ~mod_gen new_env expr in
+  let sexpr = js_of_expression ~mod_gen expr in
   match pat.pat_desc with
   | Tpat_var (id, _) -> ppf_decl ~mod_gen (Ident.name id) sexpr
   | Tpat_tuple (pat_l)
@@ -485,9 +368,9 @@ and js_of_pattern ?(mod_gen=[]) pat obj =
   | Tpat_constant   c            -> js_of_constant c, ""
   | Tpat_var       (id, _)       -> Ident.name id, ""
   | Tpat_construct (loc, cd, el) ->
-     let c = js_of_longident loc in
+     let c = cd.cstr_name in
      let spat = Printf.sprintf "%s" ("case \"" ^ c ^ "\"") in
-     let params = find_type c in
+     let params = extract_attrs cd.cstr_attributes in
      let binders =
        if List.length el = 0 then ""
        else Printf.sprintf "@[<v 0>%s@]"
@@ -502,7 +385,7 @@ and js_of_pattern ?(mod_gen=[]) pat obj =
   | Tpat_lazy _ -> out_of_scope locn "lazy-pattern"
 
 let to_javascript typedtree =
-  let pre_res = js_of_structure Env.empty typedtree in
+  let pre_res = js_of_structure typedtree in
   let mod_code = String.concat "\n\n" (List.map L.strip_log_info !module_code) in
   let logged, unlogged, pre = L.logged_output (mod_code ^ "\n" ^ pre_res),
                               L.unlogged_output (mod_code ^ "\n" ^ pre_res),

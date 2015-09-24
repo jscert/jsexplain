@@ -19,16 +19,16 @@ all: main.byte
 
 debug: main.d.byte
 
-%.byte: *.ml
+%.byte: *.ml _tags
 	$(OCAMLBUILD) $@
 
-native:
+native: _tags
 	$(OCAMLBUILD) main.native
 
 stdlib:
 	$(CC) stdlib_ml/stdlib.mli
 
-%.inferred.mli:
+%.inferred.mli: _tags
 	$(OCAMLBUILD) $@
 	cp _build/$@ .
 
