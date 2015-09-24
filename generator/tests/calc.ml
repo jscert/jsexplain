@@ -11,13 +11,13 @@ and sexpr =
   | Emp [@f]
   | Push [@f value, stack] of expr * sexpr
 
-let rec eval_ expr = match expr with
+let rec run expr = match expr with
   | Const n -> n
-  | Add (ls, rs) -> eval_ ls + eval_ rs
-  | Sub (ls, rs) -> eval_ ls - eval_ rs
-  | Mul (ls, rs) -> eval_ ls * eval_ rs
-  | Div (ls, rs) -> eval_ ls / eval_ rs
+  | Add (ls, rs) -> run ls + run rs
+  | Sub (ls, rs) -> run ls - run rs
+  | Mul (ls, rs) -> run ls * run rs
+  | Div (ls, rs) -> run ls / run rs
   | Pop s -> Stack.pop (evals s)
 and evals sexpr = match sexpr with
   | Emp -> Stack.N
-  | Push (v, s) -> Stack.push (eval_ v) (evals s)
+  | Push (v, s) -> Stack.push (run v) (evals s)
