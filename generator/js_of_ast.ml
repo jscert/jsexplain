@@ -208,6 +208,9 @@ let ppf_pat_array id_list array_expr =
     List.fold_left2 (fun acc (name, exp_type) y -> acc ^ Printf.sprintf "@[<v 0>var %s = __%s[%d];@,@]" name "array" y)
                     "" id_list @@ range 0 (List.length id_list - 1)
 
+let ppf_field_access expr field =
+  Printf.sprintf "%s.%s" expr field
+
 (**
  * Module managment part
  *)
@@ -358,12 +361,14 @@ and js_of_expression ?(mod_gen=[]) old_env e =
   | Texp_while      (cd, body)        -> ppf_while (js_of_expression ~mod_gen new_env cd) (js_of_expression ~mod_gen new_env body)
   | Texp_for        (id, _, st, ed, fl, body) -> ppf_for (Ident.name id) (js_of_expression ~mod_gen new_env st) (js_of_expression ~mod_gen new_env ed) fl (js_of_expression ~mod_gen new_env body)
   | Texp_record     (llde,_)          -> ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, js_of_expression ~mod_gen new_env exp)) llde)
+  | Texp_field      (exp, _, lbl)     ->
+    ppf_field_access (js_of_expression ~mod_gen new_env exp) lbl.lbl_name
+
   | Texp_match      (_,_,_, Partial)  -> out_of_scope locn "partial matching"
   | Texp_match      (_,_,_,_)         -> out_of_scope locn "matching with exception branches"
   | Texp_try        (_,_)             -> out_of_scope locn "exceptions"
   | Texp_function   (_,_,_)           -> out_of_scope locn "powered-up functions"
   | Texp_variant    (_,_)             -> out_of_scope locn "polymorphic variant"
-  | Texp_field      (_,_,_)           -> out_of_scope locn "accessing field"
   | Texp_setfield   (_,_,_,_)         -> out_of_scope locn "setting field"
   | Texp_send       (_,_,_)           -> out_of_scope locn "objects"
   | Texp_new        (_,_,_)           -> out_of_scope locn "objects"
