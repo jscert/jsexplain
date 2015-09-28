@@ -27,6 +27,10 @@ let show_list sep l =
 
 let is_sbool x = List.mem x ["true" ; "false"]
 
+let exp_type_is_constant exp =
+  List.exists (Ctype.matches exp.exp_env exp.exp_type)
+  [Predef.type_bool; Predef.type_int; Predef.type_char; Predef.type_string; Predef.type_float]
+
 let rec zip l1 l2 = match l1, l2 with
   | [], x :: xs | x :: xs, [] -> failwith "zip: list must have the same length."
   | [], [] -> []
@@ -90,11 +94,23 @@ let ppf_apply_infix f arg1 arg2 =
   Printf.sprintf "%s %s %s"
                  arg1 f arg2
 
-let ppf_match value cases =
-  let s =
-    Printf.sprintf "switch (%s.type) {@,@[<v 0>%s@]@,}"
-                   value cases
+let ppf_match value cases const =
+  let cons_fld = if const then "" else ".type" in
+  let s = Printf.sprintf "switch (%s%s) {@,@[<v 0>%s@]@,}"
+    value cons_fld cases
   in ppf_lambda_wrap s
+
+let ppf_match_case c =
+  Printf.sprintf "case %s" c
+
+let ppf_match_binders binders =
+  let binds = show_list ", " binders in
+  Printf.sprintf "@[<v 0>var %s;@]" binds
+
+(* obj is passed as the object variable binding, if we need to deconstruct it *)
+let ppf_match_binder var ?obj fld = match obj with
+  | None     -> Printf.sprintf "%s = %s" var fld
+  | Some obj -> Printf.sprintf "%s = %s.%s" var obj fld
 
 let ppf_array values =
   Printf.sprintf "[%s]"
@@ -235,7 +251,8 @@ and js_of_expression e =
   | Texp_match (exp, l, [], Total) ->
      let se = js_of_expression exp in
      let sb = String.concat "@," (List.map (fun x -> js_of_branch x se) l) in
-     ppf_match se sb
+     let const = exp_type_is_constant exp in
+     ppf_match se sb const
 
   | Texp_tuple (tl) -> ppf_tuple @@ show_list_f (fun exp -> js_of_expression exp) ", " tl
 
@@ -247,7 +264,9 @@ and js_of_expression e =
     else (* Constructor has parameters *)
       let fields = extract_attrs cd.cstr_attributes in
       let expr_strs = List.map (fun exp -> js_of_expression exp) el in
-      let expand_constructor_list = List.map2 ppf_cstr in
+      let expand_constructor_list fields exprs =
+        try List.map2 ppf_cstr fields exprs with
+        | Invalid_argument _ -> error ~loc ("Insufficient fieldnames for arguments to " ^ name) in
       let expanded_constructors = expand_constructor_list fields expr_strs in
       ppf_multiple_cstrs name (show_list ", " expanded_constructors)
 
@@ -314,16 +333,17 @@ and js_of_pattern pat obj =
   let loc = pat.pat_loc in
   match pat.pat_desc with
   | Tpat_any                     -> "default", ""
-  | Tpat_constant   c            -> js_of_constant c, ""
-  | Tpat_var       (id, _)       -> Ident.name id, ""
+  | Tpat_constant   c            -> ppf_match_case (js_of_constant c), ""
+  | Tpat_var       (id, _)       -> "default", (ppf_match_binders [ppf_match_binder (Ident.name id) ""])
   | Tpat_construct (_, cd, el) ->
      let c = cd.cstr_name in
-     let spat = Printf.sprintf "%s" ("case \"" ^ c ^ "\"") in
+     let spat = if is_sbool c then ppf_match_case c else ppf_match_case ("\"" ^ c ^ "\"") in
      let params = extract_attrs cd.cstr_attributes in
-     let binders =
-       if List.length el = 0 then ""
-       else Printf.sprintf "@[<v 0>%s@]"
-          ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern x obj)) el) params) ^ ";") in
+     let binder var field = (match var.pat_desc with
+     | Tpat_var (id, _) -> ppf_match_binder (Ident.name id) ~obj field
+     | Tpat_any         -> ""
+     | _                -> out_of_scope var.pat_loc "Nested pattern matching") in
+     let binders = if el = [] then "" else ppf_match_binders (List.map2 binder el params) in
      spat, binders
   | Tpat_tuple el -> unsupported ~loc "tuple matching"
   | Tpat_array el -> unsupported ~loc "array-match"
