@@ -830,16 +830,6 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
     
    end
   
-  (** val leb_spec0 : float -> float -> reflect **)
-  
-  let leb_spec0 x y =
-    iff_reflect (leb x y)
-  
-  (** val ltb_spec0 : float -> float -> reflect **)
-  
-  let ltb_spec0 x y =
-    iff_reflect (ltb x y)
-  
   module Private_OrderTac = 
    struct 
     module IsTotal = 
@@ -900,11 +890,6 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   let lcm a b =
     abs (mul a (div b (gcd a b)))
   
-  (** val eqb_spec : float -> float -> reflect **)
-  
-  let eqb_spec x y =
-    iff_reflect (eqb x y)
-  
   (** val b2z : bool -> float **)
   
   let b2z = function
@@ -930,91 +915,5 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let ones n =
     pred (shiftl 1. n)
-  
-  module Private_Tac = 
-   struct 
-    
-   end
-  
-  module Private_Dec = 
-   struct 
-    (** val max_case_strong :
-        float -> float -> (float -> float -> __ -> 'a1 -> 'a1) -> (__ -> 'a1)
-        -> (__ -> 'a1) -> 'a1 **)
-    
-    let max_case_strong n m compat hl hr =
-      let c = coq_CompSpec2Type n m (compare n m) in
-      (match c with
-       | CompEqT -> compat m (max n m) __ (hr __)
-       | CompLtT -> compat m (max n m) __ (hr __)
-       | CompGtT -> compat n (max n m) __ (hl __))
-    
-    (** val max_case :
-        float -> float -> (float -> float -> __ -> 'a1 -> 'a1) -> 'a1 -> 'a1
-        -> 'a1 **)
-    
-    let max_case n m x x0 x1 =
-      max_case_strong n m x (fun _ -> x0) (fun _ -> x1)
-    
-    (** val max_dec : float -> float -> bool **)
-    
-    let max_dec n m =
-      max_case n m (fun x y _ h0 -> if h0 then true else false) true false
-    
-    (** val min_case_strong :
-        float -> float -> (float -> float -> __ -> 'a1 -> 'a1) -> (__ -> 'a1)
-        -> (__ -> 'a1) -> 'a1 **)
-    
-    let min_case_strong n m compat hl hr =
-      let c = coq_CompSpec2Type n m (compare n m) in
-      (match c with
-       | CompEqT -> compat n (min n m) __ (hl __)
-       | CompLtT -> compat n (min n m) __ (hl __)
-       | CompGtT -> compat m (min n m) __ (hr __))
-    
-    (** val min_case :
-        float -> float -> (float -> float -> __ -> 'a1 -> 'a1) -> 'a1 -> 'a1
-        -> 'a1 **)
-    
-    let min_case n m x x0 x1 =
-      min_case_strong n m x (fun _ -> x0) (fun _ -> x1)
-    
-    (** val min_dec : float -> float -> bool **)
-    
-    let min_dec n m =
-      min_case n m (fun x y _ h0 -> if h0 then true else false) true false
-   end
-  
-  (** val max_case_strong :
-      float -> float -> (__ -> 'a1) -> (__ -> 'a1) -> 'a1 **)
-  
-  let max_case_strong n m x x0 =
-    Private_Dec.max_case_strong n m (fun x1 y _ x2 -> x2) x x0
-  
-  (** val max_case : float -> float -> 'a1 -> 'a1 -> 'a1 **)
-  
-  let max_case n m x x0 =
-    max_case_strong n m (fun _ -> x) (fun _ -> x0)
-  
-  (** val max_dec : float -> float -> bool **)
-  
-  let max_dec =
-    Private_Dec.max_dec
-  
-  (** val min_case_strong :
-      float -> float -> (__ -> 'a1) -> (__ -> 'a1) -> 'a1 **)
-  
-  let min_case_strong n m x x0 =
-    Private_Dec.min_case_strong n m (fun x1 y _ x2 -> x2) x x0
-  
-  (** val min_case : float -> float -> 'a1 -> 'a1 -> 'a1 **)
-  
-  let min_case n m x x0 =
-    min_case_strong n m (fun _ -> x) (fun _ -> x0)
-  
-  (** val min_dec : float -> float -> bool **)
-  
-  let min_dec =
-    Private_Dec.min_dec
- end
 
+end

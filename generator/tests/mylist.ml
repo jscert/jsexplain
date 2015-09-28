@@ -1,4 +1,4 @@
-let incr i = add i 1
+let incr i = i + 1
 
 type 'a liste =
   | Nil
@@ -44,8 +44,9 @@ let list0 = Nil
 let list1 = range 0 1 Nil
 let list2 = range 1 5 Nil
 
-let sqr x = mul x x
+let sqr x = x * x
 
+(*
 let print_list l = 
   let rec aux acc l = match l with
     | Nil -> acc
@@ -59,3 +60,4 @@ let f = 1 in
   print (print_list (map (fun x -> x * x) list0));
   print (print_list (map sqr list1));
   print (print_list (map sqr list2));
+  *)

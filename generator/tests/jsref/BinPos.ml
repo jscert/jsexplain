@@ -961,16 +961,6 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   | IsPos p0 -> Gt
   | IsNeg -> Lt
   
-  (** val leb_spec0 : float -> float -> reflect **)
-  
-  let leb_spec0 x y =
-    iff_reflect (leb x y)
-  
-  (** val ltb_spec0 : float -> float -> reflect **)
-  
-  let ltb_spec0 x y =
-    iff_reflect (ltb x y)
-  
   module Private_Tac = 
    struct 
     

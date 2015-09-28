@@ -10,9 +10,7 @@ open Typedtree
 
 module L = Logged (Token_generator) (struct let size = 256 end)
 
-(**
- * Debug-purpose functions
- *)
+(* TODO: Field annotations for builtin type constructors *)
 
 (**
  * Useful functions (Warning: shadows `show_list' from Mytools)
