@@ -205,9 +205,9 @@ and js_of_branch b obj =
     in L.log_line (ppf_branch spat binders se) (L.Add (binders, typ))
 
 and js_of_expression e =
-  let locn = e.exp_loc in
+  let loc = e.exp_loc in
   match e.exp_desc with
-  | Texp_ident (_, loc,  _)           -> js_of_longident loc
+  | Texp_ident (_, ident,  _)         -> js_of_longident ident
   | Texp_constant c                   -> js_of_constant c
   | Texp_let   (_, vb_l, e)           ->
     let sd = String.concat lin1 @@ List.map (fun vb -> show_value_binding vb) @@ vb_l in
@@ -224,9 +224,9 @@ and js_of_expression e =
     in ppf_function args body
   | Texp_apply (f, exp_l)                 ->
      let sl' = exp_l
-               |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope locn "optional apply arguments" | Some ei -> ei) in
+               |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope loc "optional apply arguments" | Some ei -> ei) in
      let sl = exp_l
-              |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope locn "optional apply arguments" | Some ei -> js_of_expression ei) in
+              |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope loc "optional apply arguments" | Some ei -> js_of_expression ei) in
     let se = js_of_expression f in
     if is_infix f sl' && List.length exp_l = 2
     then ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
@@ -239,7 +239,7 @@ and js_of_expression e =
 
   | Texp_tuple (tl) -> ppf_tuple @@ show_list_f (fun exp -> js_of_expression exp) ", " tl
 
-  | Texp_construct (loc, cd, el) ->
+  | Texp_construct (_, cd, el) ->
     let name = cd.cstr_name in
     if el = [] then (* Constructor has no parameters *)
       if is_sbool name then name (* Special case true/false to their JS natives *)
@@ -261,22 +261,22 @@ and js_of_expression e =
   | Texp_field      (exp, _, lbl)     ->
     ppf_field_access (js_of_expression exp) lbl.lbl_name
 
-  | Texp_match      (_,_,_, Partial)  -> out_of_scope locn "partial matching"
-  | Texp_match      (_,_,_,_)         -> out_of_scope locn "matching with exception branches"
-  | Texp_try        (_,_)             -> out_of_scope locn "exceptions"
-  | Texp_function   (_,_,_)           -> out_of_scope locn "powered-up functions"
-  | Texp_variant    (_,_)             -> out_of_scope locn "polymorphic variant"
-  | Texp_setfield   (_,_,_,_)         -> out_of_scope locn "setting field"
-  | Texp_send       (_,_,_)           -> out_of_scope locn "objects"
-  | Texp_new        (_,_,_)           -> out_of_scope locn "objects"
-  | Texp_instvar    (_,_,_)           -> out_of_scope locn "objects"
-  | Texp_setinstvar (_,_,_,_)         -> out_of_scope locn "objects"
-  | Texp_override   (_,_)             -> out_of_scope locn "objects"
-  | Texp_letmodule  (_,_,_,_)         -> out_of_scope locn "local modules"
-  | Texp_assert      _                -> out_of_scope locn "assert"
-  | Texp_lazy        _                -> out_of_scope locn "lazy expressions"
-  | Texp_object     (_,_)             -> out_of_scope locn "objects"
-  | Texp_pack        _                -> out_of_scope locn "packing"
+  | Texp_match      (_,_,_, Partial)  -> out_of_scope loc "partial matching"
+  | Texp_match      (_,_,_,_)         -> out_of_scope loc "matching with exception branches"
+  | Texp_try        (_,_)             -> out_of_scope loc "exceptions"
+  | Texp_function   (_,_,_)           -> out_of_scope loc "powered-up functions"
+  | Texp_variant    (_,_)             -> out_of_scope loc "polymorphic variant"
+  | Texp_setfield   (_,_,_,_)         -> out_of_scope loc "setting field"
+  | Texp_send       (_,_,_)           -> out_of_scope loc "objects"
+  | Texp_new        (_,_,_)           -> out_of_scope loc "objects"
+  | Texp_instvar    (_,_,_)           -> out_of_scope loc "objects"
+  | Texp_setinstvar (_,_,_,_)         -> out_of_scope loc "objects"
+  | Texp_override   (_,_)             -> out_of_scope loc "objects"
+  | Texp_letmodule  (_,_,_,_)         -> out_of_scope loc "local modules"
+  | Texp_assert      _                -> out_of_scope loc "assert"
+  | Texp_lazy        _                -> out_of_scope loc "lazy expressions"
+  | Texp_object     (_,_)             -> out_of_scope loc "objects"
+  | Texp_pack        _                -> out_of_scope loc "packing"
 
 and js_of_constant = function
   | Const_int       n     -> string_of_int n
@@ -311,12 +311,12 @@ and js_of_let_pattern pat expr =
   | _ -> error ~loc:pat.pat_loc "let can't deconstruct values"
 
 and js_of_pattern pat obj =
-  let locn = pat.pat_loc in
+  let loc = pat.pat_loc in
   match pat.pat_desc with
   | Tpat_any                     -> "default", ""
   | Tpat_constant   c            -> js_of_constant c, ""
   | Tpat_var       (id, _)       -> Ident.name id, ""
-  | Tpat_construct (loc, cd, el) ->
+  | Tpat_construct (_, cd, el) ->
      let c = cd.cstr_name in
      let spat = Printf.sprintf "%s" ("case \"" ^ c ^ "\"") in
      let params = extract_attrs cd.cstr_attributes in
@@ -325,13 +325,13 @@ and js_of_pattern pat obj =
        else Printf.sprintf "@[<v 0>%s@]"
           ("var " ^ show_list ", " (List.map2 (fun x y -> x ^ " = " ^ obj ^ "." ^ y) (List.map (fun x -> fst (js_of_pattern x obj)) el) params) ^ ";") in
      spat, binders
-  | Tpat_tuple el -> unsupported ~loc:locn "tuple matching"
-  | Tpat_array el -> unsupported ~loc:locn "array-match"
-  | Tpat_record (_,_) -> unsupported ~loc:locn "record"
-  | Tpat_or (_,_,_) -> error ~loc:locn "not implemented yet"
-  | Tpat_alias (_,_,_) -> out_of_scope locn "alias-pattern"
-  | Tpat_variant (_,_,_) -> out_of_scope locn "polymorphic variants in pattern matching"
-  | Tpat_lazy _ -> out_of_scope locn "lazy-pattern"
+  | Tpat_tuple el -> unsupported ~loc "tuple matching"
+  | Tpat_array el -> unsupported ~loc "array-match"
+  | Tpat_record (_,_) -> unsupported ~loc "record"
+  | Tpat_or (_,_,_) -> error ~loc "not implemented yet"
+  | Tpat_alias (_,_,_) -> out_of_scope loc "alias-pattern"
+  | Tpat_variant (_,_,_) -> out_of_scope loc "polymorphic variants in pattern matching"
+  | Tpat_lazy _ -> out_of_scope loc "lazy-pattern"
 
 let to_javascript module_name typedtree =
   let content = js_of_structure typedtree in
