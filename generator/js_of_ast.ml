@@ -280,8 +280,8 @@ and js_of_expression ?(mod_gen=[]) e =
               |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope locn "optional apply arguments" | Some ei -> js_of_expression ~mod_gen ei) in
     let se = js_of_expression ~mod_gen f in
     if is_infix f sl' && List.length exp_l = 2
-    then ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
-    else ppf_apply se (String.concat ", " sl)
+    then L.log_line (ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))) (L.ApplyInfix (se, (List.hd sl), (List.hd (List.tl sl))))
+    else L.log_line (ppf_apply se (String.concat ", " sl)) (L.ApplyFunc (se, (String.concat ", " sl)))
 
   | Texp_match (exp, l, [], Total) ->
      let se = js_of_expression ~mod_gen exp in

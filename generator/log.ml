@@ -29,11 +29,12 @@ sig
   type token_info
   type ident = string
   type typ = string
+  type func = string
          
   type ctx_operation =
     | Add of ident * typ
-    | Redef of ident * typ
-    | Del of ident * typ
+    | ApplyInfix of func * ident * ident
+    | ApplyFunc  of func * ident
 
   val log_line : string -> ctx_operation -> string
   val strip_log_info : string -> string
@@ -45,12 +46,13 @@ struct
   open Str
   type token = G.token
   type ident = string
-  type typ = string 
-
+  type typ = string
+  type func = string
+         
   type ctx_operation =
     | Add of ident * typ
-    | Redef of ident * typ
-    | Del of ident * typ
+    | ApplyInfix of func * ident * ident
+    | ApplyFunc  of func * ident
                  
   type token_info = ctx_operation
                                   
@@ -67,6 +69,7 @@ struct
 
   let free_token = G.withdraw
            
+  (* Takes a string and inserts a new token after the first new line character or at the end of the string.*)
   let bind_token str =
     let len = String.length str in
     let endline =
@@ -78,8 +81,10 @@ struct
         else len
       in aux 0 in
     let token = free_token ()
+    (* Insert a token after the first '\n' character by creating a substring of before and after. *)
     in token, String.sub str 0 endline ^ token_delim ^ G.string_of_token token ^ token_delim ^ String.sub str endline (len - endline)
-                      
+  
+  (* Appears unused in codebase *)            
   let token_info = Hashtbl.find info_tbl
                                 
   let token_from_line l =
@@ -120,11 +125,12 @@ struct
   (* Wrap the entire logged version in a callable run_trm function, and add a call to return run(code). *)
   (* Assumes entry point called run *)
   let ppf_run_wrap s =
-    Format.sprintf "function run_trm(code) {@;<1 2>@[<v 1>@,%s@,return run(code);@,}@]" s
+    Format.sprintf "function run_trm(code) {@;<1 2>@[<v 1>@,%s@;<1 0>return run(code);@;}@]" s
 
   let add_log_info s =
     let buf = Buffer.create 16 in
     let ls = lines s in
+    (* i is line number of line preceding return *)
     let rec aux i = function
       | [] -> ()
       | (None, str)   :: xs ->
@@ -150,10 +156,10 @@ struct
                        |> global_replace (regexp "var ") "" |> split (regexp ", ") |> List.map (fun x -> List.hd (split (regexp " = ") x))
                        |> aux
               in ctx_processing id ^ "\n" ^ pad ^ "log("^ string_of_int i ^" , ctx, " ^ typ ^ ");\n"
-          | Redef _ -> "" (* Actually not used *)
-          | Del   _ -> "" (* Actually not used *)
+          | ApplyInfix (f, e1, e2) -> ""  (* Actually not used *)
+          | ApplyFunc  (f, args) ->   ""  (* Actually not used *)
         in Buffer.add_string buf log_info; 
-            Buffer.add_string buf str; (* i is line number of line preceding return *)
+            Buffer.add_string buf (strip_log_info str);
             aux (i + 1) xs
     in aux 0 ls; Buffer.contents buf
                                  
