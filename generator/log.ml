@@ -127,6 +127,13 @@ struct
   let ppf_run_wrap s =
     Format.sprintf "function run_trm(code) {@;<1 2>@[<v 1>@,%s@;<1 0>return run(code);@;}@]" s
 
+  let ppf_call_wrap l s =
+    Format.sprintf "@[(function () {@[<v 8>\
+      @,log_custom({line:%d,type:\"enter\"});\
+      @,var res = %s;\
+      @,log_custom({line:%d,type:\"exit\"});\
+      @,return res;})()@]@]" l s l
+
   let add_log_info s =
     let buf = Buffer.create 16 in
     let ls = lines s in
@@ -136,7 +143,7 @@ struct
       | (None, str)   :: xs ->
           Buffer.add_string buf str;
           aux (i + 1) xs
-      | (Some l, str) :: xs -> let log_info =
+      | (Some l, str) :: xs ->
           let pad = 
             let len = String.length str in
             let rec repeat n x = if n = 0 then "" else x ^ repeat (n - 1) x in
@@ -146,21 +153,28 @@ struct
                 else i - 1
               else len 
             in repeat (aux 1) " " in
-        match Hashtbl.find info_tbl l with
-          | Add (id, typ)   -> 
-              let ctx_processing id =
-                 let rec aux = function
-                   | [] -> ""
-                   | x :: xs -> "\n" ^ pad ^ "ctx_push(ctx, \"" ^ x ^  "\", " ^ x ^ ", \"value\");" ^ aux xs
-                 in id |> to_format |> Format.sprintf
-                       |> global_replace (regexp "var ") "" |> split (regexp ", ") |> List.map (fun x -> List.hd (split (regexp " = ") x))
-                       |> aux
-              in ctx_processing id ^ "\n" ^ pad ^ "log("^ string_of_int i ^" , ctx, " ^ typ ^ ");\n"
-          | ApplyInfix (f, e1, e2) -> ""  (* Actually not used *)
-          | ApplyFunc  (f, args) ->   ""  (* Actually not used *)
-        in Buffer.add_string buf log_info; 
-            Buffer.add_string buf (strip_log_info str);
-            aux (i + 1) xs
+      match Hashtbl.find info_tbl l with
+        | Add (id, typ)   -> 
+            let ctx_processing id =
+               let rec aux = function
+                 | [] -> ""
+                 | x :: xs -> "\n" ^ pad ^ "ctx_push(ctx, \"" ^ x ^  "\", " ^ x ^ ", \"value\");" ^ aux xs
+               in id |> to_format |> Format.sprintf
+                     |> global_replace (regexp "var ") "" |> split (regexp ", ") |> List.map (fun x -> List.hd (split (regexp " = ") x))
+                     |> aux
+            in Buffer.add_string buf @@ ctx_processing id ^ "\n" ^ pad ^ "log("^ string_of_int i ^" , ctx, " ^ typ ^ ");\n";
+               Buffer.add_string buf str;
+               aux (i + 1) xs
+        | ApplyInfix (f, e1, e2) -> let return_pad = List.hd @@ split (regexp "return") str in
+              Buffer.add_string buf return_pad;
+              Buffer.add_string buf (ppf_call_wrap (i+1) (Format.sprintf "%s %s %s" e1 f e2)); 
+              Buffer.add_string buf ";";
+              aux (i + 1) xs
+        | ApplyFunc  (f, args) ->   let return_pad = List.hd (split (regexp "return") str) ^ "return " in
+              Buffer.add_string buf return_pad;
+              Buffer.add_string buf (ppf_call_wrap (i+1) (Format.sprintf "%s(%s)" f args));
+              Buffer.add_string buf ";";
+              aux (i + 1) xs
     in aux 0 ls; Buffer.contents buf
                                  
   let logged_output s =
