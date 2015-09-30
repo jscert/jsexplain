@@ -105,6 +105,18 @@ struct
   let strip_log_info s =
     global_replace token_re "" s
 
+  (* Helper for lines that looks for all tokens in a line, and
+   returns a tuple containing a list of tokens and the detokenized line *)
+  let rec line_token_extractor acc pos l =
+    match search_forward token_re l pos with
+      | exception Not_found -> (acc, l)
+      | _  ->  let m = matched_string l in
+               let npos = match_beginning () in
+               let m_len = String.length m in
+               let nl = global_replace (regexp m) "" l in
+               let nacc = (Some (G.token_of_string (String.sub m 1 (m_len - 2)))) :: acc in
+               line_token_extractor nacc npos nl
+
   let lines s =
     let append_token lines =
       List.fold_left
