@@ -118,21 +118,13 @@ struct
                line_token_extractor nacc npos nl
 
   let lines s =
-    let append_token lines =
-      List.fold_left
-        (fun acc x -> match search_forward token_re x 0 with
-                      | exception Not_found -> (None, x) :: acc
-                      | _  ->  let m = matched_string x in
-                              let m_len = String.length m
-                              in (Some (G.token_of_string (String.sub m 1 (m_len - 2))) , String.sub x 0 (String.length x - m_len)) :: acc
-        ) [] lines in
     let end_line_markers s =
       let rec build start = match (search_forward endline_re s start) with
         | n -> n :: build (n + 1)
         | exception not_Found -> []
       in build 0 in
     let lines_list = snd @@ List.fold_left (fun (st, acc) ed -> (ed, String.sub s st (ed - st) :: acc)) (0, []) (end_line_markers s)
-    in append_token lines_list
+    in List.fold_left (fun acc x -> (line_token_extractor [] 0 x) :: acc ) [] lines_list
 
   (* Wrap the entire logged version in a callable run_trm function, and add a call to return run(code). *)
   (* Assumes entry point called run *)
@@ -141,10 +133,10 @@ struct
 
   let ppf_call_wrap l s =
     Format.sprintf "@[(function () {@[<v 8>\
-      @,log_custom({line:%d,type:\"enter\"});\
-      @,var res = %s;\
-      @,log_custom({line:%d,type:\"exit\"});\
-      @,return res;})()@]@]" l s l
+      log_custom({line:%d,type:\"enter\"});\
+      var res = %s;\
+      log_custom({line:%d,type:\"exit\"});\
+      return res;}())@]@]" l s l
 
   let add_log_info s =
     let buf = Buffer.create 16 in
@@ -152,10 +144,10 @@ struct
     (* i is line number of line preceding return *)
     let rec aux i = function
       | [] -> ()
-      | (None, str)   :: xs ->
+      | ([], str)   :: xs ->
           Buffer.add_string buf str;
           aux (i + 1) xs
-      | (Some l, str) :: xs ->
+      | (Some l :: tks, str) :: xs ->
           let pad = 
             let len = String.length str in
             let rec repeat n x = if n = 0 then "" else x ^ repeat (n - 1) x in
@@ -165,28 +157,28 @@ struct
                 else i - 1
               else len 
             in repeat (aux 1) " " in
-      match Hashtbl.find info_tbl l with
-        | Add (id, typ)   -> 
-            let ctx_processing id =
-               let rec aux = function
-                 | [] -> ""
-                 | x :: xs -> "\n" ^ pad ^ "ctx_push(ctx, \"" ^ x ^  "\", " ^ x ^ ", \"value\");" ^ aux xs
-               in id |> to_format |> Format.sprintf
-                     |> global_replace (regexp "var ") "" |> split (regexp ", ") |> List.map (fun x -> List.hd (split (regexp " = ") x))
-                     |> aux
-            in Buffer.add_string buf @@ ctx_processing id ^ "\n" ^ pad ^ "log("^ string_of_int i ^" , ctx, " ^ typ ^ ");\n";
-               Buffer.add_string buf str;
-               aux (i + 1) xs
-        | ApplyInfix (f, e1, e2) -> let return_pad = List.hd @@ split (regexp "return") str in
-              Buffer.add_string buf return_pad;
-              Buffer.add_string buf (ppf_call_wrap (i+1) (Format.sprintf "%s %s %s" e1 f e2)); 
-              Buffer.add_string buf ";";
-              aux (i + 1) xs
-        | ApplyFunc  (f, args) ->   let return_pad = List.hd (split (regexp "return") str) ^ "return " in
-              Buffer.add_string buf return_pad;
-              Buffer.add_string buf (ppf_call_wrap (i+1) (Format.sprintf "%s(%s)" f args));
-              Buffer.add_string buf ";";
-              aux (i + 1) xs
+          let temp = Buffer.create 16 in
+          match Hashtbl.find info_tbl l with
+            | Add (id, typ)   -> 
+                let ctx_processing id =
+                   let rec aux = function
+                     | [] -> ""
+                     | x :: xs -> "\n" ^ pad ^ "ctx_push(ctx, \"" ^ x ^  "\", " ^ x ^ ", \"value\");" ^ aux xs
+                   in id |> to_format |> Format.sprintf
+                         |> global_replace (regexp "var ") "" |> split (regexp ", ") |> List.map (fun x -> List.hd (split (regexp " = ") x))
+                         |> aux
+                in Buffer.add_string buf @@ ctx_processing id ^ "\n" ^ pad ^ "log("^ string_of_int i ^" , ctx, " ^ typ ^ ");\n";
+                   aux i ((tks, str) :: xs)
+            | ApplyInfix (f, e1, e2) -> let return_pad = List.hd @@ split (regexp "return") str in
+                  Buffer.add_string buf return_pad;
+                  Buffer.add_string buf (ppf_call_wrap (i+1) (Format.sprintf "%s %s %s" e1 f e2)); 
+                  Buffer.add_string buf ";";
+                  aux (i + 1) xs
+            | ApplyFunc  (f, args) ->   let return_pad = List.hd (split (regexp "return") str) ^ "return " in
+                  Buffer.add_string buf return_pad;
+                  Buffer.add_string buf (ppf_call_wrap (i+1) (Format.sprintf "%s(%s)" f args));
+                  Buffer.add_string buf ";";
+                  aux (i + 1) xs
     in aux 0 ls; Buffer.contents buf
                                  
   let logged_output s =
