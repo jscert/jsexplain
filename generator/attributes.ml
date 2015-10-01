@@ -5,7 +5,8 @@ open Types
 open Mytools
 
 let builtin_attributes =
-  [("::", ["head"; "tail"])]
+  [("::", ["head"; "tail"]);
+   ("Some", ["value"])]
 
 let ident_builtin_attributes =
   List.map (fun (fst, snd) -> (List.assoc fst Predef.builtin_idents), snd) builtin_attributes
