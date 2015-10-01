@@ -198,6 +198,9 @@ let ppf_ident_name =
 let ppf_ident i =
   i |> Ident.name |> ppf_ident_name
 
+let ppf_path =
+  Path.name
+
 let ppf_module content =
   Printf.sprintf "{@,%s@,}" content
 
@@ -217,8 +220,8 @@ and js_of_submodule m =
   match m.mod_desc with
   | Tmod_structure  s -> ppf_module (js_of_structure s)
   | Tmod_functor (id, _, mtyp, mexp) -> ppf_function (ppf_ident id) (js_of_submodule mexp)
-  | Tmod_ident      _ -> out_of_scope loc "module ident"
-  | Tmod_apply      _ -> out_of_scope loc "module apply"
+  | Tmod_apply   (m1, m2, _)         -> ppf_apply (js_of_submodule m1) (js_of_submodule m2)
+  | Tmod_ident (p,_) -> ppf_path p
   | Tmod_constraint _ -> out_of_scope loc "module constraint"
   | Tmod_unpack     _ -> out_of_scope loc "module unpack"
 
