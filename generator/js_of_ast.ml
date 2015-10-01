@@ -208,8 +208,8 @@ and js_of_submodule m =
   let loc = m.mod_loc in
   match m.mod_desc with
   | Tmod_structure  s -> ppf_module (js_of_structure s)
+  | Tmod_functor (id, _, mtyp, mexp) -> ppf_function (ppf_ident id) (js_of_submodule mexp)
   | Tmod_ident      _ -> out_of_scope loc "module ident"
-  | Tmod_functor    _ -> out_of_scope loc "module functor"
   | Tmod_apply      _ -> out_of_scope loc "module apply"
   | Tmod_constraint _ -> out_of_scope loc "module constraint"
   | Tmod_unpack     _ -> out_of_scope loc "module unpack"
@@ -225,7 +225,7 @@ and js_of_structure_item s =
   | Tstr_type       _  -> "" (* Types have no representation in JS, but the OCaml type checker uses them *)
   | Tstr_open       _  -> "" (* Handle modules by use of multiple compilation/linking *)
   | Tstr_modtype    _  -> ""
-  | Tstr_module (b)    -> ppf_decl (ppf_ident b.mb_id) (js_of_submodule b.mb_expr)
+  | Tstr_module     b  -> ppf_decl (ppf_ident b.mb_id) (js_of_submodule b.mb_expr)
   | Tstr_primitive  _  -> out_of_scope loc "primitive functions"
   | Tstr_typext     _  -> out_of_scope loc "type extensions"
   | Tstr_exception  _  -> out_of_scope loc "exceptions"
@@ -333,6 +333,7 @@ and js_of_longident loc =
 
 and ident_of_pat pat = match pat.pat_desc with
   | Tpat_var (id, _) -> ppf_ident id
+  | Tpat_any         -> ""
   | _ -> error ~loc:pat.pat_loc "functions can't deconstruct values"
 
 and js_of_let_pattern pat expr =
