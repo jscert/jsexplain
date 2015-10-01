@@ -63,6 +63,11 @@ let is_infix f args = match args with
      let args_loc = (x.exp_loc.loc_start, x.exp_loc.loc_end) in
      if fst args_loc < fst f_loc then true else false
 
+let map_cstr_fields ?loc f cstr elements =
+  let fields = extract_attrs cstr.cstr_attributes in
+  try List.map2 f fields elements
+  with Invalid_argument _ -> error ?loc ("Insufficient fieldnames for arguments to " ^ cstr.cstr_name)
+
 (**
  * Before-hand definitions of Pretty-Printer-Format for converting ocaml
  * to ECMAScript, therefore all of them are in a single place.
@@ -261,12 +266,8 @@ and js_of_expression e =
       if is_sbool name then name (* Special case true/false to their JS natives *)
       else ppf_single_cstrs name
     else (* Constructor has parameters *)
-      let fields = extract_attrs cd.cstr_attributes in
       let expr_strs = List.map (fun exp -> js_of_expression exp) el in
-      let expand_constructor_list fields exprs =
-        try List.map2 ppf_cstr fields exprs with
-        | Invalid_argument _ -> error ~loc ("Insufficient fieldnames for arguments to " ^ name) in
-      let expanded_constructors = expand_constructor_list fields expr_strs in
+      let expanded_constructors = map_cstr_fields ~loc ppf_cstr cd expr_strs in
       ppf_multiple_cstrs name (show_list ", " expanded_constructors)
 
   | Texp_array      (exp_l)           -> ppf_array @@ show_list_f (fun exp -> js_of_expression exp) ", " exp_l
@@ -337,12 +338,11 @@ and js_of_pattern pat obj =
   | Tpat_construct (_, cd, el) ->
      let c = cd.cstr_name in
      let spat = if is_sbool c then ppf_match_case c else ppf_match_case ("\"" ^ c ^ "\"") in
-     let params = extract_attrs cd.cstr_attributes in
-     let binder var field = (match var.pat_desc with
+     let bind field var = (match var.pat_desc with
      | Tpat_var (id, _) -> ppf_match_binder (Ident.name id) ~obj field
      | Tpat_any         -> ""
      | _                -> out_of_scope var.pat_loc "Nested pattern matching") in
-     let binders = if el = [] then "" else ppf_match_binders (List.map2 binder el params) in
+     let binders = if el = [] then "" else ppf_match_binders (map_cstr_fields ~loc bind cd el) in
      spat, binders
   | Tpat_tuple el -> unsupported ~loc "tuple matching"
   | Tpat_array el -> unsupported ~loc "array-match"
