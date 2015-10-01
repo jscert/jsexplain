@@ -3,8 +3,8 @@ open BinPos
 open Bool0
 open Datatypes
 
-type __ = Obj.t
-let __ = let rec f _ = Obj.repr f in Obj.repr f
+(*type __ = Obj.t
+let __ = let rec f _ = Obj.repr f in Obj.repr f*)
 
 module Z = 
  struct 
@@ -892,7 +892,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   (** val b2z : bool -> float **)
   
-  let b2z = function
+  let b2z b = match b with
   | true -> 1.
   | false -> 0.
   

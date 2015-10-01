@@ -3,8 +3,10 @@ open Bool0
 open Datatypes
 open Peano
 
+(*
 type __ = Obj.t
 let __ = let rec f _ = Obj.repr f in Obj.repr f
+*)
 
 module N = 
  struct 
@@ -551,6 +553,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   (** val leb_spec0 : float -> float -> reflect **)
   
+(*
   let leb_spec0 x y =
     iff_reflect (leb x y)
   
@@ -558,6 +561,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let ltb_spec0 x y =
     iff_reflect (ltb x y)
+*)
   
   module Private_BootStrap = 
    struct 
@@ -619,13 +623,14 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
     mul a (div b (gcd a b))
   
   (** val eqb_spec : float -> float -> reflect **)
-  
+(*
   let eqb_spec x y =
     iff_reflect (eqb x y)
+*)
   
   (** val b2n : bool -> float **)
   
-  let b2n = function
+  let b2n b = match b with
   | true -> 1.
   | false -> 0.
   
@@ -654,6 +659,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
     
    end
   
+(*
   module Private_Dec = 
    struct 
     (** val max_case_strong :
@@ -734,5 +740,6 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let min_dec =
     Private_Dec.min_dec
+*)
  end
 

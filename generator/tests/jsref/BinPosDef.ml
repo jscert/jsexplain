@@ -138,28 +138,28 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   (** val mask_rect : 'a1 -> (float -> 'a1) -> 'a1 -> mask -> 'a1 **)
   
-  let mask_rect f f0 f1 = function
+  let mask_rect f f0 f1 mask = match mask with
   | IsNul -> f
   | IsPos x -> f0 x
   | IsNeg -> f1
   
   (** val mask_rec : 'a1 -> (float -> 'a1) -> 'a1 -> mask -> 'a1 **)
   
-  let mask_rec f f0 f1 = function
+  let mask_rec f f0 f1 mask = match mask with
   | IsNul -> f
   | IsPos x -> f0 x
   | IsNeg -> f1
   
   (** val succ_double_mask : mask -> mask **)
   
-  let succ_double_mask = function
+  let succ_double_mask mask = match mask with
   | IsNul -> IsPos 1.
   | IsPos p -> IsPos ((fun p -> 1. +. (2. *. p)) p)
   | IsNeg -> IsNeg
   
   (** val double_mask : mask -> mask **)
   
-  let double_mask = function
+  let double_mask m = match m with
   | IsNul -> IsNul
   | IsPos p -> IsPos ((fun p -> 2. *. p) p)
   | IsNeg -> IsNeg
@@ -179,7 +179,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   (** val pred_mask : mask -> mask **)
   
-  let pred_mask = function
+  let pred_mask m = match m with
   | IsNul -> IsNeg
   | IsPos q ->
     ((fun f2p1 f2p f1 p ->
@@ -477,8 +477,8 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val sqrtrem_step :
       (float -> float) -> (float -> float) -> (float * mask) -> float * mask **)
   
-  let sqrtrem_step f g = function
-  | (s, y) ->
+  let sqrtrem_step f g p =
+  let (s, y) = p in
     (match y with
      | IsNul ->
        (((fun p -> 2. *. p) s),

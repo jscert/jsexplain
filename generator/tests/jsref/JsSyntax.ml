@@ -342,8 +342,8 @@ let attributes_accessor_enumerable x = x.attributes_accessor_enumerable
 let attributes_accessor_configurable x = x.attributes_accessor_configurable
 
 type attributes =
-| Coq_attributes_data_ [@f label0] of of attributes_data (** Auto Generated Attributes **)
-| Coq_attributes_accessor_ [@f label0] of of attributes_accessor (** Auto Generated Attributes **)
+| Coq_attributes_data_of [@f label0] of attributes_data (** Auto Generated Attributes **)
+| Coq_attributes_accessor_of [@f label0] of attributes_accessor (** Auto Generated Attributes **)
 
 type descriptor = { descriptor_value : value option;
                     descriptor_writable : bool option;

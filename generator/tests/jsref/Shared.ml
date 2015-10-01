@@ -6,7 +6,7 @@ open String0
 
 (** val option_case : 'a2 -> ('a1 -> 'a2) -> 'a1 option -> 'a2 **)
 
-let option_case d f = function
+let option_case d f o = match o with
 | Some x -> f x
 | None -> d
 
@@ -81,7 +81,7 @@ module HeapGen =
   (** val indom_decidable :
       'a1 coq_Comparable -> ('a1, 'a2) heap -> 'a1 -> coq_Decidable **)
   
-  let indom_decidable h1 = function
-  | (n, h0) -> Heap.indom_decidable h1 (snd (n, h0))
+  let indom_decidable h1 p =
+    let (n, h0) = p in Heap.indom_decidable h1 (snd (n, h0))
  end
 

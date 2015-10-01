@@ -22,13 +22,13 @@ let option_comparable h x y =
 
 (** val unsome_default : 'a1 -> 'a1 option -> 'a1 **)
 
-let unsome_default d = function
+let unsome_default d o = match o with
 | Some x -> x
 | None -> d
 
 (** val map : ('a1 -> 'a2) -> 'a1 option -> 'a2 option **)
 
-let map f = function
+let map f o = match o with
 | Some x -> Some (f x)
 | None -> None
 
