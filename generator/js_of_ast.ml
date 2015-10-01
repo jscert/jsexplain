@@ -190,9 +190,12 @@ let ppf_ident_name =
 let ppf_ident i =
   i |> Ident.name |> ppf_ident_name
 
+let ppf_module content =
+  Printf.sprintf "{@,%s@,}" content
 
 let ppf_module_wrap name content =
-  Printf.sprintf "var %s = {@,%s@,};" name content
+  let modu = ppf_module content in
+  Printf.sprintf "var %s = %s;" name modu
 
 (**
  * Main part
@@ -200,6 +203,16 @@ let ppf_module_wrap name content =
 
 let rec js_of_structure s =
   show_list_f (fun strct -> js_of_structure_item strct) "@,@," s.str_items
+
+and js_of_submodule m =
+  let loc = m.mod_loc in
+  match m.mod_desc with
+  | Tmod_structure  s -> ppf_module (js_of_structure s)
+  | Tmod_ident      _ -> out_of_scope loc "module ident"
+  | Tmod_functor    _ -> out_of_scope loc "module functor"
+  | Tmod_apply      _ -> out_of_scope loc "module apply"
+  | Tmod_constraint _ -> out_of_scope loc "module constraint"
+  | Tmod_unpack     _ -> out_of_scope loc "module unpack"
 
 and show_value_binding vb =
   js_of_let_pattern vb.vb_pat vb.vb_expr
@@ -211,12 +224,12 @@ and js_of_structure_item s =
   | Tstr_value (_, vb_l) -> String.concat "@,@," @@ List.map (fun vb -> show_value_binding vb) @@ vb_l
   | Tstr_type       _  -> "" (* Types have no representation in JS, but the OCaml type checker uses them *)
   | Tstr_open       _  -> "" (* Handle modules by use of multiple compilation/linking *)
+  | Tstr_modtype    _  -> ""
+  | Tstr_module (b)    -> ppf_decl (ppf_ident b.mb_id) (js_of_submodule b.mb_expr)
   | Tstr_primitive  _  -> out_of_scope loc "primitive functions"
   | Tstr_typext     _  -> out_of_scope loc "type extensions"
   | Tstr_exception  _  -> out_of_scope loc "exceptions"
-  | Tstr_module     _  -> out_of_scope loc "modules"
   | Tstr_recmodule  _  -> out_of_scope loc "recursive modules"
-  | Tstr_modtype    _  -> out_of_scope loc "module type"
   | Tstr_class      _  -> out_of_scope loc "objects"
   | Tstr_class_type _  -> out_of_scope loc "class types"
   | Tstr_include    _  -> out_of_scope loc "includes"
