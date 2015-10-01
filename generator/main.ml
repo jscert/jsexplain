@@ -14,10 +14,6 @@ let outputfile = ref None
 (*#########################################################################*)
 
 let _ =
-
-   (* disable loading of stdlib *)
-   Clflags.nopervasives := false;
-
    (*---------------------------------------------------*)
    (* parsing of command line *)
 

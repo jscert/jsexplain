@@ -1,7 +1,5 @@
-(* Following type definition for lists hardcoded into OCaml/generator:
-type 'a list =
-| []
-| :: [@f head, tail] of 'a * 'a list
+(*
+Field name attributes for builtins (eg: ::) are defined in attributes.ml
 *)
 
 (* Custom pair type *)

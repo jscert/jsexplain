@@ -63,8 +63,8 @@ let is_infix f args = match args with
      let args_loc = (x.exp_loc.loc_start, x.exp_loc.loc_end) in
      if fst args_loc < fst f_loc then true else false
 
-let map_cstr_fields ?loc f cstr elements =
-  let fields = extract_attrs cstr.cstr_attributes in
+let map_cstr_fields ?loc f (cstr : constructor_description) elements =
+  let fields = extract_cstr_attrs cstr in
   try List.map2 f fields elements
   with Invalid_argument _ -> error ?loc ("Insufficient fieldnames for arguments to " ^ cstr.cstr_name)
 

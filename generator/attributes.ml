@@ -4,6 +4,12 @@ open Typedtree
 open Types
 open Mytools
 
+let builtin_attributes =
+  [("::", ["head"; "tail"])]
+
+let ident_builtin_attributes =
+  List.map (fun (fst, snd) -> (List.assoc fst Predef.builtin_idents), snd) builtin_attributes
+
 let rec extract_attrs attrs =
   attrs
     |> List.map extract_attr
@@ -84,10 +90,9 @@ and extract_constant = function
   | Const_int64     _     -> error "A string or a char was expected but a int64 was found"
   | Const_nativeint _     -> error "A string or a char was expected but a nativeint was found"
 
-let extract_cstr_attrs (cstr : constructor_declaration)  =
-  let cstr_name   = Ident.name cstr.cd_id in
-  let cstr_params = extract_attrs cstr.cd_attributes
-  in (cstr_name, cstr_params)
+let fetch_builtin_attrs (cstr : constructor_description) =
+  List.assoc cstr.cstr_name builtin_attributes
 
-let extract_vb_attrs (vb : Typedtree.value_binding) =
-  extract_attrs vb.vb_attributes
+let extract_cstr_attrs (cstr : constructor_description) =
+  try fetch_builtin_attrs cstr
+  with Not_found -> extract_attrs cstr.cstr_attributes

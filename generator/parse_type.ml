@@ -25,9 +25,8 @@ let init_path () =
 
 let initial_env () =
   try
-    if !Clflags.nopervasives
-    then Env.open_pers_signature "Stdlib" Env.initial_unsafe_string
-    else Env.open_pers_signature "Stdlib" Env.initial_unsafe_string
+    let env = Env.initial_unsafe_string in
+    Env.open_pers_signature "Stdlib" env
   with Not_found ->
     fatal_error "cannot open stdlib"
 
