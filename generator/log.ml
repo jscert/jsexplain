@@ -156,8 +156,7 @@ struct
   let extract_function f s =
     match search_forward (regexp (f ^ "(")) s 0 with
       | exception Not_found -> (s, "" ,"")
-      | _ ->  let m = matched_string s in
-              let pos = match_beginning () in
+      | _ ->  let pos = match_beginning () in
               let argend = 1 + parse_brackets s pos in
               (String.sub s 0 pos, String.sub s pos (argend - pos), String.sub s argend ((String.length s) - argend))
 
@@ -167,6 +166,9 @@ struct
     (* i is line number of line preceding return *)
     let rec aux i = function
       | [] -> ()
+      | (None :: tks, str) :: xs ->
+          Buffer.add_string buf str;
+          aux (i + 1) xs
       | ([], str)   :: xs ->
           Buffer.add_string buf str;
           aux (i + 1) xs
@@ -196,11 +198,9 @@ struct
                   Buffer.add_string buf (ppf_call_wrap (i+1) (Format.sprintf "%s %s %s" e1 f e2)); 
                   Buffer.add_string buf ";";
                   aux (i + 1) xs
-            | ApplyFunc  (f, args) ->   let return_pad = List.hd (split (regexp "return") str) ^ "return " in
-                  Buffer.add_string buf return_pad;
-                  Buffer.add_string buf (ppf_call_wrap (i+1) (Format.sprintf "%s(%s)" f args));
-                  Buffer.add_string buf ";";
-                  aux (i + 1) xs
+            | ApplyFunc  (f, args) -> let (pre, call, post) = extract_function f str in
+                                      let nstr = pre ^ ppf_call_wrap (i+1) call ^ post in
+                                      aux (i + 1) ((tks, nstr) :: xs)
     in aux 0 ls; Buffer.contents buf
                                  
   let logged_output s =
