@@ -183,6 +183,14 @@ let ppf_pat_array id_list array_expr =
 let ppf_field_access expr field =
   Printf.sprintf "%s.%s" expr field
 
+(* ' is not permitted in JS identifier names, and $ is not permitted in OCaml ones *)
+let ppf_ident_name =
+  String.map (function '\'' -> '$' | c -> c)
+
+let ppf_ident i =
+  i |> Ident.name |> ppf_ident_name
+
+
 let ppf_module_wrap name content =
   Printf.sprintf "var %s = {@,%s@,};" name content
 
@@ -275,7 +283,7 @@ and js_of_expression e =
   | Texp_ifthenelse (e1, e2, Some e3) -> ppf_ifthenelse (js_of_expression e1) (js_of_expression e2) (js_of_expression e3)
   | Texp_sequence   (e1, e2)          -> ppf_sequence (js_of_expression e1) (js_of_expression e2)
   | Texp_while      (cd, body)        -> ppf_while (js_of_expression cd) (js_of_expression body)
-  | Texp_for        (id, _, st, ed, fl, body) -> ppf_for (Ident.name id) (js_of_expression st) (js_of_expression ed) fl (js_of_expression body)
+  | Texp_for        (id, _, st, ed, fl, body) -> ppf_for (ppf_ident id) (js_of_expression st) (js_of_expression ed) fl (js_of_expression body)
   | Texp_record     (llde,_)          -> ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, js_of_expression exp)) llde)
   | Texp_field      (exp, _, lbl)     ->
     ppf_field_access (js_of_expression exp) lbl.lbl_name
@@ -308,22 +316,22 @@ and js_of_constant = function
 
 and js_of_longident loc =
   let res = String.concat "." @@ Longident.flatten loc.txt in
-  if res = "()" then "undefined" else res
+  if res = "()" then "undefined" else ppf_ident_name res
 
 and ident_of_pat pat = match pat.pat_desc with
-  | Tpat_var (id, _) -> Ident.name id
+  | Tpat_var (id, _) -> ppf_ident id
   | _ -> error ~loc:pat.pat_loc "functions can't deconstruct values"
 
 and js_of_let_pattern pat expr =
   let sexpr = js_of_expression expr in
   match pat.pat_desc with
-  | Tpat_var (id, _) -> ppf_decl (Ident.name id) sexpr
+  | Tpat_var (id, _) -> ppf_decl (ppf_ident id) sexpr
   | Tpat_tuple (pat_l)
   | Tpat_array (pat_l) ->
      let l = List.map
                (function pat ->
                          match pat.pat_desc with
-                         | Tpat_var (id, _) -> (Ident.name id, string_of_type_exp pat.pat_type)
+                         | Tpat_var (id, _) -> (ppf_ident id, string_of_type_exp pat.pat_type)
                          | _ -> out_of_scope pat.pat_loc "pattern-matching in arrays"
                ) pat_l in
      ppf_pat_array l sexpr
@@ -334,12 +342,12 @@ and js_of_pattern pat obj =
   match pat.pat_desc with
   | Tpat_any                     -> "default", ""
   | Tpat_constant   c            -> ppf_match_case (js_of_constant c), ""
-  | Tpat_var       (id, _)       -> "default", (ppf_match_binders [ppf_match_binder (Ident.name id) ""])
+  | Tpat_var       (id, _)       -> "default", (ppf_match_binders [ppf_match_binder (ppf_ident id) ""])
   | Tpat_construct (_, cd, el) ->
      let c = cd.cstr_name in
      let spat = if is_sbool c then ppf_match_case c else ppf_match_case ("\"" ^ c ^ "\"") in
      let bind field var = (match var.pat_desc with
-     | Tpat_var (id, _) -> ppf_match_binder (Ident.name id) ~obj field
+     | Tpat_var (id, _) -> ppf_match_binder (ppf_ident id) ~obj field
      | Tpat_any         -> ""
      | _                -> out_of_scope var.pat_loc "Nested pattern matching") in
      let binders = if el = [] then "" else ppf_match_binders (map_cstr_fields ~loc bind cd el) in
