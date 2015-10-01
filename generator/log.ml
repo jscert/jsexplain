@@ -138,6 +138,29 @@ struct
       log_custom({line:%d,type:\"exit\"});\
       return res;}())@]@]" l s l
 
+  (* Return position of first hit pair of brackets from pos *)
+  let parse_brackets s pos =
+    let slen = String.length s in
+    let rec parse s pos acc =
+      if pos = slen then slen else
+      let c = String.get s pos in
+      let npos = pos + 1 in
+      match c with
+        | '(' -> parse s npos ('(' :: acc)
+        | ')' -> if List.length acc = 1 then pos else parse s npos (List.tl acc)
+        | _   -> parse s npos acc
+    in
+    parse s pos []
+
+  (* Take a line and pull out the first occurence of a function in a line *)
+  let extract_function f s =
+    match search_forward (regexp (f ^ "(")) s 0 with
+      | exception Not_found -> (s, "" ,"")
+      | _ ->  let m = matched_string s in
+              let pos = match_beginning () in
+              let argend = 1 + parse_brackets s pos in
+              (String.sub s 0 pos, String.sub s pos (argend - pos), String.sub s argend ((String.length s) - argend))
+
   let add_log_info s =
     let buf = Buffer.create 16 in
     let ls = lines s in
@@ -157,7 +180,6 @@ struct
                 else i - 1
               else len 
             in repeat (aux 1) " " in
-          let temp = Buffer.create 16 in
           match Hashtbl.find info_tbl l with
             | Add (id, typ)   -> 
                 let ctx_processing id =
