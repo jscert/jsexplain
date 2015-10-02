@@ -116,6 +116,7 @@ let ppf_match_case c =
   Printf.sprintf "case %s" c
 
 let ppf_match_binders binders =
+  if binders = [] then "" else
   let binds = show_list ", " binders in
   Printf.sprintf "@[<v 0>var %s;@]" binds
 
@@ -362,7 +363,15 @@ and js_of_let_pattern pat expr =
                          | _ -> out_of_scope pat.pat_loc "pattern-matching in arrays"
                ) pat_l in
      ppf_pat_array l sexpr
+  | Tpat_record (flds, _) -> ppf_match_binders (List.map
+      (fun (_,lbl,pat) -> pat_bind sexpr lbl.lbl_name pat)
+    flds)
   | _ -> error ~loc:pat.pat_loc "let can't deconstruct values"
+
+and pat_bind obj field var = (match var.pat_desc with
+  | Tpat_var (id, _) -> ppf_match_binder (ppf_ident id) ~obj field
+  | Tpat_any         -> ""
+  | _                -> out_of_scope var.pat_loc "Nested pattern matching")
 
 and js_of_pattern pat obj =
   let loc = pat.pat_loc in
@@ -373,11 +382,7 @@ and js_of_pattern pat obj =
   | Tpat_construct (_, cd, el) ->
      let c = cd.cstr_name in
      let spat = if is_sbool c then ppf_match_case c else ppf_match_case ("\"" ^ c ^ "\"") in
-     let bind field var = (match var.pat_desc with
-     | Tpat_var (id, _) -> ppf_match_binder (ppf_ident id) ~obj field
-     | Tpat_any         -> ""
-     | _                -> out_of_scope var.pat_loc "Nested pattern matching") in
-     let binders = if el = [] then "" else ppf_match_binders (map_cstr_fields ~loc bind cd el) in
+     let binders = ppf_match_binders (map_cstr_fields ~loc (pat_bind obj) cd el) in
      [spat, binders]
   | Tpat_or (p1,p2,_) -> (js_of_pattern p1 obj) @ (js_of_pattern p2 obj)
   | Tpat_tuple el -> unsupported ~loc "tuple matching"
