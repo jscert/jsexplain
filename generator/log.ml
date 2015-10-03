@@ -33,6 +33,7 @@ sig
          
   type ctx_operation =
     | Add of ident * typ
+    | CreateCtx of ident
     | ApplyInfix of func * ident * ident
     | ApplyFunc  of func * ident
 
@@ -51,6 +52,7 @@ struct
          
   type ctx_operation =
     | Add of ident * typ
+    | CreateCtx of ident
     | ApplyInfix of func * ident * ident
     | ApplyFunc  of func * ident
                  
@@ -193,14 +195,15 @@ struct
                          |> aux
                 in Buffer.add_string buf @@ ctx_processing id ^ "\n" ^ pad ^ "log("^ string_of_int i ^" , ctx, " ^ typ ^ ");\n";
                    aux i ((tks, str) :: xs)
-            | ApplyInfix (f, e1, e2) -> let return_pad = List.hd @@ split (regexp "return") str in
-                  Buffer.add_string buf return_pad;
-                  Buffer.add_string buf (ppf_call_wrap (i+1) (Format.sprintf "%s %s %s" e1 f e2)); 
-                  Buffer.add_string buf ";";
-                  aux (i + 1) xs
-            | ApplyFunc  (f, args) -> let (pre, call, post) = extract_function f str in
-                                      let nstr = pre ^ ppf_call_wrap (i+1) call ^ post in
-                                      aux (i + 1) ((tks, nstr) :: xs)
+            | CreateCtx args -> 
+                let argslist = split (regexp ", ") args in
+                Buffer.add_string buf str;
+                Buffer.add_string buf (pad ^ "\nvar ctx = ctx_empty();");
+                (* Logging needs changing so we can use args actual name instead of t *)
+                List.map (fun x -> Buffer.add_string buf ("\nctx_push(ctx, \"t\", " ^ x ^ ", \"expr\");") ) argslist;
+                aux (i + 1) xs
+            | ApplyInfix (f, e1, e2) -> aux i ((tks, str):: xs)   (* Skip infix logging*)
+            | ApplyFunc  (f, args) ->   aux i ((tks, nstr) :: xs) (* Skip fun appl logging*)
     in aux 0 ls; Buffer.contents buf
                                  
   let logged_output s =

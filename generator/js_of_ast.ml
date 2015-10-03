@@ -82,8 +82,7 @@ let ppf_let_in decl exp =
   in ppf_lambda_wrap s
 
 let ppf_function args body=
-  Printf.sprintf "function (%s) {@;<1 2>@[<v 0>return %s;@]@,}"
-                 args body
+  (L.log_line (Printf.sprintf "function (%s) {@," args) (L.CreateCtx args)) ^ (Printf.sprintf "@;<1 2>@[<v 0>return %s;@]@,}" body)
 
 let ppf_apply f args =
   Printf.sprintf "%s(%s)"
