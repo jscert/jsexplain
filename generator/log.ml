@@ -34,10 +34,9 @@ sig
   type ctx_operation =
     | Add of ident * typ
     | CreateCtx of ident
-    | ApplyInfix of func * ident * ident
-    | ApplyFunc  of func * ident
+    | Enter
 
-  val log_line : string -> ctx_operation -> string
+  val log_line : string -> ctx_operation list -> string
   val strip_log_info : string -> string
   val logged_output : string -> string
   val unlogged_output : string -> string
@@ -53,8 +52,7 @@ struct
   type ctx_operation =
     | Add of ident * typ
     | CreateCtx of ident
-    | ApplyInfix of func * ident * ident
-    | ApplyFunc  of func * ident
+    | Enter
                  
   type token_info = ctx_operation
                                   
@@ -99,10 +97,12 @@ struct
     if l.[len - 1] = '|' then extract (len - 2) 0
     else None
 
-  let log_line str ctx =
-    let token, tokenized = bind_token str in
-    Hashtbl.replace info_tbl token ctx;
-    tokenized
+  let log_line str ctxls =
+    let log_ctx str ctx =
+      let token, tokenized = bind_token str in
+      Hashtbl.replace info_tbl token ctx;
+      tokenized in
+    List.fold_left log_ctx str ctxls
 
   let strip_log_info s =
     global_replace token_re "" s
@@ -195,15 +195,17 @@ struct
                          |> aux
                 in Buffer.add_string buf @@ ctx_processing id ^ "\n" ^ pad ^ "log("^ string_of_int i ^" , ctx, " ^ typ ^ ");\n";
                    aux i ((tks, str) :: xs)
-            | CreateCtx args -> 
+            | CreateCtx args ->
+                (* Creates new context and logs arguments. *)
                 let argslist = split (regexp ", ") args in
                 Buffer.add_string buf str;
-                Buffer.add_string buf (pad ^ "\nvar ctx = ctx_empty();");
+                Buffer.add_string buf ("\n" ^ pad ^ "var ctx = ctx_empty();");
                 (* Logging needs changing so we can use args actual name instead of t *)
-                List.map (fun x -> Buffer.add_string buf ("\nctx_push(ctx, \"t\", " ^ x ^ ", \"expr\");") ) argslist;
-                aux (i + 1) xs
-            | ApplyInfix (f, e1, e2) -> aux i ((tks, str):: xs)   (* Skip infix logging*)
-            | ApplyFunc  (f, args) ->   aux i ((tks, nstr) :: xs) (* Skip fun appl logging*)
+                List.map (fun x -> Buffer.add_string buf ("\n" ^ pad ^ "ctx_push(ctx, \"t\", " ^ x ^ ", \"expr\");") ) argslist;
+                aux i ((tks, str) :: xs)
+            | Enter -> 
+                Buffer.add_string buf ("\n" ^ pad ^ "log_custom({line:" ^ string_of_int (i + 1) ^ ", type: \"enter\"});");
+                aux (i+1) xs
     in aux 0 ls; Buffer.contents buf
                                  
   let logged_output s =
