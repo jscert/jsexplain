@@ -34,7 +34,9 @@ sig
   type ctx_operation =
     | Add of ident * typ
     | CreateCtx of ident
+    | ReturnStrip
     | Enter
+    | Exit
 
   val log_line : string -> ctx_operation list -> string
   val strip_log_info : string -> string
@@ -52,7 +54,9 @@ struct
   type ctx_operation =
     | Add of ident * typ
     | CreateCtx of ident
+    | ReturnStrip
     | Enter
+    | Exit
                  
   type token_info = ctx_operation
                                   
@@ -133,35 +137,6 @@ struct
   let ppf_run_wrap s =
     Format.sprintf "function run_trm(code) {@;<1 2>@[<v 1>@,%s@;<1 0>return run(code);@;}@]" s
 
-  let ppf_call_wrap l s =
-    Format.sprintf "@[(function () {@[<v 8>\
-      log_custom({line:%d,type:\"enter\"});\
-      var res = %s;\
-      log_custom({line:%d,type:\"exit\"});\
-      return res;}())@]@]" l s l
-
-  (* Return position of first hit pair of brackets from pos *)
-  let parse_brackets s pos =
-    let slen = String.length s in
-    let rec parse s pos acc =
-      if pos = slen then slen else
-      let c = String.get s pos in
-      let npos = pos + 1 in
-      match c with
-        | '(' -> parse s npos ('(' :: acc)
-        | ')' -> if List.length acc = 1 then pos else parse s npos (List.tl acc)
-        | _   -> parse s npos acc
-    in
-    parse s pos []
-
-  (* Take a line and pull out the first occurence of a function in a line *)
-  let extract_function f s =
-    match search_forward (regexp (f ^ "(")) s 0 with
-      | exception Not_found -> (s, "" ,"")
-      | _ ->  let pos = match_beginning () in
-              let argend = 1 + parse_brackets s pos in
-              (String.sub s 0 pos, String.sub s pos (argend - pos), String.sub s argend ((String.length s) - argend))
-
   let add_log_info s =
     let buf = Buffer.create 16 in
     let ls = lines s in
@@ -193,7 +168,7 @@ struct
                    in id |> to_format |> Format.sprintf
                          |> global_replace (regexp "var ") "" |> split (regexp ", ") |> List.map (fun x -> List.hd (split (regexp " = ") x))
                          |> aux
-                in Buffer.add_string buf @@ ctx_processing id ^ "\n" ^ pad ^ "log("^ string_of_int i ^" , ctx, " ^ typ ^ ");\n";
+                in Buffer.add_string buf @@ ctx_processing id ^ "\n" ^ pad ^ "log("^ string_of_int i ^" , ctx, " ^ typ ^ ");";
                    aux i ((tks, str) :: xs)
             | CreateCtx args ->
                 (* Creates new context and logs arguments. *)
@@ -203,9 +178,20 @@ struct
                 (* Logging needs changing so we can use args actual name instead of t *)
                 List.map (fun x -> Buffer.add_string buf ("\n" ^ pad ^ "ctx_push(ctx, \"t\", " ^ x ^ ", \"expr\");") ) argslist;
                 aux i ((tks, str) :: xs)
+            | ReturnStrip ->
+                let strsplit = split (regexp "return") str in
+                if List.length strsplit > 1 then
+                  let nstr = (List.nth strsplit 0) ^ "return returnres;" in
+                  Buffer.add_string buf ((List.nth strsplit 0) ^ "var returnres =" ^ (List.nth strsplit 1));
+                  aux i ((tks, nstr) :: xs)
+                else
+                  aux i ((tks, str) :: xs)
             | Enter -> 
                 Buffer.add_string buf ("\n" ^ pad ^ "log_custom({line:" ^ string_of_int (i + 1) ^ ", type: \"enter\"});");
                 aux (i+1) xs
+            | Exit ->
+                Buffer.add_string buf ("\n" ^ pad ^ "log_custom({line:" ^ string_of_int (i + 1) ^ ", type: \"exit\"});");
+                aux i ((tks, str) :: xs)
     in aux 0 ls; Buffer.contents buf
                                  
   let logged_output s =
