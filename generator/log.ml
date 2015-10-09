@@ -164,7 +164,7 @@ struct
                 let ctx_processing id =
                    let rec aux = function
                      | [] -> ""
-                     | x :: xs -> "\n" ^ pad ^ "ctx_push(ctx, \"" ^ x ^  "\", " ^ x ^ ", \"value\");" ^ aux xs
+                     | x :: xs -> "\n" ^ pad ^ "ctx = ctx_push(ctx, \"" ^ x ^  "\", " ^ x ^ ", \"value\");" ^ aux xs
                    in id |> to_format |> Format.sprintf
                          |> global_replace (regexp "var ") "" |> split (regexp ", ") |> List.map (fun x -> List.hd (split (regexp " = ") x))
                          |> aux
@@ -176,7 +176,9 @@ struct
                 Buffer.add_string buf str;
                 Buffer.add_string buf ("\n" ^ pad ^ "var ctx = ctx_empty();");
                 (* Logging needs changing so we can use args actual name instead of t *)
-                List.map (fun x -> Buffer.add_string buf ("\n" ^ pad ^ "ctx_push(ctx, \"t\", " ^ x ^ ", \"expr\");") ) argslist;
+                List.map (fun x -> Buffer.add_string buf ("\n" ^ pad ^ "ctx = ctx_push(ctx, \"" ^ x ^ "\", " ^ x ^ ", \"term\");") ) argslist;
+                (* Find way to trickle actual function name in log call? *)
+                Buffer.add_string buf ("\n" ^ pad ^ "log(" ^ string_of_int (i + 1)  ^ ", ctx, \"function\");");
                 aux i ((tks, str) :: xs)
             | ReturnStrip ->
                 let strsplit = split (regexp "return") str in
