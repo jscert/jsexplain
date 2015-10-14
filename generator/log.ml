@@ -101,6 +101,7 @@ struct
     if l.[len - 1] = '|' then extract (len - 2) 0
     else None
 
+  (* Links list of tokens to string, and returns token annotated string. Stores token info. *)
   let log_line str ctxls =
     let log_ctx str ctx =
       let token, tokenized = bind_token str in
@@ -108,6 +109,7 @@ struct
       tokenized in
     List.fold_left log_ctx str ctxls
 
+  (* Removes all tokens from string *)
   let strip_log_info s =
     global_replace token_re "" s
 
@@ -123,6 +125,7 @@ struct
                let nacc = (Some (G.token_of_string (String.sub m 1 (m_len - 2)))) :: acc in
                line_token_extractor nacc npos nl
 
+  (* Splits string by new lines and searches for all tokens in that line. Return list of tuples: [([<token_list>], <line>)] *)
   let lines s =
     let end_line_markers s =
       let rec build start = match (search_forward endline_re s start) with
@@ -181,6 +184,7 @@ struct
                 Buffer.add_string buf ("\n" ^ pad ^ "log(" ^ string_of_int (i + 1)  ^ ", ctx, \"function\");");
                 aux i ((tks, str) :: xs)
             | ReturnStrip ->
+                (* Pull whatever is in a return call out to var returnres and modify the stored string to return returnres *)
                 let strsplit = split (regexp "return") str in
                 if List.length strsplit > 1 then
                   let nstr = (List.nth strsplit 0) ^ "return returnres;" in
@@ -189,9 +193,11 @@ struct
                 else
                   aux i ((tks, str) :: xs)
             | Enter -> 
+                (* Log an entry into a function *)
                 Buffer.add_string buf ("\n" ^ pad ^ "log_custom({line:" ^ string_of_int (i + 1) ^ ", type: \"enter\"});");
                 aux (i+1) xs
             | Exit ->
+                (* Log exit of a function *)
                 Buffer.add_string buf ("\n" ^ pad ^ "log_custom({line:" ^ string_of_int (i + 1) ^ ", type: \"exit\"});");
                 aux i ((tks, str) :: xs)
     in aux 0 ls; Buffer.contents buf
@@ -199,7 +205,7 @@ struct
   let logged_output s =
     let str_ppf = Format.str_formatter in
     Format.fprintf str_ppf (Scanf.format_from_string s "");
-    ppf_run_wrap (add_log_info (Format.flush_str_formatter ()))
+    add_log_info (Format.flush_str_formatter ())
   (* let bad_output = Format.flush_str_formatter () in *)
   (* let pretty_output = global_replace lfs "\n" bad_output in *)
   (* add_log_info pretty_output *)
