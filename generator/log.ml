@@ -200,6 +200,7 @@ struct
                 (* Log exit of a function *)
                 Buffer.add_string buf ("\n" ^ pad ^ "log_custom({line:" ^ string_of_int (i + 1) ^ ", type: \"exit\"});");
                 aux i ((tks, str) :: xs)
+            | _ -> aux i ((tks, str) :: xs)
     in aux 0 ls; Buffer.contents buf
                                  
   let logged_output s =
