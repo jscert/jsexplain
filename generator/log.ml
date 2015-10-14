@@ -33,10 +33,12 @@ sig
          
   type ctx_operation =
     | Add of ident * typ
-    | ApplyInfix of func * ident * ident
-    | ApplyFunc  of func * ident
+    | CreateCtx of ident
+    | ReturnStrip
+    | Enter
+    | Exit
 
-  val log_line : string -> ctx_operation -> string
+  val log_line : string -> ctx_operation list -> string
   val strip_log_info : string -> string
   val logged_output : string -> string
   val unlogged_output : string -> string
@@ -51,8 +53,10 @@ struct
          
   type ctx_operation =
     | Add of ident * typ
-    | ApplyInfix of func * ident * ident
-    | ApplyFunc  of func * ident
+    | CreateCtx of ident
+    | ReturnStrip
+    | Enter
+    | Exit
                  
   type token_info = ctx_operation
                                   
@@ -97,30 +101,36 @@ struct
     if l.[len - 1] = '|' then extract (len - 2) 0
     else None
 
-  let log_line str ctx =
-    let token, tokenized = bind_token str in
-    Hashtbl.replace info_tbl token ctx;
-    tokenized
+  let log_line str ctxls =
+    let log_ctx str ctx =
+      let token, tokenized = bind_token str in
+      Hashtbl.replace info_tbl token ctx;
+      tokenized in
+    List.fold_left log_ctx str ctxls
 
   let strip_log_info s =
     global_replace token_re "" s
 
+  (* Helper for lines that looks for all tokens in a line, and
+   returns a tuple containing a list of tokens and the detokenized line *)
+  let rec line_token_extractor acc pos l =
+    match search_forward token_re l pos with
+      | exception Not_found -> (acc, l)
+      | _  ->  let m = matched_string l in
+               let npos = match_beginning () in
+               let m_len = String.length m in
+               let nl = global_replace (regexp m) "" l in
+               let nacc = (Some (G.token_of_string (String.sub m 1 (m_len - 2)))) :: acc in
+               line_token_extractor nacc npos nl
+
   let lines s =
-    let append_token lines =
-      List.fold_left
-        (fun acc x -> match search_forward token_re x 0 with
-                      | exception Not_found -> (None, x) :: acc
-                      | _  ->  let m = matched_string x in
-                              let m_len = String.length m
-                              in (Some (G.token_of_string (String.sub m 1 (m_len - 2))) , String.sub x 0 (String.length x - m_len)) :: acc
-        ) [] lines in
     let end_line_markers s =
       let rec build start = match (search_forward endline_re s start) with
         | n -> n :: build (n + 1)
         | exception not_Found -> []
       in build 0 in
     let lines_list = snd @@ List.fold_left (fun (st, acc) ed -> (ed, String.sub s st (ed - st) :: acc)) (0, []) (end_line_markers s)
-    in append_token lines_list
+    in List.fold_left (fun acc x -> (line_token_extractor [] 0 x) :: acc ) [] lines_list
 
   (* Wrap the entire logged version in a callable run_trm function, and add a call to return run(code). *)
   (* Assumes entry point called run *)
@@ -133,10 +143,13 @@ struct
     (* i is line number of line preceding return *)
     let rec aux i = function
       | [] -> ()
-      | (None, str)   :: xs ->
+      | (None :: tks, str) :: xs ->
           Buffer.add_string buf str;
           aux (i + 1) xs
-      | (Some l, str) :: xs -> let log_info =
+      | ([], str)   :: xs ->
+          Buffer.add_string buf str;
+          aux (i + 1) xs
+      | (Some l :: tks, str) :: xs ->
           let pad = 
             let len = String.length str in
             let rec repeat n x = if n = 0 then "" else x ^ repeat (n - 1) x in
@@ -146,21 +159,41 @@ struct
                 else i - 1
               else len 
             in repeat (aux 1) " " in
-        match Hashtbl.find info_tbl l with
-          | Add (id, typ)   -> 
-              let ctx_processing id =
-                 let rec aux = function
-                   | [] -> ""
-                   | x :: xs -> "\n" ^ pad ^ "ctx_push(ctx, \"" ^ x ^  "\", " ^ x ^ ", \"value\");" ^ aux xs
-                 in id |> to_format |> Format.sprintf
-                       |> global_replace (regexp "var ") "" |> split (regexp ", ") |> List.map (fun x -> List.hd (split (regexp " = ") x))
-                       |> aux
-              in ctx_processing id ^ "\n" ^ pad ^ "log("^ string_of_int i ^" , ctx, " ^ typ ^ ");\n"
-          | ApplyInfix (f, e1, e2) -> ""  (* Actually not used *)
-          | ApplyFunc  (f, args) ->   ""  (* Actually not used *)
-        in Buffer.add_string buf log_info; 
-            Buffer.add_string buf (strip_log_info str);
-            aux (i + 1) xs
+          match Hashtbl.find info_tbl l with
+            | Add (id, typ)   -> 
+                let ctx_processing id =
+                   let rec aux = function
+                     | [] -> ""
+                     | x :: xs -> "\n" ^ pad ^ "ctx = ctx_push(ctx, \"" ^ x ^  "\", " ^ x ^ ", \"value\");" ^ aux xs
+                   in id |> to_format |> Format.sprintf
+                         |> global_replace (regexp "var ") "" |> split (regexp ", ") |> List.map (fun x -> List.hd (split (regexp " = ") x))
+                         |> aux
+                in Buffer.add_string buf @@ ctx_processing id ^ "\n" ^ pad ^ "log("^ string_of_int i ^" , ctx, " ^ typ ^ ");";
+                   aux i ((tks, str) :: xs)
+            | CreateCtx args ->
+                (* Creates new context and logs arguments. *)
+                let argslist = split (regexp ", ") args in
+                Buffer.add_string buf str;
+                Buffer.add_string buf ("\n" ^ pad ^ "var ctx = ctx_empty();");
+                (* Logging needs changing so we can use args actual name instead of t *)
+                List.map (fun x -> Buffer.add_string buf ("\n" ^ pad ^ "ctx = ctx_push(ctx, \"" ^ x ^ "\", " ^ x ^ ", \"term\");") ) argslist;
+                (* Find way to trickle actual function name in log call? *)
+                Buffer.add_string buf ("\n" ^ pad ^ "log(" ^ string_of_int (i + 1)  ^ ", ctx, \"function\");");
+                aux i ((tks, str) :: xs)
+            | ReturnStrip ->
+                let strsplit = split (regexp "return") str in
+                if List.length strsplit > 1 then
+                  let nstr = (List.nth strsplit 0) ^ "return returnres;" in
+                  Buffer.add_string buf ((List.nth strsplit 0) ^ "var returnres =" ^ (List.nth strsplit 1));
+                  aux i ((tks, nstr) :: xs)
+                else
+                  aux i ((tks, str) :: xs)
+            | Enter -> 
+                Buffer.add_string buf ("\n" ^ pad ^ "log_custom({line:" ^ string_of_int (i + 1) ^ ", type: \"enter\"});");
+                aux (i+1) xs
+            | Exit ->
+                Buffer.add_string buf ("\n" ^ pad ^ "log_custom({line:" ^ string_of_int (i + 1) ^ ", type: \"exit\"});");
+                aux i ((tks, str) :: xs)
     in aux 0 ls; Buffer.contents buf
                                  
   let logged_output s =

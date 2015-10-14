@@ -82,8 +82,7 @@ let ppf_let_in decl exp =
   in ppf_lambda_wrap s
 
 let ppf_function args body=
-  Printf.sprintf "function (%s) {@;<1 2>@[<v 0>return %s;@]@,}"
-                 args body
+  (L.log_line (Printf.sprintf "function (%s) {" args) [L.Enter; (L.CreateCtx args)]) ^ (Printf.sprintf "@;<1 2>@[<v 0>return %s;@]@,}" body)
 
 let ppf_apply f args =
   Printf.sprintf "%s(%s)"
@@ -248,12 +247,12 @@ and js_of_structure_item ?(mod_gen=[]) s =
 and js_of_branch ?(mod_gen=[]) b obj =
   let spat, binders = js_of_pattern ~mod_gen b.c_lhs obj in
   let se = js_of_expression ~mod_gen b.c_rhs in
-  if binders = "" then ppf_branch spat binders se
+  if binders = "" then L.log_line (ppf_branch spat binders se) [(L.Exit)]
   else
     let typ = match List.rev (Str.split (Str.regexp " ") spat) with
       | [] -> assert false
       | x :: xs -> String.sub x 0 (String.length x)
-    in L.log_line (ppf_branch spat binders se) (L.Add (binders, typ))
+    in L.log_line (ppf_branch spat binders se) [(L.Exit); (L.ReturnStrip); (L.Add (binders, typ))]
     
 and js_of_expression ?(mod_gen=[]) e =
   let locn = e.exp_loc in
@@ -280,8 +279,8 @@ and js_of_expression ?(mod_gen=[]) e =
               |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope locn "optional apply arguments" | Some ei -> js_of_expression ~mod_gen ei) in
     let se = js_of_expression ~mod_gen f in
     if is_infix f sl' && List.length exp_l = 2
-    then L.log_line (ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))) (L.ApplyInfix (se, (List.hd sl), (List.hd (List.tl sl))))
-    else L.log_line (ppf_apply se (String.concat ", " sl)) (L.ApplyFunc (se, (String.concat ", " sl)))
+    then ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
+    else ppf_apply se (String.concat ", " sl)
 
   | Texp_match (exp, l, [], Total) ->
      let se = js_of_expression ~mod_gen exp in
