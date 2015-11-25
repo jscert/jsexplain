@@ -77,16 +77,8 @@ let ppf_lambda_wrap s =
   Printf.sprintf "(function () {@;<1 2>@[<v 0>%s@]@,}())@," s
 
 let ppf_branch case binders expr =
-  Printf.sprintf "%s: @[<v 0>%s%s@]@,"
+  Printf.sprintf "%s: @[<v 0>%s@,return %s;@]"
                  case binders expr
-
-let rec ppf_branches branches expr =
-  match branches with
-  | (case, binders) :: [] ->
-    let expr = Printf.sprintf "@,return %s;" expr in
-    ppf_branch case binders expr
-  | (case, binders) :: l' -> (ppf_branch case binders "") ^ (ppf_branches l' expr)
-  | [] -> ""
 
 let ppf_let_in decl exp =
   let s =
@@ -247,16 +239,14 @@ and js_of_structure_item s =
   | Tstr_attribute  _  -> out_of_scope loc "attributes"
 
 and js_of_branch b obj =
-  let patterns = js_of_pattern b.c_lhs obj in
+  let spat, binders = js_of_pattern b.c_lhs obj in
   let se = js_of_expression b.c_rhs in
-  (*if binders = "" then *)ppf_branches patterns se
-  (* FIXME: Logging
-   else
+  if binders = "" then ppf_branch spat binders se
+  else
     let typ = match List.rev (Str.split (Str.regexp " ") spat) with
       | [] -> assert false
       | x :: xs -> String.sub x 0 (String.length x)
     in L.log_line (ppf_branch spat binders se) (L.Add (binders, typ))
-  *)
 
 and js_of_expression e =
   let loc = e.exp_loc in
@@ -367,9 +357,9 @@ and js_of_let_pattern pat expr =
 and js_of_pattern pat obj =
   let loc = pat.pat_loc in
   match pat.pat_desc with
-  | Tpat_any                     -> ["default", ""]
-  | Tpat_constant   c            -> [ppf_match_case (js_of_constant c), ""]
-  | Tpat_var       (id, _)       -> ["default", (ppf_match_binders [ppf_match_binder (ppf_ident id) ""])]
+  | Tpat_any                     -> "default", ""
+  | Tpat_constant   c            -> ppf_match_case (js_of_constant c), ""
+  | Tpat_var       (id, _)       -> "default", (ppf_match_binders [ppf_match_binder (ppf_ident id) ""])
   | Tpat_construct (_, cd, el) ->
      let c = cd.cstr_name in
      let spat = if is_sbool c then ppf_match_case c else ppf_match_case ("\"" ^ c ^ "\"") in
@@ -378,11 +368,11 @@ and js_of_pattern pat obj =
      | Tpat_any         -> ""
      | _                -> out_of_scope var.pat_loc "Nested pattern matching") in
      let binders = if el = [] then "" else ppf_match_binders (map_cstr_fields ~loc bind cd el) in
-     [spat, binders]
-  | Tpat_or (p1,p2,_) -> (js_of_pattern p1 obj) @ (js_of_pattern p2 obj)
+     spat, binders
   | Tpat_tuple el -> unsupported ~loc "tuple matching"
   | Tpat_array el -> unsupported ~loc "array-match"
   | Tpat_record (_,_) -> unsupported ~loc "record"
+  | Tpat_or (_,_,_) -> error ~loc "not implemented yet"
   | Tpat_alias (_,_,_) -> out_of_scope loc "alias-pattern"
   | Tpat_variant (_,_,_) -> out_of_scope loc "polymorphic variants in pattern matching"
   | Tpat_lazy _ -> out_of_scope loc "lazy-pattern"
