@@ -240,31 +240,18 @@ let ctx_initial =
 
 
 (****************************************************************)
-(* MODES *)
-
-type generate_mode = 
-  | Mode_unlogged
-  | Mode_line_token
-  | Mode_logged
-
-let current_mode = if !logging then Mode_logged else Mode_unlogged
-
-
-(****************************************************************)
 (* LOGGED CONSTRUCTORS *)
 
 let generate_logged_case spat binders ctx newctx sbody need_break =
   (* Note: binders is a list of pairs of id *)
   (* Note: if binders = [], then newctx = ctx *)
-  match current_mode with
+  match !current_mode with
   | Mode_line_token
   | Mode_logged
   | Mode_unlogged -> 
       let sbinders = ppf_match_binders binders in
-       (Printf.sprintf "@[<v 2>%s:@;@[<v 2>%s%s@]@]" spat sbinders sbody)
-     ^ (if need_break then Printf.sprintf "@,break;" else "")
-
-
+      (Printf.sprintf "@[<v 0>%s:@;<1 2>@[<v 0>%s%s%s@]@]" spat sbinders sbody
+         (if need_break then "@,break;" else ""))
 
 
 (* generate_logged_case implement using
@@ -285,9 +272,13 @@ with help of
 
 
 let generate_logged_return ctx sbody = 
-  match current_mode with
+  match !current_mode with
   | Mode_line_token
-  | Mode_logged
+  | Mode_logged ->
+    let id = id_fresh "_return_" in
+    let token = "12" in
+    Printf.sprintf "var %s = %s;@,log_event(lineof(%s), ctx_push(%s, {\"return_value\", %s}), \"return\");@,return %s@,"
+      id sbody token ctx id id
   | Mode_unlogged -> 
      Printf.sprintf "return %s;" sbody
      (* Printf.sprintf "@[<v 0>return %s;@]" sbody *)
@@ -304,7 +295,7 @@ var t=e; logEvent(LINEOF(432423), ctx_push(ctx, {"return",t}), "return"); return
 
 
 let generate_logged_let ids ctx newctx sdecl sbody =
-  match current_mode with
+  match !current_mode with
   | Mode_line_token
   | Mode_logged
   | Mode_unlogged -> 
@@ -322,7 +313,7 @@ var x=e; var newctx=ctx_push(ctx,x,e); logEvent(LINEOF(432423), "let", ctx);sbod
 *)
 
 let generate_logged_enter arg_ids ctx newctx sbody = 
-  match current_mode with
+  match !current_mode with
   | Mode_line_token
   | Mode_logged
   | Mode_unlogged -> 
@@ -624,8 +615,9 @@ and js_of_pattern pat obj =
 let to_javascript module_name typedtree =
   let content = js_of_structure typedtree in
   let pre_res = ppf_module_wrap module_name content in
-  (L.logged_output pre_res, L.unlogged_output pre_res, pre_res)
-
+  let str_ppf = Format.str_formatter in
+  Format.fprintf str_ppf (Scanf.format_from_string pre_res "");
+  Format.flush_str_formatter ()
 
 (****************************************************************)
 (* COMMENTS *)

@@ -27,7 +27,7 @@ let _ =
      ]
      (fun f -> files := f :: !files)
      ("usage: [-I dir] [..other options..] file.ml");
-
+   current_mode := if !logging then Mode_logged else Mode_unlogged;
    if List.length !files <> 1 then
       failwith "Expects one argument: the filename of the ML source file";
    let sourcefile = List.hd !files in
@@ -52,7 +52,6 @@ let _ =
       | Some (parsetree1, (typedtree1,_)) -> parsetree1, typedtree1
       in
 
-      let (logged, unlogged, pre) = Js_of_ast.to_javascript modulename typedtree1 in
-      file_put_contents log_output logged;
-      file_put_contents unlog_output unlogged;
-      file_put_contents pre_output pre;
+      let out = Js_of_ast.to_javascript modulename typedtree1 in
+      let output_filename = if !logging then log_output else unlog_output in
+      file_put_contents output_filename out
