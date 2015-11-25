@@ -31,6 +31,12 @@ let testg x =
 
 
 
+let test00 x = 
+  match x with
+  | None -> 2
+  | Some y -> y
+
+
 
 
 let test0 f = 
@@ -49,28 +55,33 @@ let test1 on =
 
 let test2 v =
   let x = 
-    let x = 3 in x+1 
+    let y = 3 in y+1 
     in
   x
 
 
 let test3 x =
-  let x =
+  let y =
     match x with 
     | None -> 1
-    | Some x -> x+2
+    | Some z -> z+2
     in
-  x
+  y
 
-let test4 x =
-  let y = x+1 in
-  let x x = x in
-  x (let x = y in x)
+
+
+
+(*
+let test4 a =
+  let y = a+1 in
+  let f x = x in
+  f (let x = y in x)
 
 let test5 x =
   match x with
   | None -> 0
   | Some x -> let x = x+x in x+1
+*)
 
 (*
 

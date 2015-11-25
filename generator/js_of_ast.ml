@@ -120,7 +120,7 @@ let ppf_match value cases const =
   let cons_fld = if const then "" else ".type" in
   let s = Printf.sprintf "switch (%s%s) {@,@[<v 0>%s@]@,}"
     value cons_fld cases
-  in ppf_lambda_wrap s
+  in s
 
 let ppf_match_case c =
   Printf.sprintf "case %s" c
@@ -128,7 +128,7 @@ let ppf_match_case c =
 let ppf_match_binders binders =
   if binders = [] then "" else
   let binds = show_list ", " (List.map (fun (id,se) -> Printf.sprintf "%s = %s" id se) binders) in
-  Printf.sprintf "@,@[<v 0>var %s;@]" binds
+  Printf.sprintf "var %s;@," binds
 
 let ppf_array values =
   Printf.sprintf "[%s]"
@@ -141,7 +141,7 @@ let ppf_ifthen cond iftrue =
                  cond iftrue
 
 let ppf_ifthenelse cond iftrue iffalse =
-  Printf.sprintf "(function () {@;<1 2>@[<v 2>@,if (%s) {@,return  %s;@,} else {@,return  %s;@,}@]@,})()"
+  Printf.sprintf "@[<v 2>@,if (%s) {@, %s @,} else {@, %s @,} @]@,"
                  cond iftrue iffalse
 
 let ppf_sequence exp1 exp2 =
@@ -260,7 +260,7 @@ let generate_logged_case spat binders ctx newctx sbody need_break =
   | Mode_logged
   | Mode_unlogged -> 
       let sbinders = ppf_match_binders binders in
-       (Printf.sprintf "%s:%s@,%s" spat sbinders sbody)
+       (Printf.sprintf "@[<v 2>%s:@;@[<v 2>%s%s@]@]" spat sbinders sbody)
      ^ (if need_break then Printf.sprintf "@,break;" else "")
 
 
