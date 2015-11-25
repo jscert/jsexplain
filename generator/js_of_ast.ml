@@ -126,8 +126,9 @@ let ppf_match_case c =
   Printf.sprintf "case %s" c
 
 let ppf_match_binders binders =
+  if binders = [] then "" else
   let binds = show_list ", " (List.map (fun (id,se) -> Printf.sprintf "%s = %s" id se) binders) in
-  Printf.sprintf "@[<v 0>var %s;@]" binds
+  Printf.sprintf "@,@[<v 0>var %s;@]" binds
 
 let ppf_array values =
   Printf.sprintf "[%s]"
@@ -259,7 +260,7 @@ let generate_logged_case spat binders ctx newctx sbody need_break =
   | Mode_logged
   | Mode_unlogged -> 
       let sbinders = ppf_match_binders binders in
-       (Printf.sprintf "%s@,%s@,%s" spat sbinders sbody)
+       (Printf.sprintf "%s:%s@,%s" spat sbinders sbody)
      ^ (if need_break then Printf.sprintf "@,break;" else "")
 
 
