@@ -286,6 +286,7 @@ with help of
 
 *)
 
+(* LATER: optimize return when it's a value *)
 
 let generate_logged_return ctx sbody = 
   match !current_mode with
