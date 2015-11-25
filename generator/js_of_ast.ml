@@ -119,7 +119,7 @@ let ppf_match_case c =
   Printf.sprintf "case %s" c
 
 let ppf_match_binders binders =
-  let binds = show_list ", " binders in
+  let binds = show_list ", " (List.map (fun (id,se) -> Print.sprintf "%s = %s" id se) binders) in
   Printf.sprintf "@[<v 0>var %s;@]" binds
 
 let ppf_array values =
@@ -231,14 +231,36 @@ let ctx_initial =
 
 
 (****************************************************************)
+(* MODES *)
+
+type generate_mode = 
+  | Mode_unlogged
+  | Mode_line_token
+  | Mode_logged
+
+let current_mode = Mode_unlogged
+
+
+(****************************************************************)
 (* LOGGED CONSTRUCTORS *)
 
-let generate_logged_case spat binders ctx newctx sbody need_break = ""
+let generate_logged_case spat binders ctx newctx sbody need_break =
+  (* Note: binders is a list of pairs of id *)
   (* Note: if binders = [], then newctx = ctx *)
+  match current_mode with
+  | Mode_line_token
+  | Mode_logged
+  | Mode_unlogged -> 
+      let sbinders = ppf_match_binders binders in
+       (Printf.sprintf "%s@,%s@,%s" spat sbinders sbody)
+     ^ (if need_break then Printf.sprintf "@,break;" else "")
+
+
+
 
 (* generate_logged_case implement using
 [insertCaseCode(caseBody,bindings,ctx,newctx,sbody)]
-£4424;case(caseBody);codeOf(bindings);sbody;break
+£4424;caseBody;codeOf(bindings);sbody;break
 case(caseBody); codeOf(bindings); newctx=ctx_push(ctx,bindings); logEvent(LINEOF(432423), "case", newctx);sbody;break
 
 with help of
@@ -252,8 +274,14 @@ with help of
 
 *)
 
-let generate_logged_return ctx sbody = ""
 
+let generate_logged_return ctx sbody = 
+  match current_mode with
+  | Mode_line_token
+  | Mode_logged
+  | Mode_unlogged -> 
+     Printf.sprintf "return %s;" sbody
+     (* Printf.sprintf "@[<v 0>return %s;@]" sbody *)
 (*
 ----
   [insertReturnCode(e,ctx)]
@@ -264,7 +292,14 @@ var t=e; logEvent(LINEOF(432423), ctx_push(ctx, {"return",t}), "return"); return
 ----
 *)
 
-let generate_logged_let ids ctx newctx sdecl sbody = ""
+
+
+let generate_logged_let ids ctx newctx sdecl sbody =
+  match current_mode with
+  | Mode_line_token
+  | Mode_logged
+  | Mode_unlogged -> 
+     Printf.sprintf "%s@,%s" sdecl sbody
 
 (*
 
@@ -277,7 +312,12 @@ var x=e; var newctx=ctx_push(ctx,x,e); logEvent(LINEOF(432423), "let", ctx);sbod
 ----
 *)
 
-let generate_logged_enter arg_ids ctx newctx sbody = ""
+let generate_logged_enter arg_ids ctx newctx sbody = 
+  match current_mode with
+  | Mode_line_token
+  | Mode_logged
+  | Mode_unlogged -> 
+     sbody
 
 (*
 
