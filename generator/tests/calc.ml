@@ -1,5 +1,3 @@
-open Stack
-
 type expr =
   | Const [@f value] of int
   | Add [@f left, right] of expr * expr
@@ -21,3 +19,7 @@ let rec run expr = match expr with
 and evals sexpr = match sexpr with
   | Emp -> Stack.N
   | Push (v, s) -> Stack.push (run v) (evals s)
+
+let rec mapStack f s = match s with
+  | Stack.N -> Stack.N
+  | Stack.C (x, xs) -> Stack.C (f x, mapStack f xs)

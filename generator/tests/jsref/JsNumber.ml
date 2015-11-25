@@ -50,10 +50,10 @@ let ln2 = (log 2.)
 (** val from_string : char list -> number **)
 
 let from_string = (fun s ->
-    try
+    (*try*)
       let s = (String.concat "" (List.map (String.make 1) s)) in
       if s = "" then 0. else float_of_string s
-    with Failure "float_of_string" -> nan)
+    (* FIXME: with Failure "float_of_string" -> nan *) )
    (* Note that we're using `float_of_string' there, which does not have the same
       behavior than JavaScript.  For instance it will read "022" as 22 instead of
       18, which should be the JavaScript result for it. *)

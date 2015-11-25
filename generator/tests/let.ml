@@ -17,3 +17,12 @@ let affiche x = match x with
 
 let pet = Petite 5
 let cinq = 5
+
+let test b = match b with
+  | true -> ()
+  | false -> ()
+
+let test x = match x with
+  | 1 -> ()
+  | 2 -> ()
+  | _ -> ()

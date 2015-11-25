@@ -3,7 +3,9 @@ open JsSyntaxAux
 open LibBool
 open List0
 
+(*
 let __ = let rec f _ = Obj.repr f in Obj.repr f
+*)
 
 (** val add_infos_exp : strictness_flag -> expr -> expr **)
 
@@ -35,21 +37,18 @@ let rec add_infos_exp str e =
 
 (** val add_infos_funcbody : strictness_flag -> funcbody -> funcbody **)
 
-and add_infos_funcbody str = function
+and add_infos_funcbody str fb = match fb with
 | Coq_funcbody_intro (p, s) -> Coq_funcbody_intro ((add_infos_prog str p), s)
 
 (** val add_infos_stat : strictness_flag -> label_set -> stat -> stat **)
 
 and add_infos_stat str labs t =
-  let opt = fun _ f smth ->
-    match smth with
+  let opt f smth = match smth with
     | Some smth0 -> Some (f smth0)
     | None -> None
   in
   let f = add_infos_stat str label_set_empty in
-  let fo = opt __ f in
   let fe = add_infos_exp str in
-  let feo = opt __ fe in
   let fsb = add_infos_switchbody str in
   (match t with
    | Coq_stat_expr e -> Coq_stat_expr (fe e)
@@ -59,31 +58,31 @@ and add_infos_stat str labs t =
    | Coq_stat_block ts -> Coq_stat_block (map f ts)
    | Coq_stat_var_decl vars ->
      Coq_stat_var_decl
-       (map (fun var -> let (s, eo) = var in (s, (feo eo))) vars)
-   | Coq_stat_if (e, t0, to0) -> Coq_stat_if ((fe e), (f t0), (fo to0))
+       (map (fun var -> let (s, eo) = var in (s, (opt fe eo))) vars)
+   | Coq_stat_if (e, t0, to0) -> Coq_stat_if ((fe e), (f t0), (opt f to0))
    | Coq_stat_do_while (l, t0, e) ->
      Coq_stat_do_while ((label_set_add_empty labs), (f t0), (fe e))
    | Coq_stat_while (l, e, t0) ->
      Coq_stat_while ((label_set_add_empty labs), (fe e), (f t0))
    | Coq_stat_with (e, t0) -> Coq_stat_with ((fe e), (f t0))
    | Coq_stat_throw e -> Coq_stat_throw (fe e)
-   | Coq_stat_return eo -> Coq_stat_return (feo eo)
+   | Coq_stat_return eo -> Coq_stat_return (opt fe eo)
    | Coq_stat_break lopt -> Coq_stat_break lopt
    | Coq_stat_continue lopt -> Coq_stat_continue lopt
    | Coq_stat_try (t0, catch, to0) ->
      Coq_stat_try ((f t0),
-       (opt __ (fun c -> let (cs, t1) = c in (cs, (f t1))) catch), (fo to0))
+       (opt (fun c -> let (cs, t1) = c in (cs, (f t1))) catch), (opt f to0))
    | Coq_stat_for (l, eo1, eo2, eo3, t0) ->
-     Coq_stat_for ((label_set_add_empty labs), (feo eo1), (feo eo2),
-       (feo eo3), (f t0))
+     Coq_stat_for ((label_set_add_empty labs), (opt fe eo1), (opt fe eo2),
+       (opt fe eo3), (f t0))
    | Coq_stat_for_var (l, vars, eo2, eo3, t0) ->
      Coq_stat_for_var ((label_set_add_empty labs),
-       (map (fun var -> let (s, eo) = var in (s, (feo eo))) vars), (feo eo2),
-       (feo eo3), (f t0))
+       (map (fun var -> let (s, eo) = var in (s, (opt fe eo))) vars), (opt fe eo2),
+       (opt fe eo3), (f t0))
    | Coq_stat_for_in (l, e1, e2, t0) ->
      Coq_stat_for_in ((label_set_add_empty labs), (fe e1), (fe e2), (f t0))
    | Coq_stat_for_in_var (l, str0, eo, e, t0) ->
-     Coq_stat_for_in_var ((label_set_add_empty labs), str0, (feo eo), 
+     Coq_stat_for_in_var ((label_set_add_empty labs), str0, (opt fe eo), 
        (fe e), (f t0))
    | Coq_stat_debugger -> Coq_stat_debugger
    | Coq_stat_switch (labs0, e, ts) ->
@@ -95,8 +94,8 @@ and add_infos_stat str labs t =
 and add_infos_switchbody str ts =
   let fe = add_infos_exp str in
   let fs = add_infos_stat str label_set_empty in
-  let f = fun sc ->
-    let Coq_switchclause_intro (e, l) = sc in
+  let f sc = match sc with
+  | Coq_switchclause_intro (e, l) ->
     Coq_switchclause_intro ((fe e), (map fs l))
   in
   (match ts with
@@ -106,14 +105,14 @@ and add_infos_switchbody str ts =
 
 (** val add_infos_prog : strictness_flag -> prog -> prog **)
 
-and add_infos_prog str = function
+and add_infos_prog str p = match p with
 | Coq_prog_intro (str', els) ->
   let str'' = coq_or str str' in
   Coq_prog_intro (str'', (map (add_infos_element str'') els))
 
 (** val add_infos_element : strictness_flag -> element -> element **)
 
-and add_infos_element str = function
+and add_infos_element str el = match el with
 | Coq_element_stat t ->
   Coq_element_stat (add_infos_stat str label_set_empty t)
 | Coq_element_func_decl (s, ss, fb) ->

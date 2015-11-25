@@ -25,9 +25,8 @@ let init_path () =
 
 let initial_env () =
   try
-    if !Clflags.nopervasives
-    then Env.open_pers_signature "Stdlib" Env.initial_unsafe_string
-    else Env.open_pers_signature "Stdlib" Env.initial_unsafe_string
+    let env = Env.initial_unsafe_string in
+    Env.open_pers_signature "Stdlib" env
   with Not_found ->
     fatal_error "cannot open stdlib"
 
@@ -105,34 +104,34 @@ let process_implementation_file ppf sourcefile =
     let env = initial_env () in
     let parsetree = parse_file inputfile Parse.implementation ast_impl_magic_number in
     let typedtree = Typemod.type_implementation sourcefile prefixname modulename env parsetree in
-    (Some (parsetree, typedtree), inputfile)
+    (Some (parsetree, typedtree), inputfile, modulename)
   with
     e ->
       match e with
         Syntaxerr.Error err ->
           fprintf Format.err_formatter "@[%a@]@."
             Syntaxerr.report_error err;
-          None, inputfile
+          None, inputfile, modulename
       | Failure s ->
           prerr_endline s;
           (*incr Odoc_global.errors ;*)
-          None, inputfile
+          None, inputfile, modulename
       (* ADDED *)
-      | Env.Error err -> 
+      | Env.Error err ->
           Env.report_error ppf err;
           print_newline();
           raise e
-      | Typecore.Error (loc,env,err) -> 
+      | Typecore.Error (loc,env,err) ->
           Location.print_error ppf loc;
           Typecore.report_error env ppf err;
           print_newline();
           raise e
-      | Typetexp.Error (loc,env,err) -> 
+      | Typetexp.Error (loc,env,err) ->
           Location.print_error ppf loc;
           Typetexp.report_error env ppf err;
           print_newline();
           raise e
-      | Typemod.Error (loc,env,err) -> 
+      | Typemod.Error (loc,env,err) ->
           Location.print_error ppf loc;
           Typemod.report_error env ppf err;
           print_newline();
@@ -179,21 +178,21 @@ let typecheck_implementation_file ppf sourcefile parsetree =
           prerr_endline s;
           (*incr Odoc_global.errors ;*)
           None
-      | Env.Error err -> 
+      | Env.Error err ->
           Env.report_error ppf err;
           print_newline();
           raise e
-      | Typetexp.Error (loc,env,err) -> 
+      | Typetexp.Error (loc,env,err) ->
           Location.print_error ppf loc;
           Typetexp.report_error env ppf err;
           print_newline();
           raise e
-      | Typecore.Error (loc,env,err) -> 
+      | Typecore.Error (loc,env,err) ->
           Location.print_error ppf loc;
-          Typecore.report_error env ppf err; 
+          Typecore.report_error env ppf err;
           print_newline();
           raise e
-      | Typemod.Error (loc,env,err) -> 
+      | Typemod.Error (loc,env,err) ->
           Location.print_error ppf loc;
           Typemod.report_error env ppf err;
           print_newline();
@@ -224,21 +223,21 @@ let typecheck_interface_file ppf sourcefile output_prefix =
           prerr_endline s;
           (*incr Odoc_global.errors ;*)
           None
-      | Env.Error err -> 
+      | Env.Error err ->
           Env.report_error ppf err;
           print_newline();
           raise e
-      | Typetexp.Error (loc,env,err) -> 
+      | Typetexp.Error (loc,env,err) ->
           Location.print_error ppf loc;
           Typetexp.report_error env ppf err;
           print_newline();
           raise e
-      | Typecore.Error (loc,env,err) -> 
+      | Typecore.Error (loc,env,err) ->
           Location.print_error ppf loc;
-          Typecore.report_error env ppf err; 
+          Typecore.report_error env ppf err;
           print_newline();
           raise e
-      | Typemod.Error (loc,env,err) -> 
+      | Typemod.Error (loc,env,err) ->
           Location.print_error ppf loc;
           Typemod.report_error env ppf err;
           print_newline();

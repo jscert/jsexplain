@@ -3,8 +3,6 @@ open LibBool
 open LibList
 open LibReflect
 
-let __ = let rec f _ = Obj.repr f in Obj.repr f
-
 module type HeapSpec = 
  sig 
   type ('x0, 'x) heap 
@@ -42,8 +40,8 @@ module HeapList =
   
   (** val assoc : 'a1 coq_Comparable -> 'a1 -> ('a1 * 'a2) list -> 'a2 **)
   
-  let rec assoc h1 k = function
-  | [] -> (raise Not_found) __
+  let rec assoc h1 k l = match l with
+  | [] -> raise Not_found
   | p :: l' -> let (x, v) = p in if h1 x k then v else assoc h1 k l'
   
   (** val read : 'a1 coq_Comparable -> ('a1, 'a2) heap -> 'a1 -> 'a2 **)
@@ -76,7 +74,7 @@ module HeapList =
   (** val mem_assoc :
       'a2 coq_Comparable -> 'a2 -> ('a2 * 'a1) list -> bool **)
   
-  let rec mem_assoc h1 k = function
+  let rec mem_assoc h1 k l = match l with
   | [] -> false
   | p :: l' -> let (x, y) = p in coq_or (h1 x k) (mem_assoc h1 k l')
   

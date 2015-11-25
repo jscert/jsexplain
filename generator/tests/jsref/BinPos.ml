@@ -3,8 +3,10 @@ open Bool0
 open Datatypes
 open Peano
 
+(*
 type __ = Obj.t
 let __ = let rec f _ = Obj.repr f in Obj.repr f
+*)
 
 module Pos = 
  struct 
@@ -92,28 +94,28 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   (** val mask_rect : 'a1 -> (float -> 'a1) -> 'a1 -> mask -> 'a1 **)
   
-  let mask_rect f f0 f1 = function
+  let mask_rect f f0 f1 m = match m with
   | IsNul -> f
   | IsPos x -> f0 x
   | IsNeg -> f1
   
   (** val mask_rec : 'a1 -> (float -> 'a1) -> 'a1 -> mask -> 'a1 **)
   
-  let mask_rec f f0 f1 = function
+  let mask_rec f f0 f1 m = match m with
   | IsNul -> f
   | IsPos x -> f0 x
   | IsNeg -> f1
   
   (** val succ_double_mask : mask -> mask **)
   
-  let succ_double_mask = function
+  let succ_double_mask m = match m with
   | IsNul -> IsPos 1.
   | IsPos p -> IsPos ((fun p -> 1. +. (2. *. p)) p)
   | IsNeg -> IsNeg
   
   (** val double_mask : mask -> mask **)
   
-  let double_mask = function
+  let double_mask m = match m with
   | IsNul -> IsNul
   | IsPos p -> IsPos ((fun p -> 2. *. p) p)
   | IsNeg -> IsNeg
@@ -133,7 +135,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   (** val pred_mask : mask -> mask **)
   
-  let pred_mask = function
+  let pred_mask m = match m with
   | IsNul -> IsNeg
   | IsPos q ->
     ((fun f2p1 f2p f1 p ->
@@ -376,8 +378,8 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val sqrtrem_step :
       (float -> float) -> (float -> float) -> (float * mask) -> float * mask **)
   
-  let sqrtrem_step f g = function
-  | (s, y) ->
+  let sqrtrem_step f g p = 
+    let (s, y) = p in
     (match y with
      | IsNul ->
        (((fun p -> 2. *. p) s),
@@ -888,25 +890,21 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
       'a1 -> (float -> coq_PeanoView -> 'a1 -> 'a1) -> float -> coq_PeanoView
       -> 'a1 **)
   
-  let coq_PeanoView_rect f f0 =
-    let rec f1 p = function
+  let rec coq_PeanoView_rect f f0 p p' = match p' with
     | PeanoOne -> f
-    | PeanoSucc (p1, p2) -> f0 p1 p2 (f1 p1 p2)
-    in f1
+    | PeanoSucc (p1, p2) -> f0 p1 p2 (coq_PeanoView_rect f f0 p1 p2)
   
   (** val coq_PeanoView_rec :
       'a1 -> (float -> coq_PeanoView -> 'a1 -> 'a1) -> float -> coq_PeanoView
       -> 'a1 **)
   
-  let coq_PeanoView_rec f f0 =
-    let rec f1 p = function
+  let rec coq_PeanoView_rec f f0 p p' = match p' with
     | PeanoOne -> f
-    | PeanoSucc (p1, p2) -> f0 p1 p2 (f1 p1 p2)
-    in f1
+    | PeanoSucc (p1, p2) -> f0 p1 p2 (coq_PeanoView_rec f f0 p1 p2)
   
   (** val peanoView_xO : float -> coq_PeanoView -> coq_PeanoView **)
   
-  let rec peanoView_xO p = function
+  let rec peanoView_xO p p' = match p' with
   | PeanoOne -> PeanoSucc (1., PeanoOne)
   | PeanoSucc (p0, q0) ->
     PeanoSucc ((succ ((fun p -> 2. *. p) p0)), (PeanoSucc
@@ -914,7 +912,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   (** val peanoView_xI : float -> coq_PeanoView -> coq_PeanoView **)
   
-  let rec peanoView_xI p = function
+  let rec peanoView_xI p p' = match p' with
   | PeanoOne -> PeanoSucc ((succ 1.), (PeanoSucc (1., PeanoOne)))
   | PeanoSucc (p0, q0) ->
     PeanoSucc ((succ ((fun p -> 1. +. (2. *. p)) p0)), (PeanoSucc
@@ -936,46 +934,36 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val coq_PeanoView_iter :
       'a1 -> (float -> 'a1 -> 'a1) -> float -> coq_PeanoView -> 'a1 **)
   
-  let coq_PeanoView_iter a f =
-    let rec iter0 p = function
+  let rec coq_PeanoView_iter a f p p' = match p' with
     | PeanoOne -> a
-    | PeanoSucc (p0, q0) -> f p0 (iter0 p0 q0)
-    in iter0
+    | PeanoSucc (p0, q0) -> f p0 (coq_PeanoView_iter a f p0 q0)
   
   (** val eqb_spec : float -> float -> reflect **)
-  
+(*
   let eqb_spec x y =
     iff_reflect (eqb x y)
+*)
   
   (** val switch_Eq : comparison -> comparison -> comparison **)
   
-  let switch_Eq c = function
+  let switch_Eq c c' = match c' with
   | Eq -> c
   | Lt -> Lt
   | Gt -> Gt
   
   (** val mask2cmp : mask -> comparison **)
   
-  let mask2cmp = function
+  let mask2cmp m = match m with
   | IsNul -> Eq
   | IsPos p0 -> Gt
   | IsNeg -> Lt
-  
-  (** val leb_spec0 : float -> float -> reflect **)
-  
-  let leb_spec0 x y =
-    iff_reflect (leb x y)
-  
-  (** val ltb_spec0 : float -> float -> reflect **)
-  
-  let ltb_spec0 x y =
-    iff_reflect (ltb x y)
   
   module Private_Tac = 
    struct 
     
    end
   
+(*
   module Private_Dec = 
    struct 
     (** val max_case_strong :
@@ -1056,5 +1044,5 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let min_dec =
     Private_Dec.min_dec
+*)
  end
-

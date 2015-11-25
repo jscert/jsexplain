@@ -10,7 +10,5 @@ let coq_or x y =
 
 (** val neg : bool -> bool **)
 
-let neg = function
-| true -> false
-| false -> true
+let neg b = if b then false else true
 

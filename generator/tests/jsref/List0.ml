@@ -1,20 +1,18 @@
 (** val hd : 'a1 -> 'a1 list -> 'a1 **)
 
-let hd default = function
+let hd default l = match l with
 | [] -> default
 | x :: l0 -> x
 
 (** val tl : 'a1 list -> 'a1 list **)
 
-let tl = function
+let tl l = match l with
 | [] -> []
 | a :: m -> m
 
 (** val map : ('a1 -> 'a2) -> 'a1 list -> 'a2 list **)
 
-let map f =
-  let rec map0 = function
+let rec map f l = match l with
   | [] -> []
-  | a :: t -> (f a) :: (map0 t)
-  in map0
+  | a :: t -> (f a) :: (map f t)
 
