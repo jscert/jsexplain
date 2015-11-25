@@ -421,6 +421,7 @@ and js_of_expression_wrapped ctx e = (* dest = Dest_return *)
   ppf_lambda_wrap (js_of_expression ctx Dest_return e)
 
 and js_of_expression ctx dest =
+  let inline_of_wrap = js_of_expression_inline_or_wrap ctx in (* shorthand *)
   let loc = e.exp_loc in
   match e.exp_desc with
 
@@ -465,8 +466,8 @@ and js_of_expression ctx dest =
               |> List.map (fun (_, eo, _) -> match eo with 
                                              | None -> out_of_scope loc "optional apply arguments" 
                                              | Some ei -> ei) in
-     let sl = sl_clean |> List.map (fun ei -> js_of_expression_inline_or_wrap ctx ei) in
-     let se = js_of_expression_inline_or_wrap ctx f in
+     let sl = sl_clean |> List.map (fun ei -> inline_of_wrap ei) in
+     let se = inline_of_wrap f in
      let sexp = 
         if is_infix f sl' && List.length exp_l = 2
            then ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
@@ -491,7 +492,7 @@ and js_of_expression ctx dest =
      apply_dest dest sexp
 
   | Texp_tuple (tl) -> 
-     let sexp = ppf_tuple @@ show_list_f (fun exp -> js_of_expression_inline_or_wrap ctx exp) ", " tl in
+     let sexp = ppf_tuple @@ show_list_f (fun exp -> inline_of_wrap exp) ", " tl in
      apply_dest dest sexp
 
   | Texp_construct (_, cd, el) ->
@@ -501,21 +502,26 @@ and js_of_expression ctx dest =
         if is_sbool name then name (* Special case true/false to their JS natives *)
         else ppf_single_cstrs name
       else (* Constructor has parameters *)
-        let expr_strs = List.map (fun exp -> js_of_expression_inline_or_wrap ctx exp) el in
+        let expr_strs = List.map (fun exp -> inline_of_wrap exp) el in
         let expanded_constructors = map_cstr_fields ~loc ppf_cstr cd expr_strs in
         ppf_multiple_cstrs name (show_list ", " expanded_constructors)
       in
     apply_dest dest sexp
 
-  | Texp_array      (exp_l)           -> ppf_array @@ show_list_f (fun exp -> js_of_expression exp) ", " exp_l
-  | Texp_ifthenelse (e1, e2, None)    -> ppf_ifthen (js_of_expression e1) (js_of_expression e2)
-  | Texp_ifthenelse (e1, e2, Some e3) -> ppf_ifthenelse (js_of_expression e1) (js_of_expression e2) (js_of_expression e3)
-  | Texp_sequence   (e1, e2)          -> ppf_sequence (js_of_expression e1) (js_of_expression e2)
-  | Texp_while      (cd, body)        -> ppf_while (js_of_expression cd) (js_of_expression body)
-  | Texp_for        (id, _, st, ed, fl, body) -> ppf_for (ppf_ident id) (js_of_expression st) (js_of_expression ed) fl (js_of_expression body)
-  | Texp_record     (llde,_)          -> ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, js_of_expression exp)) llde)
-  | Texp_field      (exp, _, lbl)     ->
-    ppf_field_access (js_of_expression exp) lbl.lbl_name
+  | Texp_array      (exp_l)           -> ppf_array @@ show_list_f (fun exp -> inline_of_wrap exp) ", " exp_l
+  | Texp_ifthenelse (e1, e2, None)    -> out_of_scope loc "if without else"
+    (* ppf_ifthen (js_of_expression e1) (js_of_expression e2) *)
+  | Texp_ifthenelse (e1, e2, Some e3) ->
+     reject_inline dest;
+     ppf_ifthenelse (inline_of_wrap e1) (js_of_expression ctx dest e2) (js_of_expression ctx dest e3)
+  | Texp_sequence   (e1, e2)          -> out_of_scope loc "sequence"
+    (* ppf_sequence (js_of_expression e1) (js_of_expression e2) *)
+  | Texp_while      (cd, body)        -> out_of_scope loc "while"
+    (* ppf_while (js_of_expression cd) (js_of_expression body) *)
+  | Texp_for        (id, _, st, ed, fl, body) -> out_of_scope loc "for"
+    (* ppf_for (ppf_ident id) (js_of_expression st) (js_of_expression ed) fl (js_of_expression body) *)
+  | Texp_record     (llde,_)          -> ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, inline_of_wrap exp)) llde)
+  | Texp_field      (exp, _, lbl)     -> ppf_field_access (inline_of_wrap exp) lbl.lbl_name
 
   | Texp_match      (_,_,_, Partial)  -> out_of_scope loc "partial matching"
   | Texp_match      (_,_,_,_)         -> out_of_scope loc "matching with exception branches"
