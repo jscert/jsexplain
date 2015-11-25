@@ -3,7 +3,7 @@ let testa x =
   x
 
 let testb x = 
-  let x = x in x
+  let a = x in a
 
 let testc x = 
   let y = x in 
@@ -33,7 +33,7 @@ let testg x =
 
 
 
-let test0 = 
+let test0 f = 
   match Some 3 with
   | None -> 2
   | Some y -> y
@@ -81,3 +81,5 @@ let test6 =
 let test6 (x,y) =
   x
   *)
+  
+  

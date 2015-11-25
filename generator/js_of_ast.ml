@@ -398,8 +398,9 @@ and js_of_structure_item s =
   match s.str_desc with
   | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression ctx_initial Dest_ignore e
   | Tstr_value (_, vb_l) -> String.concat "@,@," @@ List.map (fun vb -> 
-      let (id, sdecl) = show_value_binding ctx_initial vb in
-      sdecl) @@ vb_l
+     (* let (id, sdecl) = show_value_binding ctx_initial vb in *)
+     Printf.sprintf "@\n@\n%s: %s," (ident_of_pat vb.vb_pat) (js_of_expression_inline_or_wrap ctx_initial vb.vb_expr))
+     @@ vb_l
   | Tstr_type       _  -> "" (* Types have no representation in JS, but the OCaml type checker uses them *)
   | Tstr_open       _  -> "" (* Handle modules by use of multiple compilation/linking *)
   | Tstr_modtype    _  -> ""
@@ -461,8 +462,7 @@ and js_of_expression ctx dest e =
       in
     let arg_ids, body = explore [c.c_lhs] c.c_rhs in
     let newctx = ctx_fresh() in
-    let newdest = Dest_return in
-    let sbody = js_of_expression newctx newdest body in
+    let sbody = js_of_expression newctx Dest_return body in
     let sexp = generate_logged_enter arg_ids ctx newctx sbody in
     apply_dest ctx dest sexp
 
