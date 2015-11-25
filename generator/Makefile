@@ -50,8 +50,11 @@ tests/jsref/%.ml:
 tests/%.ml.d: tests/%.ml
 	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
 
-tests/%.cmi tests/%.log.js tests/%.unlog.js: tests/%.ml main.byte stdlib
+tests/%.cmi tests/%.unlog.js: tests/%.ml main.byte stdlib
 	./main.byte -I $(<D) $<
+
+tests/%.log.js: tests/%.ml tests/%.cmi main.byte stdlib
+	./main.byte -I $(<D) -log $<
 
 tests: $(ML_TESTS:.ml=.log.js)
 

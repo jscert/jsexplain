@@ -1,3 +1,4 @@
+open Params
 open Asttypes
 open Attributes
 open Log
@@ -246,7 +247,7 @@ type generate_mode =
   | Mode_line_token
   | Mode_logged
 
-let current_mode = Mode_unlogged
+let current_mode = if !logging then Mode_logged else Mode_unlogged
 
 
 (****************************************************************)
