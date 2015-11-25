@@ -68,7 +68,14 @@ let test3 x =
     in
   y
 
-
+let test4 x =
+  match x with
+  | None -> 1
+  | Some y -> 
+    begin match y with
+    | None -> 2
+    | Some z -> z 
+    end
 
 
 (*
