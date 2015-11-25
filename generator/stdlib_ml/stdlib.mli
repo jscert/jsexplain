@@ -43,11 +43,14 @@ val int_of_float : float -> int
 val string_of_float : float -> string
 val string_of_int : int -> string
 
+val ( === ) : 'a -> 'a -> bool
 val ( < ) : 'a -> 'a -> bool
 val ( > ) : 'a -> 'a -> bool
 val ( <= ) : 'a -> 'a -> bool 
 val ( >= ) : 'a -> 'a -> bool
 val compare : 'a -> 'a -> int
+
+val stuck : string -> 'a
 
 (* Structural equality, need to be careful with implementation *)
 val (=) : 'a -> 'a -> bool
