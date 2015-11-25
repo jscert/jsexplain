@@ -73,7 +73,7 @@ type expr =
 | Coq_expr_this [@f]  (** Auto Generated Attributes **)
 | Coq_expr_identifier  [@f label0] of char list (** Auto Generated Attributes **)
 | Coq_expr_literal  [@f label0] of literal (** Auto Generated Attributes **)
-| Coq_expr_object  [@f label0, label1] of (propname * propbody) list (** Auto Generated Attributes **)
+| Coq_expr_object  [@f label0] of (propname * propbody) list (** Auto Generated Attributes **)
 | Coq_expr_array  [@f label0] of expr option list (** Auto Generated Attributes **)
 | Coq_expr_function  [@f label0, label1, label2] of char list option * char list list * funcbody (** Auto Generated Attributes **)
 | Coq_expr_access  [@f label0, label1] of expr * expr (** Auto Generated Attributes **)
@@ -94,7 +94,7 @@ and stat =
 | Coq_stat_expr  [@f label0] of expr (** Auto Generated Attributes **)
 | Coq_stat_label  [@f label0, label1] of char list * stat (** Auto Generated Attributes **)
 | Coq_stat_block  [@f label0] of stat list (** Auto Generated Attributes **)
-| Coq_stat_var_decl  [@f label0, label1] of (char list * expr option) list (** Auto Generated Attributes **)
+| Coq_stat_var_decl  [@f label0] of (char list * expr option) list (** Auto Generated Attributes **)
 | Coq_stat_if  [@f label0, label1, label2] of expr * stat * stat option (** Auto Generated Attributes **)
 | Coq_stat_do_while  [@f label0, label1, label2] of label_set * stat * expr (** Auto Generated Attributes **)
 | Coq_stat_while  [@f label0, label1, label2] of label_set * expr * stat (** Auto Generated Attributes **)
@@ -103,18 +103,16 @@ and stat =
 | Coq_stat_return  [@f label0] of expr option (** Auto Generated Attributes **)
 | Coq_stat_break  [@f label0] of label (** Auto Generated Attributes **)
 | Coq_stat_continue  [@f label0] of label (** Auto Generated Attributes **)
-| Coq_stat_try  [@f label0, label1, label2, label3] of stat * (char list * stat) option * stat option (** Auto Generated Attributes **)
+| Coq_stat_try  [@f label0, label1, label2] of stat * (char list * stat) option * stat option (** Auto Generated Attributes **)
 | Coq_stat_for  [@f label0, label1, label2, label3, label4] of label_set * expr option * expr option * expr option * stat (** Auto Generated Attributes **)
-| Coq_stat_for_var  [@f label0, label1, label2] of label_set * (char list * expr option) list (** Auto Generated Attributes **)
-   * expr option * expr option * stat
+| Coq_stat_for_var  [@f label0, label1, label2, label3, label4] of label_set * (char list * expr option) list * expr option * expr option * stat (** Auto Generated Attributes **)
 | Coq_stat_for_in  [@f label0, label1, label2, label3] of label_set * expr * expr * stat (** Auto Generated Attributes **)
 | Coq_stat_for_in_var  [@f label0, label1, label2, label3, label4] of label_set * char list * expr option * expr * stat (** Auto Generated Attributes **)
 | Coq_stat_debugger [@f]  (** Auto Generated Attributes **)
 | Coq_stat_switch  [@f label0, label1, label2] of label_set * expr * switchbody (** Auto Generated Attributes **)
 and switchbody =
 | Coq_switchbody_nodefault  [@f label0] of switchclause list (** Auto Generated Attributes **)
-| Coq_switchbody_withdefault  [@f label0, label1] of switchclause list * stat list (** Auto Generated Attributes **)
-   * switchclause list
+| Coq_switchbody_withdefault  [@f label0, label1, label2] of switchclause list * stat list * switchclause list (** Auto Generated Attributes **)
 and switchclause =
 | Coq_switchclause_intro  [@f label0, label1] of expr * stat list (** Auto Generated Attributes **)
 and prog =
@@ -570,7 +568,7 @@ let object_parameter_map_ x = x.object_parameter_map_
 
 type event =
 | Coq_delete_event  [@f label0, label1, label2] of object_loc * prop_name * object_loc option (** Auto Generated Attributes **)
-| Coq_mutateproto_event  [@f label0, label1, label2] of object_loc * (object_loc * prop_name) list (** Auto Generated Attributes **)
+| Coq_mutateproto_event  [@f label0, label1] of object_loc * (object_loc * prop_name) list (** Auto Generated Attributes **)
    * (object_loc * prop_name) list
 | Coq_enumchange_event  [@f label0, label1] of object_loc * prop_name (** Auto Generated Attributes **)
 

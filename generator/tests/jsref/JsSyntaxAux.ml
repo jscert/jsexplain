@@ -361,7 +361,10 @@ let object_for_args_object o paramsmap get getownproperty defineownproperty dele
 (** val mathop_compare : mathop -> mathop -> bool **)
 
 let mathop_compare m1 m2 =
-  let Coq_mathop_abs = m1 in let Coq_mathop_abs = m2 in true
+  match m1 with
+  | Coq_mathop_abs ->
+    match m2 with
+    | Coq_mathop_abs -> true
 
 (** val mathop_comparable : mathop coq_Comparable **)
 
@@ -6634,24 +6637,25 @@ let binary_op_comparable x y =
 
 (** val prog_intro_strictness : prog -> strictness_flag **)
 
-let prog_intro_strictness = function
+let prog_intro_strictness p = match p with
 | Coq_prog_intro (str, els) -> str
 
 (** val prog_elements : prog -> element list **)
 
-let prog_elements = function
+let prog_elements p = match p with
 | Coq_prog_intro (str, els) -> els
 
 (** val funcbody_prog : funcbody -> prog **)
 
-let funcbody_prog = function
+let funcbody_prog fb = match fb with
 | Coq_funcbody_intro (p, s) -> p
 
 (** val funcbody_is_strict : funcbody -> strictness_flag **)
 
-let funcbody_is_strict = function
+let funcbody_is_strict fb = match fb with
 | Coq_funcbody_intro (p, s) ->
-  let Coq_prog_intro (b_strict, l) = p in b_strict
+  match p with
+  | Coq_prog_intro (b_strict, l) -> b_strict
 
 (** val restype_compare : restype -> restype -> bool **)
 
