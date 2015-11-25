@@ -381,3 +381,83 @@ let to_javascript module_name typedtree =
   let pre_res = ppf_module_wrap module_name content in
   (L.logged_output pre_res, L.unlogged_output pre_res, pre_res)
 
+
+
+(*
+ctx_empty
+ctx_push(ctx, bindings)   where bindings = [ { key:"ls", val:ls}, { key:"xs", val:xs } ]
+
+example:  
+  ctx321 = ctx_push(ctx320, bindings); log(|line|, ctx321, "ctx_push")
+
+
+  enter  (or call)   => current ctx plus arguments of the call
+  return (was exit)  => current ctx plus return value
+  let (on the "in")  => current ctx plus new binding
+  case               => current ctx plus bound variables
+ 
+  type token_info = ctx_operation * ctx
+
+  
+  if  ==> viewed as match with case true/false.
+
+
+ctx_empty is passed on each structure_item
+on each ctx extension, we need a fresh name (enter, let, match_branch)
+(for return values, do the extension on the fly)
+
+   
+   return f(x);
+translates as
+   var v213 = f(x);
+   log(|line|, ctx_push(ctx320, {key: "return", val: v213}), "return")
+
+
+
+  match v with | None -> x | Some y -> y
+translates as
+  function() { 
+
+
+  
+----------------------
+  let f ... =
+    match ...
+
+=> 
+  switch
+    case:
+      return;
+
+----------------------
+  let f ... =
+    match .. -> 
+      match ...
+
+=>
+  return
+
+----------------------
+  let x = match ... in ...
+=> 
+  switch ...
+    case:
+      x = ..; break;
+    case:
+      x = ..; break;
+
+
+----------------------
+  let x = 
+    match .. ->
+      match .. ->
+=> 
+  would not work without wrapping
+
+----------------------
+
+  f (match ...)
+=> 
+  requires A-normalization
+
+*)
