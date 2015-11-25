@@ -324,7 +324,8 @@ let generate_logged_enter arg_ids ctx newctx sbody =
   | Mode_line_token
   | Mode_logged
   | Mode_unlogged -> 
-     sbody
+    let args = String.concat ", " arg_ids in
+    Printf.sprintf "function (%s) {@;<1 2>@[<v 0>%s;@]@,}" args sbody
 
 (*
 
@@ -447,7 +448,7 @@ and js_of_expression ctx dest e =
     let newctx = ctx_fresh() in
     let sbody = js_of_expression newctx dest e in
     let sexp = generate_logged_let ids ctx newctx sdecl sbody in
-    apply_dest ctx dest sexp
+    sexp
    
   | Texp_function (_, c :: [], Total) ->
     let rec explore pats e = match e.exp_desc with
@@ -496,7 +497,7 @@ and js_of_expression ctx dest e =
      let sb = String.concat "@," (List.map (fun b -> js_of_branch ctx dest b seobj) l) in
      let const = exp_type_is_constant exp in
      let sexp = sintro ^ (ppf_match seobj sb const) in
-     apply_dest ctx dest sexp
+     sexp
 
   | Texp_tuple (tl) -> 
      let sexp = ppf_tuple @@ show_list_f (fun exp -> inline_of_wrap exp) ", " tl in
