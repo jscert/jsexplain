@@ -245,13 +245,29 @@ let ctx_initial =
 let generate_logged_case spat binders ctx newctx sbody need_break =
   (* Note: binders is a list of pairs of id *)
   (* Note: if binders = [], then newctx = ctx *)
+  let sintro =
   match !current_mode with
   | Mode_line_token
-  | Mode_logged
-  | Mode_unlogged -> 
-      let sbinders = ppf_match_binders binders in
-      (Printf.sprintf "@[<v 0>%s:@;<1 2>@[<v 0>%s%s%s@]@]" spat sbinders sbody
-         (if need_break then "@,break;" else ""))
+  | Mode_logged ->
+    let token = "123" in
+    let ids = List.map fst binders in
+    let mk_binding x =
+      Printf.sprintf "{key: \"%s\", val: %s}" x x
+    in
+    let bindings =
+      Printf.sprintf "[%s]" (show_list ", " (List.map mk_binding ids))
+    in 
+    let spreintro =
+      if binders = [] then ""
+      else Printf.sprintf "var %s = ctx_push(%s, %s);@," newctx ctx bindings
+    in
+    Printf.sprintf "%slog_event(lineof(%s), %s, \"case\");@,"
+      spreintro token newctx
+  | Mode_unlogged -> ""
+  in
+  let sbinders = ppf_match_binders binders in
+  (Printf.sprintf "@[<v 0>%s:@;<1 2>@[<v 0>%s%s%s%s@]@]" spat sbinders sintro sbody
+     (if need_break then "@,break;" else ""))
 
 
 (* generate_logged_case implement using
@@ -297,7 +313,16 @@ var t=e; logEvent(LINEOF(432423), ctx_push(ctx, {"return",t}), "return"); return
 let generate_logged_let ids ctx newctx sdecl sbody =
   match !current_mode with
   | Mode_line_token
-  | Mode_logged
+  | Mode_logged ->
+    let token = "42" in
+    let mk_binding x =
+      Printf.sprintf "{key: \"%s\", val: %s}" x x
+    in
+    let bindings =
+      Printf.sprintf "[%s]" (show_list ", " (List.map mk_binding ids))
+    in 
+    Printf.sprintf "%s@,var %s = ctx_push(%s, %s);@,log_event(lineof(%s), %s, \"let\");@,%s@,"
+      sdecl newctx ctx bindings token newctx sbody
   | Mode_unlogged -> 
      Printf.sprintf "%s@,%s" sdecl sbody
 
@@ -312,13 +337,26 @@ var x=e; var newctx=ctx_push(ctx,x,e); logEvent(LINEOF(432423), "let", ctx);sbod
 ----
 *)
 
+(* LATER: factoriser les bindings *)
+
 let generate_logged_enter arg_ids ctx newctx sbody = 
-  match !current_mode with
-  | Mode_line_token
-  | Mode_logged
-  | Mode_unlogged -> 
-    let args = String.concat ", " arg_ids in
-    Printf.sprintf "function (%s) {@;<1 2>@[<v 0>%s@]@,}" args sbody
+  let sintro =
+    match !current_mode with
+    | Mode_line_token
+    | Mode_logged ->
+      let token = "51" in
+      let mk_binding x =
+        Printf.sprintf "{key: \"%s\", val: %s}" x x
+      in
+      let bindings =
+        Printf.sprintf "[%s]" (show_list ", " (List.map mk_binding arg_ids))
+      in 
+      Printf.sprintf "var %s = ctx_push(%s, %s);@,log_event(lineof(%s), %s, \"enter\");@,"
+        newctx ctx bindings token newctx
+    | Mode_unlogged -> ""
+  in
+  let args = String.concat ", " arg_ids in
+  Printf.sprintf "function (%s) {@;<1 2>@[<v 0>%s%s@]@,}" args sintro sbody
 
 (*
 
@@ -563,10 +601,10 @@ and ident_of_pat pat = match pat.pat_desc with
 and js_of_let_pattern ctx pat expr =
   let id = 
     match pat.pat_desc with
-    | Tpat_var (id, _) -> id
+    | Tpat_var (id, _) -> ppf_ident id
     | _ -> error ~loc:pat.pat_loc "let can't deconstruct values" 
     in
-  (id, js_of_expression ctx (Dest_assign (ppf_ident id)) expr)
+  (id, js_of_expression ctx (Dest_assign id) expr)
 
   (* LATER: for   let (x,y) = e,  encode as  translate(e,assign z); x = z[0]; y=z[1] 
     | Tpat_tuple (pat_l)
