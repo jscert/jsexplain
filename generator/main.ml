@@ -1,10 +1,10 @@
+open Params
 open Format
 open Mytools
 open Parse_type
 
 (*#########################################################################*)
 
-let debug = ref false
 let ppf = Format.std_formatter
 let outputfile = ref None
 
@@ -22,7 +22,8 @@ let _ =
      [ ("-I", Arg.String (fun i -> Clflags.include_dirs := i :: !Clflags.include_dirs),
                       "includes a directory where to look for interface files");
        ("-o", Arg.String (fun s -> outputfile := Some s), "set the output file name");
-       ("-debug", Arg.Set debug, "trace the various steps")
+       ("-debug", Arg.Set debug, "trace the various steps");
+       ("-log", Arg.Set logging, "generate file with logging")
      ]
      (fun f -> files := f :: !files)
      ("usage: [-I dir] [..other options..] file.ml");
