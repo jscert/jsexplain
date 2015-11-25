@@ -71,12 +71,19 @@ let is_infix f args = match args with
      let args_loc = (x.exp_loc.loc_start, x.exp_loc.loc_end) in
      if fst args_loc < fst f_loc then true else false
 
-let map_cstr_fields ?loc f (cstr : constructor_description) elements =
+let map_cstr_fields ?loc bind (cstr : constructor_description) elements =
   let fields = extract_cstr_attrs cstr in
-  try List.map2 f fields elements
-  with Invalid_argument _ -> error ?loc ("Insufficient fieldnames for arguments to " ^ cstr.cstr_name)
-
-
+  let rec aux = function
+    | [], [] -> []
+    | f :: fs, e :: es ->
+      let res = aux (fs,es) in
+      begin match bind e f with
+        | None -> res
+        | Some p -> p :: res  (* p is a pair identifier, code to be bound *)
+      end
+    | _ -> error ?loc ("Insufficient fieldnames for arguments to " ^ cstr.cstr_name)
+  in aux (fields, elements)
+    
 (****************************************************************)
 (* PPF HELPERS *)
 
@@ -119,7 +126,7 @@ let ppf_match_case c =
   Printf.sprintf "case %s" c
 
 let ppf_match_binders binders =
-  let binds = show_list ", " (List.map (fun (id,se) -> Print.sprintf "%s = %s" id se) binders) in
+  let binds = show_list ", " (List.map (fun (id,se) -> Printf.sprintf "%s = %s" id se) binders) in
   Printf.sprintf "@[<v 0>var %s;@]" binds
 
 let ppf_array values =
@@ -212,9 +219,9 @@ let ppf_module_wrap name content =
 (****************************************************************)
 (* FRESH ID NAMES *)
 
-let id_fresh prefix =
+let id_fresh =
   let r = ref 0 in
-  fun () -> (incr r; prefix ^ string_of_int !r)
+  fun prefix -> (incr r; prefix ^ string_of_int !r)
 
 
 (****************************************************************)
@@ -347,14 +354,14 @@ may reuse
 type dest = 
   | Dest_ignore
   | Dest_return
-  | Dest_assign of id
+  | Dest_assign of string
   | Dest_inline
 
-let apply_dest dest sbody =
+let apply_dest ctx dest sbody =
   match dest with
   | Dest_ignore -> sbody
   | Dest_return -> generate_logged_return ctx sbody
-  | Dest_assign id -> Printf.sprintf "var %s = %s;" (ppf_ident id) sbody
+  | Dest_assign id -> Printf.sprintf "var %s = %s;" id sbody
   | Dest_inline -> sbody
 
 (* LATER: pull out the "var" out of switch *)
@@ -387,7 +394,7 @@ and show_value_binding ctx vb = (* dest is Ignore *)
 and js_of_structure_item s =
   let loc = s.str_loc in
   match s.str_desc with
-  | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression ctx_initial Dest_ignore initial_dest e
+  | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression ctx_initial Dest_ignore e
   | Tstr_value (_, vb_l) -> String.concat "@,@," @@ List.map (fun vb -> 
       let (id, sdecl) = show_value_binding ctx_initial vb in
       sdecl) @@ vb_l
@@ -420,18 +427,18 @@ and js_of_expression_inline_or_wrap ctx e =
 and js_of_expression_wrapped ctx e = (* dest = Dest_return *)
   ppf_lambda_wrap (js_of_expression ctx Dest_return e)
 
-and js_of_expression ctx dest =
+and js_of_expression ctx dest e =
   let inline_of_wrap = js_of_expression_inline_or_wrap ctx in (* shorthand *)
   let loc = e.exp_loc in
   match e.exp_desc with
 
   | Texp_ident (_, ident,  _) -> 
       let sexp = js_of_longident ident in
-      apply_dest dest sexp
+      apply_dest ctx dest sexp
 
   | Texp_constant c -> 
       let sexp = js_of_constant c in
-      apply_dest dest sexp
+      apply_dest ctx dest sexp
 
   | Texp_let   (_, vb_l, e) ->
     reject_inline dest;
@@ -440,7 +447,7 @@ and js_of_expression ctx dest =
     let newctx = ctx_fresh() in
     let sbody = js_of_expression newctx dest e in
     let sexp = generate_logged_let ids ctx newctx sdecl sbody in
-    apply_dest dest sexp
+    apply_dest ctx dest sexp
    
   | Texp_function (_, c :: [], Total) ->
     let rec explore pats e = match e.exp_desc with
@@ -455,7 +462,7 @@ and js_of_expression ctx dest =
     let newdest = Dest_return in
     let sbody = js_of_expression newctx newdest body in
     let sexp = generate_logged_enter arg_ids ctx newctx sbody in
-    apply_dest dest sexp
+    apply_dest ctx dest sexp
 
   | Texp_apply (f, exp_l) ->
      let sl' = exp_l  (* only used to know if infix *)
@@ -473,7 +480,7 @@ and js_of_expression ctx dest =
            then ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
            else ppf_apply se (String.concat ", " sl)
         in
-     apply_dest dest sexp
+     apply_dest ctx dest sexp
 
   | Texp_match (exp, l, [], Total) ->
      reject_inline dest;
@@ -483,17 +490,17 @@ and js_of_expression ctx dest =
             "", (js_of_longident ident)
         | _ ->  (* generate  var id = sexp;  *)
             let id = id_fresh "_switch_arg_" in
-            let sdecl = js_of_expression (Dest_assign id) ctx exp in
-            sdecl, id
+            let sintro = js_of_expression ctx (Dest_assign id) exp in
+            (sintro ^ "@,"), id
         in
      let sb = String.concat "@," (List.map (fun b -> js_of_branch ctx dest b seobj) l) in
      let const = exp_type_is_constant exp in
-     let sexp = ppf_match se sb const in
-     apply_dest dest sexp
+     let sexp = sintro ^ (ppf_match seobj sb const) in
+     apply_dest ctx dest sexp
 
   | Texp_tuple (tl) -> 
      let sexp = ppf_tuple @@ show_list_f (fun exp -> inline_of_wrap exp) ", " tl in
-     apply_dest dest sexp
+     apply_dest ctx dest sexp
 
   | Texp_construct (_, cd, el) ->
     let name = cd.cstr_name in
@@ -506,7 +513,7 @@ and js_of_expression ctx dest =
         let expanded_constructors = map_cstr_fields ~loc ppf_cstr cd expr_strs in
         ppf_multiple_cstrs name (show_list ", " expanded_constructors)
       in
-    apply_dest dest sexp
+    apply_dest ctx dest sexp
 
   | Texp_array      (exp_l)           -> ppf_array @@ show_list_f (fun exp -> inline_of_wrap exp) ", " exp_l
   | Texp_ifthenelse (e1, e2, None)    -> out_of_scope loc "if without else"
@@ -565,7 +572,7 @@ and js_of_let_pattern ctx pat expr =
     | Tpat_var (id, _) -> id
     | _ -> error ~loc:pat.pat_loc "let can't deconstruct values" 
     in
-  (id, js_of_expression ctx (Dest_assign id) expr)
+  (id, js_of_expression ctx (Dest_assign (ppf_ident id)) expr)
 
   (* LATER: for   let (x,y) = e,  encode as  translate(e,assign z); x = z[0]; y=z[1] 
     | Tpat_tuple (pat_l)
@@ -596,8 +603,8 @@ and js_of_pattern pat obj =
      let bind field var = 
         match var.pat_desc with
         | Tpat_var (id, _) -> 
-            (ppf_ident id, Printf.sprintf "%s.%s" obj field)
-        | Tpat_any -> []
+            Some (ppf_ident id, Printf.sprintf "%s.%s" obj field)
+        | Tpat_any -> None
         | _ -> out_of_scope var.pat_loc "Nested pattern matching"
         in
       let binders = map_cstr_fields ~loc bind cd el in
