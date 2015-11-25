@@ -118,7 +118,7 @@ let ppf_apply_infix f arg1 arg2 =
 
 let ppf_match value cases const =
   let cons_fld = if const then "" else ".type" in
-  let s = Printf.sprintf "switch (%s%s) {@,@[<v 0>%s@]@,}"
+  let s = Printf.sprintf "switch (%s%s) {@;<1 2>@[<v 0>%s@]@,}@,"
     value cons_fld cases
   in s
 
@@ -326,7 +326,7 @@ let generate_logged_enter arg_ids ctx newctx sbody =
   | Mode_logged
   | Mode_unlogged -> 
     let args = String.concat ", " arg_ids in
-    Printf.sprintf "function (%s) {@;<1 2>@[<v 0>%s;@]@,}" args sbody
+    Printf.sprintf "function (%s) {@;<1 2>@[<v 0>%s@]@,}" args sbody
 
 (*
 
