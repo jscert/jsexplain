@@ -77,7 +77,7 @@ let map_cstr_fields ?loc bind (cstr : constructor_description) elements =
     | [], [] -> []
     | f :: fs, e :: es ->
       let res = aux (fs,es) in
-      begin match bind e f with
+      begin match bind f e with
         | None -> res
         | Some p -> p :: res  (* p is a pair identifier, code to be bound *)
       end
@@ -170,7 +170,7 @@ let ppf_for id start ed flag body =
     tag
 *)
 let ppf_cstr tag value =
-  Printf.sprintf "%s: %s" tag value
+  Some (Printf.sprintf "%s: %s" tag value)
 
 let ppf_single_cstrs typ =
    Printf.sprintf "@[<v 2>{type: \"%s\"}@]" typ
