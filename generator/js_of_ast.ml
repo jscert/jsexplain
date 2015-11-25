@@ -12,6 +12,10 @@ module L = Logged (Token_generator) (struct let size = 256 end)
 
 (* TODO: Field annotations for builtin type constructors *)
 
+
+(****************************************************************)
+(* STRING UTILITIES *)
+
 (**
  * Useful functions (Warning: shadows `show_list' from Mytools)
  *)
@@ -22,13 +26,6 @@ let show_list_f f sep l = l
 
 let show_list sep l =
   List.fold_left (fun acc x -> acc ^ (if acc = "" then "" else sep) ^ x) "" l
-
-let is_sbool x = List.mem x ["true" ; "false"]
-
-(* Given an expression, check whether it is a primitive type or a constructed type *)
-let exp_type_is_constant exp =
-  List.exists (Ctype.matches exp.exp_env exp.exp_type)
-  [Predef.type_bool; Predef.type_int; Predef.type_char; Predef.type_string; Predef.type_float]
 
 let rec zip l1 l2 = match l1, l2 with
   | [], x :: xs | x :: xs, [] -> failwith "zip: list must have the same length."
@@ -55,6 +52,17 @@ let string_fold_righti f s acc =
     else f i s.[i] (aux f (succ i) acc)
   in aux f 0 acc
 
+
+(****************************************************************)
+(* RECOGNIZING EXPRESSIONS *)
+
+let is_sbool x = List.mem x ["true" ; "false"]
+
+(* Given an expression, check whether it is a primitive type or a constructed type *)
+let exp_type_is_constant exp =
+  List.exists (Ctype.matches exp.exp_env exp.exp_type)
+  [Predef.type_bool; Predef.type_int; Predef.type_char; Predef.type_string; Predef.type_float]
+
 let is_infix f args = match args with
   | _ :: [] | [] -> false
   | x :: xs ->
@@ -67,6 +75,10 @@ let map_cstr_fields ?loc f (cstr : constructor_description) elements =
   let fields = extract_cstr_attrs cstr in
   try List.map2 f fields elements
   with Invalid_argument _ -> error ?loc ("Insufficient fieldnames for arguments to " ^ cstr.cstr_name)
+
+
+(****************************************************************)
+(* PPF HELPERS *)
 
 (**
  * Before-hand definitions of Pretty-Printer-Format for converting ocaml
@@ -109,11 +121,6 @@ let ppf_match_case c =
 let ppf_match_binders binders =
   let binds = show_list ", " binders in
   Printf.sprintf "@[<v 0>var %s;@]" binds
-
-(* obj is passed as the object variable binding, if we need to deconstruct it *)
-let ppf_match_binder var ?obj fld = match obj with
-  | None     -> Printf.sprintf "%s = %s" var fld
-  | Some obj -> Printf.sprintf "%s = %s.%s" var obj fld
 
 let ppf_array values =
   Printf.sprintf "[%s]"
@@ -199,9 +206,93 @@ let ppf_module_wrap name content =
   let modu = ppf_module content in
   Printf.sprintf "var %s = %s;" name modu
 
-(**
- * Main part
- *)
+
+
+(****************************************************************)
+(* CONTEXTS *)
+
+(** Fresh name generator for contexts *)
+
+let ctx_fresh =
+  let r = ref 0 in
+  fun () -> (incr r; "ctx_" ^ string_of_int !r)
+
+let ctx_initial =
+  "ctx_empty"
+
+
+(****************************************************************)
+(* LOGGED CONSTRUCTORS *)
+
+let generate_logged_case spat binders ctx newctx sbody = ""
+  (* Note: if binders = [], then newctx = ctx *)
+
+(* generate_logged_case implement using
+[insertCaseCode(caseBody,bindings,ctx,newctx,sbody)]
+£4424;case(caseBody);codeOf(bindings);sbody
+case(caseBody); codeOf(bindings); newctx=ctx_push(ctx,bindings); logEvent(LINEOF(432423), "case", newctx);sbody
+
+with help of
+
+  if binders = [] then L.log_line (ppf_branch spat binders se) [(L.Exit)]
+  else
+    let typ = match List.rev (Str.split (Str.regexp " ") spat) with
+      | [] -> assert false
+      | x :: xs -> String.sub x 0 (String.length x)
+    in L.log_line (ppf_branch spat binders se) [(L.Exit); (L.ReturnStrip); (L.Add (binders, typ))]
+
+*)
+
+let generate_logged_return ctx sbody = ""
+
+(*
+----
+  [insertReturnCode(e,ctx)]
+
+TOKEN(432423);return e
+
+var t=e; logEvent(LINEOF(432423), ctx_push(ctx, {"return",t}), "return"); return t
+----
+*)
+
+let generate_logged_let ids ctx newctx sdecl sbody = ""
+
+(*
+
+----
+  [insertLetCode(x,e,ctx,newctx,sbody)]
+
+TOKEN(432423);var x = e;sbody
+
+var x=e; var newctx=ctx_push(ctx,x,e); logEvent(LINEOF(432423), "let", ctx);sbody
+----
+*)
+
+
+
+
+
+(****************************************************************)
+(* DESTINATIONS *)
+
+(** Destination-style translation of expressions *)
+
+type dest = 
+  | Dest_ignore
+  | Dest_return
+  | Dest_assign of id
+
+let apply_dest dest sbody =
+  match dest with
+  | Dest_ignore -> sbody
+  | Dest_return -> generate_logged_return ctx sbody
+  | Dest_assign id -> Printf.sprintf "var %s = %s;" (ppf_ident id) sbody
+
+(* LATER: pull out the "var" out of switch *)
+
+
+(****************************************************************)
+(* TRANSLATION *)
 
 let rec js_of_structure s =
   show_list_f (fun strct -> js_of_structure_item strct) "@,@," s.str_items
@@ -211,19 +302,21 @@ and js_of_submodule m =
   match m.mod_desc with
   | Tmod_structure  s -> ppf_module (js_of_structure s)
   | Tmod_functor (id, _, mtyp, mexp) -> ppf_function (ppf_ident id) (js_of_submodule mexp)
-  | Tmod_apply   (m1, m2, _)         -> ppf_apply (js_of_submodule m1) (js_of_submodule m2)
+  | Tmod_apply (m1, m2, _) -> ppf_apply (js_of_submodule m1) (js_of_submodule m2)
   | Tmod_ident (p,_) -> ppf_path p
   | Tmod_constraint _ -> out_of_scope loc "module constraint"
   | Tmod_unpack     _ -> out_of_scope loc "module unpack"
 
-and show_value_binding vb =
-  js_of_let_pattern vb.vb_pat vb.vb_expr
+and show_value_binding ctx vb = (* dest is Ignore *)
+  js_of_let_pattern ctx vb.vb_pat vb.vb_expr
 
 and js_of_structure_item s =
   let loc = s.str_loc in
   match s.str_desc with
-  | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression e
-  | Tstr_value (_, vb_l) -> String.concat "@,@," @@ List.map (fun vb -> show_value_binding vb) @@ vb_l
+  | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression ctx_initial Dest_ignore initial_dest e
+  | Tstr_value (_, vb_l) -> String.concat "@,@," @@ List.map (fun vb -> 
+      let (id, sdecl) = show_value_binding ctx_initial vb in
+      sdecl) @@ vb_l
   | Tstr_type       _  -> "" (* Types have no representation in JS, but the OCaml type checker uses them *)
   | Tstr_open       _  -> "" (* Handle modules by use of multiple compilation/linking *)
   | Tstr_modtype    _  -> ""
@@ -237,39 +330,45 @@ and js_of_structure_item s =
   | Tstr_include    _  -> out_of_scope loc "includes"
   | Tstr_attribute  _  -> out_of_scope loc "attributes"
 
-and js_of_branch b obj =
+and js_of_branch ctx dest b obj =
   let spat, binders = js_of_pattern b.c_lhs obj in
-  let se = js_of_expression b.c_rhs in
-  if binders = "" then L.log_line (ppf_branch spat binders se) [(L.Exit)]
-  else
-    let typ = match List.rev (Str.split (Str.regexp " ") spat) with
-      | [] -> assert false
-      | x :: xs -> String.sub x 0 (String.length x)
-    in L.log_line (ppf_branch spat binders se) [(L.Exit); (L.ReturnStrip); (L.Add (binders, typ))]
+  let newctx = if binders = [] then ctx else ctx_fresh() in
+  let sbody = js_of_expression newctx dest b.c_rhs in
+  generate_logged_case spat binders ctx newctx sbody 
 
-and js_of_expression e =
+
+and js_of_expression ctx dest =
   let loc = e.exp_loc in
   match e.exp_desc with
-  | Texp_ident (_, ident,  _)         -> js_of_longident ident
-  | Texp_constant c                   -> js_of_constant c
-  | Texp_let   (_, vb_l, e)           ->
-    let sd = String.concat lin1 @@ List.map (fun vb -> show_value_binding vb) @@ vb_l in
-    let se = js_of_expression e
-    in ppf_let_in sd se
+  | Texp_ident (_, ident,  _) -> 
+      js_of_longident ident
+  | Texp_constant c -> 
+      js_of_constant c
+  | Texp_let   (_, vb_l, e) ->
+    let (ids,sdecls) = List.split (List.map (fun vb -> show_value_binding ctx vb) @@ vb_l) in
+    let sdecl = String.concat lin1 @@ sdecls in
+    let newctx = ctx_fresh() in
+    let sbody = js_of_expression newctx dest e in
+    generate_logged_let ids ctx newctx sdecl sbody
+   
   | Texp_function (_, c :: [], Total) ->
     let rec explore pats e = match e.exp_desc with
       | Texp_function (_, c :: [], Total) ->
         let p, e = c.c_lhs, c.c_rhs
         in explore (p :: pats) e
-      | _                                 ->
+      | _ ->
         String.concat ", " @@ List.map ident_of_pat @@ List.rev @@ pats, js_of_expression e in
     let args, body = explore [c.c_lhs] c.c_rhs
     in ppf_function args body
-  | Texp_apply (f, exp_l)                 ->
+  | Texp_apply (f, exp_l) ->
      let sl' = exp_l
-               |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope loc "optional apply arguments" | Some ei -> ei) in
+               |> List.map (fun (_, eo, _) -> match eo with 
+                                              | None -> out_of_scope loc "optional apply arguments"
+                                              | Some ei -> ei) in
      let sl = exp_l
-              |> List.map (fun (_, eo, _) -> match eo with None -> out_of_scope loc "optional apply arguments" | Some ei -> js_of_expression ei) in
+              |> List.map (fun (_, eo, _) -> match eo with 
+                                             | one -> out_of_scope loc "optional apply arguments" 
+                                             | Some ei -> js_of_expression ei) in
     let se = js_of_expression f in
     if is_infix f sl' && List.length exp_l = 2
     then ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
@@ -281,7 +380,8 @@ and js_of_expression e =
      let const = exp_type_is_constant exp in
      ppf_match se sb const
 
-  | Texp_tuple (tl) -> ppf_tuple @@ show_list_f (fun exp -> js_of_expression exp) ", " tl
+  | Texp_tuple (tl) -> 
+     ppf_tuple @@ show_list_f (fun exp -> js_of_expression exp) ", " tl
 
   | Texp_construct (_, cd, el) ->
     let name = cd.cstr_name in
@@ -338,36 +438,51 @@ and ident_of_pat pat = match pat.pat_desc with
   | Tpat_any         -> ""
   | _ -> error ~loc:pat.pat_loc "functions can't deconstruct values"
 
-and js_of_let_pattern pat expr =
-  let sexpr = js_of_expression expr in
-  match pat.pat_desc with
-  | Tpat_var (id, _) -> ppf_decl (ppf_ident id) sexpr
-  | Tpat_tuple (pat_l)
-  | Tpat_array (pat_l) ->
-     let l = List.map
-               (function pat ->
-                         match pat.pat_desc with
-                         | Tpat_var (id, _) -> (ppf_ident id, string_of_type_exp pat.pat_type)
-                         | _ -> out_of_scope pat.pat_loc "pattern-matching in arrays"
-               ) pat_l in
-     ppf_pat_array l sexpr
-  | _ -> error ~loc:pat.pat_loc "let can't deconstruct values"
+(* returns the name bound and the code that assigns a value to this name *)
+and js_of_let_pattern ctx pat expr =
+  let id = 
+    match pat.pat_desc with
+    | Tpat_var (id, _) -> id
+    | _ -> error ~loc:pat.pat_loc "let can't deconstruct values" 
+    in
+  (id, js_of_expression ctx (Dest_assign id) expr)
 
-and js_of_pattern pat obj =
+  (* LATER: for   let (x,y) = e,  encode as  translate(e,assign z); x = z[0]; y=z[1] 
+    | Tpat_tuple (pat_l)
+    | Tpat_array (pat_l) ->
+       let l = List.map
+                 (function pat ->
+                           match pat.pat_desc with
+                           | Tpat_var (id, _) -> (ppf_ident id, string_of_type_exp pat.pat_type)
+                           | _ -> out_of_scope pat.pat_loc "nested pattern-matching in tuples or arrays"
+                 ) pat_l in
+       ppf_pat_array l sexpr
+       *)
+
+(* [js_of_pattern] translates a pattern to a "case" statement of a switch,
+   and a list of assignements of variables (pairs of identifier and body).
+   Nested patterns are not supported.
+   It returns a pair: spat (the "case" instruction), binders (the assignements) *)
+and js_of_pattern pat obj = 
   let loc = pat.pat_loc in
   match pat.pat_desc with
-  | Tpat_any                     -> "default", ""
-  | Tpat_constant   c            -> ppf_match_case (js_of_constant c), ""
-  | Tpat_var       (id, _)       -> "default", (ppf_match_binders [ppf_match_binder (ppf_ident id) ""])
+  | Tpat_any -> 
+     "default", []
+  | Tpat_constant c -> 
+     ppf_match_case (js_of_constant c), []
   | Tpat_construct (_, cd, el) ->
      let c = cd.cstr_name in
      let spat = if is_sbool c then ppf_match_case c else ppf_match_case ("\"" ^ c ^ "\"") in
-     let bind field var = (match var.pat_desc with
-     | Tpat_var (id, _) -> ppf_match_binder (ppf_ident id) ~obj field
-     | Tpat_any         -> ""
-     | _                -> out_of_scope var.pat_loc "Nested pattern matching") in
-     let binders = if el = [] then "" else ppf_match_binders (map_cstr_fields ~loc bind cd el) in
-     spat, binders
+     let bind field var = 
+        match var.pat_desc with
+        | Tpat_var (id, _) -> 
+            (ppf_ident id, Printf.sprintf "%s.%s" obj field)
+        | Tpat_any -> []
+        | _ -> out_of_scope var.pat_loc "Nested pattern matching"
+        in
+      let binders = map_cstr_fields ~loc bind cd el in
+      spat, binders
+  | Tpat_var (id, _) -> unsupported ~loc "Tpat_var"
   | Tpat_tuple el -> unsupported ~loc "tuple matching"
   | Tpat_array el -> unsupported ~loc "array-match"
   | Tpat_record (_,_) -> unsupported ~loc "record"
@@ -382,21 +497,42 @@ let to_javascript module_name typedtree =
   (L.logged_output pre_res, L.unlogged_output pre_res, pre_res)
 
 
+(****************************************************************)
+(* COMMENTS *)
 
 (*
 ctx_empty
 ctx_push(ctx, bindings)   where bindings = [ { key:"ls", val:ls}, { key:"xs", val:xs } ]
 
+push("ls", ls, push("v", v, push("y", y, ctx314)); 
+
 example:  
   ctx321 = ctx_push(ctx320, bindings); log(|line|, ctx321, "ctx_push")
 
 
-  enter  (or call)   => current ctx plus arguments of the call
-  return (was exit)  => current ctx plus return value
-  let (on the "in")  => current ctx plus new binding
-  case               => current ctx plus bound variables
- 
-  type token_info = ctx_operation * ctx
+  enter  (or call)   => arguments of the call + name of new ctx
+  return (was exit)  => return value
+  let (on the "in")  => new binding + name of new ctx
+  case               => bound variables + name of new ctx
+
+
+----
+function(x,y) {
+  [isnertEnterCode(bindings,ctx,newctx)]fdqfdsf
+  }
+
+TOKEN(432423);
+
+var newctx = ctx_push(bindings);
+logEvent(LINEOF(432423), newctx, "enter")
+----
+
+
+
+
+
+
+  type token_info = ctx_operation * current ctx
 
   
   if  ==> viewed as match with case true/false.
