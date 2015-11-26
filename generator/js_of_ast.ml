@@ -256,7 +256,7 @@ let generate_logged_case spat binders ctx newctx sbody need_break =
   let token = token_fresh () in
   let sintro =
   match !current_mode with
-  | Mode_line_token -> ""
+  | Mode_line_token -> token
   | Mode_logged ->
     let ids = List.map fst binders in
     let mk_binding x =
@@ -274,8 +274,7 @@ let generate_logged_case spat binders ctx newctx sbody need_break =
   | Mode_unlogged -> ""
   in
   let sbinders = ppf_match_binders binders in
-  (Printf.sprintf "@[<v 0>%s%s:@;<1 2>@[<v 0>%s%s%s%s@]@]"
-     (match !current_mode with Mode_line_token -> token | _ -> "")
+  (Printf.sprintf "@[<v 0>%s:@;<1 2>@[<v 0>%s%s%s%s@]@]"
      spat sbinders sintro sbody
      (if need_break then "@,break;" else ""))
 
