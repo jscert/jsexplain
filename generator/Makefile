@@ -90,3 +90,13 @@ endif
 ifeq ($(MAKECMDGOALS),tests/jsref)
 -include $(ML_JSREF:.ml=.ml.d)
 endif
+
+
+
+
+# TODO
+
+# or pattern -> see JsNumber
+# records -> replace warning with code
+# lazy -> use a function for fresh locations in copied extracted code
+# replace "char list" with strings.

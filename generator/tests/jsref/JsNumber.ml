@@ -136,7 +136,7 @@ let classify_float n =
 
 let to_int32 = fun n ->
   match classify_float n with
-  | FP_normal ->
+  | FP_normal -> (* ARTHUR hacked this from | FP_normal | FP_subnormal *)
     let i32 = 2. ** 32. in
     let i31 = 2. ** 31. in
     let posint = (if n < 0. then (-1.) else 1.) *. (floor (abs_float n)) in
@@ -151,7 +151,7 @@ let to_int32 = fun n ->
 
 let to_uint32 = fun n ->
   match classify_float n with
-  | FP_normal ->
+  | FP_normal -> (* ARTHUR hacked this from | FP_normal | FP_subnormal *)
     let i32 = 2. ** 32. in
     let posint = (if n < 0. then (-1.) else 1.) *. (floor (abs_float n)) in
     let int32bit =
