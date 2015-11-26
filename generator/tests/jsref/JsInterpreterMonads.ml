@@ -325,7 +325,7 @@ let if_object w k =
     | Coq_value_object l -> k s l)
 
 (** val if_string :
-    result -> (state -> char list -> 'a1 specres) -> 'a1 specres **)
+    result -> (state -> string -> 'a1 specres) -> 'a1 specres **)
 
 let if_string w k =
   if_value w (fun s v ->

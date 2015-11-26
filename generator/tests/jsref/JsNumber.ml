@@ -47,7 +47,7 @@ let e = (exp 1.)
 
 let ln2 = (log 2.)
 
-(** val from_string : char list -> number **)
+(** val from_string : string -> number **)
 
 let from_string = (fun s ->
     (*try*)
@@ -58,7 +58,7 @@ let from_string = (fun s ->
       behavior than JavaScript.  For instance it will read "022" as 22 instead of
       18, which should be the JavaScript result for it. *)
 
-(** val to_string : number -> char list **)
+(** val to_string : number -> string **)
 
 let to_string = (fun f -> 
     prerr_string ("Warning:  JsNumber.to_string called.  This might be responsible for errors.  Argument value:  " ^ string_of_float f ^ ".");

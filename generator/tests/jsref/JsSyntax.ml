@@ -49,11 +49,11 @@ type literal =
 | Coq_literal_null [@f]  (** Auto Generated Attributes **)
 | Coq_literal_bool  [@f label0] of bool (** Auto Generated Attributes **)
 | Coq_literal_number  [@f label0] of number (** Auto Generated Attributes **)
-| Coq_literal_string  [@f label0] of char list (** Auto Generated Attributes **)
+| Coq_literal_string  [@f label0] of string (** Auto Generated Attributes **)
 
 type label =
 | Coq_label_empty [@f]  (** Auto Generated Attributes **)
-| Coq_label_string  [@f label0] of char list (** Auto Generated Attributes **)
+| Coq_label_string  [@f label0] of string (** Auto Generated Attributes **)
 
 type label_set = label list
 
@@ -65,19 +65,19 @@ let strictness_false =
   false
 
 type propname =
-| Coq_propname_identifier  [@f label0] of char list (** Auto Generated Attributes **)
-| Coq_propname_string  [@f label0] of char list (** Auto Generated Attributes **)
+| Coq_propname_identifier  [@f label0] of string (** Auto Generated Attributes **)
+| Coq_propname_string  [@f label0] of string (** Auto Generated Attributes **)
 | Coq_propname_number  [@f label0] of number (** Auto Generated Attributes **)
 
 type expr =
 | Coq_expr_this [@f]  (** Auto Generated Attributes **)
-| Coq_expr_identifier  [@f label0] of char list (** Auto Generated Attributes **)
+| Coq_expr_identifier  [@f label0] of string (** Auto Generated Attributes **)
 | Coq_expr_literal  [@f label0] of literal (** Auto Generated Attributes **)
 | Coq_expr_object  [@f label0] of (propname * propbody) list (** Auto Generated Attributes **)
 | Coq_expr_array  [@f label0] of expr option list (** Auto Generated Attributes **)
-| Coq_expr_function  [@f label0, label1, label2] of char list option * char list list * funcbody (** Auto Generated Attributes **)
+| Coq_expr_function  [@f label0, label1, label2] of string option * string list * funcbody (** Auto Generated Attributes **)
 | Coq_expr_access  [@f label0, label1] of expr * expr (** Auto Generated Attributes **)
-| Coq_expr_member  [@f label0, label1] of expr * char list (** Auto Generated Attributes **)
+| Coq_expr_member  [@f label0, label1] of expr * string (** Auto Generated Attributes **)
 | Coq_expr_new  [@f label0, label1] of expr * expr list (** Auto Generated Attributes **)
 | Coq_expr_call  [@f label0, label1] of expr * expr list (** Auto Generated Attributes **)
 | Coq_expr_unary_op  [@f label0, label1] of unary_op * expr (** Auto Generated Attributes **)
@@ -87,14 +87,14 @@ type expr =
 and propbody =
 | Coq_propbody_val  [@f label0] of expr (** Auto Generated Attributes **)
 | Coq_propbody_get  [@f label0] of funcbody (** Auto Generated Attributes **)
-| Coq_propbody_set  [@f label0, label1] of char list list * funcbody (** Auto Generated Attributes **)
+| Coq_propbody_set  [@f label0, label1] of string list * funcbody (** Auto Generated Attributes **)
 and funcbody =
-| Coq_funcbody_intro  [@f label0, label1] of prog * char list (** Auto Generated Attributes **)
+| Coq_funcbody_intro  [@f label0, label1] of prog * string (** Auto Generated Attributes **)
 and stat =
 | Coq_stat_expr  [@f label0] of expr (** Auto Generated Attributes **)
-| Coq_stat_label  [@f label0, label1] of char list * stat (** Auto Generated Attributes **)
+| Coq_stat_label  [@f label0, label1] of string * stat (** Auto Generated Attributes **)
 | Coq_stat_block  [@f label0] of stat list (** Auto Generated Attributes **)
-| Coq_stat_var_decl  [@f label0] of (char list * expr option) list (** Auto Generated Attributes **)
+| Coq_stat_var_decl  [@f label0] of (string * expr option) list (** Auto Generated Attributes **)
 | Coq_stat_if  [@f label0, label1, label2] of expr * stat * stat option (** Auto Generated Attributes **)
 | Coq_stat_do_while  [@f label0, label1, label2] of label_set * stat * expr (** Auto Generated Attributes **)
 | Coq_stat_while  [@f label0, label1, label2] of label_set * expr * stat (** Auto Generated Attributes **)
@@ -103,11 +103,11 @@ and stat =
 | Coq_stat_return  [@f label0] of expr option (** Auto Generated Attributes **)
 | Coq_stat_break  [@f label0] of label (** Auto Generated Attributes **)
 | Coq_stat_continue  [@f label0] of label (** Auto Generated Attributes **)
-| Coq_stat_try  [@f label0, label1, label2] of stat * (char list * stat) option * stat option (** Auto Generated Attributes **)
+| Coq_stat_try  [@f label0, label1, label2] of stat * (string * stat) option * stat option (** Auto Generated Attributes **)
 | Coq_stat_for  [@f label0, label1, label2, label3, label4] of label_set * expr option * expr option * expr option * stat (** Auto Generated Attributes **)
-| Coq_stat_for_var  [@f label0, label1, label2, label3, label4] of label_set * (char list * expr option) list * expr option * expr option * stat (** Auto Generated Attributes **)
+| Coq_stat_for_var  [@f label0, label1, label2, label3, label4] of label_set * (string * expr option) list * expr option * expr option * stat (** Auto Generated Attributes **)
 | Coq_stat_for_in  [@f label0, label1, label2, label3] of label_set * expr * expr * stat (** Auto Generated Attributes **)
-| Coq_stat_for_in_var  [@f label0, label1, label2, label3, label4] of label_set * char list * expr option * expr * stat (** Auto Generated Attributes **)
+| Coq_stat_for_in_var  [@f label0, label1, label2, label3, label4] of label_set * string * expr option * expr * stat (** Auto Generated Attributes **)
 | Coq_stat_debugger [@f]  (** Auto Generated Attributes **)
 | Coq_stat_switch  [@f label0, label1, label2] of label_set * expr * switchbody (** Auto Generated Attributes **)
 and switchbody =
@@ -119,21 +119,21 @@ and prog =
 | Coq_prog_intro  [@f label0, label1] of strictness_flag * element list (** Auto Generated Attributes **)
 and element =
 | Coq_element_stat  [@f label0] of stat (** Auto Generated Attributes **)
-| Coq_element_func_decl  [@f label0, label1, label2] of char list * char list list * funcbody (** Auto Generated Attributes **)
+| Coq_element_func_decl  [@f label0, label1, label2] of string * string list * funcbody (** Auto Generated Attributes **)
 
 type propdefs = (propname * propbody) list
 
 type elements = element list
 
-type funcdecl = { funcdecl_name : char list;
-                  funcdecl_parameters : char list list;
+type funcdecl = { funcdecl_name : string;
+                  funcdecl_parameters : string list;
                   funcdecl_body : funcbody }
 
-(** val funcdecl_name : funcdecl -> char list **)
+(** val funcdecl_name : funcdecl -> string **)
 
 let funcdecl_name x = x.funcdecl_name
 
-(** val funcdecl_parameters : funcdecl -> char list list **)
+(** val funcdecl_parameters : funcdecl -> string list **)
 
 let funcdecl_parameters x = x.funcdecl_parameters
 
@@ -283,7 +283,7 @@ type prim =
 | Coq_prim_null [@f]  (** Auto Generated Attributes **)
 | Coq_prim_bool  [@f label0] of bool (** Auto Generated Attributes **)
 | Coq_prim_number  [@f label0] of number (** Auto Generated Attributes **)
-| Coq_prim_string  [@f label0] of char list (** Auto Generated Attributes **)
+| Coq_prim_string  [@f label0] of string (** Auto Generated Attributes **)
 
 type value =
 | Coq_value_prim  [@f label0] of prim (** Auto Generated Attributes **)
@@ -384,7 +384,7 @@ type mutability =
 | Coq_mutability_nondeletable [@f]  (** Auto Generated Attributes **)
 | Coq_mutability_deletable [@f]  (** Auto Generated Attributes **)
 
-type decl_env_record = (char list, mutability * value) Heap.heap
+type decl_env_record = (string, mutability * value) Heap.heap
 
 type provide_this_flag = bool
 
@@ -421,7 +421,7 @@ let execution_ctx_this_binding x = x.execution_ctx_this_binding
 
 let execution_ctx_strict x = x.execution_ctx_strict
 
-type prop_name = char list
+type prop_name = string
 
 type ref_base_type =
 | Coq_ref_base_type_value  [@f label0] of value (** Auto Generated Attributes **)
@@ -442,7 +442,7 @@ let ref_name x = x.ref_name
 
 let ref_strict x = x.ref_strict
 
-type class_name = char list
+type class_name = string
 
 type object_properties_type = (prop_name, attributes) Heap.heap
 
@@ -463,7 +463,7 @@ type coq_object = { object_proto_ : value; object_class_ : class_name;
                     object_call_ : call option;
                     object_has_instance_ : builtin_has_instance option;
                     object_scope_ : lexical_env option;
-                    object_formal_parameters_ : char list list option;
+                    object_formal_parameters_ : string list option;
                     object_code_ : funcbody option;
                     object_target_function_ : object_loc option;
                     object_bound_this_ : value option;
@@ -542,7 +542,7 @@ let object_has_instance_ x = x.object_has_instance_
 
 let object_scope_ x = x.object_scope_
 
-(** val object_formal_parameters_ : coq_object -> char list list option **)
+(** val object_formal_parameters_ : coq_object -> string list option **)
 
 let object_formal_parameters_ x = x.object_formal_parameters_
 

@@ -260,7 +260,7 @@ let object_with_scope o scope =
   object_bound_args_ = x23; object_parameter_map_ = x24 }
 
 (** val object_with_formal_params :
-    coq_object -> char list list option -> coq_object **)
+    coq_object -> string list option -> coq_object **)
 
 let object_with_formal_params o params =
   let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
@@ -284,7 +284,7 @@ let object_with_formal_params o params =
   object_bound_args_ = x23; object_parameter_map_ = x24 }
 
 (** val object_with_details :
-    coq_object -> lexical_env option -> char list list option -> funcbody
+    coq_object -> lexical_env option -> string list option -> funcbody
     option -> object_loc option -> value option -> value list option ->
     object_loc option -> coq_object **)
 

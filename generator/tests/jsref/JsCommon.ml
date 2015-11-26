@@ -429,7 +429,7 @@ let element_funcdecl = function
 let prog_funcdecl p =
   concat (LibList.map element_funcdecl (prog_elements p))
 
-(** val stat_vardecl : stat -> char list list **)
+(** val stat_vardecl : stat -> string list **)
 
 let rec stat_vardecl = function
 | Coq_stat_expr e -> []
@@ -460,7 +460,7 @@ let rec stat_vardecl = function
 | Coq_stat_debugger -> []
 | Coq_stat_switch (l, e, sb) -> switchbody_vardecl sb
 
-(** val switchbody_vardecl : switchbody -> char list list **)
+(** val switchbody_vardecl : switchbody -> string list **)
 
 and switchbody_vardecl = function
 | Coq_switchbody_nodefault scl -> concat (map switchclause_vardecl scl)
@@ -469,18 +469,18 @@ and switchbody_vardecl = function
     (append (concat (map stat_vardecl sl))
       (concat (map switchclause_vardecl scl2)))
 
-(** val switchclause_vardecl : switchclause -> char list list **)
+(** val switchclause_vardecl : switchclause -> string list **)
 
 and switchclause_vardecl = function
 | Coq_switchclause_intro (e, sl) -> concat (map stat_vardecl sl)
 
-(** val element_vardecl : element -> char list list **)
+(** val element_vardecl : element -> string list **)
 
 let element_vardecl = function
 | Coq_element_stat t -> stat_vardecl t
 | Coq_element_func_decl (name, args, bd) -> []
 
-(** val prog_vardecl : prog -> char list list **)
+(** val prog_vardecl : prog -> string list **)
 
 let prog_vardecl p =
   concat (LibList.map element_vardecl (prog_elements p))
@@ -489,7 +489,7 @@ type preftype =
 | Coq_preftype_number [@f]  (** Auto Generated Attributes **)
 | Coq_preftype_string [@f]  (** Auto Generated Attributes **)
 
-(** val method_of_preftype : preftype -> char list **)
+(** val method_of_preftype : preftype -> string **)
 
 let method_of_preftype = function
 | Coq_preftype_number -> "valueOf"
@@ -579,7 +579,7 @@ let elision_tail_count ol =
 let elision_tail_remove ol =
   rev (elision_head_remove (rev ol))
 
-(** val parse_pickable : char list -> bool -> prog coq_Pickable_option **)
+(** val parse_pickable : string -> bool -> prog coq_Pickable_option **)
 
 let parse_pickable = (fun s strict ->
     let str = String.concat "" (List.map (String.make 1) s) in

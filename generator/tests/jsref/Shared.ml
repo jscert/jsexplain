@@ -18,7 +18,7 @@ let int_of_char = (fun c -> float_of_int (int_of_char c))
 
 let ascii_comparable = (=)
 
-(** val string_sub : char list -> float -> float -> char list **)
+(** val string_sub : string -> float -> float -> string **)
 
 let string_sub s n l =
   substring (Z.abs_nat n) (Z.abs_nat l) s

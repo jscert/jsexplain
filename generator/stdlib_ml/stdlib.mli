@@ -95,6 +95,9 @@ module List : sig
 end
 
 module String : sig
+  val length : string -> int
+  val append : string -> string -> string
+  val sub : string -> int -> int -> string
   val concat : string -> string list -> string
   val iter : (char -> unit) -> string -> unit
   val make : int -> char -> string
@@ -106,3 +109,17 @@ val raise : exn -> 'a
 (* JSRef specific functions *)
 val prerr_string : string -> unit
 val prerr_newline : unit -> unit
+
+
+module Parser_main : sig 
+  val exp_from_string : ?force_strict:bool -> string -> string
+end 
+
+
+module Parser_syntax : sig (* ARTHUR: to implement *)
+  type unary_op
+  type arith_op
+  type bin_op
+  type exp
+end
+

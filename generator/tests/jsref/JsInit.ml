@@ -71,7 +71,7 @@ let write_constant p name value0 =
 
 let object_prealloc_global_proto = (Coq_value_prim Coq_prim_null)
 
-(** val object_prealloc_global_class : char list **)
+(** val object_prealloc_global_class : string **)
 
 let object_prealloc_global_class = (
   let rec aux s = function

@@ -15,7 +15,7 @@ let convert_number_to_bool n =
   then false
   else true
 
-(** val convert_string_to_bool : char list -> bool **)
+(** val convert_string_to_bool : string -> bool **)
 
 let convert_string_to_bool s =
   if string_comparable s [] then false else true
@@ -56,13 +56,13 @@ let convert_number_to_integer n =
        then n
        else mult (sign n) (floor (absolute n))
 
-(** val convert_bool_to_string : bool -> char list **)
+(** val convert_bool_to_string : bool -> string **)
 
 let convert_bool_to_string = function
 | true -> "true"
 | false -> "false"
 
-(** val convert_prim_to_string : prim -> char list **)
+(** val convert_prim_to_string : prim -> string **)
 
 let convert_prim_to_string = function
 | Coq_prim_undef ->
@@ -145,7 +145,7 @@ let inequality_test_number n1 n2 =
                                      then Coq_prim_bool true
                                      else Coq_prim_bool (lt_bool n1 n2)
 
-(** val inequality_test_string : char list -> char list -> bool **)
+(** val inequality_test_string : string -> string -> bool **)
 
 let rec inequality_test_string s1 s2 =
   match s1 with
@@ -193,7 +193,7 @@ let inequality_test_primitive w1 w2 =
          (convert_prim_to_number w2)
      | Coq_prim_string s2 -> Coq_prim_bool (inequality_test_string s1 s2))
 
-(** val typeof_prim : prim -> char list **)
+(** val typeof_prim : prim -> string **)
 
 let typeof_prim = function
 | Coq_prim_undef ->
@@ -210,7 +210,7 @@ let string_of_propname = function
 | Coq_propname_string s -> s
 | Coq_propname_number n -> to_string n
 
-(** val string_of_native_error : native_error -> char list **)
+(** val string_of_native_error : native_error -> string **)
 
 let string_of_native_error = function
 | Coq_native_error_eval ->

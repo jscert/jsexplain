@@ -1,4 +1,17 @@
-(** val string_dec : char list -> char list -> bool **)
+
+(* ARTHUR: hacked this file *)
+
+let string_dec s1 s2 = (s1 = s2)
+
+let append s1 s2 = String.append s1 s2
+
+let length s = String.length s
+
+let substring n m s = String.sub s n m
+
+(*
+
+(** val string_dec : string -> string -> bool **)
 
 let rec string_dec s1 s2 = match s1 with
   | [] -> (match s2 with
@@ -8,20 +21,20 @@ let rec string_dec s1 s2 = match s1 with
     | [] -> false
     | a0::s4 -> if (=) a a0 then string_dec s0 s4 else false)
 
-(** val append : char list -> char list -> char list **)
+(** val append : string -> string -> string **)
 
 let rec append s1 s2 =
   match s1 with
   | [] -> s2
   | c::s1' -> c::(append s1' s2)
 
-(** val length : char list -> int **)
+(** val length : string -> int **)
 
 let rec length l = match l with
 | [] -> 0
 | c::s' -> Pervasives.succ (length s')
 
-(** val substring : int -> int -> char list -> char list **)
+(** val substring : int -> int -> string -> string **)
 
 let rec substring n m s =
   if n=0 then
@@ -33,3 +46,6 @@ let rec substring n m s =
   else match s with
     | [] -> s
     | c::s' -> substring (n-1) m s'
+
+
+*)

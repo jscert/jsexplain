@@ -47,7 +47,7 @@ tests/jsref/%.ml:
 	../../convert-ml-strings.pl tests/jsref/*.ml
 	cd $(@D) && $(CURDIR)/../../ml-add-cstr-annots.pl *.ml
 
-tests/%.ml.d: tests/%.ml
+tests/%.ml.d: tests/%.ml tests/%.mli
 	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
 
 tests/%.cmi tests/%.unlog.js: tests/%.ml main.byte stdlib

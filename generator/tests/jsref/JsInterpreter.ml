@@ -148,8 +148,8 @@ let run_object_heap_set_extensible b s l =
                                          result);
                    runs_type_array_join_elements : (state -> execution_ctx ->
                                                    object_loc -> float ->
-                                                   float -> char list ->
-                                                   char list -> result);
+                                                   float -> string ->
+                                                   string -> result);
                    runs_type_array_element_list : (state -> execution_ctx ->
                                                   object_loc -> expr option
                                                   list -> float -> result);
@@ -285,7 +285,7 @@ let runs_type_to_string x = x.runs_type_to_string
 
 (** val runs_type_array_join_elements :
     runs_type -> state -> execution_ctx -> object_loc -> float -> float ->
-    char list -> char list -> result **)
+    string -> string -> result **)
 
 let runs_type_array_join_elements x = x.runs_type_array_join_elements
 
@@ -1665,7 +1665,7 @@ let rec array_args_map_loop runs0 s c l args ind =
           (Coq_attributes_data_of (attributes_data_intro_all_true h))))
       (fun s' -> array_args_map_loop runs0 s' c l rest (Z.add ind 1.))
 
-(** val string_of_prealloc : prealloc -> char list **)
+(** val string_of_prealloc : prealloc -> string **)
 
 let string_of_prealloc = function
 | Coq_prealloc_global -> "global"
@@ -2565,7 +2565,7 @@ let creating_function_object_proto runs0 s c l =
             (descriptor_of_attributes (Coq_attributes_data_of a2)) false))))
 
 (** val creating_function_object :
-    runs_type -> state -> execution_ctx -> char list list -> funcbody ->
+    runs_type -> state -> execution_ctx -> string list -> funcbody ->
     lexical_env -> strictness_flag -> result **)
 
 let creating_function_object runs0 s c names bd x str =
@@ -2619,7 +2619,7 @@ let creating_function_object runs0 s c names bd x str =
                                res_ter s5 (res_val (Coq_value_object l))))))))))))))
 
 (** val binding_inst_formal_params :
-    runs_type -> state -> execution_ctx -> env_loc -> value list -> char list
+    runs_type -> state -> execution_ctx -> env_loc -> value list -> string
     list -> strictness_flag -> result_void **)
 
 let rec binding_inst_formal_params runs0 s c l args names str =
@@ -2737,9 +2737,9 @@ let make_arg_setter runs0 s c x x0 =
   creating_function_object runs0 s c (xparam :: []) bd x0 true
 
 (** val arguments_object_map_loop :
-    runs_type -> state -> execution_ctx -> object_loc -> char list list ->
+    runs_type -> state -> execution_ctx -> object_loc -> string list ->
     int -> value list -> lexical_env -> strictness_flag -> object_loc ->
-    char list list -> result_void **)
+    string list -> result_void **)
 
 let rec arguments_object_map_loop runs0 s c l xs len args x str lmap xsmap =
   (fun fO fS n -> if n=0 then fO () else fS (n-1))
@@ -2794,7 +2794,7 @@ let rec arguments_object_map_loop runs0 s c l xs len args x str lmap xsmap =
     len
 
 (** val arguments_object_map :
-    runs_type -> state -> execution_ctx -> object_loc -> char list list ->
+    runs_type -> state -> execution_ctx -> object_loc -> string list ->
     value list -> lexical_env -> strictness_flag -> result_void **)
 
 let arguments_object_map runs0 s c l xs args x str =
@@ -2804,7 +2804,7 @@ let arguments_object_map runs0 s c l xs args x str =
       str lmap [])
 
 (** val create_arguments_object :
-    runs_type -> state -> execution_ctx -> object_loc -> char list list ->
+    runs_type -> state -> execution_ctx -> object_loc -> string list ->
     value list -> lexical_env -> strictness_flag -> result **)
 
 let create_arguments_object runs0 s c lf xs args x str =
@@ -2858,7 +2858,7 @@ let create_arguments_object runs0 s c lf xs args x str =
                      res_ter s3 (res_val (Coq_value_object l)))))))))
 
 (** val binding_inst_arg_obj :
-    runs_type -> state -> execution_ctx -> object_loc -> prog -> char list
+    runs_type -> state -> execution_ctx -> object_loc -> prog -> string
     list -> value list -> env_loc -> result_void **)
 
 let binding_inst_arg_obj runs0 s c lf p xs args l =
@@ -2878,7 +2878,7 @@ let binding_inst_arg_obj runs0 s c lf p xs args l =
              (Coq_value_object largs) false))
 
 (** val binding_inst_var_decls :
-    runs_type -> state -> execution_ctx -> env_loc -> char list list -> bool
+    runs_type -> state -> execution_ctx -> env_loc -> string list -> bool
     -> strictness_flag -> result_void **)
 
 let rec binding_inst_var_decls runs0 s c l vds bconfig str =
@@ -3456,7 +3456,7 @@ let convert_twice_number runs0 s c v1 v2 =
 
 (** val convert_twice_string :
     runs_type -> state -> execution_ctx -> value -> value ->
-    (char list * char list) specres **)
+    (string * string) specres **)
 
 let convert_twice_string runs0 s c v1 v2 =
   convert_twice if_string (fun s0 v -> to_string runs0 s0 c v) s v1 v2
@@ -3628,7 +3628,7 @@ let run_prepost_op = function
 | Coq_unary_op_bitwise_not -> None
 | Coq_unary_op_not -> None
 
-(** val run_typeof_value : state -> value -> char list **)
+(** val run_typeof_value : state -> value -> string **)
 
 let run_typeof_value s = function
 | Coq_value_prim w -> typeof_prim w
@@ -4262,7 +4262,7 @@ let run_unary_op runs0 s c op e =
                   (neg (convert_value_to_boolean v)))))))
 
 (** val create_new_function_in :
-    runs_type -> state -> execution_ctx -> char list list -> funcbody ->
+    runs_type -> state -> execution_ctx -> string list -> funcbody ->
     result **)
 
 let create_new_function_in runs0 s c args bd =
@@ -4479,7 +4479,7 @@ let run_expr_assign runs0 s c opo e1 e2 =
           follow x (Coq_resvalue_value x0))))
 
 (** val run_expr_function :
-    runs_type -> state -> execution_ctx -> prop_name option -> char list list
+    runs_type -> state -> execution_ctx -> prop_name option -> string list
     -> funcbody -> result **)
 
 let run_expr_function runs0 s c fo args bd =
@@ -4965,7 +4965,7 @@ let run_stat_for runs0 s c labs eo1 eo2 eo3 t =
    | None -> follows s)
 
 (** val run_stat_for_var :
-    runs_type -> state -> execution_ctx -> label_set -> (char list * expr
+    runs_type -> state -> execution_ctx -> label_set -> (string * expr
     option) list -> expr option -> expr option -> stat -> result **)
 
 let run_stat_for_var runs0 s c labs ds eo2 eo3 t =
@@ -5225,7 +5225,7 @@ let run_get_args_for_apply runs0 s c l index n =
   else res_spec s []
 
 (** val valueToStringForJoin :
-    runs_type -> state -> execution_ctx -> object_loc -> float -> char list
+    runs_type -> state -> execution_ctx -> object_loc -> float -> string
     specres **)
 
 let valueToStringForJoin runs0 s c l k =
@@ -5249,7 +5249,7 @@ let valueToStringForJoin runs0 s c l k =
 
 (** val run_array_join_elements :
     runs_type -> state -> execution_ctx -> object_loc -> float -> float ->
-    char list -> char list -> result **)
+    string -> string -> result **)
 
 let run_array_join_elements runs0 s c l k length0 sep sR =
   if lt_int_decidable k length0
