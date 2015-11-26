@@ -86,6 +86,7 @@ end
 (* This may be awkward! *)
 module Lazy : sig
   type 'a t
+  val force : 'a t -> 'a (* ARTHUR added *)
 end
 
 module List : sig

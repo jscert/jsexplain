@@ -146,7 +146,7 @@ let ppf_ifthenelse cond iftrue iffalse =
                  cond iftrue iffalse
 
 let ppf_sequence exp1 exp2 =
-  Printf.sprintf "%s,@,%s"
+  Printf.sprintf "%s;@,%s"
                  exp1 exp2
 
 let ppf_while cd body =
@@ -585,8 +585,8 @@ and js_of_expression ctx dest e =
   | Texp_ifthenelse (e1, e2, Some e3) ->
      reject_inline dest;
      ppf_ifthenelse (inline_of_wrap e1) (js_of_expression ctx dest e2) (js_of_expression ctx dest e3)
-  | Texp_sequence   (e1, e2)          -> out_of_scope loc "sequence"
-    (* ppf_sequence (js_of_expression e1) (js_of_expression e2) *)
+  | Texp_sequence (e1, e2) -> 
+     ppf_sequence (inline_of_wrap e1) (js_of_expression ctx dest e2)
   | Texp_while      (cd, body)        -> out_of_scope loc "while"
     (* ppf_while (js_of_expression cd) (js_of_expression body) *)
   | Texp_for        (id, _, st, ed, fl, body) -> out_of_scope loc "for"
@@ -634,7 +634,9 @@ and js_of_let_pattern ctx pat expr =
   let id = 
     match pat.pat_desc with
     | Tpat_var (id, _) -> ppf_ident id
-    | _ -> error ~loc:pat.pat_loc "let can't deconstruct values" 
+    | _ -> 
+      Printf.printf "warning: unsupported let-record\n"; ""
+      (*  error ~loc:pat.pat_loc "let can't deconstruct values"  *)
     in
   (id, js_of_expression ctx (Dest_assign id) expr)
 
@@ -677,7 +679,7 @@ and js_of_pattern pat obj =
   | Tpat_tuple el -> unsupported ~loc "tuple matching, if not in a simple let-binding"
   | Tpat_array el -> unsupported ~loc "array-match"
   | Tpat_record (_,_) -> unsupported ~loc "record"
-  | Tpat_or (_,_,_) -> error ~loc "not implemented yet"
+  | Tpat_or (_,_,_) -> error ~loc "or pattern not implemented yet"
   | Tpat_alias (_,_,_) -> out_of_scope loc "alias-pattern"
   | Tpat_variant (_,_,_) -> out_of_scope loc "polymorphic variants in pattern matching"
   | Tpat_lazy _ -> out_of_scope loc "lazy-pattern"

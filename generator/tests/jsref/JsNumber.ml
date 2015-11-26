@@ -125,9 +125,18 @@ let of_int = fun x -> x
 
 (** val to_int32 : number -> float **)
 
+
+(* ARTHUR hacked this in *)
+let classify_float n =
+  let x = classify_float n in
+  match x with
+  | FP_normal -> FP_normal
+  | FP_subnormal -> FP_normal
+  | _ -> x
+
 let to_int32 = fun n ->
   match classify_float n with
-  | FP_normal | FP_subnormal ->
+  | FP_normal ->
     let i32 = 2. ** 32. in
     let i31 = 2. ** 31. in
     let posint = (if n < 0. then (-1.) else 1.) *. (floor (abs_float n)) in
@@ -142,7 +151,7 @@ let to_int32 = fun n ->
 
 let to_uint32 = fun n ->
   match classify_float n with
-  | FP_normal | FP_subnormal ->
+  | FP_normal ->
     let i32 = 2. ** 32. in
     let posint = (if n < 0. then (-1.) else 1.) *. (floor (abs_float n)) in
     let int32bit =
