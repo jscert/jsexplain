@@ -51,7 +51,7 @@ let ln2 = (log 2.)
 
 let from_string = (fun s ->
     (*try*)
-      let s = (String.concat "" (List.map (String.make 1) s)) in
+     (* let s = (String.concat "" (List.map (String.make 1) s)) in ARTHUR hack*)
       if s = "" then 0. else float_of_string s
     (* FIXME: with Failure "float_of_string" -> nan *) )
    (* Note that we're using `float_of_string' there, which does not have the same
@@ -70,10 +70,16 @@ let to_string = (fun f ->
        if (sfn = "nan") then "NaN" else
        let inum = int_of_float n in
        if (float_of_int inum = n) then (string_of_int inum) else (string_of_float n)) in
+    string_of_number f
+
+    (* ARTHUR hack
     let ret = ref [] in (* Ugly, but the API for OCaml string is not very functional... *)
     String.iter (fun c -> ret := c :: !ret) (string_of_number f);
-    List.rev !ret)
+    List.rev !ret
+    *)
+    )
    (* Note that this is ugly, we should use the spec of JsNumber.to_string here (9.8.1). *)
+
 
 (** val neg : number -> number **)
 

@@ -44,6 +44,7 @@ val string_of_float : float -> string
 val string_of_int : int -> string
 
 val ( === ) : 'a -> 'a -> bool
+val ( <> ) : 'a -> 'a -> bool
 val ( < ) : 'a -> 'a -> bool
 val ( > ) : 'a -> 'a -> bool
 val ( <= ) : 'a -> 'a -> bool 
@@ -111,11 +112,6 @@ val prerr_string : string -> unit
 val prerr_newline : unit -> unit
 
 
-module Parser_main : sig 
-  val exp_from_string : ?force_strict:bool -> string -> string
-end 
-
-
 module Parser_syntax : sig (* ARTHUR: to implement *)
   type unary_op
   type arith_op
@@ -123,3 +119,27 @@ module Parser_syntax : sig (* ARTHUR: to implement *)
   type exp
 end
 
+module Parser_main : sig 
+  val exp_from_string : ?force_strict:bool -> string -> Parser_syntax.exp
+end 
+
+(* ARTHUR: not needed
+module Parser : sig
+  exception ParserFailure of string
+  exception InvalidArgument
+end
+
+*)
+
+module Obj : sig
+  type t
+end
+
+val print_endline : string -> unit
+
+val __LOC__ : string
+
+module Prheap : sig
+  val prstate : bool -> string -> string
+  val string_of_char_list : string -> string
+end

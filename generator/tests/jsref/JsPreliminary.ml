@@ -18,11 +18,12 @@ let convert_number_to_bool n =
 (** val convert_string_to_bool : string -> bool **)
 
 let convert_string_to_bool s =
-  if string_comparable s [] then false else true
+  if string_comparable s "" then false else true
+  (* Arthur hack string.empty *)
 
 (** val convert_prim_to_boolean : prim -> bool **)
 
-let convert_prim_to_boolean = function
+let convert_prim_to_boolean _foo_ = match _foo_ with
 | Coq_prim_undef -> false
 | Coq_prim_null -> false
 | Coq_prim_bool b -> b
@@ -31,13 +32,13 @@ let convert_prim_to_boolean = function
 
 (** val convert_value_to_boolean : value -> bool **)
 
-let convert_value_to_boolean = function
+let convert_value_to_boolean _foo_ = match _foo_ with
 | Coq_value_prim p -> convert_prim_to_boolean p
 | Coq_value_object o -> true
 
 (** val convert_prim_to_number : prim -> number **)
 
-let convert_prim_to_number = function
+let convert_prim_to_number _foo_ = match _foo_ with
 | Coq_prim_undef -> nan
 | Coq_prim_null -> zero
 | Coq_prim_bool b -> if b then one else zero
@@ -58,13 +59,13 @@ let convert_number_to_integer n =
 
 (** val convert_bool_to_string : bool -> string **)
 
-let convert_bool_to_string = function
+let convert_bool_to_string _foo_ = match _foo_ with
 | true -> "true"
 | false -> "false"
 
 (** val convert_prim_to_string : prim -> string **)
 
-let convert_prim_to_string = function
+let convert_prim_to_string _foo_ = match _foo_ with
 | Coq_prim_undef ->
   "undefined"
 | Coq_prim_null -> "null"
@@ -147,6 +148,7 @@ let inequality_test_number n1 n2 =
 
 (** val inequality_test_string : string -> string -> bool **)
 
+(* ARTHUR hack 
 let rec inequality_test_string s1 s2 =
   match s1 with
   | [] ->
@@ -160,6 +162,9 @@ let rec inequality_test_string s1 s2 =
        if ascii_comparable c1 c2
        then inequality_test_string s1' s2'
        else lt_int_decidable (int_of_char c1) (int_of_char c2))
+*)
+let inequality_test_string s1 s2 = (s1 <> s2)
+
 
 (** val inequality_test_primitive : prim -> prim -> prim **)
 
@@ -195,7 +200,7 @@ let inequality_test_primitive w1 w2 =
 
 (** val typeof_prim : prim -> string **)
 
-let typeof_prim = function
+let typeof_prim _foo_ = match _foo_ with
 | Coq_prim_undef ->
   "undefined"
 | Coq_prim_null -> "object"
@@ -205,14 +210,14 @@ let typeof_prim = function
 
 (** val string_of_propname : propname -> prop_name **)
 
-let string_of_propname = function
+let string_of_propname _foo_ = match _foo_ with
 | Coq_propname_identifier s -> s
 | Coq_propname_string s -> s
 | Coq_propname_number n -> to_string n
 
 (** val string_of_native_error : native_error -> string **)
 
-let string_of_native_error = function
+let string_of_native_error _foo_ = match _foo_ with
 | Coq_native_error_eval ->
   "EvalError"
 | Coq_native_error_range ->

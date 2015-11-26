@@ -41,17 +41,21 @@ tests/%.ml: tests/%.v
 	cd $(@D) && $(CURDIR)/../../ml-add-cstr-annots.pl *.ml
 
 .PRECIOUS: tests/jsref/%.ml
-tests/jsref/%.ml:
-	$(MAKE) -C $(CURDIR)/../../.. interpreter
-	cp ../../../interp/src/extract/*.ml tests/jsref/
-	../../convert-ml-strings.pl tests/jsref/*.ml
-	cd $(@D) && $(CURDIR)/../../ml-add-cstr-annots.pl *.ml
+#tests/jsref/%.ml:
+#	$(MAKE) -C $(CURDIR)/../../.. interpreter
+#	cp ../../../interp/src/extract/*.ml tests/jsref/
+#	../../convert-ml-strings.pl tests/jsref/*.ml
+#	cd $(@D) && $(CURDIR)/../../ml-add-cstr-annots.pl *.ml
 
-tests/%.ml.d: tests/%.ml tests/%.mli
+tests/%.ml.d: tests/%.ml
 	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
 
 tests/%.cmi tests/%.unlog.js: tests/%.ml main.byte stdlib
 	./main.byte -mode unlog -I $(<D) $<
+
+tests/%.cmi tests/%.unlog.js: tests/%.mli stdlib
+	ocamlc -I stdlib_ml -open Stdlib -I $(<D) $<
+
 
 tests/%.log.js: tests/%.ml tests/%.cmi main.byte stdlib
 	./main.byte -mode log -I $(<D) $<
@@ -100,3 +104,6 @@ endif
 # records -> replace warning with code
 # lazy -> use a function for fresh locations in copied extracted code
 # replace "char list" with strings.
+# fix functor translation
+# missing return in:    funcdecl_name: function (x) { x.funcdecl_name},
+# change extraction of:   native_error_compare

@@ -499,7 +499,7 @@ let to_primitive runs0 s c v prefo =
 (** val to_number :
     runs_type -> state -> execution_ctx -> value -> result **)
 
-let to_number runs0 s c = function
+let to_number runs0 s c _foo_ = match _foo_ with
 | Coq_value_prim w ->
   result_out (Coq_out_ter (s,
     (res_val (Coq_value_prim (Coq_prim_number (convert_prim_to_number w))))))
@@ -534,7 +534,7 @@ let to_uint32 runs0 s c v =
 (** val to_string :
     runs_type -> state -> execution_ctx -> value -> result **)
 
-let to_string runs0 s c = function
+let to_string runs0 s c _foo_ = match _foo_ with
 | Coq_value_prim w ->
   result_out (Coq_out_ter (s,
     (res_val (Coq_value_prim (Coq_prim_string (convert_prim_to_string w))))))
@@ -995,7 +995,7 @@ let object_define_own_prop runs0 s c l x desc throw =
 (** val run_to_descriptor :
     runs_type -> state -> execution_ctx -> value -> descriptor specres **)
 
-let run_to_descriptor runs0 s c = function
+let run_to_descriptor runs0 s c _foo_ = match _foo_ with
 | Coq_value_prim p -> throw_result (run_error s Coq_native_error_type)
 | Coq_value_object l ->
   let sub0 = fun s0 desc name conv k ->
@@ -1064,7 +1064,7 @@ let run_to_descriptor runs0 s c = function
 
 (** val prim_new_object : state -> prim -> result **)
 
-let prim_new_object s = function
+let prim_new_object s _foo_ = match _foo_ with
 | Coq_prim_undef ->
   (fun s message ->
   print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
@@ -1123,7 +1123,7 @@ let prim_new_object s = function
 
 (** val to_object : state -> value -> result **)
 
-let to_object s = function
+let to_object s _foo_ = match _foo_ with
 | Coq_value_prim w ->
   (match w with
    | Coq_prim_undef -> run_error s Coq_native_error_type
@@ -1293,7 +1293,7 @@ let env_record_get_binding_value runs0 s c l x str =
 (** val ref_get_value :
     runs_type -> state -> execution_ctx -> resvalue -> value specres **)
 
-let ref_get_value runs0 s c = function
+let ref_get_value runs0 s c _foo_ = match _foo_ with
 | Coq_resvalue_empty ->
   (fun s message ->
   print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
@@ -1667,7 +1667,7 @@ let rec array_args_map_loop runs0 s c l args ind =
 
 (** val string_of_prealloc : prealloc -> string **)
 
-let string_of_prealloc = function
+let string_of_prealloc _foo_ = match _foo_ with
 | Coq_prealloc_global -> "global"
 | Coq_prealloc_global_eval ->
   "global_eval"
@@ -3099,7 +3099,7 @@ let run_object_get_own_prop runs0 s c l x =
 (** val run_function_has_instance :
     runs_type -> state -> object_loc -> value -> result **)
 
-let run_function_has_instance runs0 s lv = function
+let run_function_has_instance runs0 s lv _foo_ = match _foo_ with
 | Coq_value_prim p -> run_error s Coq_native_error_type
 | Coq_value_object lo ->
   if_some (run_object_method object_proto_ s lv) (fun vproto ->
@@ -3174,7 +3174,7 @@ let run_object_has_instance runs0 s c b l v =
 (** val from_prop_descriptor :
     runs_type -> state -> execution_ctx -> full_descriptor -> result **)
 
-let from_prop_descriptor runs0 s c = function
+let from_prop_descriptor runs0 s c _foo_ = match _foo_ with
 | Coq_full_descriptor_undef ->
   result_out (Coq_out_ter (s, (res_val (Coq_value_prim Coq_prim_undef))))
 | Coq_full_descriptor_some a ->
@@ -3233,7 +3233,7 @@ let from_prop_descriptor runs0 s c = function
 
 (** val is_lazy_op : binary_op -> bool option **)
 
-let is_lazy_op = function
+let is_lazy_op _foo_ = match _foo_ with
 | Coq_binary_op_mult -> None
 | Coq_binary_op_div -> None
 | Coq_binary_op_mod -> None
@@ -3262,7 +3262,7 @@ let is_lazy_op = function
 (** val get_puremath_op :
     binary_op -> (number -> number -> number) option **)
 
-let get_puremath_op = function
+let get_puremath_op _foo_ = match _foo_ with
 | Coq_binary_op_mult -> Some mult
 | Coq_binary_op_div -> Some div
 | Coq_binary_op_mod -> Some fmod
@@ -3290,7 +3290,7 @@ let get_puremath_op = function
 
 (** val get_inequality_op : binary_op -> (bool * bool) option **)
 
-let get_inequality_op = function
+let get_inequality_op _foo_ = match _foo_ with
 | Coq_binary_op_mult -> None
 | Coq_binary_op_div -> None
 | Coq_binary_op_mod -> None
@@ -3319,7 +3319,7 @@ let get_inequality_op = function
 (** val get_shift_op :
     binary_op -> (bool * (float -> float -> float)) option **)
 
-let get_shift_op = function
+let get_shift_op _foo_ = match _foo_ with
 | Coq_binary_op_mult -> None
 | Coq_binary_op_div -> None
 | Coq_binary_op_mod -> None
@@ -3347,7 +3347,7 @@ let get_shift_op = function
 
 (** val get_bitwise_op : binary_op -> (float -> float -> float) option **)
 
-let get_bitwise_op = function
+let get_bitwise_op _foo_ = match _foo_ with
 | Coq_binary_op_mult -> None
 | Coq_binary_op_div -> None
 | Coq_binary_op_mod -> None
@@ -3463,7 +3463,7 @@ let convert_twice_string runs0 s c v1 v2 =
 
 (** val issome : 'a1 option -> bool **)
 
-let issome = function
+let issome _foo_ = match _foo_ with
 | Some t -> true
 | None -> false
 
@@ -3615,7 +3615,7 @@ let run_binary_op runs0 s c op v1 v2 =
 
 (** val run_prepost_op : unary_op -> ((number -> number) * bool) option **)
 
-let run_prepost_op = function
+let run_prepost_op _foo_ = match _foo_ with
 | Coq_unary_op_delete -> None
 | Coq_unary_op_void -> None
 | Coq_unary_op_typeof -> None
@@ -3630,7 +3630,7 @@ let run_prepost_op = function
 
 (** val run_typeof_value : state -> value -> string **)
 
-let run_typeof_value s = function
+let run_typeof_value s _foo_ = match _foo_ with
 | Coq_value_prim w -> typeof_prim w
 | Coq_value_object l ->
   if is_callable_dec s (Coq_value_object l)
@@ -4272,7 +4272,7 @@ let create_new_function_in runs0 s c args bd =
 (** val init_object :
     runs_type -> state -> execution_ctx -> object_loc -> propdefs -> result **)
 
-let rec init_object runs0 s c l = function
+let rec init_object runs0 s c l _foo_ = match _foo_ with
 | [] -> result_out (Coq_out_ter (s, (res_val (Coq_value_object l))))
 | p :: pds' ->
   let (pn, pb) = p in
@@ -4370,7 +4370,7 @@ let init_array runs0 s c l oes =
 (** val run_var_decl_item :
     runs_type -> state -> execution_ctx -> prop_name -> expr option -> result **)
 
-let run_var_decl_item runs0 s c x = function
+let run_var_decl_item runs0 s c x _foo_ = match _foo_ with
 | Some e ->
   if_spec (identifier_resolution runs0 s c x) (fun s1 ir ->
     if_spec (run_expr_get_value runs0 s1 c e) (fun s2 v ->
@@ -4385,7 +4385,7 @@ let run_var_decl_item runs0 s c x = function
     runs_type -> state -> execution_ctx -> (prop_name * expr option) list ->
     result **)
 
-let rec run_var_decl runs0 s c = function
+let rec run_var_decl runs0 s c _foo_ = match _foo_ with
 | [] -> result_out (Coq_out_ter (s, res_empty))
 | y :: xeos' ->
   let (x, eo) = y in
@@ -4396,7 +4396,7 @@ let rec run_var_decl runs0 s c = function
     runs_type -> state -> execution_ctx -> value list -> expr list -> value
     list specres **)
 
-let rec run_list_expr runs0 s1 c vs = function
+let rec run_list_expr runs0 s1 c vs _foo_ = match _foo_ with
 | [] -> res_spec s1 (rev vs)
 | e :: es' ->
   if_spec (run_expr_get_value runs0 s1 c e) (fun s2 v ->
@@ -4405,7 +4405,7 @@ let rec run_list_expr runs0 s1 c vs = function
 (** val run_block :
     runs_type -> state -> execution_ctx -> stat list -> result **)
 
-let rec run_block runs0 s c = function
+let rec run_block runs0 s c _foo_ = match _foo_ with
 | [] -> res_ter s (res_normal Coq_resvalue_empty)
 | t :: ts_rev' ->
   if_success (run_block runs0 s c ts_rev') (fun s0 rv0 ->
@@ -4745,7 +4745,7 @@ let run_stat_while runs0 s c rv labs e1 t2 =
     runs_type -> state -> execution_ctx -> resvalue -> switchclause list ->
     result **)
 
-let rec run_stat_switch_end runs0 s c rv = function
+let rec run_stat_switch_end runs0 s c rv _foo_ = match _foo_ with
 | [] -> result_out (Coq_out_ter (s, (res_normal rv)))
 | y :: scs' ->
   let Coq_switchclause_intro (e, ts) = y in
@@ -4756,7 +4756,7 @@ let rec run_stat_switch_end runs0 s c rv = function
     runs_type -> state -> execution_ctx -> value -> resvalue -> switchclause
     list -> result **)
 
-let rec run_stat_switch_no_default runs0 s c vi rv = function
+let rec run_stat_switch_no_default runs0 s c vi rv _foo_ = match _foo_ with
 | [] -> result_out (Coq_out_ter (s, (res_normal rv)))
 | y :: scs' ->
   let Coq_switchclause_intro (e, ts) = y in
@@ -4908,7 +4908,7 @@ let run_stat_throw runs0 s c e =
 (** val run_stat_return :
     runs_type -> state -> execution_ctx -> expr option -> result **)
 
-let run_stat_return runs0 s c = function
+let run_stat_return runs0 s c _foo_ = match _foo_ with
 | Some e ->
   if_spec (run_expr_get_value runs0 s c e) (fun s1 v1 ->
     res_ter s1 (res_return (Coq_resvalue_value v1)))
@@ -4974,7 +4974,7 @@ let run_stat_for_var runs0 s c labs ds eo2 eo3 t =
 
 (** val run_expr : runs_type -> state -> execution_ctx -> expr -> result **)
 
-let run_expr runs0 s c = function
+let run_expr runs0 s c _foo_ = match _foo_ with
 | Coq_expr_this ->
   result_out (Coq_out_ter (s, (res_val c.execution_ctx_this_binding)))
 | Coq_expr_identifier x ->
@@ -5004,7 +5004,7 @@ let run_expr runs0 s c = function
 
 (** val run_stat : runs_type -> state -> execution_ctx -> stat -> result **)
 
-let run_stat runs0 s c = function
+let run_stat runs0 s c _foo_ = match _foo_ with
 | Coq_stat_expr e ->
   if_spec (run_expr_get_value runs0 s c e) (fun s0 r ->
     res_ter s0 (res_val r))
@@ -5043,7 +5043,7 @@ let run_stat runs0 s c = function
 (** val run_elements :
     runs_type -> state -> execution_ctx -> elements -> result **)
 
-let rec run_elements runs0 s c = function
+let rec run_elements runs0 s c _foo_ = match _foo_ with
 | [] -> result_out (Coq_out_ter (s, (res_normal Coq_resvalue_empty)))
 | el :: els_rev' ->
   if_success (run_elements runs0 s c els_rev') (fun s0 rv0 ->
@@ -5056,7 +5056,7 @@ let rec run_elements runs0 s c = function
 
 (** val run_prog : runs_type -> state -> execution_ctx -> prog -> result **)
 
-let run_prog runs0 s c = function
+let run_prog runs0 s c _foo_ = match _foo_ with
 | Coq_prog_intro (str, els) -> run_elements runs0 s c (rev els)
 
 (** val push :
@@ -5082,7 +5082,7 @@ let rec push runs0 s c l args ilen =
     runs_type -> state -> execution_ctx -> object_loc -> prop_name list ->
     result **)
 
-let rec run_object_is_sealed runs0 s c l = function
+let rec run_object_is_sealed runs0 s c l _foo_ = match _foo_ with
 | [] ->
   if_some (run_object_method object_extensible_ s l) (fun ext ->
     res_ter s (res_val (Coq_value_prim (Coq_prim_bool (neg ext)))))
@@ -5105,7 +5105,7 @@ let rec run_object_is_sealed runs0 s c l = function
     runs_type -> state -> execution_ctx -> object_loc -> prop_name list ->
     result **)
 
-let rec run_object_seal runs0 s c l = function
+let rec run_object_seal runs0 s c l _foo_ = match _foo_ with
 | [] ->
   if_some (run_object_heap_set_extensible false s l) (fun s0 ->
     res_ter s0 (res_val (Coq_value_object l)))
@@ -5138,7 +5138,7 @@ let rec run_object_seal runs0 s c l = function
     runs_type -> state -> execution_ctx -> object_loc -> prop_name list ->
     result **)
 
-let rec run_object_freeze runs0 s c l = function
+let rec run_object_freeze runs0 s c l _foo_ = match _foo_ with
 | [] ->
   if_some (run_object_heap_set_extensible false s l) (fun s0 ->
     res_ter s0 (res_val (Coq_value_object l)))
@@ -5181,7 +5181,7 @@ let rec run_object_freeze runs0 s c l = function
     runs_type -> state -> execution_ctx -> object_loc -> prop_name list ->
     result **)
 
-let rec run_object_is_frozen runs0 s c l = function
+let rec run_object_is_frozen runs0 s c l _foo_ = match _foo_ with
 | [] ->
   if_some (run_object_method object_extensible_ s l) (fun ext ->
     res_ter s (res_val (Coq_value_prim (Coq_prim_bool (neg ext)))))

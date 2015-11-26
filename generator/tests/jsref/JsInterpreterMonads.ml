@@ -44,7 +44,7 @@ let res_void s =
 
 (** val out_from_retn : retn -> out **)
 
-let out_from_retn = function
+let out_from_retn _foo_ = match _foo_ with
 | Coq_specret_val (s, _) -> assert false (* absurd case *)
 | Coq_specret_out o -> o
 

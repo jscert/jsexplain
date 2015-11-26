@@ -25,7 +25,7 @@ let res_label_in r labs =
 
 (** val convert_literal_to_prim : literal -> prim **)
 
-let convert_literal_to_prim = function
+let convert_literal_to_prim _foo_ = match _foo_ with
 | Coq_literal_null -> Coq_prim_null
 | Coq_literal_bool b -> Coq_prim_bool b
 | Coq_literal_number n -> Coq_prim_number n
@@ -33,7 +33,7 @@ let convert_literal_to_prim = function
 
 (** val type_of_prim : prim -> coq_type **)
 
-let type_of_prim = function
+let type_of_prim _foo_ = match _foo_ with
 | Coq_prim_undef -> Coq_type_undef
 | Coq_prim_null -> Coq_type_null
 | Coq_prim_bool b -> Coq_type_bool
@@ -42,7 +42,7 @@ let type_of_prim = function
 
 (** val type_of : value -> coq_type **)
 
-let type_of = function
+let type_of _foo_ = match _foo_ with
 | Coq_value_prim w -> type_of_prim w
 | Coq_value_object o -> Coq_type_object
 
@@ -132,7 +132,7 @@ let attributes_accessor_of_descriptor desc =
 
 (** val descriptor_of_attributes : attributes -> descriptor **)
 
-let descriptor_of_attributes = function
+let descriptor_of_attributes _foo_ = match _foo_ with
 | Coq_attributes_data_of ad ->
   { descriptor_value = (Some ad.attributes_data_value); descriptor_writable =
     (Some ad.attributes_data_writable); descriptor_get = None;
@@ -148,13 +148,13 @@ let descriptor_of_attributes = function
 
 (** val attributes_configurable : attributes -> bool **)
 
-let attributes_configurable = function
+let attributes_configurable _foo_ = match _foo_ with
 | Coq_attributes_data_of ad -> ad.attributes_data_configurable
 | Coq_attributes_accessor_of aa -> aa.attributes_accessor_configurable
 
 (** val attributes_enumerable : attributes -> bool **)
 
-let attributes_enumerable = function
+let attributes_enumerable _foo_ = match _foo_ with
 | Coq_attributes_data_of ad -> ad.attributes_data_enumerable
 | Coq_attributes_accessor_of aa -> aa.attributes_accessor_enumerable
 
@@ -209,7 +209,7 @@ let object_new vproto sclass =
 
 (** val attributes_writable : attributes -> bool **)
 
-let attributes_writable = function
+let attributes_writable _foo_ = match _foo_ with
 | Coq_attributes_data_of ad -> ad.attributes_data_writable
 | Coq_attributes_accessor_of aa -> false
 
@@ -278,7 +278,7 @@ let ref_create_env_loc l x strict =
 
 (** val mutability_of_bool : bool -> mutability **)
 
-let mutability_of_bool = function
+let mutability_of_bool _foo_ = match _foo_ with
 | true -> Coq_mutability_deletable
 | false -> Coq_mutability_nondeletable
 
@@ -418,7 +418,7 @@ let execution_ctx_initial str =
 
 (** val element_funcdecl : element -> funcdecl list **)
 
-let element_funcdecl = function
+let element_funcdecl _foo_ = match _foo_ with
 | Coq_element_stat s -> []
 | Coq_element_func_decl (name, args, bd) ->
   { funcdecl_name = name; funcdecl_parameters = args; funcdecl_body =
@@ -431,7 +431,7 @@ let prog_funcdecl p =
 
 (** val stat_vardecl : stat -> string list **)
 
-let rec stat_vardecl = function
+let rec stat_vardecl _foo_ = match _foo_ with
 | Coq_stat_expr e -> []
 | Coq_stat_label (s0, s) -> stat_vardecl s
 | Coq_stat_block ts -> concat (map stat_vardecl ts)
@@ -462,7 +462,7 @@ let rec stat_vardecl = function
 
 (** val switchbody_vardecl : switchbody -> string list **)
 
-and switchbody_vardecl = function
+and switchbody_vardecl _foo_ = match _foo_ with
 | Coq_switchbody_nodefault scl -> concat (map switchclause_vardecl scl)
 | Coq_switchbody_withdefault (scl1, sl, scl2) ->
   append (concat (map switchclause_vardecl scl1))
@@ -471,12 +471,12 @@ and switchbody_vardecl = function
 
 (** val switchclause_vardecl : switchclause -> string list **)
 
-and switchclause_vardecl = function
+and switchclause_vardecl _foo_ = match _foo_ with
 | Coq_switchclause_intro (e, sl) -> concat (map stat_vardecl sl)
 
 (** val element_vardecl : element -> string list **)
 
-let element_vardecl = function
+let element_vardecl _foo_ = match _foo_ with
 | Coq_element_stat t -> stat_vardecl t
 | Coq_element_func_decl (name, args, bd) -> []
 
@@ -491,14 +491,14 @@ type preftype =
 
 (** val method_of_preftype : preftype -> string **)
 
-let method_of_preftype = function
+let method_of_preftype _foo_ = match _foo_ with
 | Coq_preftype_number -> "valueOf"
 | Coq_preftype_string ->
   "toString"
 
 (** val other_preftypes : preftype -> preftype **)
 
-let other_preftypes = function
+let other_preftypes _foo_ = match _foo_ with
 | Coq_preftype_number -> Coq_preftype_string
 | Coq_preftype_string -> Coq_preftype_number
 
@@ -529,7 +529,7 @@ let sub_one n =
 
 (** val is_syntactic_eval : expr -> bool **)
 
-let is_syntactic_eval = function
+let is_syntactic_eval _foo_ = match _foo_ with
 | Coq_expr_this -> false
 | Coq_expr_identifier s -> string_comparable s ("eval")
 | Coq_expr_literal l ->
@@ -553,7 +553,7 @@ let is_syntactic_eval = function
 
 (** val elision_head_count : 'a1 option list -> int **)
 
-let rec elision_head_count = function
+let rec elision_head_count _foo_ = match _foo_ with
 | [] -> 0
 | o :: ol' ->
   (match o with
@@ -583,15 +583,16 @@ let elision_tail_remove ol =
 
 let parse_pickable = (fun s strict ->
     let str = String.concat "" (List.map (String.make 1) s) in
-    try
+    (* try  ARTHUR HACK *)
       let parserExp = Parser_main.exp_from_string ~force_strict:strict str in
       Some (JsSyntaxInfos.add_infos_prog strict
         (Translate_syntax.exp_to_prog parserExp))
-    with
-    (* | Translate_syntax.CoqSyntaxDoesNotSupport _ -> assert false (* Temporary *) *)
-    | Parser.ParserFailure _ [@f]  (** Auto Generated Attributes **)
-    | Parser.InvalidArgument ->
-      prerr_string ("Warning:  Parser error on eval.  Input string:  \"" ^ str ^ "\"\n");
-      None
+    (* with
+      (* | Translate_syntax.CoqSyntaxDoesNotSupport _ -> assert false (* Temporary *) *)
+      | Parser.ParserFailure _ [@f]  (** Auto Generated Attributes **)
+      | Parser.InvalidArgument ->
+        prerr_string ("Warning:  Parser error on eval.  Input string:  \"" ^ str ^ "\"\n");
+        None
+    *)
   )
 

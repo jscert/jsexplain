@@ -74,7 +74,7 @@ let object_prealloc_global_proto = (Coq_value_prim Coq_prim_null)
 (** val object_prealloc_global_class : string **)
 
 let object_prealloc_global_class = (
-  let rec aux s = function
+  let rec aux s _foo_ = match _foo_ with
   | 0 -> []
   | n -> let n' = n - 1 in
     s.[n'] :: aux s n'
