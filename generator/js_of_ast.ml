@@ -227,6 +227,14 @@ let id_fresh =
 
 
 (****************************************************************)
+(* FRESH TOKEN NAMES *)
+
+let token_fresh =
+  let r = ref 0 in
+  fun () -> (incr r; Printf.sprintf "#%d#" !r)
+
+
+(****************************************************************)
 (* CONTEXTS *)
 
 (** Fresh name generator for contexts *)
@@ -245,11 +253,11 @@ let ctx_initial =
 let generate_logged_case spat binders ctx newctx sbody need_break =
   (* Note: binders is a list of pairs of id *)
   (* Note: if binders = [], then newctx = ctx *)
+  let token = token_fresh () in
   let sintro =
   match !current_mode with
-  | Mode_line_token
+  | Mode_line_token -> ""
   | Mode_logged ->
-    let token = "123" in
     let ids = List.map fst binders in
     let mk_binding x =
       Printf.sprintf "{key: \"%s\", val: %s}" x x
@@ -266,7 +274,9 @@ let generate_logged_case spat binders ctx newctx sbody need_break =
   | Mode_unlogged -> ""
   in
   let sbinders = ppf_match_binders binders in
-  (Printf.sprintf "@[<v 0>%s:@;<1 2>@[<v 0>%s%s%s%s@]@]" spat sbinders sintro sbody
+  (Printf.sprintf "@[<v 0>%s%s:@;<1 2>@[<v 0>%s%s%s%s@]@]"
+     (match !current_mode with Mode_line_token -> token | _ -> "")
+     spat sbinders sintro sbody
      (if need_break then "@,break;" else ""))
 
 
@@ -289,12 +299,13 @@ with help of
 (* LATER: optimize return when it's a value *)
 
 let generate_logged_return ctx sbody = 
+  let token = token_fresh () in
   match !current_mode with
-  | Mode_line_token
+  | Mode_line_token ->
+     Printf.sprintf "%sreturn %s;" token sbody
   | Mode_logged ->
     let id = id_fresh "_return_" in
-    let token = "12" in
-    Printf.sprintf "var %s = %s;@,log_event(lineof(%s), ctx_push(%s, {\"return_value\", %s}), \"return\");@,return %s@,"
+    Printf.sprintf "var %s = %s;@,log_event(lineof(%s), ctx_push(%s, {\"return_value\", %s}), \"return\");@,return %s"
       id sbody token ctx id id
   | Mode_unlogged -> 
      Printf.sprintf "return %s;" sbody
@@ -312,10 +323,11 @@ var t=e; logEvent(LINEOF(432423), ctx_push(ctx, {"return",t}), "return"); return
 
 
 let generate_logged_let ids ctx newctx sdecl sbody =
+  let token = token_fresh () in
   match !current_mode with
-  | Mode_line_token
+  | Mode_line_token ->
+     Printf.sprintf "%s%s@,%s" sdecl token sbody
   | Mode_logged ->
-    let token = "42" in
     let mk_binding x =
       Printf.sprintf "{key: \"%s\", val: %s}" x x
     in
@@ -341,11 +353,11 @@ var x=e; var newctx=ctx_push(ctx,x,e); logEvent(LINEOF(432423), "let", ctx);sbod
 (* LATER: factoriser les bindings *)
 
 let generate_logged_enter arg_ids ctx newctx sbody = 
+  let token = token_fresh () in
   let sintro =
     match !current_mode with
-    | Mode_line_token
+    | Mode_line_token -> token
     | Mode_logged ->
-      let token = "51" in
       let mk_binding x =
         Printf.sprintf "{key: \"%s\", val: %s}" x x
       in

@@ -51,12 +51,15 @@ tests/%.ml.d: tests/%.ml
 	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
 
 tests/%.cmi tests/%.unlog.js: tests/%.ml main.byte stdlib
-	./main.byte -I $(<D) $<
+	./main.byte -mode unlog -I $(<D) $<
 
 tests/%.log.js: tests/%.ml tests/%.cmi main.byte stdlib
-	./main.byte -I $(<D) -log $<
+	./main.byte -mode log -I $(<D) $<
 
-tests: $(ML_TESTS:.ml=.log.js)
+tests/%.token.js: tests/%.ml tests/%.cmi main.byte stdlib
+	./main.byte -mode token -I $(<D) $<
+
+tests: $(ML_TESTS:.ml=.log.js) $(ML_TESTS:.ml=.token.js)
 
 tests/lambda: tests/lambda/Lambda.log.js
 tests/jsref: tests/jsref/JsInterpreter.log.js
@@ -64,7 +67,7 @@ tests/jsref: tests/jsref/JsInterpreter.log.js
 clean_stdlib:
 	rm -f $(STD_DIR)/*.cmi
 
-DIRTY_EXTS := cmi,js.pre,js,d
+DIRTY_EXTS := cmi,token.js,js,d
 clean_tests:
 	rm -f $(TEST_DIR)/*.{$(DIRTY_EXTS)}
 	rm -f $(TEST_DIR)/lambda/*.{$(DIRTY_EXTS)}
