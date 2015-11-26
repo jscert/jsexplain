@@ -1,4 +1,9 @@
 
+let testp1 x = 
+  let (a,b,c) = x in
+  a+b
+
+
 let testa x = 
   x
 

@@ -473,6 +473,15 @@ and js_of_expression_inline_or_wrap ctx e =
 and js_of_expression_wrapped ctx e = (* dest = Dest_return *)
   ppf_lambda_wrap (js_of_expression ctx Dest_return e)
 
+and js_of_expression_naming_argument_if_non_variable ctx obj name_prefix = 
+  match obj.exp_desc with
+  | Texp_ident (_, ident,  _) -> 
+      "", (js_of_longident ident)
+  | _ ->  (* generate  var id = sexp;  *)
+      let id = id_fresh "_switch_arg_" in
+      let sintro = js_of_expression ctx (Dest_assign id) obj in
+      (sintro ^ "@,"), id
+
 and js_of_expression ctx dest e =
   let inline_of_wrap = js_of_expression_inline_or_wrap ctx in (* shorthand *)
   let loc = e.exp_loc in
@@ -488,13 +497,31 @@ and js_of_expression ctx dest e =
 
   | Texp_let   (_, vb_l, e) ->
     reject_inline dest;
-    let (ids,sdecls) = List.split (List.map (fun vb -> show_value_binding ctx vb) @@ vb_l) in
-    let sdecl = String.concat lin1 @@ sdecls in
+    let (ids, sdecl) = begin match vb_l with  
+      | [ { vb_pat = { pat_desc = Tpat_tuple el }; vb_expr = obj } ] -> (* binding tuples *)
+         let (sintro, seobj) = js_of_expression_naming_argument_if_non_variable ctx obj "_switch_arg_" in     
+         let bind i var = 
+            match var.pat_desc with
+            | Tpat_var (id, _) -> 
+                let sid = ppf_ident id in
+                (sid, Printf.sprintf "%s[%d]" seobj i)
+            | Tpat_any -> out_of_scope var.pat_loc "Underscore pattern in let tuple"
+            | _ -> out_of_scope var.pat_loc "Nested pattern matching"
+            in
+          let binders = List.mapi bind el in
+          let ids = List.map fst binders in
+          let sdecl = ppf_match_binders binders in
+          (ids, sdecl)
+      | _ -> (* other cases *)
+        let (ids,sdecls) = List.split (List.map (fun vb -> show_value_binding ctx vb) @@ vb_l) in
+        let sdecl = String.concat lin1 @@ sdecls in
+        (ids, sdecl)
+      end in
     let newctx = ctx_fresh() in
     let sbody = js_of_expression newctx dest e in
     let sexp = generate_logged_let ids ctx newctx sdecl sbody in
     sexp
-   
+
   | Texp_function (_, c :: [], Total) ->
     let rec explore pats e = match e.exp_desc with
       | Texp_function (_, c :: [], Total) ->
@@ -527,19 +554,11 @@ and js_of_expression ctx dest e =
         in
      apply_dest ctx dest sexp
 
-  | Texp_match (exp, l, [], Total) ->
+  | Texp_match (obj, l, [], Total) ->
      reject_inline dest;
-     let (sintro, seobj) = 
-        match exp.exp_desc with
-        | Texp_ident (_, ident,  _) -> 
-            "", (js_of_longident ident)
-        | _ ->  (* generate  var id = sexp;  *)
-            let id = id_fresh "_switch_arg_" in
-            let sintro = js_of_expression ctx (Dest_assign id) exp in
-            (sintro ^ "@,"), id
-        in
+     let (sintro, seobj) = js_of_expression_naming_argument_if_non_variable ctx obj "_switch_arg_" in     
      let sb = String.concat "@," (List.map (fun b -> js_of_branch ctx dest b seobj) l) in
-     let const = exp_type_is_constant exp in
+     let const = exp_type_is_constant obj in
      let sexp = sintro ^ (ppf_match seobj sb const) in
      sexp
 
@@ -655,7 +674,7 @@ and js_of_pattern pat obj =
       let binders = map_cstr_fields ~loc bind cd el in
       spat, binders
   | Tpat_var (id, _) -> unsupported ~loc "Tpat_var"
-  | Tpat_tuple el -> unsupported ~loc "tuple matching"
+  | Tpat_tuple el -> unsupported ~loc "tuple matching, if not in a simple let-binding"
   | Tpat_array el -> unsupported ~loc "array-match"
   | Tpat_record (_,_) -> unsupported ~loc "record"
   | Tpat_or (_,_,_) -> error ~loc "not implemented yet"
