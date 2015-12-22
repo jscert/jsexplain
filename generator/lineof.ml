@@ -71,28 +71,9 @@ end
 let hashtbl_keys t =
   Hashtbl.fold (fun key value acc -> key::acc) t []
 
-
 (*#########################################################################*)
 
-(* Generate a JS function of the following form:
-
-function lineof(filename, token) {
-  switch (filename) {
-    case "foo.js": 
-      switch (token) {
-        case 2: return {start: {line: 12, col: 9}, stop: {line: 13, col: 2}};
-        case 19: return {start: {line: 15, col: 9}, stop: {line: 14, col: 5}};
-        default: throw "lineof does not know token " + token + " in file: " + filename
-      }
-      break;
-    case "bar.js": 
-      ...
-    default:
-      throw "lineof does not know file: " + filename
-  }
-}
-
-*)
+(* Gather the position of all tokens the form #<324#  and #324># *)
 
 type pos = { pos_line: int; pos_col: int }
 type tokens_start = (int, pos) Hashtbl.t
@@ -102,45 +83,51 @@ type tokens = (string * tokens_start * tokens_stop) list ref
 let tokens : tokens = ref []
 
 let gather_tokens basename input_lines =
+  let find_tokens tokens_table regexp =
+    ~~ List.iteri input_lines (fun line input ->
+      let r = Str.regexp regexp in 
+      let i = ref 0 in
+      let mk_pos () = { pos_line = line; pos_col = !i } in
+      try
+        while true do 
+          (* Printf.printf "search from %d\n" !i; *)
+          let j = Str.search_forward r input !i in
+          i := j+1;
+          let key = Str.matched_group 1 input in
+          let pos = mk_pos() in
+          (* Printf.printf "matched key: %s\n" key; *)
+          Hashtbl.add tokens_table (int_of_string key) pos
+        done;
+      with Not_found -> () 
+      );
+     in
   let tokens_start = Hashtbl.create 50 in
   let tokens_stop = Hashtbl.create 50 in
-  (* start tokens *) 
-  ~~ List.iteri input_lines (fun line input ->
-    let r = Str.regexp "#<\\([0-9]*\\)#" in 
-    let i = ref 0 in
-    let mk_pos () = { pos_line = line; pos_col = !i } in
-    try
-      while true do 
-        (* Printf.printf "search from %d\n" !i; *)
-        let j = Str.search_forward r input !i in
-        i := j+1;
-        let key = Str.matched_group 1 input in
-        let pos = mk_pos() in
-        (* Printf.printf "matched key: %s\n" key; *)
-        Hashtbl.add tokens_start (int_of_string key) pos
-      done;
-    with Not_found -> () 
-    );
-  (* end tokens *) 
-  ~~ List.iteri input_lines (fun line input ->
-    let r = Str.regexp "#\\([0-9]*\\)>#" in 
-    let i = ref 0 in
-    let mk_pos () = { pos_line = line; pos_col = !i } in
-    try
-      while true do 
-        (* Printf.printf "search from %d\n" !i; *)
-        let j = Str.search_forward r input !i in
-        i := j+1;
-        let key = Str.matched_group 1 input in
-        let pos = mk_pos() in
-        (* Printf.printf "matched key: %s\n" key;   *)
-        Hashtbl.add tokens_stop (int_of_string key) pos
-      done;
-    with Not_found -> ()
-    );
-  (* final *)
+  find_tokens tokens_start "#<\\([0-9]*\\)#";
+  find_tokens tokens_stop "#\\([0-9]*\\)>#";
   tokens := (basename, tokens_start, tokens_stop)::!tokens
 
+
+(*#########################################################################*)
+
+(* Generate a JS function of the following form:
+
+  function lineof(filename, token) {
+    switch (filename) {
+      case "foo.js": 
+        switch (token) {
+          case 2: return {start: {line: 12, col: 9}, stop: {line: 13, col: 2}};
+          case 19: return {start: {line: 15, col: 9}, stop: {line: 14, col: 5}};
+          default: throw "lineof does not know token " + token + " in file: " + filename
+        }
+        break;
+      case "bar.js": 
+        ...
+      default:
+        throw "lineof does not know file: " + filename
+    }
+  }
+*)
 
 let generate_lineof_function output_file : string =
   let aux_pos pos =
@@ -176,7 +163,6 @@ let generate_lineof_function output_file : string =
 
 
 (*#########################################################################*)
-
 
 
 let files = ref ([]:string list)
