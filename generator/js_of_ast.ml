@@ -620,8 +620,15 @@ and js_of_constant = function
   | Const_nativeint n     -> Nativeint.to_string n
 
 and js_of_longident loc =
-  let res = String.concat "." @@ Longident.flatten loc.txt in
-  if res = "()" then "undefined" else ppf_ident_name res
+  match String.concat "." @@ Longident.flatten loc.txt with
+  | "()"  -> "undefined"
+  | "+."  -> "+"
+  | "*."  -> "*"
+  | "-."  -> "-"
+  | "~-." -> "-"
+  | "/."  -> "/"
+  | "="   -> "=="
+  | res   -> ppf_ident_name res
 
 and ident_of_pat pat = match pat.pat_desc with
   | Tpat_var (id, _) -> ppf_ident id
