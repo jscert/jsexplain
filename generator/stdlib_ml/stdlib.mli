@@ -102,6 +102,7 @@ module String : sig
   val concat : string -> string list -> string
   val iter : (char -> unit) -> string -> unit
   val make : int -> char -> string
+  val get : string -> int -> char
 end
 
 (* Coq outputs exceptions in the place of arbitrary *)
