@@ -1,4 +1,5 @@
 *.cmi
 *.log.js
 *.unlog.js
+*.token.js
 *.pre
