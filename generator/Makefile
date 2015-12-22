@@ -2,11 +2,11 @@
 
 # requires: opam switch 4.02.1; eval `opam config env`
 
-STD_DIR	    := stdlib_ml
+STD_DIR     := stdlib_ml
 TEST_DIR    := tests
 ML_TESTS    := $(wildcard $(TEST_DIR)/*.ml)
 ML_LAMBDA   := $(wildcard $(TEST_DIR)/lambda/*.ml)
-ML_JSREF    := $(wildcard $(TEST_DIR)/jsref/*.ml)
+ML_JSREF    := $(wildcard $(TEST_DIR)/jsref/*.ml) $(wildcard $(TEST_DIR)/jsref/*.mli)
 
 OCAMLBUILD  := ocamlbuild -j 4 -classic-display -use-ocamlfind
 
@@ -47,13 +47,16 @@ tests/%.ml: tests/%.v
 #	../../convert-ml-strings.pl tests/jsref/*.ml
 #	cd $(@D) && $(CURDIR)/../../ml-add-cstr-annots.pl *.ml
 
+tests/%.mli.d: tests/%.mli
+	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
+
 tests/%.ml.d: tests/%.ml
 	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
 
-tests/%.cmi tests/%.unlog.js: tests/%.ml main.byte stdlib
+tests/%.unlog.js: tests/%.ml main.byte stdlib
 	./main.byte -mode unlog -I $(<D) $<
 
-tests/%.cmi tests/%.unlog.js: tests/%.mli stdlib
+tests/%.cmi: tests/%.mli stdlib
 	ocamlc -I stdlib_ml -open Stdlib -I $(<D) $<
 
 
@@ -75,6 +78,7 @@ DIRTY_EXTS := cmi,token.js,js,d
 clean_tests:
 	rm -f $(TEST_DIR)/*.{$(DIRTY_EXTS)}
 	rm -f $(TEST_DIR)/lambda/*.{$(DIRTY_EXTS)}
+	rm -f $(TEST_DIR)/jsref/*.{$(DIRTY_EXTS)}
 
 clean:
 	rm -rf _build
@@ -93,6 +97,7 @@ endif
 
 ifeq ($(MAKECMDGOALS),tests/jsref)
 -include $(ML_JSREF:.ml=.ml.d)
+-include $(ML_JSREF:.mli=.mli.d)
 endif
 
 
