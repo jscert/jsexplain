@@ -6,14 +6,16 @@ STD_DIR     := stdlib_ml
 TEST_DIR    := tests
 ML_TESTS    := $(wildcard $(TEST_DIR)/*.ml)
 ML_LAMBDA   := $(wildcard $(TEST_DIR)/lambda/*.ml)
-ML_JSREF    := $(wildcard $(TEST_DIR)/jsref/*.ml) $(wildcard $(TEST_DIR)/jsref/*.mli)
+ML_JSREF    := $(wildcard $(TEST_DIR)/jsref/*.ml) 
+MLI_JSREF   := $(wildcard $(TEST_DIR)/jsref/*.mli)
 
 OCAMLBUILD  := ocamlbuild -j 4 -classic-display -use-ocamlfind
 
 # Used for stdlib and generator dependency generation
 CC          := ocamlc -c
 OCAMLDEP    := ocamldep -one-line
-DEPSED      := sed -e "s/cmo/log.js/; s/cmo/cmi/g; s/cmx/cmi/g"
+# DEPSED      := sed -e "s/cmo/log.js/; s/cmo/cmi/g; s/cmx/cmi/g"
+DEPSED      := sed -e "s/cmx/cmi/; s/cmx/cmi/g"
 
 all: main.byte
 
@@ -47,24 +49,47 @@ tests/%.ml: tests/%.v
 #	../../convert-ml-strings.pl tests/jsref/*.ml
 #	cd $(@D) && $(CURDIR)/../../ml-add-cstr-annots.pl *.ml
 
+# tests/%.cmi: tests/%.log.js
+# tests/jsref/%.cmi: tests/jsref/%.log.js
+# tests/jsref/BinNat.cmi : tests/jsref/BinNat.log.js 
+
 tests/%.mli.d: tests/%.mli
 	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
 
 tests/%.ml.d: tests/%.ml
 	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
 
+tests/%.log.js: tests/%.ml main.byte stdlib tests/%.cmi
+	./main.byte -mode log -I $(<D) $<
+
 tests/%.unlog.js: tests/%.ml main.byte stdlib
 	./main.byte -mode unlog -I $(<D) $<
 
-tests/%.cmi: tests/%.mli stdlib
-	ocamlc -I stdlib_ml -open Stdlib -I $(<D) $<
+tests/%.token.js: tests/%.ml main.byte stdlib 
+	./main.byte -mode token -I $(<D) $<
 
 
-tests/%.log.js: tests/%.ml tests/%.cmi main.byte stdlib
+-include  tests/jsref/BinNat.ml.d
+
+tests/%.cmi: tests/%.ml main.byte stdlib 
 	./main.byte -mode log -I $(<D) $<
 
-tests/%.token.js: tests/%.ml tests/%.cmi main.byte stdlib
-	./main.byte -mode token -I $(<D) $<
+
+
+
+tests/%.cmi: tests/%.ml main.byte stdlib
+	./main.byte -mode unlog -I $(<D) $<
+
+
+
+tests/jsref/Translate_syntax.cmi: tests/jsref/Translate_syntax.mli stdlib 
+	ocamlc -I tests/jsref -I stdlib_ml -open Stdlib $<
+
+
+
+# tests/%.cmi: tests/%.mli stdlib
+#	ocamlc -I stdlib_ml -open Stdlib -I $(<D) $<
+
 
 tests: $(ML_TESTS:.ml=.log.js) $(ML_TESTS:.ml=.token.js)
 
@@ -76,9 +101,9 @@ clean_stdlib:
 
 DIRTY_EXTS := cmi,token.js,js,d
 clean_tests:
-	rm -f $(TEST_DIR)/*.{$(DIRTY_EXTS)}
-	rm -f $(TEST_DIR)/lambda/*.{$(DIRTY_EXTS)}
-	rm -f $(TEST_DIR)/jsref/*.{$(DIRTY_EXTS)}
+	bash -c "rm -f $(TEST_DIR)/*.{$(DIRTY_EXTS)}"
+	bash -c "rm -f $(TEST_DIR)/lambda/*.{$(DIRTY_EXTS)}"
+	bash -c "rm -f $(TEST_DIR)/jsref/*.{$(DIRTY_EXTS)}"
 
 clean:
 	rm -rf _build
@@ -91,14 +116,17 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 -include $(ML_TESTS:.ml=.ml.d)
 endif
 
-ifeq ($(MAKECMDGOALS),tests/lambda)
+#ifeq ($(MAKECMDGOALS),tests/lambda)
+ifneq ($(findstring tests/lambda,$(MAKECMDGOALS)),)
 -include $(ML_LAMBDA:.ml=.ml.d)
 endif
 
-ifeq ($(MAKECMDGOALS),tests/jsref)
+ifneq ($(findstring tests/jsref,$(MAKECMDGOALS)),)
+#$(error $(ML_JSREF:.ml=.ml.d))
 -include $(ML_JSREF:.ml=.ml.d)
--include $(ML_JSREF:.mli=.mli.d)
+-include $(MLI_JSREF:.mli=.mli.d)
 endif
+
 
 
 
