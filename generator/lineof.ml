@@ -63,19 +63,6 @@ module XFile = struct
      close_in f;
      XList.rev_not_rec !lines
 
-  (** Read the content of a file as a list of lines;
-      returns an empty list if no such file exists *)
-
-  let get_lines_or_empty file =
-     try get_lines file
-     with FileNotFound _ -> []
-
-  (** Read the content of a file as a string, terminated with a newline;
-      raise FileNotFound if no such file exists *)
-
-  let get_contents file =
-     let lines = get_lines file in
-     (String.concat "\n" lines) ^ "\n"
 
 end
 
@@ -114,15 +101,15 @@ type tokens = (string * tokens_start * tokens_stop) list ref
 
 let tokens : tokens = ref []
 
-let gather_tokens basename input =
+let gather_tokens basename input_lines =
   let tokens_start = Hashtbl.create 50 in
   let tokens_stop = Hashtbl.create 50 in
   (* start tokens *) 
-  begin
+  ~~ List.iteri input_lines (fun line input ->
     let r = Str.regexp "#<\\([0-9]*\\)#" in 
     let i = ref 0 in
-    let mk_pos () = { pos_line = !i; pos_col = 0 } in
-    begin try
+    let mk_pos () = { pos_line = line; pos_col = !i } in
+    try
       while true do 
         (* Printf.printf "search from %d\n" !i; *)
         let j = Str.search_forward r input !i in
@@ -132,15 +119,14 @@ let gather_tokens basename input =
         (* Printf.printf "matched key: %s\n" key; *)
         Hashtbl.add tokens_start (int_of_string key) pos
       done;
-    with
-      | Not_found -> () end;
-  end;
+    with Not_found -> () 
+    );
   (* end tokens *) 
-  begin
+  ~~ List.iteri input_lines (fun line input ->
     let r = Str.regexp "#\\([0-9]*\\)>#" in 
     let i = ref 0 in
-    let mk_pos () = { pos_line = !i; pos_col = 0 } in
-    begin try
+    let mk_pos () = { pos_line = line; pos_col = !i } in
+    try
       while true do 
         (* Printf.printf "search from %d\n" !i; *)
         let j = Str.search_forward r input !i in
@@ -150,9 +136,8 @@ let gather_tokens basename input =
         (* Printf.printf "matched key: %s\n" key;   *)
         Hashtbl.add tokens_stop (int_of_string key) pos
       done;
-    with
-      | Not_found -> () end;
-  end;
+    with Not_found -> ()
+    );
   (* final *)
   tokens := (basename, tokens_start, tokens_stop)::!tokens
 
@@ -165,7 +150,7 @@ let generate_lineof_function output_file : string =
     Printf.sprintf "case %d: return {start: %s, stop: %s};" key (aux_pos pos_start) (aux_pos pos_stop)
     in
   let aux_file (basename, tokens_start, tokens_stop) =
-    let filename = basename ^ "js" in
+    let filename = basename ^ ".js" in
     let keys = hashtbl_keys tokens_start in
     let skeycases = String.concat "@," (~~ List.map keys (fun key -> 
      let pos_start = try Hashtbl.find tokens_start key
@@ -230,8 +215,8 @@ let _ =
      if not (Filename.check_suffix filename ".token.js") then
        failwith "Input file must be of the form *.token.js";
      let basename = Filename.chop_suffix (Filename.basename filename) ".token.js" in
-     let input = XFile.get_contents filename in
-     gather_tokens basename input
+     let input_lines = XFile.get_lines filename in
+     gather_tokens basename input_lines
    );
 
    (*---------------------------------------------------*)
