@@ -229,9 +229,18 @@ let id_fresh =
 (****************************************************************)
 (* FRESH TOKEN NAMES *)
 
+let token_basename_ref = ref "no_token_basename_registered"
+
+let token_register_basename basename =
+  token_basename_ref := basename
+
 let token_fresh =
   let r = ref 0 in
-  fun () -> (incr r; Printf.sprintf "#%d#" !r)
+  fun () -> (incr r; 
+    let token_start = Printf.sprintf "#<%d#" !r in
+    let token_stop = Printf.sprintf "#%d>#" !r in
+    let token_lineof = Printf.sprintf "lineof(\"%s.js\", %d)" !token_basename_ref !r in  
+    (token_start, token_stop, token_lineof))
 
 
 (****************************************************************)
@@ -253,29 +262,31 @@ let ctx_initial =
 let generate_logged_case spat binders ctx newctx sbody need_break =
   (* Note: binders is a list of pairs of id *)
   (* Note: if binders = [], then newctx = ctx *)
-  let token = token_fresh () in
-  let sintro =
-  match !current_mode with
-  | Mode_line_token -> token
-  | Mode_logged ->
-    let ids = List.map fst binders in
-    let mk_binding x =
-      Printf.sprintf "{key: \"%s\", val: %s}" x x
+  let (token_start, token_stop, token_lineof) = token_fresh() in
+  let (shead, sintro) =
+    match !current_mode with
+    | Mode_line_token -> 
+      (token_start, token_stop)
+    | Mode_logged ->
+      let ids = List.map fst binders in
+      let mk_binding x =
+        Printf.sprintf "{key: \"%s\", val: %s}" x x
+      in
+      let bindings =
+        Printf.sprintf "[%s]" (show_list ", " (List.map mk_binding ids))
+      in 
+      let spreintro =
+        if binders = [] then ""
+        else Printf.sprintf "var %s = ctx_push(%s, %s);@," newctx ctx bindings
+      in
+      let sintro = Printf.sprintf "%slog_event(%s, %s, \"case\");@,"
+        spreintro token_lineof newctx in
+      ("", sintro)
+    | Mode_unlogged -> ("", "")
     in
-    let bindings =
-      Printf.sprintf "[%s]" (show_list ", " (List.map mk_binding ids))
-    in 
-    let spreintro =
-      if binders = [] then ""
-      else Printf.sprintf "var %s = ctx_push(%s, %s);@," newctx ctx bindings
-    in
-    Printf.sprintf "%slog_event(lineof(%s), %s, \"case\");@,"
-      spreintro token newctx
-  | Mode_unlogged -> ""
-  in
   let sbinders = ppf_match_binders binders in
-  (Printf.sprintf "@[<v 0>%s:@;<1 2>@[<v 0>%s%s%s%s@]@]"
-     spat sbinders sintro sbody
+  (Printf.sprintf "@[<v 0>%s%s:@;<1 2>@[<v 0>%s%s%s%s@]@]"
+     shead spat sbinders sintro sbody
      (if need_break then "@,break;" else ""))
 
 
@@ -298,14 +309,14 @@ with help of
 (* LATER: optimize return when it's a value *)
 
 let generate_logged_return ctx sbody = 
-  let token = token_fresh () in
+  let (token_start, token_stop, token_lineof) = token_fresh() in
   match !current_mode with
   | Mode_line_token ->
-     Printf.sprintf "%sreturn %s;" token sbody
+     Printf.sprintf "%sreturn %s;%s" token_start sbody token_stop
   | Mode_logged ->
     let id = id_fresh "_return_" in
-    Printf.sprintf "var %s = %s;@,log_event(lineof(%s), ctx_push(%s, {\"return_value\", %s}), \"return\");@,return %s"
-      id sbody token ctx id id
+    Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, {\"return_value\", %s}), \"return\");@,return %s"
+      id sbody token_lineof ctx id id
   | Mode_unlogged -> 
      Printf.sprintf "return %s;" sbody
      (* Printf.sprintf "@[<v 0>return %s;@]" sbody *)
@@ -322,10 +333,10 @@ var t=e; logEvent(LINEOF(432423), ctx_push(ctx, {"return",t}), "return"); return
 
 
 let generate_logged_let ids ctx newctx sdecl sbody =
-  let token = token_fresh () in
+  let (token_start, token_stop, token_lineof) = token_fresh() in
   match !current_mode with
   | Mode_line_token ->
-     Printf.sprintf "%s%s@,%s" sdecl token sbody
+     Printf.sprintf "%s%s%s@,%s" token_start sdecl token_stop sbody  
   | Mode_logged ->
     let mk_binding x =
       Printf.sprintf "{key: \"%s\", val: %s}" x x
@@ -333,8 +344,8 @@ let generate_logged_let ids ctx newctx sdecl sbody =
     let bindings =
       Printf.sprintf "[%s]" (show_list ", " (List.map mk_binding ids))
     in 
-    Printf.sprintf "%s@,var %s = ctx_push(%s, %s);@,log_event(lineof(%s), %s, \"let\");@,%s@,"
-      sdecl newctx ctx bindings token newctx sbody
+    Printf.sprintf "%s@,var %s = ctx_push(%s, %s);@,log_event(%s, %s, \"let\");@,%s@,"
+      sdecl newctx ctx bindings token_lineof newctx sbody
   | Mode_unlogged -> 
      Printf.sprintf "%s@,%s" sdecl sbody
 
@@ -352,10 +363,10 @@ var x=e; var newctx=ctx_push(ctx,x,e); logEvent(LINEOF(432423), "let", ctx);sbod
 (* LATER: factoriser les bindings *)
 
 let generate_logged_enter arg_ids ctx newctx sbody = 
-  let token = token_fresh () in
-  let sintro =
+  let (token_start, token_stop, token_lineof) = token_fresh() in
+  let (shead1, shead2, sintro) =
     match !current_mode with
-    | Mode_line_token -> token
+    | Mode_line_token -> (token_start, token_stop, "")
     | Mode_logged ->
       let mk_binding x =
         Printf.sprintf "{key: \"%s\", val: %s}" x x
@@ -363,12 +374,13 @@ let generate_logged_enter arg_ids ctx newctx sbody =
       let bindings =
         Printf.sprintf "[%s]" (show_list ", " (List.map mk_binding arg_ids))
       in 
-      Printf.sprintf "var %s = ctx_push(%s, %s);@,log_event(lineof(%s), %s, \"enter\");@,"
-        newctx ctx bindings token newctx
-    | Mode_unlogged -> ""
+      let sintro = Printf.sprintf "var %s = ctx_push(%s, %s);@,log_event(%s, %s, \"enter\");@,"
+        newctx ctx bindings token_lineof newctx in
+      ("", "", sintro)
+    | Mode_unlogged -> ("", "", "")
   in
   let args = String.concat ", " arg_ids in
-  Printf.sprintf "function (%s) {@;<1 2>@[<v 0>%s%s@]@,}" args sintro sbody
+  Printf.sprintf "%sfunction (%s)%s {@;<1 2>@[<v 0>%s%s@]@,}" shead1 args shead2 sintro sbody
 
 (*
 
@@ -690,12 +702,14 @@ and js_of_pattern pat obj =
   | Tpat_variant (_,_,_) -> out_of_scope loc "polymorphic variants in pattern matching"
   | Tpat_lazy _ -> out_of_scope loc "lazy-pattern"
 
-let to_javascript module_name typedtree =
+let to_javascript basename module_name typedtree =
+  token_register_basename basename;
   let content = js_of_structure typedtree in
   let pre_res = ppf_module_wrap module_name content in
   let str_ppf = Format.str_formatter in
   Format.fprintf str_ppf (Scanf.format_from_string pre_res "");
   Format.flush_str_formatter ()
+
 
 (****************************************************************)
 (* COMMENTS *)

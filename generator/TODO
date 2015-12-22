@@ -1,0 +1,9 @@
+
+
+- untab closing bracket for fun def
+
+- default case with error in switch, for logged/token mode
+
+- understand spec of polymorphic equality (= vs ===)
+
+- {type: "()"} devrait être "unit"

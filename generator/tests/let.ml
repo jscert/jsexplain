@@ -1,6 +1,14 @@
-let abr = 1
-and bli = 4 in
-if true then abr else bli
+
+
+let test0 x =
+  let y = 2*x in
+  y+y
+
+
+let foo x =
+  let abr = 1
+  and bli = 4 in
+  if true then abr else bli
 
 let app x = x
 

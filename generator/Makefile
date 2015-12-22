@@ -97,6 +97,9 @@ endif
 
 
 
+arthur: lineof.byte
+	./lineof.byte -o tests/calc.lineof.js tests/calc.token.js
+
 
 # TODO
 

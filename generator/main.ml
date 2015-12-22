@@ -44,14 +44,14 @@ let _ =
 
    (*---------------------------------------------------*)
    (* "reading and typing source file" *)
-   let (opt, _, modulename) = process_implementation_file ppf sourcefile in
+   let (opt, _, module_name) = process_implementation_file ppf sourcefile in
    let ((parsetree1 : Parsetree.structure), typedtree1) =
       match opt with
       | None -> failwith "Could not read and typecheck input file"
       | Some (parsetree1, (typedtree1,_)) -> parsetree1, typedtree1
       in
 
-      let out = Js_of_ast.to_javascript modulename typedtree1 in
+      let out = Js_of_ast.to_javascript basename module_name typedtree1 in
       let output_filename = match !current_mode with
         | Mode_unlogged -> unlog_output
         | Mode_logged -> log_output
