@@ -59,31 +59,37 @@ tests/%.mli.d: tests/%.mli
 tests/%.ml.d: tests/%.ml
 	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
 
+tests/%.cmi: tests/%.ml main.byte stdlib 
+	./main.byte -mode cmi -I $(<D) $<
+
 tests/%.log.js: tests/%.ml main.byte stdlib tests/%.cmi
 	./main.byte -mode log -I $(<D) $<
 
-tests/%.unlog.js: tests/%.ml main.byte stdlib
+tests/%.unlog.js: tests/%.ml main.byte stdlib tests/%.cmi 
 	./main.byte -mode unlog -I $(<D) $<
 
-tests/%.token.js: tests/%.ml main.byte stdlib 
+tests/%.token.js: tests/%.ml main.byte stdlib tests/%.cmi  
 	./main.byte -mode token -I $(<D) $<
 
-
--include  tests/jsref/BinNat.ml.d
-
-tests/%.cmi: tests/%.ml main.byte stdlib 
-	./main.byte -mode log -I $(<D) $<
+#tests/%.cmi: tests/%.ml main.byte stdlib
+#	./main.byte -mode unlog -I $(<D) $<
 
 
-
-
-tests/%.cmi: tests/%.ml main.byte stdlib
-	./main.byte -mode unlog -I $(<D) $<
-
-
+# ad hoc rules
 
 tests/jsref/Translate_syntax.cmi: tests/jsref/Translate_syntax.mli stdlib 
 	ocamlc -I tests/jsref -I stdlib_ml -open Stdlib $<
+ 
+tests/jsref/Prheap.cmi: tests/jsref/Prheap.mli stdlib tests/jsref/JsSyntax.cmi
+	ocamlc -I tests/jsref -I stdlib_ml -open Stdlib $<
+
+
+
+
+
+
+
+
 
 
 

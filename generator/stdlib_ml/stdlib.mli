@@ -138,8 +138,3 @@ end
 val print_endline : string -> unit
 
 val __LOC__ : string
-
-module Prheap : sig
-  val prstate : bool -> string -> string
-  val string_of_char_list : string -> string
-end

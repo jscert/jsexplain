@@ -42,8 +42,12 @@ let _ =
      | Some f -> f ^ ".log.js", f ^ ".unlog.js", f ^ ".token.js"
    in
 
+   if !current_mode <> Mode_cmi
+      then Clflags.dont_write_files := true;
+
    (*---------------------------------------------------*)
    (* "reading and typing source file" *)
+
    let (opt, _, module_name) = process_implementation_file ppf sourcefile in
    let ((parsetree1 : Parsetree.structure), typedtree1) =
       match opt with
@@ -51,10 +55,14 @@ let _ =
       | Some (parsetree1, (typedtree1,_)) -> parsetree1, typedtree1
       in
 
-      let out = Js_of_ast.to_javascript basename module_name typedtree1 in
-      let output_filename = match !current_mode with
-        | Mode_unlogged -> unlog_output
-        | Mode_logged -> log_output
-        | Mode_line_token -> token_output
-      in
-      file_put_contents output_filename out
+      match !current_mode with
+        | Mode_cmi -> Printf.printf "wrote cmi file\n"
+        | _ ->
+          let out = Js_of_ast.to_javascript basename module_name typedtree1 in
+          let output_filename = match !current_mode with
+            | Mode_unlogged -> unlog_output
+            | Mode_logged -> log_output
+            | Mode_line_token -> token_output
+          in
+          file_put_contents output_filename out;
+          Printf.printf "wrote %s\n" output_filename

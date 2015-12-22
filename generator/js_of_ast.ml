@@ -604,6 +604,9 @@ and js_of_expression ctx dest e =
     (* ppf_for (ppf_ident id) (js_of_expression st) (js_of_expression ed) fl (js_of_expression body) *)
   | Texp_record     (llde,_)          -> ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, inline_of_wrap exp)) llde)
   | Texp_field      (exp, _, lbl)     -> ppf_field_access (inline_of_wrap exp) lbl.lbl_name
+  | Texp_assert      e                -> 
+      let sexp = inline_of_wrap e in
+      Printf.sprintf "throw %s;" sexp
 
   | Texp_match      (_,_,_, Partial)  -> out_of_scope loc "partial matching"
   | Texp_match      (_,_,_,_)         -> out_of_scope loc "matching with exception branches"
@@ -617,7 +620,6 @@ and js_of_expression ctx dest e =
   | Texp_setinstvar (_,_,_,_)         -> out_of_scope loc "objects"
   | Texp_override   (_,_)             -> out_of_scope loc "objects"
   | Texp_letmodule  (_,_,_,_)         -> out_of_scope loc "local modules"
-  | Texp_assert      _                -> out_of_scope loc "assert"
   | Texp_lazy        _                -> out_of_scope loc "lazy expressions"
   | Texp_object     (_,_)             -> out_of_scope loc "objects"
   | Texp_pack        _                -> out_of_scope loc "packing"

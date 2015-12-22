@@ -76,10 +76,10 @@ let destr_list l d f =
 (** val if_empty_label :
     state -> res -> (unit -> 'a1 resultof) -> 'a1 resultof **)
 
-let if_empty_label s r k =
+let if_empty_label (s:state) r k =
   if label_comparable r.res_label Coq_label_empty
   then k ()
-  else (fun s message ->
+  else (fun (s:state) message ->
   print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
     ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
   Coq_result_impossible)
@@ -134,7 +134,7 @@ let if_ter w k =
     resvalue -> result -> (state -> resvalue -> result) -> result **)
 
 let if_success_state rv w k =
-  if_ter w (fun s0 r ->
+  if_ter w (fun (s0:state) r ->
     match r.res_type with
     | Coq_restype_normal ->
       if_empty_label s0 r (fun x ->
