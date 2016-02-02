@@ -86,12 +86,6 @@ module Int64 : sig
   val float_of_bits : int64 -> float
 end
 
-(* This may be awkward! *)
-module Lazy : sig
-  type 'a t
-  val force : 'a t -> 'a (* ARTHUR added *)
-end
-
 module List : sig
   val map : ('a -> 'b) -> 'a list -> 'b list
   val rev : 'a list -> 'a list

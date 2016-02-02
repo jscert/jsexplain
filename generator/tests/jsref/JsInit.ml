@@ -4,9 +4,8 @@ open JsPreliminary
 open JsSyntax
 open JsSyntaxAux
 open LibInt
-open LibStream
 
-(** val prop_attributes_for_global_object : value -> attributes_data **)
+(** Val prop_attributes_for_global_object : value -> attributes_data **)
 
 let prop_attributes_for_global_object v =
   { attributes_data_value = v; attributes_data_writable = true;

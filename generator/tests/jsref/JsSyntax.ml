@@ -1,7 +1,6 @@
 open JsNumber
 open LibHeap
 open LibReflect
-open LibStream
 open Shared
 
 module Heap = HeapGen(HeapList)

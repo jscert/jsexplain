@@ -6,7 +6,6 @@ open JsSyntaxAux
 open LibList
 open LibNat
 open LibOption
-open LibStream
 open LibString
 open List0
 open Shared
