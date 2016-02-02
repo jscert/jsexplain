@@ -101,6 +101,7 @@ tests: $(ML_TESTS:.ml=.log.js) $(ML_TESTS:.ml=.token.js)
 
 tests/lambda: tests/lambda/Lambda.log.js
 tests/jsref: tests/jsref/JsInterpreter.log.js
+tests/jsrefunlog: tests/jsref/JsInterpreter.unlog.js
 
 clean_stdlib:
 	rm -f $(STD_DIR)/*.cmi

@@ -1,4 +1,6 @@
+- deal with unsupported let record in jsinterpreter.ml
 
+- cases seem to be in reversed order, check and fix
 
 - untab closing bracket for fun def
 
@@ -7,3 +9,31 @@
 - understand spec of polymorphic equality (= vs ===)
 
 - {type: "()"} devrait être "unit"
+
+- Choose a small example
+
+    var x = 3;
+    x = 4;
+    if (x === 4) {
+      while (true) {}
+    }
+
+- write a JS function that takes an esprima AST as input (sub-language for the
+  moment) that generates an AST in our syntax (encoded of concrete types):
+    { type : constructor; label0 : value ; … }
+  this should remember locations
+
+- edit JsSyntax.ml to put readable labels
+
+- write a driver in JS
+  - take a program in the text area
+  - parse to esprima
+  - translate to our syntax
+  - call JsInterpreter.js using the correct function (see run_js.ml)
+
+- translate stdlib.ml into stdlib.js
+
+- change constructors to functions, and generate nicer looking JS code for
+  these functions
+
+- correct the Makefile to make sure we do not generate everything all the time
