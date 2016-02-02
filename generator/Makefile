@@ -149,3 +149,4 @@ arthur: lineof.byte
 # fix functor translation
 # missing return in:    funcdecl_name: function (x) { x.funcdecl_name},
 # change extraction of:   native_error_compare
+# object_prealloc_global_class is defined in JsInterpreterExtraction
