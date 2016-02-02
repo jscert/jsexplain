@@ -10,7 +10,7 @@ open LibReflect
 open LibString
 open Shared
 
-let __ = let rec f _ = Obj.repr f in Obj.repr f
+let __ = ()
 
 (** val if_some_then_same_dec :
     'a1 option -> 'a1 option -> ('a1 -> 'a1 -> coq_Decidable) ->

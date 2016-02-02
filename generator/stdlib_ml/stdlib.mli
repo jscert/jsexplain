@@ -51,6 +51,8 @@ val ( <= ) : 'a -> 'a -> bool
 val ( >= ) : 'a -> 'a -> bool
 val compare : 'a -> 'a -> int
 
+val ( && ) : bool -> bool -> bool
+
 val stuck : string -> 'a
 
 (* Structural equality, need to be careful with implementation *)
@@ -111,6 +113,7 @@ val raise : exn -> 'a
 (* JSRef specific functions *)
 val prerr_string : string -> unit
 val prerr_newline : unit -> unit
+val prerr_endline : string -> unit
 
 
 module Parser_syntax : sig (* ARTHUR: to implement *)

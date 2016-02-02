@@ -6,7 +6,7 @@ open LibList
 open LibOption
 open Shared
 
-type __ = Obj.t
+type __ = unit
 
 type 't resultof =
 | Coq_result_some  [@f label0] of 't (** Auto Generated Attributes **)

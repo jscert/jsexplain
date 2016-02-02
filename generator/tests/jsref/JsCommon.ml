@@ -188,7 +188,8 @@ let object_alloc s o =
     state_fresh_locations = state_fresh_locations0; state_event_list =
     ev_list } = s
   in
-  let Coq_stream_intro (n, alloc) = Lazy.force state_fresh_locations0 in
+  let n = state_fresh_locations0 in
+  let alloc = state_fresh_locations0 + 1 in
   let l = Coq_object_loc_normal n in
   (l,
   (object_write { state_object_heap = cells; state_env_record_heap =
@@ -312,7 +313,8 @@ let env_record_alloc s e =
     state_fresh_locations = state_fresh_locations0; state_event_list =
     ev_list } = s
   in
-  let Coq_stream_intro (l, alloc) = Lazy.force state_fresh_locations0 in
+  let l =  state_fresh_locations0 in
+  let alloc = state_fresh_locations0 + 1 in
   let bindings' = Heap.write bindings l e in
   (l, { state_object_heap = cells; state_env_record_heap = bindings';
   state_fresh_locations = alloc; state_event_list = ev_list })
@@ -582,7 +584,7 @@ let elision_tail_remove ol =
 (** val parse_pickable : string -> bool -> prog coq_Pickable_option **)
 
 let parse_pickable = (fun s strict ->
-    let str = String.concat "" (List.map (String.make 1) s) in
+    let str = s in
     (* try  ARTHUR HACK *)
       let parserExp = Parser_main.exp_from_string ~force_strict:strict str in
       Some (JsSyntaxInfos.add_infos_prog strict

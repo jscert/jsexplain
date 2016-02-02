@@ -574,7 +574,7 @@ type event =
 
 type state = { state_object_heap : (object_loc, coq_object) Heap.heap;
                state_env_record_heap : (env_loc, env_record) Heap.heap;
-               state_fresh_locations : int stream;
+               state_fresh_locations : int;
                state_event_list : event list }
 
 (** val state_object_heap : state -> (object_loc, coq_object) Heap.heap **)

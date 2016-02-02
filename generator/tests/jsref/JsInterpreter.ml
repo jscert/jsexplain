@@ -23,8 +23,8 @@ open List0
 open Shared
 open String0
 
-type __ = Obj.t
-let __ = let rec f _ = Obj.repr f in Obj.repr f
+type __ = unit
+let __ = ()
 
 (** val build_error : state -> value -> value -> result **)
 
@@ -68,7 +68,7 @@ let run_object_method proj s l =
 let run_object_method proj s l =
    let opt = object_binds_pickable_option s l in
      begin match opt with
-       | None -> prerr_endline (Printf.sprintf "Warning: in run_object_method the location %s is unfetchable." (Prheap.prloc l))
+       | None -> prerr_endline ("Warning: in run_object_method the location" ^ (Prheap.prloc l) ^ " is unfetchable." )
        | _ -> ()
      end;
      LibOption.map proj opt
@@ -83,7 +83,7 @@ let run_object_heap_set_extensible b s l =
 let run_object_heap_set_extensible b s l =
    let opt = object_binds_pickable_option s l in
      begin match opt with
-       | None -> prerr_endline (Printf.sprintf "Warning: in run_object_heap_set_extensible the location %s is unfetchable." (Prheap.prloc l))
+       | None -> prerr_endline ("Warning: in run_object_heap_set_extensible the location " ^ (Prheap.prloc l) ^ " is unfetchable." )
        | _ -> ()
      end;
      LibOption.map (fun o -> object_write s l (object_set_extensible o b)) opt
@@ -1353,11 +1353,20 @@ let ref_get_value runs0 s c _foo_ = match _foo_ with
 
 let ref_get_value runs s c r =
    let res = ref_get_value runs s c r in match res with
-     | JsInterpreterMonads.Coq_result_some (Coq_specret_val (_, rs)) -> begin match rs with
-         | Coq_value_prim (Coq_prim_undef) ->
+   | JsInterpreterMonads.Coq_result_some crs ->
+     begin match crs with
+       | (Coq_specret_val (_,rs)) ->
+         begin match rs with
+           | Coq_value_prim cvp ->
+             begin match cvp with
+               | Coq_prim_undef ->
            prerr_string ("Warning: ref_get_value returns the undefined value on "); prerr_string (Prheap.prresvalue r); prerr_newline(); res
+               | _ -> res
+             end
          | _ -> res
-       end
+         end
+       | _ -> res
+     end
      | _ -> res
  
  (** val run_expr_get_value :
@@ -2353,7 +2362,7 @@ let run_construct_prealloc runs0 s c b args =
                 res_ter s' (res_val (Coq_value_object l)))))) (fun follow ->
           let_binding (LibList.length args) (fun arg_len ->
             if nat_comparable arg_len 0
-            then follow s []
+            then follow s ""
             else let_binding (get_arg 0 args) (fun arg ->
                    if_string (to_string runs0 s c arg) (fun s0 s1 ->
                      follow s0 s1))))))
@@ -2728,7 +2737,7 @@ let make_arg_getter runs0 s c x x0 =
 let make_arg_setter runs0 s c x x0 =
   let xparam = append x ("_arg") in
   let xbd =
-    append x (append (" = ") (append xparam (';'::[])))
+    append x (append (" = ") (append xparam ";"))
   in
   let bd = Coq_funcbody_intro ((Coq_prog_intro (true, ((Coq_element_stat
     (Coq_stat_expr (Coq_expr_assign ((Coq_expr_identifier x), None,
@@ -2768,7 +2777,7 @@ let rec arguments_object_map_loop runs0 s c l xs len args x str lmap xsmap =
             (fun s1 b ->
             if ge_nat_decidable len' (LibList.length xs)
             then arguments_object_map_loop' s1 xsmap
-            else let dummy = [] in
+            else let dummy = "" in
                  let_binding (nth_def dummy len' xs) (fun x0 ->
                    if or_decidable (bool_comparable str true)
                         (coq_Mem_decidable string_comparable x0 xsmap)
@@ -5236,8 +5245,8 @@ let valueToStringForJoin runs0 s c l k =
       match v with
       | Coq_value_prim p ->
         (match p with
-         | Coq_prim_undef -> res_spec s1 []
-         | Coq_prim_null -> res_spec s1 []
+         | Coq_prim_undef -> res_spec s1 ""
+         | Coq_prim_null -> res_spec s1 ""
          | Coq_prim_bool b ->
            if_string (to_string runs0 s1 c v) (fun s2 s3 -> res_spec s2 s3)
          | Coq_prim_number n ->
@@ -5933,7 +5942,7 @@ let run_call_prealloc runs0 s c b vthis args =
               if_string (to_string runs0 s2 c rsep) (fun s3 sep ->
                 if int_comparable ilen (my_Z_of_nat 0)
                 then res_ter s3
-                       (res_val (Coq_value_prim (Coq_prim_string [])))
+                       (res_val (Coq_value_prim (Coq_prim_string "")))
                 else let_binding (valueToStringForJoin runs0 s3 c l 0.)
                        (fun sR ->
                        if_spec sR (fun s4 sR0 ->
@@ -5975,7 +5984,7 @@ let run_call_prealloc runs0 s c b vthis args =
           push runs0 s2 c l args ilen)))
   | Coq_prealloc_string ->
     if list_eq_nil_decidable args
-    then res_ter s (res_val (Coq_value_prim (Coq_prim_string [])))
+    then res_ter s (res_val (Coq_value_prim (Coq_prim_string "")))
     else let_binding (get_arg 0 args) (fun value0 ->
            if_string (to_string runs0 s c value0) (fun s0 s1 ->
              res_ter s0 (res_val (Coq_value_prim (Coq_prim_string s1)))))

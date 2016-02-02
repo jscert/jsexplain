@@ -73,14 +73,7 @@ let object_prealloc_global_proto = (Coq_value_prim Coq_prim_null)
 
 (** val object_prealloc_global_class : string **)
 
-let object_prealloc_global_class = (
-  let rec aux s _foo_ = match _foo_ with
-  | 0 -> []
-  | n -> let n' = n - 1 in
-    s.[n'] :: aux s n'
-  in let aux2 s =
-    List.rev (aux s (String.length s))
-  in aux2 "GlobalClass")
+let object_prealloc_global_class = "GlobalClass"
 
 (** val object_prealloc_global_properties :
     (prop_name, attributes) Heap.heap **)
@@ -791,7 +784,7 @@ let object_prealloc_string_proto =
       Coq_prealloc_object_proto))
       ("String") p1
   in
-  object_with_primitive_value o (Coq_value_prim (Coq_prim_string []))
+  object_with_primitive_value o (Coq_value_prim (Coq_prim_string ""))
 
 (** val string_proto_to_string_function_object : coq_object **)
 
@@ -905,7 +898,7 @@ let object_prealloc_error_proto =
   in
   let p1 =
     write_native p0 ("message")
-      (Coq_value_prim (Coq_prim_string []))
+      (Coq_value_prim (Coq_prim_string ""))
   in
   let p2 =
     write_native p1
@@ -950,7 +943,7 @@ let object_prealloc_native_error_proto ne =
   in
   let p1 =
     write_native p0 ("message")
-      (Coq_value_prim (Coq_prim_string []))
+      (Coq_value_prim (Coq_prim_string ""))
   in
   object_create_builtin (Coq_value_object (Coq_object_loc_prealloc
     Coq_prealloc_error_proto)) ("Error") p1
@@ -1326,15 +1319,9 @@ let env_record_heap_initial =
   Heap.write Heap.empty env_loc_global_env_record
     (env_record_object_default (Coq_object_loc_prealloc Coq_prealloc_global))
 
-(** val all_locations : int -> int stream **)
-
-let rec all_locations k =
-  lazy (Coq_stream_intro (k, (all_locations (Pervasives.succ k))))
-
 (** val dummy_fresh_locations : int stream **)
 
-let dummy_fresh_locations =
-  all_locations (Pervasives.succ 0)
+let dummy_fresh_locations = 0
 
 (** val state_initial : state **)
 
