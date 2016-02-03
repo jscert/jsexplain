@@ -654,8 +654,16 @@ and js_of_let_pattern ctx pat expr =
   let id = 
     match pat.pat_desc with
     | Tpat_var (id, _) -> ppf_ident id
-    | _ -> 
-      Printf.printf "warning: unsupported let-record\n"; ""
+    | Tpat_any -> Printf.printf "warning: unsupported let-any\n"; ""
+    | Tpat_alias _ -> Printf.printf "warning: unsupported let-alias\n"; ""
+    | Tpat_constant _ -> Printf.printf "warning: unsupported let-constant\n"; ""
+    | Tpat_tuple _ -> Printf.printf "warning: unsupported let-tuple\n"; ""
+    | Tpat_construct _ -> Printf.printf "warning: unsupported let-construct\n"; ""
+    | Tpat_variant _ -> Printf.printf "warning: unsupported let-variant\n"; ""
+    | Tpat_record _ -> Printf.printf "warning: unsupported let-record\n"; ""
+    | Tpat_array _ -> Printf.printf "warning: unsupported let-array\n"; ""
+    | Tpat_or _ -> Printf.printf "warning: unsupported let-or\n"; ""
+    | Tpat_lazy _ -> Printf.printf "warning: unsupported let-lazy\n"; ""
       (*  error ~loc:pat.pat_loc "let can't deconstruct values"  *)
     in
   (id, js_of_expression ctx (Dest_assign id) expr)
