@@ -33,7 +33,7 @@ let le_int_decidable = (<=)
 
 (** val ge_nat_decidable : int -> int -> coq_Decidable **)
 
-let ge_nat_decidable = (>=)
+let ge_nat_decidable = int_ge
 
 type 'a coq_Pickable_option =
   'a option

@@ -307,7 +307,7 @@ let runs_type_object_define_own_prop_array_loop x = x.runs_type_object_define_ow
 
 let object_has_prop runs0 s c l x =
   if_some (run_object_method object_has_prop_ s l) (fun b ->
-    let Coq_builtin_has_prop_default = b in
+    match b with Coq_builtin_has_prop_default ->
     if_spec (runs0.runs_type_object_get_prop s c l x) (fun s1 d ->
       res_ter s1
         (res_val (Coq_value_prim (Coq_prim_bool
@@ -371,7 +371,7 @@ let run_object_get runs0 s c l x =
 
 let run_object_get_prop runs0 s c l x =
   if_some (run_object_method object_get_prop_ s l) (fun b ->
-    let Coq_builtin_get_prop_default = b in
+    match b with Coq_builtin_get_prop_default ->
     if_spec (runs0.runs_type_object_get_own_prop s c l x) (fun s1 d ->
       if full_descriptor_comparable d Coq_full_descriptor_undef
       then if_some (run_object_method object_proto_ s1 l) (fun proto ->
@@ -462,7 +462,7 @@ let object_proto_is_prototype_of runs0 s l0 l =
 
 let object_default_value runs0 s c l prefo =
   if_some (run_object_method object_default_value_ s l) (fun b ->
-    let Coq_builtin_default_value_default = b in
+    match b with Coq_builtin_default_value_default ->
     let gpref = unsome_default Coq_preftype_number prefo in
     let lpref = other_preftypes gpref in
     let_binding (fun s' x k ->
@@ -550,7 +550,7 @@ let to_string runs0 s c _foo_ = match _foo_ with
 
 let object_can_put runs0 s c l x =
   if_some (run_object_method object_can_put_ s l) (fun b ->
-    let Coq_builtin_can_put_default = b in
+    match b with Coq_builtin_can_put_default ->
     if_spec (runs0.runs_type_object_get_own_prop s c l x) (fun s1 d ->
       match d with
       | Coq_full_descriptor_undef ->
@@ -1381,7 +1381,7 @@ let run_expr_get_value runs0 s c e =
     -> prop_name -> value -> strictness_flag -> result_void **)
 
 let object_put_complete runs0 b s c vthis l x v str =
-  let Coq_builtin_put_default = b in
+  match b with Coq_builtin_put_default ->
   if_bool (object_can_put runs0 s c l x) (fun s1 b0 ->
     if b0
     then if_spec (runs0.runs_type_object_get_own_prop s1 c l x) (fun s2 d ->
@@ -2751,7 +2751,7 @@ let make_arg_setter runs0 s c x x0 =
     string list -> result_void **)
 
 let rec arguments_object_map_loop runs0 s c l xs len args x str lmap xsmap =
-  (fun fO fS n -> if n=0 then fO () else fS (n-1))
+  (fun fO fS n -> if int_eq n 0 then fO () else fS (n-1))
     (fun _ ->
     if list_eq_nil_decidable xsmap
     then res_void s
@@ -4757,7 +4757,7 @@ let run_stat_while runs0 s c rv labs e1 t2 =
 let rec run_stat_switch_end runs0 s c rv _foo_ = match _foo_ with
 | [] -> result_out (Coq_out_ter (s, (res_normal rv)))
 | y :: scs' ->
-  let Coq_switchclause_intro (e, ts) = y in
+  match y with Coq_switchclause_intro (e, ts) ->
   if_success_state rv (run_block runs0 s c (rev ts)) (fun s1 rv1 ->
     run_stat_switch_end runs0 s1 c rv1 scs')
 
@@ -4768,7 +4768,7 @@ let rec run_stat_switch_end runs0 s c rv _foo_ = match _foo_ with
 let rec run_stat_switch_no_default runs0 s c vi rv _foo_ = match _foo_ with
 | [] -> result_out (Coq_out_ter (s, (res_normal rv)))
 | y :: scs' ->
-  let Coq_switchclause_intro (e, ts) = y in
+  match y with Coq_switchclause_intro (e, ts) ->
   if_spec (run_expr_get_value runs0 s c e) (fun s1 v1 ->
     let_binding (strict_equality_test v1 vi) (fun b ->
       if b
@@ -4791,7 +4791,7 @@ let run_stat_switch_with_default_default runs0 s c ts scs =
 let rec run_stat_switch_with_default_B runs0 s c vi rv ts0 scs = match scs with
 | [] -> run_stat_switch_with_default_default runs0 s c ts0 scs
 | y :: scs' ->
-  let Coq_switchclause_intro (e, ts) = y in
+  match y with Coq_switchclause_intro (e, ts) ->
   if_spec (run_expr_get_value runs0 s c e) (fun s1 v1 ->
     let_binding (strict_equality_test v1 vi) (fun b ->
       if b
@@ -4810,7 +4810,7 @@ let rec run_stat_switch_with_default_A runs0 s c found vi rv scs1 ts0 scs2 =
     then run_stat_switch_with_default_default runs0 s c ts0 scs2
     else run_stat_switch_with_default_B runs0 s c vi rv ts0 scs2
   | y :: scs' ->
-    let Coq_switchclause_intro (e, ts) = y in
+    match y with Coq_switchclause_intro (e, ts) ->
     let_binding (fun s0 ->
       if_success_state rv (run_block runs0 s0 c (rev ts)) (fun s1 rv0 ->
         run_stat_switch_with_default_A runs0 s1 c true vi rv0 scs' ts0 scs2))
@@ -6142,7 +6142,7 @@ let run_javascript runs0 p =
 (** val runs : int -> runs_type **)
 
 let rec runs max_step =
-  (fun fO fS n -> if n=0 then fO () else fS (n-1))
+  (fun fO fS n -> if int_eq n 0 then fO () else fS (n-1))
     (fun _ -> { runs_type_expr = (fun s x x0 -> Coq_result_bottom s);
     runs_type_stat = (fun s x x0 -> Coq_result_bottom s); runs_type_prog =
     (fun s x x0 -> Coq_result_bottom s); runs_type_call =

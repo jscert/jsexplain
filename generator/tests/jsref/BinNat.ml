@@ -11,7 +11,11 @@ let __ = let rec f _ = Obj.repr f in Obj.repr f
 module N = 
  struct 
   type t = float
-  
+
+    (* HACK *)
+  let is_even p =
+     float_eq (mod_float p 2.) 0.
+
   (** val zero : float **)
   
   let zero =
@@ -30,7 +34,7 @@ module N =
   (** val succ_double : float -> float **)
   
   let succ_double x =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       1.)
       (fun p -> ((fun p -> 1. +. (2. *. p))
@@ -40,7 +44,7 @@ module N =
   (** val double : float -> float **)
   
   let double n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       0.)
       (fun p -> ((fun p -> 2. *. p)
@@ -58,7 +62,7 @@ module N =
   (** val succ_pos : float -> float **)
   
   let succ_pos n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       1.)
       (fun p ->
@@ -79,21 +83,21 @@ module N =
   
   (** val compare : float -> float -> comparison **)
   
-  let compare = fun x y -> if x=y then Eq else if x<y then Lt else Gt
+  let compare = fun x y -> if float_eq x y then Eq else if x<y then Lt else Gt
   
   (** val eqb : float -> float -> bool **)
   
   let rec eqb n m =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
-      (fun f0 fp n -> if n=0. then f0 () else fp n)
+      (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
         (fun _ ->
         true)
         (fun p ->
         false)
         m)
       (fun p ->
-      (fun f0 fp n -> if n=0. then f0 () else fp n)
+      (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
         (fun _ ->
         false)
         (fun q ->
@@ -128,12 +132,12 @@ module N =
   (** val div2 : float -> float **)
   
   let div2 n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       0.)
       (fun p0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun p ->
         p)
         (fun p ->
@@ -146,12 +150,12 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val even : float -> bool **)
   
   let even n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       true)
       (fun p ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun p0 ->
         false)
         (fun p0 ->
@@ -169,11 +173,11 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val pow : float -> float -> float **)
   
   let pow n p =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       1.)
       (fun p0 ->
-      (fun f0 fp n -> if n=0. then f0 () else fp n)
+      (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
         (fun _ ->
         0.)
         (fun q ->
@@ -184,7 +188,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val square : float -> float **)
   
   let square n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       0.)
       (fun p ->
@@ -194,12 +198,12 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val log2 : float -> float **)
   
   let log2 n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       0.)
       (fun p0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun p ->
         (Pos.size p))
         (fun p ->
@@ -212,7 +216,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val size : float -> float **)
   
   let size n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       0.)
       (fun p ->
@@ -222,7 +226,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val size_nat : float -> int **)
   
   let size_nat n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       0)
       (fun p ->
@@ -233,7 +237,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec pos_div_eucl a b =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun a' ->
       let (q, r) = pos_div_eucl a' b in
       let r' = succ_double r in
@@ -243,12 +247,12 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
       let r' = double r in
       if leb b r' then ((succ_double q), (sub r' b)) else ((double q), r'))
       (fun _ ->
-      (fun f0 fp n -> if n=0. then f0 () else fp n)
+      (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
         (fun _ -> (0.,
         1.))
         (fun p ->
         (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
           (fun p0 -> (0.,
           1.))
           (fun p0 -> (0.,
@@ -262,11 +266,11 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val div_eucl : float -> float -> float * float **)
   
   let div_eucl a b =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ -> (0.,
       0.))
       (fun na ->
-      (fun f0 fp n -> if n=0. then f0 () else fp n)
+      (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
         (fun _ -> (0.,
         a))
         (fun p ->
@@ -276,7 +280,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   (** val div : float -> float -> float **)
   
-  let div = (fun x y -> if x = 0. then 0. else floor (x /. y))
+  let div = (fun x y -> if float_eq x 0. then 0. else floor (x /. y))
   
   (** val modulo : float -> float -> float **)
   
@@ -285,11 +289,11 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val gcd : float -> float -> float **)
   
   let gcd a b =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       b)
       (fun p ->
-      (fun f0 fp n -> if n=0. then f0 () else fp n)
+      (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
         (fun _ ->
         a)
         (fun q ->
@@ -300,11 +304,11 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val ggcd : float -> float -> float * (float * float) **)
   
   let ggcd a b =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ -> (b, (0.,
       1.)))
       (fun p ->
-      (fun f0 fp n -> if n=0. then f0 () else fp n)
+      (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
         (fun _ -> (a, (1.,
         0.)))
         (fun q ->
@@ -315,7 +319,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val sqrtrem : float -> float * float **)
   
   let sqrtrem n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ -> (0.,
       0.))
       (fun p ->
@@ -329,7 +333,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val sqrt : float -> float **)
   
   let sqrt n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       0.)
       (fun p ->
@@ -339,11 +343,11 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val coq_lor : float -> float -> float **)
   
   let coq_lor n m =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       m)
       (fun p ->
-      (fun f0 fp n -> if n=0. then f0 () else fp n)
+      (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
         (fun _ ->
         n)
         (fun q ->
@@ -354,11 +358,11 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val coq_land : float -> float -> float **)
   
   let coq_land n m =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       0.)
       (fun p ->
-      (fun f0 fp n -> if n=0. then f0 () else fp n)
+      (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
         (fun _ ->
         0.)
         (fun q ->
@@ -369,11 +373,11 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val ldiff : float -> float -> float **)
   
   let rec ldiff n m =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       0.)
       (fun p ->
-      (fun f0 fp n -> if n=0. then f0 () else fp n)
+      (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
         (fun _ ->
         n)
         (fun q ->
@@ -384,11 +388,11 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val coq_lxor : float -> float -> float **)
   
   let coq_lxor n m =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       m)
       (fun p ->
-      (fun f0 fp n -> if n=0. then f0 () else fp n)
+      (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
         (fun _ ->
         n)
         (fun q ->
@@ -409,7 +413,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val shiftl : float -> float -> float **)
   
   let shiftl a n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       0.)
       (fun a0 ->
@@ -419,7 +423,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val shiftr : float -> float -> float **)
   
   let shiftr a n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       a)
       (fun p ->
@@ -429,7 +433,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val testbit_nat : float -> int -> bool **)
   
   let testbit_nat a =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ x ->
       false)
       (fun p ->
@@ -439,7 +443,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val testbit : float -> float -> bool **)
   
   let testbit a n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       false)
       (fun p ->
@@ -449,7 +453,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val to_nat : float -> int **)
   
   let to_nat a =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       0)
       (fun p ->
@@ -459,7 +463,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val of_nat : int -> float **)
   
   let of_nat n =
-    (fun fO fS n -> if n=0 then fO () else fS (n-1))
+    (fun fO fS n -> if int_eq n 0 then fO () else fS (n-1))
       (fun _ ->
       0.)
       (fun n' ->
@@ -469,7 +473,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val iter : float -> ('a1 -> 'a1) -> 'a1 -> 'a1 **)
   
   let iter n f x =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       x)
       (fun p ->
@@ -479,16 +483,16 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val eq_dec : float -> float -> bool **)
   
   let eq_dec n m =
-    ((fun f0 fp n -> if n=0. then f0 () else fp n)
+    ((fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
        (fun _ m0 ->
-       (fun f0 fp n -> if n=0. then f0 () else fp n)
+       (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
          (fun _ ->
          true)
          (fun p ->
          false)
          m0)
        (fun x m0 ->
-       (fun f0 fp n -> if n=0. then f0 () else fp n)
+       (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
          (fun _ ->
          false)
          (fun p0 ->
@@ -499,7 +503,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val discr : float -> float option **)
   
   let discr n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       None)
       (fun p -> Some
@@ -512,13 +516,13 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   let binary_rect f0 f2 fS2 n =
     let f2' = fun p -> f2 p in
     let fS2' = fun p -> fS2 p in
-    ((fun f0 fp n -> if n=0. then f0 () else fp n)
+    ((fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
        (fun _ ->
        f0)
        (fun p ->
        let rec f p0 =
          (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
            (fun p1 ->
            fS2' p1 (f p1))
            (fun p1 ->
@@ -539,7 +543,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let peano_rect f0 f n =
     let f' = fun p -> f p in
-    ((fun f0 fp n -> if n=0. then f0 () else fp n)
+    ((fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
        (fun _ ->
        f0)
        (fun p ->

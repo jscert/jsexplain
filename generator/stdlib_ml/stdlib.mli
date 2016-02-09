@@ -43,20 +43,33 @@ val int_of_float : float -> int
 val string_of_float : float -> string
 val string_of_int : int -> string
 
-val ( === ) : 'a -> 'a -> bool
-val ( <> ) : 'a -> 'a -> bool
-val ( < ) : 'a -> 'a -> bool
+(*val ( === ) : 'a -> 'a -> bool*)
+(*val ( <> ) : 'a -> 'a -> bool*)
+(*val ( < ) : 'a -> 'a -> bool
 val ( > ) : 'a -> 'a -> bool
 val ( <= ) : 'a -> 'a -> bool 
 val ( >= ) : 'a -> 'a -> bool
-val compare : 'a -> 'a -> int
+*)
+val ( = ) : float -> float -> bool
+val ( < ) : float -> float -> bool
+val ( > ) : float -> float -> bool
+val ( <= ) : float -> float -> bool 
+val ( >= ) : float -> float -> bool
+(*val compare : 'a -> 'a -> int*)
+
+val bool_eq : bool -> bool -> bool
+val int_eq : int -> int -> bool
+val int_ge : int -> int -> bool
+val string_eq : string -> string -> bool
+val float_eq : float -> float -> bool
+val float_compare : float -> float -> int
 
 val ( && ) : bool -> bool -> bool
-
+val not : bool -> bool
 val stuck : string -> 'a
 
-(* Structural equality, need to be careful with implementation *)
-val (=) : 'a -> 'a -> bool
+(* Structural equality, need to be careful with implementation 
+val (=) : 'a -> 'a -> bool*)
 
 val (^) : string -> string -> string
 

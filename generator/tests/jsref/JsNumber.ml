@@ -52,7 +52,7 @@ let ln2 = (log 2.)
 let from_string = (fun s ->
     (*try*)
      (* let s = (String.concat "" (List.map (String.make 1) s)) in ARTHUR hack*)
-      if s = "" then 0. else float_of_string s
+      if string_eq s "" then 0. else float_of_string s
     (* FIXME: with Failure "float_of_string" -> nan *) )
    (* Note that we're using `float_of_string' there, which does not have the same
       behavior than JavaScript.  For instance it will read "022" as 22 instead of
@@ -65,9 +65,9 @@ let to_string = (fun f ->
     prerr_newline();
     let string_of_number n =
       let sfn = string_of_float n in
-      (if (sfn = "inf") then "Infinity" else
-       if (sfn = "-inf") then "-Infinity" else
-       if (sfn = "nan") then "NaN" else
+      (if (string_eq sfn "inf") then "Infinity" else
+       if (string_eq sfn  "-inf") then "-Infinity" else
+       if (string_eq sfn  "nan") then "NaN" else
        let inum = int_of_float n in
        if (float_of_int inum = n) then (string_of_int inum) else (string_of_float n)) in
     string_of_number f
@@ -95,7 +95,7 @@ let absolute = abs_float
 
 (** val sign : number -> number **)
 
-let sign = (fun f -> float_of_int (compare f 0.))
+let sign = (fun f -> float_of_int (float_compare f 0.))
 
 (** val lt_bool : number -> number -> bool **)
 
@@ -123,7 +123,7 @@ let div = (/.)
 
 (** val number_comparable : number coq_Comparable **)
 
-let number_comparable = (fun n1 n2 -> 0 = compare n1 n2)
+let number_comparable = (fun n1 n2 -> int_eq 0  (float_compare n1 n2))
 
 (** val of_int : float -> number **)
 

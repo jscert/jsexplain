@@ -52,5 +52,5 @@ let bool_comparable x y =
 (** val prop_eq_decidable :
     coq_Decidable -> coq_Decidable -> coq_Decidable **)
 
-let prop_eq_decidable = (=)
+let prop_eq_decidable = bool_eq
 

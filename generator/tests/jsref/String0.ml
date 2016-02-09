@@ -1,7 +1,7 @@
 
 (* ARTHUR: hacked this file *)
 
-let string_dec s1 s2 = (s1 = s2)
+let string_dec s1 s2 = (string_eq s1 s2)
 
 let append s1 s2 = String.append s1 s2
 

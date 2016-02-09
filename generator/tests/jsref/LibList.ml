@@ -63,7 +63,7 @@ let rec take_drop_last l = match l with
 
 let rec nth_def d n l = match l with
   | [] -> d
-  | x :: l' -> if n=0 then x else nth_def d (n-1) l'
+  | x :: l' -> if int_eq n 0 then x else nth_def d (n-1) l'
 
 (** val mem_decide : 'a1 coq_Comparable -> 'a1 -> 'a1 list -> bool **)
 

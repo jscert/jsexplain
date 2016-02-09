@@ -1,10 +1,14 @@
-- deal with unsupported let record in jsinterpreter.ml
+
+
 
 - cases seem to be in reversed order, check and fix
+   => corriger à la main le jour où on s'amuse à relire le code.
+	=> order in pattern matching extraction seems to follow
+	   order from the definition of the inductive type,
+		instead of the order of the code.
 
 - untab closing bracket for fun def
-
-- default case with error in switch, for logged/token mode
+  => later maybe
 
 - understand spec of polymorphic equality (= vs ===)
 

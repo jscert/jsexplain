@@ -119,6 +119,12 @@ let ppf_apply_infix f arg1 arg2 =
 
 let ppf_match value cases const =
   let cons_fld = if const then "" else ".type" in
+  let cases = 
+    match !current_mode with
+    | Mode_unlogged -> cases
+    | Mode_line_token
+    | Mode_logged -> cases ^ "@,default: throw \"No matching case for switch\";"
+    in
   let s = Printf.sprintf "switch (%s%s) {@;<1 2>@[<v 0>%s@]@,}@,"
     value cons_fld cases
   in s
@@ -315,7 +321,7 @@ let generate_logged_return ctx sbody =
      Printf.sprintf "%sreturn %s;%s" token_start sbody token_stop
   | Mode_logged ->
     let id = id_fresh "_return_" in
-    Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, {\"return_value\", %s}), \"return\");@,return %s"
+    Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, {\"return_value\", %s}), \"return\");@,return %s;"
       id sbody token_lineof ctx id id
   | Mode_unlogged -> 
      Printf.sprintf "return %s;" sbody

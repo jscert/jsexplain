@@ -12,6 +12,11 @@ module Pos =
  struct 
   type t = float
   
+  (* HACK *)
+  let is_even p =
+     float_eq (mod_float p 2.) 0.
+
+
   (** val succ : float -> float **)
   
   let rec succ = (+.) 1.
@@ -24,10 +29,10 @@ module Pos =
   
   and add_carry x y =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q -> (fun p -> 1. +. (2. *. p))
         (add_carry p q))
         (fun q -> (fun p -> 2. *. p)
@@ -37,7 +42,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         y)
       (fun p ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q -> (fun p -> 2. *. p)
         (add_carry p q))
         (fun q -> (fun p -> 1. +. (2. *. p))
@@ -47,7 +52,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         y)
       (fun _ ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q -> (fun p -> 1. +. (2. *. p))
         (succ q))
         (fun q -> (fun p -> 2. *. p)
@@ -61,7 +66,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec pred_double x =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p -> (fun p -> 1. +. (2. *. p)) ((fun p -> 2. *. p)
       p))
       (fun p -> (fun p -> 1. +. (2. *. p))
@@ -78,7 +83,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let pred_N x =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p -> ((fun p -> 2. *. p)
       p))
       (fun p ->
@@ -124,7 +129,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let double_pred_mask x =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p -> IsPos ((fun p -> 2. *. p) ((fun p -> 2. *. p)
       p)))
       (fun p -> IsPos ((fun p -> 2. *. p)
@@ -139,7 +144,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   | IsNul -> IsNeg
   | IsPos q ->
     ((fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
        (fun p0 -> IsPos
        (pred q))
        (fun p0 -> IsPos
@@ -153,10 +158,10 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec sub_mask x y =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q ->
         double_mask (sub_mask p q))
         (fun q ->
@@ -166,7 +171,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         y)
       (fun p ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q ->
         succ_double_mask (sub_mask_carry p q))
         (fun q ->
@@ -176,7 +181,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         y)
       (fun _ ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun p ->
         IsNeg)
         (fun p ->
@@ -190,10 +195,10 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   and sub_mask_carry x y =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q ->
         succ_double_mask (sub_mask_carry p q))
         (fun q ->
@@ -203,7 +208,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         y)
       (fun p ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q ->
         double_mask (sub_mask_carry p q))
         (fun q ->
@@ -227,7 +232,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec iter n f x =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun n' ->
       f (iter n' f (iter n' f x)))
       (fun n' ->
@@ -245,7 +250,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec square p =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p0 -> (fun p -> 1. +. (2. *. p)) ((fun p -> 2. *. p)
       (add (square p0) p0)))
       (fun p0 -> (fun p -> 2. *. p) ((fun p -> 2. *. p)
@@ -258,7 +263,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let div2 p =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p0 ->
       p0)
       (fun p0 ->
@@ -271,7 +276,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let div2_up p =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p0 ->
       succ p0)
       (fun p0 ->
@@ -284,7 +289,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec size_nat p =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p0 -> Pervasives.succ
       (size_nat p0))
       (fun p0 -> Pervasives.succ
@@ -297,7 +302,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec size p =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p0 ->
       succ (size p0))
       (fun p0 ->
@@ -308,11 +313,11 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   (** val compare_cont : float -> float -> comparison -> comparison **)
   
-  let rec compare_cont = fun x y c -> if x=y then c else if x<y then Lt else Gt
+  let rec compare_cont = fun x y c -> if float_eq x y then c else if x<y then Lt else Gt
   
   (** val compare : float -> float -> comparison **)
   
-  let compare = fun x y -> if x=y then Eq else if x<y then Lt else Gt
+  let compare = fun x y -> if float_eq x y then Eq else if x<y then Lt else Gt
   
   (** val min : float -> float -> float **)
   
@@ -326,10 +331,10 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec eqb p q =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q0 ->
         eqb p0 q0)
         (fun p1 ->
@@ -339,7 +344,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         q)
       (fun p0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun p1 ->
         false)
         (fun q0 ->
@@ -349,7 +354,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         q)
       (fun _ ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun p0 ->
         false)
         (fun p0 ->
@@ -398,10 +403,10 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec sqrtrem p =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun p1 ->
         sqrtrem_step (fun x -> (fun p -> 1. +. (2. *. p)) x) (fun x ->
           (fun p -> 1. +. (2. *. p)) x) (sqrtrem p1))
@@ -413,7 +418,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         p0)
       (fun p0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun p1 ->
         sqrtrem_step (fun x -> (fun p -> 1. +. (2. *. p)) x) (fun x ->
           (fun p -> 2. *. p) x) (sqrtrem p1))
@@ -435,15 +440,15 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val gcdn : int -> float -> float -> float **)
   
   let rec gcdn n a b =
-    (fun fO fS n -> if n=0 then fO () else fS (n-1))
+    (fun fO fS n -> if int_eq n 0 then fO () else fS (n-1))
       (fun _ ->
       1.)
       (fun n0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun a' ->
         (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
           (fun b' ->
           match compare a' b' with
           | Eq -> a
@@ -456,7 +461,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
           b)
         (fun a0 ->
         (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
           (fun p ->
           gcdn n0 a0 b)
           (fun b0 -> (fun p -> 2. *. p)
@@ -477,15 +482,15 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val ggcdn : int -> float -> float -> float * (float * float) **)
   
   let rec ggcdn n a b =
-    (fun fO fS n -> if n=0 then fO () else fS (n-1))
+    (fun fO fS n -> if int_eq n 0 then fO () else fS (n-1))
       (fun _ -> (1., (a,
       b)))
       (fun n0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun a' ->
         (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
           (fun b' ->
           match compare a' b' with
           | Eq -> (a, (1., 1.))
@@ -503,7 +508,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
           b)
         (fun a0 ->
         (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
           (fun p ->
           let (g, p0) = ggcdn n0 a0 b in
           let (aa, bb) = p0 in (g, (((fun p -> 2. *. p) aa), bb)))
@@ -525,7 +530,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val coq_Nsucc_double : float -> float **)
   
   let coq_Nsucc_double x =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       1.)
       (fun p -> ((fun p -> 1. +. (2. *. p))
@@ -535,7 +540,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val coq_Ndouble : float -> float **)
   
   let coq_Ndouble n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       0.)
       (fun p -> ((fun p -> 2. *. p)
@@ -546,10 +551,10 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec coq_lor p q =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q0 -> (fun p -> 1. +. (2. *. p))
         (coq_lor p0 q0))
         (fun q0 -> (fun p -> 1. +. (2. *. p))
@@ -559,7 +564,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         q)
       (fun p0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q0 -> (fun p -> 1. +. (2. *. p))
         (coq_lor p0 q0))
         (fun q0 -> (fun p -> 2. *. p)
@@ -569,7 +574,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         q)
       (fun _ ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun p0 ->
         q)
         (fun q0 -> (fun p -> 1. +. (2. *. p))
@@ -583,10 +588,10 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec coq_land p q =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q0 ->
         coq_Nsucc_double (coq_land p0 q0))
         (fun q0 ->
@@ -596,7 +601,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         q)
       (fun p0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q0 ->
         coq_Ndouble (coq_land p0 q0))
         (fun q0 ->
@@ -606,7 +611,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         q)
       (fun _ ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun p0 ->
         1.)
         (fun q0 ->
@@ -620,10 +625,10 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec ldiff p q =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q0 ->
         coq_Ndouble (ldiff p0 q0))
         (fun q0 ->
@@ -633,7 +638,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         q)
       (fun p0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q0 ->
         coq_Ndouble (ldiff p0 q0))
         (fun q0 ->
@@ -643,7 +648,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         q)
       (fun _ ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun p0 ->
         0.)
         (fun q0 ->
@@ -657,10 +662,10 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec coq_lxor p q =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q0 ->
         coq_Ndouble (coq_lxor p0 q0))
         (fun q0 ->
@@ -670,7 +675,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         q)
       (fun p0 ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q0 ->
         coq_Nsucc_double (coq_lxor p0 q0))
         (fun q0 ->
@@ -680,7 +685,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         q)
       (fun _ ->
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun q0 -> ((fun p -> 2. *. p)
         q0))
         (fun q0 -> ((fun p -> 1. +. (2. *. p))
@@ -703,7 +708,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val shiftl : float -> float -> float **)
   
   let shiftl p n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       p)
       (fun n0 ->
@@ -713,7 +718,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val shiftr : float -> float -> float **)
   
   let shiftr p n =
-    (fun f0 fp n -> if n=0. then f0 () else fp n)
+    (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
       (fun _ ->
       p)
       (fun n0 ->
@@ -724,23 +729,23 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec testbit_nat p =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p0 n ->
-      (fun fO fS n -> if n=0 then fO () else fS (n-1))
+      (fun fO fS n -> if int_eq n 0 then fO () else fS (n-1))
         (fun _ ->
         true)
         (fun n' ->
         testbit_nat p0 n')
         n)
       (fun p0 n ->
-      (fun fO fS n -> if n=0 then fO () else fS (n-1))
+      (fun fO fS n -> if int_eq n 0 then fO () else fS (n-1))
         (fun _ ->
         false)
         (fun n' ->
         testbit_nat p0 n')
         n)
       (fun _ n ->
-      (fun fO fS n -> if n=0 then fO () else fS (n-1))
+      (fun fO fS n -> if int_eq n 0 then fO () else fS (n-1))
         (fun _ ->
         true)
         (fun n0 ->
@@ -752,23 +757,23 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec testbit p n =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p0 ->
-      (fun f0 fp n -> if n=0. then f0 () else fp n)
+      (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
         (fun _ ->
         true)
         (fun n0 ->
         testbit p0 (pred_N n0))
         n)
       (fun p0 ->
-      (fun f0 fp n -> if n=0. then f0 () else fp n)
+      (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
         (fun _ ->
         false)
         (fun n0 ->
         testbit p0 (pred_N n0))
         n)
       (fun _ ->
-      (fun f0 fp n -> if n=0. then f0 () else fp n)
+      (fun f0 fp n -> if float_eq n 0. then f0 () else fp n)
         (fun _ ->
         true)
         (fun p0 ->
@@ -781,7 +786,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   let iter_op op =
     let rec iter0 p a =
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun p0 ->
         op a (iter0 p0 (op a a)))
         (fun p0 ->
@@ -799,11 +804,11 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val of_nat : int -> float **)
   
   let rec of_nat n =
-    (fun fO fS n -> if n=0 then fO () else fS (n-1))
+    (fun fO fS n -> if int_eq n 0 then fO () else fS (n-1))
       (fun _ ->
       1.)
       (fun x ->
-      (fun fO fS n -> if n=0 then fO () else fS (n-1))
+      (fun fO fS n -> if int_eq n 0 then fO () else fS (n-1))
         (fun _ ->
         1.)
         (fun n0 ->
@@ -814,7 +819,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   (** val of_succ_nat : int -> float **)
   
   let rec of_succ_nat n =
-    (fun fO fS n -> if n=0 then fO () else fS (n-1))
+    (fun fO fS n -> if int_eq n 0 then fO () else fS (n-1))
       (fun _ ->
       1.)
       (fun x ->
@@ -826,10 +831,10 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   let eq_dec x y =
     let rec f p =
       (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
         (fun p0 y0 ->
         (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
           (fun p1 ->
           if f p0 p1 then true else false)
           (fun p1 ->
@@ -839,7 +844,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
           y0)
         (fun p0 y0 ->
         (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
           (fun p1 ->
           false)
           (fun p1 ->
@@ -849,7 +854,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
           y0)
         (fun _ y0 ->
         (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
           (fun p0 ->
           false)
           (fun p0 ->
@@ -868,7 +873,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
         f (succ ((fun p -> 2. *. p) p0)) (f ((fun p -> 2. *. p) p0) x))
     in
     ((fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
        (fun q ->
        f ((fun p -> 2. *. p) q) (f2 q))
        (fun q ->
@@ -922,7 +927,7 @@ if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) els
   
   let rec peanoView p =
     (fun f2p1 f2p f1 p ->
-if p <= 1. then f1 () else if mod_float p 2. = 0. then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
+if p <= 1. then f1 () else if is_even p then f2p (floor (p /. 2.)) else f2p1 (floor (p /. 2.)))
       (fun p0 ->
       peanoView_xI p0 (peanoView p0))
       (fun p0 ->
