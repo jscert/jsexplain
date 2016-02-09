@@ -10,9 +10,12 @@
 - untab closing bracket for fun def
   => later maybe
 
-- understand spec of polymorphic equality (= vs ===)
 
-- {type: "()"} devrait être "unit"
+
+- change constructors to functions, and generate nicer looking JS code for
+  these functions
+
+
 
 - Choose a small example
 
@@ -36,8 +39,5 @@
   - call JsInterpreter.js using the correct function (see run_js.ml)
 
 - translate stdlib.ml into stdlib.js
-
-- change constructors to functions, and generate nicer looking JS code for
-  these functions
 
 - correct the Makefile to make sure we do not generate everything all the time

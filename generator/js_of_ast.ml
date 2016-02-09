@@ -13,6 +13,9 @@ module L = Logged (Token_generator) (struct let size = 256 end)
 
 (* TODO: Field annotations for builtin type constructors *)
 
+let string_of_longident i =
+  String.concat "." @@ Longident.flatten @@ i
+
 
 (****************************************************************)
 (* STRING UTILITIES *)
@@ -72,8 +75,13 @@ let is_infix f args = match args with
      let args_loc = (x.exp_loc.loc_start, x.exp_loc.loc_end) in
      if fst args_loc < fst f_loc then true else false
 
-let map_cstr_fields ?loc bind (cstr : constructor_description) elements =
-  let fields = extract_cstr_attrs cstr in
+exception Map_fields_elements_mismatch_number_args
+
+(* here, bind is the function to be applied to a field and an element,
+   and it returns an option, with None when the entry should be ignored,
+   and with a result otherwise, to be added to the list of results *)
+
+let map_filter_fields_elements bind fields elements =
   let rec aux = function
     | [], [] -> []
     | f :: fs, e :: es ->
@@ -82,9 +90,15 @@ let map_cstr_fields ?loc bind (cstr : constructor_description) elements =
         | None -> res
         | Some p -> p :: res  (* p is a pair identifier, code to be bound *)
       end
-    | _ -> error ?loc ("Insufficient fieldnames for arguments to " ^ cstr.cstr_name)
+    | _ -> raise Map_fields_elements_mismatch_number_args
   in aux (fields, elements)
-    
+
+let map_cstr_fields ?loc bind (cstr : constructor_description) elements =
+  let fields = extract_cstr_attrs cstr in
+  try map_filter_fields_elements bind fields elements 
+  with   Map_fields_elements_mismatch_number_args -> 
+     error ?loc ("Insufficient fieldnames for arguments to " ^ cstr.cstr_name)
+  
 (****************************************************************)
 (* PPF HELPERS *)
 
@@ -118,9 +132,10 @@ let ppf_apply_infix f arg1 arg2 =
                  arg1 f arg2
 
 let ppf_match value cases const =
-  let cons_fld = if const then "" else ".type" in
+  let cons_fld = if const then "" else ".tag" in
   let cases = 
     match !current_mode with
+    | Mode_cmi -> assert false
     | Mode_unlogged -> cases
     | Mode_line_token
     | Mode_logged -> cases ^ "@,default: throw \"No matching case for switch\";"
@@ -180,12 +195,24 @@ let ppf_for id start ed flag body =
 let ppf_cstr tag value =
   Some (Printf.sprintf "%s: %s" tag value)
 
-let ppf_single_cstrs typ =
-   Printf.sprintf "@[<v 2>{type: \"%s\"}@]" typ
+(* deprecated:
+  let expanded_constructors = map_cstr_fields (*~loc*) ppf_cstr cd args in
+*)
 
-let ppf_multiple_cstrs typ rest =
-  Printf.sprintf "@[<v 2>{type: \"%s\", %s}@]"
-    typ rest
+let ppf_cstrs styp cstr_name rest =
+  let comma = if rest = "" then "" else "," in
+  let styp_full =
+    match !current_mode with
+    | Mode_cmi -> assert false
+    | Mode_unlogged -> ""
+    | Mode_line_token
+    | Mode_logged -> Printf.sprintf "type: \"%s\", " styp
+    in
+  Printf.sprintf "@[<v 2>{%stag: \"%s\"%s %s}@]"
+    styp_full cstr_name comma rest
+
+let ppf_cstrs_fct cstr_fullname args =
+   ppf_apply cstr_fullname (show_list ", " args)
 
 let ppf_record llde =
   let rec aux acc = function
@@ -271,6 +298,7 @@ let generate_logged_case spat binders ctx newctx sbody need_break =
   let (token_start, token_stop, token_lineof) = token_fresh() in
   let (shead, sintro) =
     match !current_mode with
+    | Mode_cmi -> assert false
     | Mode_line_token -> 
       (token_start, token_stop)
     | Mode_logged ->
@@ -317,14 +345,15 @@ with help of
 let generate_logged_return ctx sbody = 
   let (token_start, token_stop, token_lineof) = token_fresh() in
   match !current_mode with
+  | Mode_cmi -> assert false
   | Mode_line_token ->
-     Printf.sprintf "%sreturn %s;%s" token_start sbody token_stop
+     Printf.sprintf "%sreturn %s; %s" token_start sbody token_stop
   | Mode_logged ->
     let id = id_fresh "_return_" in
-    Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, {\"return_value\", %s}), \"return\");@,return %s;"
+    Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, {\"return_value\", %s}), \"return\");@,return %s; "
       id sbody token_lineof ctx id id
   | Mode_unlogged -> 
-     Printf.sprintf "return %s;" sbody
+     Printf.sprintf "return %s; " sbody
      (* Printf.sprintf "@[<v 0>return %s;@]" sbody *)
 (*
 ----
@@ -341,6 +370,7 @@ var t=e; logEvent(LINEOF(432423), ctx_push(ctx, {"return",t}), "return"); return
 let generate_logged_let ids ctx newctx sdecl sbody =
   let (token_start, token_stop, token_lineof) = token_fresh() in
   match !current_mode with
+  | Mode_cmi -> assert false
   | Mode_line_token ->
      Printf.sprintf "%s%s%s@,%s" token_start sdecl token_stop sbody  
   | Mode_logged ->
@@ -372,6 +402,7 @@ let generate_logged_enter arg_ids ctx newctx sbody =
   let (token_start, token_stop, token_lineof) = token_fresh() in
   let (shead1, shead2, sintro) =
     match !current_mode with
+    | Mode_cmi -> assert false
     | Mode_line_token -> (token_start, token_stop, "")
     | Mode_logged ->
       let mk_binding x =
@@ -461,7 +492,23 @@ and js_of_structure_item s =
      (* let (id, sdecl) = show_value_binding ctx_initial vb in *)
      Printf.sprintf "@\n@\n%s: %s," (ident_of_pat vb.vb_pat) (js_of_expression_inline_or_wrap ctx_initial vb.vb_expr))
      @@ vb_l
-  | Tstr_type       _  -> "" (* Types have no representation in JS, but the OCaml type checker uses them *)
+  | Tstr_type decls -> 
+     (* function id( f1, f2) { return { typ: t, tag: x, "f1": f1, "f2": f2 } } *)
+     String.concat "@,@," @@ (List.map (fun decl -> 
+        match decl.typ_type.type_kind with
+        | Type_variant cstr_decls ->
+           let styp = decl.typ_name.txt in
+           String.concat "@,@," @@ (List.map (fun (cd:Types.constructor_declaration) -> 
+              let cstr_name = cd.Types.cd_id.Ident.name in
+              let fields = extract_cstr_attrs_basic cstr_name cd.cd_attributes in
+              let sargs = show_list ", " fields in
+              let sbindings = map_filter_fields_elements ppf_cstr fields fields in
+              let rest = show_list ", " sbindings in
+              let sobj = ppf_cstrs styp cstr_name rest in 
+              Printf.sprintf "function %s(%s) { return %s; }" cstr_name sargs sobj))
+          @@ cstr_decls
+        | _ -> ""))
+     @@ decls
   | Tstr_open       _  -> "" (* Handle modules by use of multiple compilation/linking *)
   | Tstr_modtype    _  -> ""
   | Tstr_module     b  -> ppf_decl (ppf_ident b.mb_id) (js_of_submodule b.mb_expr)
@@ -583,17 +630,15 @@ and js_of_expression ctx dest e =
      let sexp = ppf_tuple @@ show_list_f (fun exp -> inline_of_wrap exp) ", " tl in
      apply_dest ctx dest sexp
 
-  | Texp_construct (_, cd, el) ->
-    let name = cd.cstr_name in
+  | Texp_construct (p, cd, el) ->
+    let cstr_fullname = string_of_longident p.txt in
+    let cstr_name = cd.cstr_name in
+    (*let styp = string_of_type_exp e.exp_type in*)
     let sexp =
-      if el = [] then (* Constructor has no parameters *)
-        if is_sbool name then name (* Special case true/false to their JS natives *)
-        else ppf_single_cstrs name
-      else (* Constructor has parameters *)
+      if is_sbool cstr_name then cstr_name else begin
         let expr_strs = List.map (fun exp -> inline_of_wrap exp) el in
-        let expanded_constructors = map_cstr_fields ~loc ppf_cstr cd expr_strs in
-        ppf_multiple_cstrs name (show_list ", " expanded_constructors)
-      in
+        ppf_cstrs_fct cstr_fullname expr_strs
+      end in
     apply_dest ctx dest sexp
 
   | Texp_array      (exp_l)           -> ppf_array @@ show_list_f (fun exp -> inline_of_wrap exp) ", " exp_l

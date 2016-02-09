@@ -42,7 +42,15 @@ tests/%.ml: tests/%.v
 	cd $(@D) && rm *.mli
 	cd $(@D) && $(CURDIR)/../../ml-add-cstr-annots.pl *.ml
 
-.PRECIOUS: tests/jsref/%.ml
+.PRECIOUS: tests/jsref/*.ml tests/jsref/*.log.js  tests/jsref/*.unlog.js  tests/jsref/*.token.js
+.PHONY: .all .log.js .unlog.js  .token.js
+
+# Do not delete intermediate files.
+.SECONDARY:
+.PRECIOUS: *.vio
+
+
+
 #tests/jsref/%.ml:
 #	$(MAKE) -C $(CURDIR)/../../.. interpreter
 #	cp ../../../interp/src/extract/*.ml tests/jsref/
@@ -70,6 +78,9 @@ tests/%.unlog.js: tests/%.ml main.byte stdlib tests/%.cmi
 
 tests/%.token.js: tests/%.ml main.byte stdlib tests/%.cmi  
 	./main.byte -mode token -I $(<D) $<
+
+tests/%.all: tests/%.log.js tests/%.unlog.js tests/%.token.js
+	touch $@
 
 #tests/%.cmi: tests/%.ml main.byte stdlib
 #	./main.byte -mode unlog -I $(<D) $<

@@ -63,6 +63,7 @@ let _ =
             | Mode_unlogged -> unlog_output
             | Mode_logged -> log_output
             | Mode_line_token -> token_output
+            | _ -> assert false
           in
           file_put_contents output_filename out;
           Printf.printf "wrote %s\n" output_filename

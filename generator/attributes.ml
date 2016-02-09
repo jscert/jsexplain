@@ -91,9 +91,13 @@ and extract_constant = function
   | Const_int64     _     -> error "A string or a char was expected but a int64 was found"
   | Const_nativeint _     -> error "A string or a char was expected but a nativeint was found"
 
-let fetch_builtin_attrs (cstr : constructor_description) =
-  List.assoc cstr.cstr_name builtin_attributes
+let fetch_builtin_attrs cstr_name =
+  List.assoc cstr_name builtin_attributes
+
+let extract_cstr_attrs_basic cstr_name cstr_attributes =
+  try fetch_builtin_attrs cstr_name
+  with Not_found -> extract_attrs cstr_attributes
+
 
 let extract_cstr_attrs (cstr : constructor_description) =
-  try fetch_builtin_attrs cstr
-  with Not_found -> extract_attrs cstr.cstr_attributes
+  extract_cstr_attrs_basic cstr.cstr_name cstr.cstr_attributes
