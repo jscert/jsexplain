@@ -7,5 +7,5 @@ true: bin_annot
 <typing>: include
 <utils>: include
 
-<tests>: precious
-<stdlib_ml>: precious
+# <tests>: precious
+# <stdlib_ml>: precious

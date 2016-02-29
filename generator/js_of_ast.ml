@@ -659,10 +659,41 @@ and js_of_expression ctx dest e =
       let sexp = inline_of_wrap e in
       Printf.sprintf "throw %s;" sexp
 
+  | Texp_function (label, cases, Total) when label = "" -> 
+      Printf.printf "here\n";
+      let mk_pat pat_des =
+        { pat_desc = pat_des;
+          pat_loc = e.exp_loc;
+          pat_extra = [];
+          pat_type = e.exp_type;
+          pat_env = e.exp_env;
+          pat_attributes = [];
+         } in
+      let mk_exp exp_desc =
+         { exp_desc = exp_desc;  
+           exp_loc = e.exp_loc;
+           exp_extra = [];
+           exp_type = e.exp_type;
+           exp_env = e.exp_env;
+           exp_attributes = [];
+         } in
+      let name = "_fun_arg_" in
+      let arg = Ident.create name in
+      let thearg_lident = { txt = Longident.Lident name; loc = Location.none } in
+      let thearg = mk_exp (Texp_ident (Path.Pident arg, thearg_lident, Obj.magic ())) in
+      let thecase = {  
+           c_lhs = mk_pat (Tpat_var (arg, Location.mknoloc name));
+           c_guard = None;
+           c_rhs = mk_exp (Texp_match (thearg, cases, [], Total));
+          } in
+      let exp = mk_exp (Texp_function (label, [thecase], Total)) in
+      js_of_expression ctx dest exp
+
   | Texp_match      (_,_,_, Partial)  -> out_of_scope loc "partial matching"
   | Texp_match      (_,_,_,_)         -> out_of_scope loc "matching with exception branches"
   | Texp_try        (_,_)             -> out_of_scope loc "exceptions"
-  | Texp_function   (_,_,_)           -> out_of_scope loc "powered-up functions"
+  | Texp_function (_, _, _) -> out_of_scope loc "use of labels"
+
   | Texp_variant    (_,_)             -> out_of_scope loc "polymorphic variant"
   | Texp_setfield   (_,_,_,_)         -> out_of_scope loc "setting field"
   | Texp_send       (_,_,_)           -> out_of_scope loc "objects"

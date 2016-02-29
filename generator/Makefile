@@ -9,7 +9,8 @@ ML_LAMBDA   := $(wildcard $(TEST_DIR)/lambda/*.ml)
 ML_JSREF    := $(wildcard $(TEST_DIR)/jsref/*.ml) 
 MLI_JSREF   := $(wildcard $(TEST_DIR)/jsref/*.mli)
 
-OCAMLBUILD  := ocamlbuild -j 4 -classic-display -use-ocamlfind
+OCAMLBUILD  := ocamlbuild -j 4 -classic-display -use-ocamlfind -X tests -X $(STD_DIR)
+# -X $(TEST_DIR)/jsref -X $(TEST_DIR)/lambda 
 
 # Used for stdlib and generator dependency generation
 CC          := ocamlc -c
@@ -97,13 +98,6 @@ tests/jsref/Prheap.cmi: tests/jsref/Prheap.mli stdlib tests/jsref/JsSyntax.cmi
 
 
 
-
-
-
-
-
-
-
 # tests/%.cmi: tests/%.mli stdlib
 #	ocamlc -I stdlib_ml -open Stdlib -I $(<D) $<
 
@@ -111,8 +105,18 @@ tests/jsref/Prheap.cmi: tests/jsref/Prheap.mli stdlib tests/jsref/JsSyntax.cmi
 tests: $(ML_TESTS:.ml=.log.js) $(ML_TESTS:.ml=.token.js)
 
 tests/lambda: tests/lambda/Lambda.log.js
+
 tests/jsref: tests/jsref/JsInterpreter.log.js
 tests/jsrefunlog: tests/jsref/JsInterpreter.unlog.js
+
+
+arthur: $(ML_JSREF:.ml=.log.js) $(ML_JSREF:.ml=.unlog.js) $(ML_JSREF:.ml=.token.js)
+
+# foo:
+# 	make $(ML_JSREF:.ml=.log.js)
+# 
+# tests/jsref/JsInterpreter.log.js
+
 
 clean_stdlib:
 	rm -f $(STD_DIR)/*.cmi
@@ -123,9 +127,14 @@ clean_tests:
 	bash -c "rm -f $(TEST_DIR)/lambda/*.{$(DIRTY_EXTS)}"
 	bash -c "rm -f $(TEST_DIR)/jsref/*.{$(DIRTY_EXTS)}"
 
-clean:
+clean_jsref:
+	rm -f tests/jsref/*.ml.d tests/jsref/*.mli.d tests/jsref/*.log.js tests/jsref/*.unlog.js tests/jsref/*.token.js  tests/jsref/*.cmi
+
+clean: clean_jsref
 	rm -rf _build
 	rm -f *.native *.byte
+	rm -f stdlib_ml/*.cmi
+
 
 clean_cmi: clean_tests clean_stdlib
 cleanall: clean clean_cmi
@@ -139,7 +148,14 @@ ifneq ($(findstring tests/lambda,$(MAKECMDGOALS)),)
 -include $(ML_LAMBDA:.ml=.ml.d)
 endif
 
-ifneq ($(findstring tests/jsref,$(MAKECMDGOALS)),)
+#tests/
+ifneq ($(findstring jsref,$(MAKECMDGOALS)),)
+#$(error $(ML_JSREF:.ml=.ml.d))
+-include $(ML_JSREF:.ml=.ml.d)
+-include $(MLI_JSREF:.mli=.mli.d)
+endif
+
+ifneq ($(findstring a,$(MAKECMDGOALS)),)
 #$(error $(ML_JSREF:.ml=.ml.d))
 -include $(ML_JSREF:.ml=.ml.d)
 -include $(MLI_JSREF:.mli=.mli.d)
@@ -147,18 +163,5 @@ endif
 
 
 
-
 arthur: lineof.byte
 	./lineof.byte -o tests/calc.lineof.js tests/calc.token.js
-
-
-# TODO
-
-# or pattern -> see JsNumber
-# records -> replace warning with code
-# lazy -> use a function for fresh locations in copied extracted code
-# replace "char list" with strings.
-# fix functor translation
-# missing return in:    funcdecl_name: function (x) { x.funcdecl_name},
-# change extraction of:   native_error_compare
-# object_prealloc_global_class is defined in JsInterpreterExtraction
