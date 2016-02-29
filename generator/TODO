@@ -1,19 +1,16 @@
 
 
 
+LATER
 - cases seem to be in reversed order, check and fix
    => corriger à la main le jour où on s'amuse à relire le code.
 	=> order in pattern matching extraction seems to follow
 	   order from the definition of the inductive type,
 		instead of the order of the code.
 
+LATER
 - untab closing bracket for fun def
   => later maybe
-
-
-
-- change constructors to functions, and generate nicer looking JS code for
-  these functions
 
 
 
@@ -41,3 +38,9 @@
 - translate stdlib.ml into stdlib.js
 
 - correct the Makefile to make sure we do not generate everything all the time
+
+
+
+- => binder qq part vers une comparaison --- dans un fichier js
+  _compare_JsSyntax_native_error
+  _compare_JsSyntax_prealloc

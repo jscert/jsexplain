@@ -373,7 +373,7 @@ let mathop_comparable x y =
 
 (** val native_error_compare : native_error -> native_error -> bool **)
 
-let native_error_compare ne1 ne2 = ne1 === ne2
+let native_error_compare ne1 ne2 = (ne1:native_error) === ne2
 
 (** val native_error_comparable : native_error coq_Comparable **)
 
@@ -382,7 +382,7 @@ let native_error_comparable x y =
 
 (** val prealloc_compare : prealloc -> prealloc -> bool **)
 
-let prealloc_compare bl1 bl2 = bl1 === bl2
+let prealloc_compare bl1 bl2 = (bl1:prealloc) === bl2
 
 (** val prealloc_comparable : prealloc coq_Comparable **)
 

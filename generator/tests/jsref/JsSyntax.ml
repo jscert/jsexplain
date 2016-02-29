@@ -46,13 +46,13 @@ type binary_op =
 
 type literal =
 | Coq_literal_null [@f]  (** Auto Generated Attributes **)
-| Coq_literal_bool  [@f label0] of bool (** Auto Generated Attributes **)
-| Coq_literal_number  [@f label0] of number (** Auto Generated Attributes **)
-| Coq_literal_string  [@f label0] of string (** Auto Generated Attributes **)
+| Coq_literal_bool  [@f value] of bool (** Auto Generated Attributes **)
+| Coq_literal_number  [@f value] of number (** Auto Generated Attributes **)
+| Coq_literal_string  [@f value] of string (** Auto Generated Attributes **)
 
 type label =
 | Coq_label_empty [@f]  (** Auto Generated Attributes **)
-| Coq_label_string  [@f label0] of string (** Auto Generated Attributes **)
+| Coq_label_string  [@f value] of string (** Auto Generated Attributes **)
 
 type label_set = label list
 
@@ -64,9 +64,9 @@ let strictness_false =
   false
 
 type propname =
-| Coq_propname_identifier  [@f label0] of string (** Auto Generated Attributes **)
-| Coq_propname_string  [@f label0] of string (** Auto Generated Attributes **)
-| Coq_propname_number  [@f label0] of number (** Auto Generated Attributes **)
+| Coq_propname_identifier  [@f value] of string (** Auto Generated Attributes **)
+| Coq_propname_string  [@f value] of string (** Auto Generated Attributes **)
+| Coq_propname_number  [@f value] of number (** Auto Generated Attributes **)
 
 type expr =
 | Coq_expr_this [@f]  (** Auto Generated Attributes **)
@@ -214,13 +214,13 @@ type prealloc =
 | Coq_prealloc_string_proto_char_at [@f]  (** Auto Generated Attributes **)
 | Coq_prealloc_string_proto_char_code_at [@f]  (** Auto Generated Attributes **)
 | Coq_prealloc_math [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_mathop  [@f label0] of mathop (** Auto Generated Attributes **)
+| Coq_prealloc_mathop  [@f mathop] of mathop (** Auto Generated Attributes **)
 | Coq_prealloc_date [@f]  (** Auto Generated Attributes **)
 | Coq_prealloc_regexp [@f]  (** Auto Generated Attributes **)
 | Coq_prealloc_error [@f]  (** Auto Generated Attributes **)
 | Coq_prealloc_error_proto [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_native_error  [@f label0] of native_error (** Auto Generated Attributes **)
-| Coq_prealloc_native_error_proto  [@f label0] of native_error (** Auto Generated Attributes **)
+| Coq_prealloc_native_error  [@f error] of native_error (** Auto Generated Attributes **)
+| Coq_prealloc_native_error_proto  [@f error] of native_error (** Auto Generated Attributes **)
 | Coq_prealloc_error_proto_to_string [@f]  (** Auto Generated Attributes **)
 | Coq_prealloc_throw_type_error [@f]  (** Auto Generated Attributes **)
 | Coq_prealloc_json [@f]  (** Auto Generated Attributes **)
@@ -228,12 +228,12 @@ type prealloc =
 type call =
 | Coq_call_default [@f]  (** Auto Generated Attributes **)
 | Coq_call_after_bind [@f]  (** Auto Generated Attributes **)
-| Coq_call_prealloc  [@f label0] of prealloc (** Auto Generated Attributes **)
+| Coq_call_prealloc  [@f prealloc] of prealloc (** Auto Generated Attributes **)
 
 type construct =
 | Coq_construct_default [@f]  (** Auto Generated Attributes **)
 | Coq_construct_after_bind [@f]  (** Auto Generated Attributes **)
-| Coq_construct_prealloc  [@f label0] of prealloc (** Auto Generated Attributes **)
+| Coq_construct_prealloc  [@f prealloc] of prealloc (** Auto Generated Attributes **)
 
 type builtin_has_instance =
 | Coq_builtin_has_instance_function [@f]  (** Auto Generated Attributes **)
@@ -274,19 +274,19 @@ type builtin_define_own_prop =
 | Coq_builtin_define_own_prop_args_obj [@f]  (** Auto Generated Attributes **)
 
 type object_loc =
-| Coq_object_loc_normal  [@f label0] of int (** Auto Generated Attributes **)
-| Coq_object_loc_prealloc  [@f label0] of prealloc (** Auto Generated Attributes **)
+| Coq_object_loc_normal  [@f address] of int (** Auto Generated Attributes **)
+| Coq_object_loc_prealloc  [@f prealloc] of prealloc (** Auto Generated Attributes **)
 
 type prim =
 | Coq_prim_undef [@f]  (** Auto Generated Attributes **)
 | Coq_prim_null [@f]  (** Auto Generated Attributes **)
-| Coq_prim_bool  [@f label0] of bool (** Auto Generated Attributes **)
-| Coq_prim_number  [@f label0] of number (** Auto Generated Attributes **)
-| Coq_prim_string  [@f label0] of string (** Auto Generated Attributes **)
+| Coq_prim_bool  [@f value] of bool (** Auto Generated Attributes **)
+| Coq_prim_number  [@f value] of number (** Auto Generated Attributes **)
+| Coq_prim_string  [@f value] of string (** Auto Generated Attributes **)
 
 type value =
-| Coq_value_prim  [@f label0] of prim (** Auto Generated Attributes **)
-| Coq_value_object  [@f label0] of object_loc (** Auto Generated Attributes **)
+| Coq_value_prim  [@f value] of prim (** Auto Generated Attributes **)
+| Coq_value_object  [@f value] of object_loc (** Auto Generated Attributes **)
 
 type coq_type =
 | Coq_type_undef [@f]  (** Auto Generated Attributes **)
@@ -339,8 +339,8 @@ let attributes_accessor_enumerable x = x.attributes_accessor_enumerable
 let attributes_accessor_configurable x = x.attributes_accessor_configurable
 
 type attributes =
-| Coq_attributes_data_of [@f label0] of attributes_data (** Auto Generated Attributes **)
-| Coq_attributes_accessor_of [@f label0] of attributes_accessor (** Auto Generated Attributes **)
+| Coq_attributes_data_of [@f value] of attributes_data (** Auto Generated Attributes **)
+| Coq_attributes_accessor_of [@f value] of attributes_accessor (** Auto Generated Attributes **)
 
 type descriptor = { descriptor_value : value option;
                     descriptor_writable : bool option;
@@ -375,7 +375,7 @@ let descriptor_configurable x = x.descriptor_configurable
 
 type full_descriptor =
 | Coq_full_descriptor_undef [@f]  (** Auto Generated Attributes **)
-| Coq_full_descriptor_some  [@f label0] of attributes (** Auto Generated Attributes **)
+| Coq_full_descriptor_some  [@f value] of attributes (** Auto Generated Attributes **)
 
 type mutability =
 | Coq_mutability_uninitialized_immutable [@f]  (** Auto Generated Attributes **)
@@ -388,8 +388,8 @@ type decl_env_record = (string, mutability * value) Heap.heap
 type provide_this_flag = bool
 
 type env_record =
-| Coq_env_record_decl  [@f label0] of decl_env_record (** Auto Generated Attributes **)
-| Coq_env_record_object  [@f label0, label1] of object_loc * provide_this_flag (** Auto Generated Attributes **)
+| Coq_env_record_decl  [@f value] of decl_env_record (** Auto Generated Attributes **)
+| Coq_env_record_object  [@f value, label1] of object_loc * provide_this_flag (** Auto Generated Attributes **)
 
 type env_loc = int
 
@@ -423,8 +423,8 @@ let execution_ctx_strict x = x.execution_ctx_strict
 type prop_name = string
 
 type ref_base_type =
-| Coq_ref_base_type_value  [@f label0] of value (** Auto Generated Attributes **)
-| Coq_ref_base_type_env_loc  [@f label0] of env_loc (** Auto Generated Attributes **)
+| Coq_ref_base_type_value  [@f value] of value (** Auto Generated Attributes **)
+| Coq_ref_base_type_env_loc  [@f value] of env_loc (** Auto Generated Attributes **)
 
 type ref = { ref_base : ref_base_type; ref_name : prop_name;
              ref_strict : bool }
@@ -566,10 +566,10 @@ let object_bound_args_ x = x.object_bound_args_
 let object_parameter_map_ x = x.object_parameter_map_
 
 type event =
-| Coq_delete_event  [@f label0, label1, label2] of object_loc * prop_name * object_loc option (** Auto Generated Attributes **)
-| Coq_mutateproto_event  [@f label0, label1] of object_loc * (object_loc * prop_name) list (** Auto Generated Attributes **)
+| Coq_delete_event  [@f loc, name, locopt] of object_loc * prop_name * object_loc option (** Auto Generated Attributes **)
+| Coq_mutateproto_event  [@f loc, fields] of object_loc * (object_loc * prop_name) list (** Auto Generated Attributes **)
    * (object_loc * prop_name) list
-| Coq_enumchange_event  [@f label0, label1] of object_loc * prop_name (** Auto Generated Attributes **)
+| Coq_enumchange_event  [@f loc, name] of object_loc * prop_name (** Auto Generated Attributes **)
 
 type state = { state_object_heap : (object_loc, coq_object) Heap.heap;
                state_env_record_heap : (env_loc, env_record) Heap.heap;
@@ -593,8 +593,8 @@ type restype =
 
 type resvalue =
 | Coq_resvalue_empty [@f]  (** Auto Generated Attributes **)
-| Coq_resvalue_value  [@f label0] of value (** Auto Generated Attributes **)
-| Coq_resvalue_ref  [@f label0] of ref (** Auto Generated Attributes **)
+| Coq_resvalue_value  [@f value] of value (** Auto Generated Attributes **)
+| Coq_resvalue_ref  [@f value] of ref (** Auto Generated Attributes **)
 
 type res = { res_type : restype; res_value : resvalue; res_label : label }
 
@@ -660,7 +660,7 @@ let res_throw v =
 
 type out =
 | Coq_out_div [@f]  (** Auto Generated Attributes **)
-| Coq_out_ter  [@f label0, label1] of state * res (** Auto Generated Attributes **)
+| Coq_out_ter  [@f state, res] of state * res (** Auto Generated Attributes **)
 
 (** val out_void : state -> out **)
 
@@ -668,8 +668,8 @@ let out_void s =
   Coq_out_ter (s, res_empty)
 
 type 't specret =
-| Coq_specret_val  [@f label0, label1] of state * 't (** Auto Generated Attributes **)
-| Coq_specret_out  [@f label0] of out (** Auto Generated Attributes **)
+| Coq_specret_val  [@f state, res] of state * 't (** Auto Generated Attributes **)
+| Coq_specret_out  [@f out] of out (** Auto Generated Attributes **)
 
 type codetype =
 | Coq_codetype_func [@f]  (** Auto Generated Attributes **)

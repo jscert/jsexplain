@@ -563,20 +563,36 @@ and js_of_expression ctx dest e =
       let sexp = js_of_constant c in
       apply_dest ctx dest sexp
 
-  | Texp_let   (_, vb_l, e) ->
+  | Texp_let (_, vb_l, e) ->
     reject_inline dest;
     let (ids, sdecl) = begin match vb_l with  
       | [ { vb_pat = { pat_desc = Tpat_tuple el }; vb_expr = obj } ] -> (* binding tuples *)
-         let (sintro, seobj) = js_of_expression_naming_argument_if_non_variable ctx obj "_switch_arg_" in     
+         let (sintro, seobj) = js_of_expression_naming_argument_if_non_variable ctx obj "_tuple_arg_" in     
          let bind i var = 
             match var.pat_desc with
             | Tpat_var (id, _) -> 
                 let sid = ppf_ident id in
                 (sid, Printf.sprintf "%s[%d]" seobj i)
-            | Tpat_any -> out_of_scope var.pat_loc "Underscore pattern in let tuple"
+            | Tpat_any -> out_of_scope var.pat_loc "Underscore pattern in let-tuple"
             | _ -> out_of_scope var.pat_loc "Nested pattern matching"
             in
           let binders = List.mapi bind el in
+          let ids = List.map fst binders in
+          let sdecl = ppf_match_binders binders in
+          (ids, sdecl)
+      | [ { vb_pat = { pat_desc = Tpat_record (args, closed_flag) }; vb_expr = obj } ] -> (* binding records *)
+          (* args : (Longident.t loc * label_description * pattern) list *)
+         let (sintro, seobj) = js_of_expression_naming_argument_if_non_variable ctx obj "_record_arg_" in     
+         let bind (arg_loc,label_descr,pat) = 
+            let name = label_descr.lbl_name in
+            match pat.pat_desc with
+            | Tpat_var (id, _) -> 
+                let sid = ppf_ident id in
+                (sid, Printf.sprintf "%s.%s" seobj name)
+            | Tpat_any -> out_of_scope e.exp_loc "Underscore pattern in let-record"
+            | _ -> out_of_scope e.exp_loc "Nested pattern matching"
+            in
+          let binders = List.map bind args in
           let ids = List.map fst binders in
           let sdecl = ppf_match_binders binders in
           (ids, sdecl)
@@ -616,10 +632,18 @@ and js_of_expression ctx dest e =
      let sl = sl_clean |> List.map (fun ei -> inline_of_wrap ei) in
      let se = inline_of_wrap f in
      let sexp = 
-        if is_infix f sl' && List.length exp_l = 2
-           then ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
-           else ppf_apply se (String.concat ", " sl)
-        in
+        if is_primitive_comparison f then begin
+          if (List.length exp_l <> 2) 
+            then out_of_scope loc "=== should be applied to 2 arguments";
+          let typ = (List.hd sl_clean).exp_type in
+          let stype = Print_type.string_of_type_exp typ in
+          let stype = Str.global_replace (Str.regexp "\\.") "_" stype in
+          ppf_apply ("_compare_" ^ stype) (String.concat ", " sl)
+        end else if is_infix f sl' && List.length exp_l = 2 then begin
+           ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
+        end else begin
+           ppf_apply se (String.concat ", " sl)
+        end in
      apply_dest ctx dest sexp
 
   | Texp_match (obj, l, [], Total) ->
@@ -730,6 +754,13 @@ and js_of_longident loc =
   | "/."  -> "/"
   | "="   -> "=="
   | res   -> ppf_ident_name res
+
+and is_primitive_comparison e =
+   match e.exp_desc with
+   | Texp_ident (_, ident,  _) ->
+      let sexp = js_of_longident ident in
+      sexp = "==="
+   | _ -> false
 
 and ident_of_pat pat = match pat.pat_desc with
   | Tpat_var (id, _) -> ppf_ident id
