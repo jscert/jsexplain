@@ -62,6 +62,10 @@ let string_fold_righti f s acc =
 
 let is_sbool x = List.mem x ["true" ; "false"]
 
+let is_unit x = x = "()"
+
+let unit_repr = "{}"
+
 (* Given an expression, check whether it is a primitive type or a constructed type *)
 let exp_type_is_constant exp =
   List.exists (Ctype.matches exp.exp_env exp.exp_type)
@@ -635,10 +639,12 @@ and js_of_expression ctx dest e =
     let cstr_name = cd.cstr_name in
     (*let styp = string_of_type_exp e.exp_type in*)
     let sexp =
-      if is_sbool cstr_name then cstr_name else begin
-        let expr_strs = List.map (fun exp -> inline_of_wrap exp) el in
-        ppf_cstrs_fct cstr_fullname expr_strs
-      end in
+      if is_sbool cstr_name then cstr_name else
+      if is_unit cstr_name then unit_repr else
+        begin
+          let expr_strs = List.map (fun exp -> inline_of_wrap exp) el in
+          ppf_cstrs_fct cstr_fullname expr_strs
+        end in
     apply_dest ctx dest sexp
 
   | Texp_array      (exp_l)           -> ppf_array @@ show_list_f (fun exp -> inline_of_wrap exp) ", " exp_l
@@ -717,7 +723,7 @@ and js_of_constant = function
 
 and js_of_longident loc =
   match String.concat "." @@ Longident.flatten loc.txt with
-  | "()"  -> "undefined"
+  | "()"  -> unit_repr
   | "+."  -> "+"
   | "*."  -> "*"
   | "-."  -> "-"

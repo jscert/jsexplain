@@ -6141,58 +6141,28 @@ let run_javascript runs0 p =
 
 (** val runs : int -> runs_type **)
 
-let rec runs max_step =
-  (fun fO fS n -> if int_eq n 0 then fO () else fS (n-1))
-    (fun _ -> { runs_type_expr = (fun s x x0 -> Coq_result_bottom s);
-    runs_type_stat = (fun s x x0 -> Coq_result_bottom s); runs_type_prog =
-    (fun s x x0 -> Coq_result_bottom s); runs_type_call =
-    (fun s x x0 x1 x2 -> Coq_result_bottom s); runs_type_call_prealloc =
-    (fun s x x0 x1 x2 -> Coq_result_bottom s); runs_type_construct =
-    (fun s x x0 x1 x2 -> Coq_result_bottom s);
-    runs_type_function_has_instance = (fun s x x0 -> Coq_result_bottom s);
-    runs_type_object_has_instance = (fun s x x0 x1 x2 -> Coq_result_bottom
-    s); runs_type_get_args_for_apply = (fun s x x0 x1 x2 -> Coq_result_bottom
-    s); runs_type_stat_while = (fun s x x0 x1 x2 x3 -> Coq_result_bottom s);
-    runs_type_stat_do_while = (fun s x x0 x1 x2 x3 -> Coq_result_bottom s);
-    runs_type_stat_for_loop = (fun s x x0 x1 x2 x3 x4 -> Coq_result_bottom
-    s); runs_type_object_delete = (fun s x x0 x1 x2 -> Coq_result_bottom s);
-    runs_type_object_get_own_prop = (fun s x x0 x1 -> Coq_result_bottom s);
-    runs_type_object_get_prop = (fun s x x0 x1 -> Coq_result_bottom s);
-    runs_type_object_get = (fun s x x0 x1 -> Coq_result_bottom s);
-    runs_type_object_proto_is_prototype_of = (fun s x x0 -> Coq_result_bottom
-    s); runs_type_object_put = (fun s x x0 x1 x2 x3 -> Coq_result_bottom s);
-    runs_type_equal = (fun s x x0 x1 -> Coq_result_bottom s);
-    runs_type_to_integer = (fun s x x0 -> Coq_result_bottom s);
-    runs_type_to_string = (fun s x x0 -> Coq_result_bottom s);
-    runs_type_array_join_elements = (fun s x x0 x1 x2 x3 x4 ->
-    Coq_result_bottom s); runs_type_array_element_list = (fun s x x0 x1 x2 ->
-    Coq_result_bottom s); runs_type_object_define_own_prop_array_loop =
-    (fun s x x0 x1 x2 x3 x4 x5 x6 -> Coq_result_bottom
-    s) })
-    (fun max_step' ->
-    let wrap = fun _ f s -> let runs' = runs max_step' in f runs' s in
-    { runs_type_expr = (wrap __ run_expr); runs_type_stat =
-    (wrap __ run_stat); runs_type_prog = (wrap __ run_prog); runs_type_call =
-    (wrap __ run_call); runs_type_call_prealloc =
-    (wrap __ run_call_prealloc); runs_type_construct =
-    (wrap __ run_construct); runs_type_function_has_instance =
-    (wrap __ run_function_has_instance); runs_type_object_has_instance =
-    (wrap __ run_object_has_instance); runs_type_get_args_for_apply =
-    (wrap __ run_get_args_for_apply); runs_type_stat_while =
-    (wrap __ run_stat_while); runs_type_stat_do_while =
-    (wrap __ run_stat_do_while); runs_type_stat_for_loop =
-    (wrap __ run_stat_for_loop); runs_type_object_delete =
-    (wrap __ object_delete); runs_type_object_get_own_prop =
-    (wrap __ run_object_get_own_prop); runs_type_object_get_prop =
-    (wrap __ run_object_get_prop); runs_type_object_get =
-    (wrap __ run_object_get); runs_type_object_proto_is_prototype_of =
-    (wrap __ object_proto_is_prototype_of); runs_type_object_put =
-    (wrap __ object_put); runs_type_equal = (wrap __ run_equal);
-    runs_type_to_integer = (wrap __ to_integer); runs_type_to_string =
-    (wrap __ to_string); runs_type_array_join_elements =
-    (wrap __ run_array_join_elements); runs_type_array_element_list =
-    (wrap __ run_array_element_list);
-    runs_type_object_define_own_prop_array_loop =
-    (wrap __ run_object_define_own_prop_array_loop) })
-    max_step
-
+let rec runs =
+  { runs_type_expr = (fun x y z -> run_expr runs x y z);
+    runs_type_stat = (fun x y z -> run_stat runs x y z);
+    runs_type_prog = (fun x y z -> run_prog runs x y z);
+    runs_type_call = (fun x y z r t -> run_call runs x y z r t);
+    runs_type_call_prealloc = (fun x y z r t -> run_call_prealloc runs x y z r t);
+    runs_type_construct = (fun x y z r t -> run_construct runs x y z r t);
+    runs_type_function_has_instance = (fun x y z -> run_function_has_instance runs x y z);
+    runs_type_object_has_instance = (fun x y z r t -> run_object_has_instance runs x y z r t);
+    runs_type_get_args_for_apply = (fun x y z r t -> run_get_args_for_apply runs x y z r t);
+    runs_type_stat_while = (fun x y z r t s -> run_stat_while runs x y z r t s);
+    runs_type_stat_do_while = (fun x y z r t s -> run_stat_do_while runs x y z r t s);
+    runs_type_stat_for_loop = (fun x y z r t s v -> run_stat_for_loop runs x y z r t s v);
+    runs_type_object_delete = (fun x y z r t -> object_delete runs x y z r t);
+    runs_type_object_get_own_prop = (fun x y z r -> run_object_get_own_prop runs x y z r);
+    runs_type_object_get_prop = (fun x y z r -> run_object_get_prop runs x y z r);
+    runs_type_object_get = (fun x y z r -> run_object_get runs x y z r);
+    runs_type_object_proto_is_prototype_of = (fun x y z -> object_proto_is_prototype_of runs x y z);
+    runs_type_object_put = (fun x y z r s t -> object_put runs x y z r s t);
+    runs_type_equal = (fun x y z r -> run_equal runs x y z r);
+    runs_type_to_integer = (fun x y z -> to_integer runs x y z);
+    runs_type_to_string = (fun x y z -> to_string runs x y z);
+    runs_type_array_join_elements = (fun x y z r s t v -> run_array_join_elements runs x y z r s t v);
+    runs_type_array_element_list = (fun x y z r s -> run_array_element_list runs x y z r s);
+    runs_type_object_define_own_prop_array_loop = (fun x y z r s t u v w -> run_object_define_own_prop_array_loop runs x y z r s t u v w) }
