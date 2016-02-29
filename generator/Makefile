@@ -111,12 +111,7 @@ tests/jsref: tests/jsref/JsInterpreter.log.js
 tests/jsrefunlog: tests/jsref/JsInterpreter.unlog.js
 
 
-arthur: $(ML_JSREF:.ml=.log.js) $(ML_JSREF:.ml=.unlog.js) $(ML_JSREF:.ml=.token.js)
 
-# foo:
-# 	make $(ML_JSREF:.ml=.log.js)
-# 
-# tests/jsref/JsInterpreter.log.js
 
 
 ######### lineof target #########
@@ -124,7 +119,14 @@ arthur: $(ML_JSREF:.ml=.log.js) $(ML_JSREF:.ml=.unlog.js) $(ML_JSREF:.ml=.token.
 tests/jsref/lineof.js: lineof.byte $(ML_JSREF:.ml=.token.js)
 	lineof.byte -o $@ $(ML_JSREF:.ml=.token.js)
 
+
+######### short targets #########
+
+unlog: $(ML_JSREF:.ml=.unlog.js) 
+full: $(ML_JSREF:.ml=.log.js) $(ML_JSREF:.ml=.unlog.js) $(ML_JSREF:.ml=.token.js)
 lineof: tests/jsref/lineof.js
+
+
 
 ##################
 

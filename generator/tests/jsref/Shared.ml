@@ -1,6 +1,6 @@
 open BinInt
 open Datatypes
-open LibHeap
+open Heap
 open LibReflect
 open String0
 
@@ -39,49 +39,5 @@ type 'a coq_Pickable_option =
   'a option
   (* singleton inductive, whose constructor was pickable_option_make *)
 
-module HeapGen = 
- functor (Heap:HeapSpec) ->
- struct 
-  type ('k, 'v) heap = int * ('k, 'v) Heap.heap
-  
-  (** val empty : ('a1, 'a2) heap **)
-  
-  let empty =
-    (0, Heap.empty)
-  
-  (** val to_list : ('a1, 'a2) heap -> ('a1 * 'a2) list **)
-  
-  let to_list h =
-    Heap.to_list (snd h)
-  
-  (** val read : 'a1 coq_Comparable -> ('a1, 'a2) heap -> 'a1 -> 'a2 **)
-  
-  let read h h0 =
-    Heap.read h (snd h0)
-  
-  (** val write :
-      ('a1, 'a2) heap -> 'a1 -> 'a2 -> int * ('a1, 'a2) Heap.heap **)
-  
-  let write h k v =
-    let (id, h0) = h in ((Pervasives.succ id), (Heap.write (snd h) k v))
-  
-  (** val rem :
-      'a1 coq_Comparable -> ('a1, 'a2) heap -> 'a1 -> int * ('a1, 'a2)
-      Heap.heap **)
-  
-  let rem h h0 k =
-    let (id, h1) = h0 in ((Pervasives.succ id), (Heap.rem h (snd h0) k))
-  
-  (** val read_option :
-      'a1 coq_Comparable -> ('a1, 'a2) heap -> 'a1 -> 'a2 option **)
-  
-  let read_option h h0 =
-    Heap.read_option h (snd h0)
-  
-  (** val indom_decidable :
-      'a1 coq_Comparable -> ('a1, 'a2) heap -> 'a1 -> coq_Decidable **)
-  
-  let indom_decidable h1 p =
-    let (n, h0) = p in Heap.indom_decidable h1 (snd (n, h0))
- end
+
 

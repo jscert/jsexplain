@@ -1,9 +1,7 @@
 open JsNumber
-open LibHeap
+open Heap
 open LibReflect
 open Shared
-
-module Heap = HeapGen(HeapList)
 
 type unary_op =
 | Coq_unary_op_delete [@f]  (** Auto Generated Attributes **)
@@ -70,55 +68,55 @@ type propname =
 
 type expr =
 | Coq_expr_this [@f]  (** Auto Generated Attributes **)
-| Coq_expr_identifier  [@f label0] of string (** Auto Generated Attributes **)
-| Coq_expr_literal  [@f label0] of literal (** Auto Generated Attributes **)
-| Coq_expr_object  [@f label0] of (propname * propbody) list (** Auto Generated Attributes **)
-| Coq_expr_array  [@f label0] of expr option list (** Auto Generated Attributes **)
-| Coq_expr_function  [@f label0, label1, label2] of string option * string list * funcbody (** Auto Generated Attributes **)
-| Coq_expr_access  [@f label0, label1] of expr * expr (** Auto Generated Attributes **)
-| Coq_expr_member  [@f label0, label1] of expr * string (** Auto Generated Attributes **)
-| Coq_expr_new  [@f label0, label1] of expr * expr list (** Auto Generated Attributes **)
-| Coq_expr_call  [@f label0, label1] of expr * expr list (** Auto Generated Attributes **)
-| Coq_expr_unary_op  [@f label0, label1] of unary_op * expr (** Auto Generated Attributes **)
-| Coq_expr_binary_op  [@f label0, label1, label2] of expr * binary_op * expr (** Auto Generated Attributes **)
-| Coq_expr_conditional  [@f label0, label1, label2] of expr * expr * expr (** Auto Generated Attributes **)
-| Coq_expr_assign  [@f label0, label1, label2] of expr * binary_op option * expr (** Auto Generated Attributes **)
+| Coq_expr_identifier  [@f name] of string (** Auto Generated Attributes **)
+| Coq_expr_literal  [@f value] of literal (** Auto Generated Attributes **)
+| Coq_expr_object  [@f fields] of (propname * propbody) list (** Auto Generated Attributes **)
+| Coq_expr_array  [@f elements] of expr option list (** Auto Generated Attributes **)
+| Coq_expr_function  [@f func_name_opt, arg_names, body] of string option * string list * funcbody (** Auto Generated Attributes **)
+| Coq_expr_access  [@f obj, field] of expr * expr (** Auto Generated Attributes **)
+| Coq_expr_member  [@f obj, field_name] of expr * string (** Auto Generated Attributes **)
+| Coq_expr_new  [@f func, args] of expr * expr list (** Auto Generated Attributes **)
+| Coq_expr_call  [@f func, args] of expr * expr list (** Auto Generated Attributes **)
+| Coq_expr_unary_op  [@f op, arg] of unary_op * expr (** Auto Generated Attributes **)
+| Coq_expr_binary_op  [@f arg1, op, arg2] of expr * binary_op * expr (** Auto Generated Attributes **)
+| Coq_expr_conditional  [@f cond, then_branch, else_branch] of expr * expr * expr (** Auto Generated Attributes **)
+| Coq_expr_assign  [@f left_expr, op_opt, right_expr] of expr * binary_op option * expr (** Auto Generated Attributes **)
 and propbody =
-| Coq_propbody_val  [@f label0] of expr (** Auto Generated Attributes **)
-| Coq_propbody_get  [@f label0] of funcbody (** Auto Generated Attributes **)
-| Coq_propbody_set  [@f label0, label1] of string list * funcbody (** Auto Generated Attributes **)
+| Coq_propbody_val  [@f expr] of expr (** Auto Generated Attributes **)
+| Coq_propbody_get  [@f body] of funcbody (** Auto Generated Attributes **)
+| Coq_propbody_set  [@f names, body] of string list * funcbody (** Auto Generated Attributes **)
 and funcbody =
-| Coq_funcbody_intro  [@f label0, label1] of prog * string (** Auto Generated Attributes **)
+| Coq_funcbody_intro  [@f prog, source] of prog * string (** Auto Generated Attributes **)
 and stat =
-| Coq_stat_expr  [@f label0] of expr (** Auto Generated Attributes **)
-| Coq_stat_label  [@f label0, label1] of string * stat (** Auto Generated Attributes **)
-| Coq_stat_block  [@f label0] of stat list (** Auto Generated Attributes **)
-| Coq_stat_var_decl  [@f label0] of (string * expr option) list (** Auto Generated Attributes **)
-| Coq_stat_if  [@f label0, label1, label2] of expr * stat * stat option (** Auto Generated Attributes **)
-| Coq_stat_do_while  [@f label0, label1, label2] of label_set * stat * expr (** Auto Generated Attributes **)
-| Coq_stat_while  [@f label0, label1, label2] of label_set * expr * stat (** Auto Generated Attributes **)
-| Coq_stat_with  [@f label0, label1] of expr * stat (** Auto Generated Attributes **)
-| Coq_stat_throw  [@f label0] of expr (** Auto Generated Attributes **)
-| Coq_stat_return  [@f label0] of expr option (** Auto Generated Attributes **)
-| Coq_stat_break  [@f label0] of label (** Auto Generated Attributes **)
-| Coq_stat_continue  [@f label0] of label (** Auto Generated Attributes **)
-| Coq_stat_try  [@f label0, label1, label2] of stat * (string * stat) option * stat option (** Auto Generated Attributes **)
-| Coq_stat_for  [@f label0, label1, label2, label3, label4] of label_set * expr option * expr option * expr option * stat (** Auto Generated Attributes **)
-| Coq_stat_for_var  [@f label0, label1, label2, label3, label4] of label_set * (string * expr option) list * expr option * expr option * stat (** Auto Generated Attributes **)
-| Coq_stat_for_in  [@f label0, label1, label2, label3] of label_set * expr * expr * stat (** Auto Generated Attributes **)
-| Coq_stat_for_in_var  [@f label0, label1, label2, label3, label4] of label_set * string * expr option * expr * stat (** Auto Generated Attributes **)
+| Coq_stat_expr  [@f expr] of expr (** Auto Generated Attributes **)
+| Coq_stat_label  [@f label, stat] of string * stat (** Auto Generated Attributes **)
+| Coq_stat_block  [@f stats] of stat list (** Auto Generated Attributes **)
+| Coq_stat_var_decl  [@f decls] of (string * expr option) list (** Auto Generated Attributes **)
+| Coq_stat_if  [@f cond, then_branch, else_branch] of expr * stat * stat option (** Auto Generated Attributes **)
+| Coq_stat_do_while  [@f labels, body, cond] of label_set * stat * expr (** Auto Generated Attributes **)
+| Coq_stat_while  [@f labels, cond, body] of label_set * expr * stat (** Auto Generated Attributes **)
+| Coq_stat_with  [@f obj, stat] of expr * stat (** Auto Generated Attributes **)
+| Coq_stat_throw  [@f arg] of expr (** Auto Generated Attributes **)
+| Coq_stat_return  [@f arg_opt] of expr option (** Auto Generated Attributes **)
+| Coq_stat_break  [@f label] of label (** Auto Generated Attributes **)
+| Coq_stat_continue  [@f label] of label (** Auto Generated Attributes **)
+| Coq_stat_try  [@f body, catch_stats_opt, finally_opt] of stat * (string * stat) option * stat option (** Auto Generated Attributes **)
+| Coq_stat_for  [@f labels, TODO_opt1, TODO_opt2, TODO_opt3, body] of label_set * expr option * expr option * expr option * stat (** Auto Generated Attributes **)
+| Coq_stat_for_var  [@f labels, TODO_list1, TODO_opt2, TODO_opt3, body] of label_set * (string * expr option) list * expr option * expr option * stat (** Auto Generated Attributes **)
+| Coq_stat_for_in  [@f labels, TODO_exp1, TODO_exp2, body] of label_set * expr * expr * stat (** Auto Generated Attributes **)
+| Coq_stat_for_in_var  [@f labels, TODO_str1, TODO_exp2, TODO_exp3, body] of label_set * string * expr option * expr * stat (** Auto Generated Attributes **)
 | Coq_stat_debugger [@f]  (** Auto Generated Attributes **)
-| Coq_stat_switch  [@f label0, label1, label2] of label_set * expr * switchbody (** Auto Generated Attributes **)
+| Coq_stat_switch  [@f labels, arg, body] of label_set * expr * switchbody (** Auto Generated Attributes **)
 and switchbody =
-| Coq_switchbody_nodefault  [@f label0] of switchclause list (** Auto Generated Attributes **)
-| Coq_switchbody_withdefault  [@f label0, label1, label2] of switchclause list * stat list * switchclause list (** Auto Generated Attributes **)
+| Coq_switchbody_nodefault  [@f clauses] of switchclause list (** Auto Generated Attributes **)
+| Coq_switchbody_withdefault  [@f clauses_before, default, clauses_after] of switchclause list * stat list * switchclause list (** Auto Generated Attributes **)
 and switchclause =
-| Coq_switchclause_intro  [@f label0, label1] of expr * stat list (** Auto Generated Attributes **)
+| Coq_switchclause_intro  [@f arg, stats] of expr * stat list (** Auto Generated Attributes **)
 and prog =
-| Coq_prog_intro  [@f label0, label1] of strictness_flag * element list (** Auto Generated Attributes **)
+| Coq_prog_intro  [@f strictness, elements] of strictness_flag * element list (** Auto Generated Attributes **)
 and element =
-| Coq_element_stat  [@f label0] of stat (** Auto Generated Attributes **)
-| Coq_element_func_decl  [@f label0, label1, label2] of string * string list * funcbody (** Auto Generated Attributes **)
+| Coq_element_stat  [@f stat] of stat (** Auto Generated Attributes **)
+| Coq_element_func_decl  [@f func_name, arg_names, body] of string * string list * funcbody (** Auto Generated Attributes **)
 
 type propdefs = (propname * propbody) list
 
@@ -389,7 +387,7 @@ type provide_this_flag = bool
 
 type env_record =
 | Coq_env_record_decl  [@f value] of decl_env_record (** Auto Generated Attributes **)
-| Coq_env_record_object  [@f value, label1] of object_loc * provide_this_flag (** Auto Generated Attributes **)
+| Coq_env_record_object  [@f value, provide_this] of object_loc * provide_this_flag (** Auto Generated Attributes **)
 
 type env_loc = int
 
