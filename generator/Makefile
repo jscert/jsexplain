@@ -89,9 +89,9 @@ tests/%.all: tests/%.log.js tests/%.unlog.js tests/%.token.js
 
 # ad hoc rules
 
-tests/jsref/Translate_syntax.cmi: tests/jsref/Translate_syntax.mli stdlib 
+tests/jsref/Translate_syntax.cmi: tests/jsref/Translate_syntax.mli tests/jsref/JsSyntax.cmi stdlib
 	ocamlc -I tests/jsref -I stdlib_ml -open Stdlib $<
- 
+
 tests/jsref/Prheap.cmi: tests/jsref/Prheap.mli stdlib tests/jsref/JsSyntax.cmi
 	ocamlc -I tests/jsref -I stdlib_ml -open Stdlib $<
 

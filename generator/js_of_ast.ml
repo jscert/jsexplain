@@ -666,7 +666,6 @@ and js_of_expression ctx dest e =
       Printf.sprintf "throw %s;" sexp
 
   | Texp_function (label, cases, Total) when label = "" -> 
-      Printf.printf "here\n";
       let mk_pat pat_des =
         { pat_desc = pat_des;
           pat_loc = e.exp_loc;
