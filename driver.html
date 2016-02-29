@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>JavaScript Reference Tracer</title>
+
+<script src="../../interp/tracer/jquery-2.1.1.min.js"></script>
+
+<link rel=stylesheet href="../../interp/tracer/codemirror/lib/codemirror.css">
+<script src="../../interp/tracer/codemirror/lib/codemirror.js"></script>
+
+
+<!-- styles needed by jScrollPane - include in your own sites -->
+<link type="text/css" href="jquery_scroll/jquery.jscrollpane.css" rel="stylesheet" media="all" />
+<!-- the mousewheel plugin -->
+<script type="text/javascript" src="jquery_scroll/jquery.mousewheel.js"></script>
+<!-- the jScrollPane script -->
+<script type="text/javascript" src="jquery_scroll/jquery.jscrollpane.min.js"></script>
+
+<link rel="stylesheet" href="jquery-ui-1.11.4.custom/jquery-ui.css">
+<script src="jquery-ui-1.11.4.custom/jquery-ui.js"></script>
+
+<script src="https://cdn.rawgit.com/jquery/esprima/1.2/esprima.js"></script>
+<script type = "text/javascript" src="source-driver.js"></script>
+<!-- <script src="interp-poc.js"></script> -->
+
+<!-- <style> -->
+<!-- .source_div { -->
+<!--    border-top: 1px solid black;  -->
+<!--    border-bottom: 1px solid black; -->
+<!-- } -->
+
+<!-- .heap_link { -->
+<!--    color: black; -->
+<!-- } -->
+
+<!-- #file_list { -->
+<!--    height: 1em; -->
+<!--    padding-top: 8px; -->
+<!--    padding-bottom: 8px; -->
+<!--    border-bottom: 1px solid black; -->
+<!-- } -->
+
+<!-- .file_item, .file_item_current { -->
+<!--    margin-right: 5px; -->
+<!--    padding: 5px; -->
+<!--    text-decoration: underline; -->
+<!-- } -->
+
+<!-- .file_item, .file_item_current:hover { -->
+<!--    cursor: pointer;  -->
+<!--    cursor: hand; -->
+<!-- } -->
+
+<!-- .file_item { -->
+<!--    background-color: #FAFAFA; -->
+<!-- } -->
+
+<!-- .file_item_current { -->
+<!--    background-color: #FFCCCC; -->
+<!-- } -->
+
+<!-- #main_table td { -->
+<!--    vertical-align: top; -->
+<!--    border: 1px solid black; -->
+<!-- } -->
+
+<!-- .CodeMirror-selected { background: #F3F781; } -->
+<!-- .CodeMirror-focused .CodeMirror-selected { background: #F3F781; } -->
+
+
+<!-- .scroll-pane -->
+<!-- { -->
+<!-- 	width: 100%; -->
+<!-- 	height: 200px; -->
+<!-- 	overflow: auto; -->
+<!-- } -->
+<!-- </style> -->
+
+
+</head>
+<body>
+
+<h2>Mini-ML Interpreter</h2>
+
+
+<!-- <div class='source_div'> -->
+
+<!-- <table id='main_table'><tr> -->
+<!-- <td> -->
+<!--    <textarea id='source_code' class='source' rows='6' cols='60'>source code here</textarea> -->
+<!-- </td> -->
+<!-- <td width='600'> -->
+<!--    <div class="scroll-pane" style="height: 10em"> -->
+<!--    <div id='disp_env'>ctx here</div> -->
+<!--    </div> -->
+<!-- </td> -->
+<!-- </tr></table> -->
+<!-- </div> -->
+
+
+
+<!-- <br/> -->
+<!-- <div> -->
+<!-- <input type="button" id="button_run" value="RUN" /> -->
+<!-- Navigation: -->
+<!-- <input type="textbox" id='navigation_step' style="width:3em" value="0"/> -->
+<!-- / <span id="navigation_total"></span> -->
+<!-- <input type="button" id='button_reset' value="Reset" /> -->
+<!-- <input type="button" id='button_prev' value="Prev" /> -->
+<!-- <input type="button" id='button_next' value="Next" /> -->
+<!-- Reach condition: -->
+<!-- <input type="textbox" id='text_condition' style="width:30em" /> -->
+<!-- <input type="button" id='button_reach' value="Reach" /> -->
+<!-- <span id="reach_output"></span> -->
+<!-- </div> -->
+
+<!-- <div id="action_output"></div> -->
+<!-- <br/> -->
+
+<!-- <div class='source_div'> -->
+
+<!-- <table id='main_table'><tr> -->
+<!-- <td> -->
+<!--    <div id='file_list'></div> -->
+<!--    <textarea id='interpreter_code' class='source' rows='20' cols='60'></textarea> -->
+<!-- </td> -->
+<!-- <td width='600'> -->
+<!--    <div id='disp_infos'></div> -->
+<!--    <div id='disp_ctx'>ctx here</div> -->
+<!-- </td> -->
+<!-- </tr></table> -->
+<!-- </div> -->
+
+
+<!-- <script src="navig-poc.js"></script> -->
+
+<!-- <\!-- -->
+<!-- <script language="javascript"> -->
+<!-- $(function() { -->
+<!-- 	$('.scroll-pane').jScrollPane(); -->
+<!-- }); -->
+<!-- </script> -->
+<!-- -\-> -->
+
+<!-- <\!--div style="font-size:0.8em">Instructions: from console, the variable "h" denotes the current heap.</div-\-> -->
+
+<!-- <div style="font-size:0.8em">Instructions: type 'S' for step (next function call), 'N' for next (next call at same level), 'B' for backstep (symmetric to step), 'P' for previous (symmetric to next), 'F' for finish (next call at upper level), 'R' for restart.</div> -->
+
+<!-- <div style="font-size:0.8em">Examples of conditions: -->
+<!--     <ul> -->
+<!--         <li><pre style = "display:inline">X.type === "fun" && (X.v1, true)</pre> (we are at the beginning of a function and v1 is defined in the local interpreter context),</li> -->
+<!--         <li><pre style = "display:inline">X.line === 32 && X.t.tag === "trm_set" && X.t.field === "bar"</pre> (we are at line 32 and we are setting the field “bar” of the current location),</li> -->
+<!--         <li><pre style = "display:inline">y.foo === 12</pre> (the program variable “y” points to an object whose field “foo” is equal to 12),</li> -->
+<!--         <li><pre style = "display:inline">X.heap[0].bar === 12</pre> (the first cell of the heap has a field “bar” defined equal to 12).</li> -->
+<!--     </ul></div> -->
+<!--   -->
+
+</body>
+</html>
+
+
+
+<!---
+$timeout(function() {codeMirror.refresh();});
+
+this.codeMirrorInstance.setValue(content);
+var that = this;
+setTimeout(function() {
+    that.codeMirrorInstance.refresh();
+},1);
+
+http://codemirror.net/demo/buffers.html
+
+//CodeMirror.Doc(text
+---->
+
+
+
