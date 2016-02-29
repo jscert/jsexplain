@@ -43,7 +43,8 @@ val int_of_float : float -> int
 val string_of_float : float -> string
 val string_of_int : int -> string
 
-(*val ( === ) : 'a -> 'a -> bool*)
+(* We use this to compare types that are not known by stdlib, like Native_error *)
+val ( === ) : 'a -> 'a -> bool
 (*val ( <> ) : 'a -> 'a -> bool*)
 (*val ( < ) : 'a -> 'a -> bool
 val ( > ) : 'a -> 'a -> bool
