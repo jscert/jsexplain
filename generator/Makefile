@@ -160,8 +160,3 @@ ifneq ($(findstring a,$(MAKECMDGOALS)),)
 -include $(ML_JSREF:.ml=.ml.d)
 -include $(MLI_JSREF:.mli=.mli.d)
 endif
-
-
-
-arthur: lineof.byte
-	./lineof.byte -o tests/calc.lineof.js tests/calc.token.js
