@@ -28,6 +28,7 @@ debug: main.d.byte
 native: _tags
 	$(OCAMLBUILD) main.native
 
+
 stdlib:
 	$(CC) stdlib_ml/stdlib.mli
 
@@ -118,6 +119,16 @@ arthur: $(ML_JSREF:.ml=.log.js) $(ML_JSREF:.ml=.unlog.js) $(ML_JSREF:.ml=.token.
 # tests/jsref/JsInterpreter.log.js
 
 
+######### lineof target #########
+
+tests/jsref/lineof.js: lineof.byte $(ML_JSREF:.ml=.token.js)
+	lineof.byte -o $@ $(ML_JSREF:.ml=.token.js)
+
+lineof: tests/jsref/lineof.js
+
+##################
+
+
 clean_stdlib:
 	rm -f $(STD_DIR)/*.cmi
 
@@ -141,22 +152,12 @@ cleanall: clean clean_cmi
 
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 -include $(ML_TESTS:.ml=.ml.d)
-endif
-
-#ifeq ($(MAKECMDGOALS),tests/lambda)
-ifneq ($(findstring tests/lambda,$(MAKECMDGOALS)),)
--include $(ML_LAMBDA:.ml=.ml.d)
-endif
-
-#tests/
-ifneq ($(findstring jsref,$(MAKECMDGOALS)),)
-#$(error $(ML_JSREF:.ml=.ml.d))
 -include $(ML_JSREF:.ml=.ml.d)
 -include $(MLI_JSREF:.mli=.mli.d)
 endif
 
-ifneq ($(findstring a,$(MAKECMDGOALS)),)
-#$(error $(ML_JSREF:.ml=.ml.d))
--include $(ML_JSREF:.ml=.ml.d)
--include $(MLI_JSREF:.mli=.mli.d)
-endif
+
+#ifeq ($(findstring clean,$(MAKECMDGOALS)),)
+#-include $(ML_JSREF:.ml=.ml.d)
+#-include $(MLI_JSREF:.mli=.mli.d)
+#endif

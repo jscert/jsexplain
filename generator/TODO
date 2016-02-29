@@ -44,3 +44,21 @@ LATER
 - => binder qq part vers une comparaison --- dans un fichier js
   _compare_JsSyntax_native_error
   _compare_JsSyntax_prealloc
+
+
+
+==========
+
+TODO: demo of double clicking goes to the right page in ecma in english
+
+TODO: interpretation of comparison function in the search by "predicate"
+   might want to automatically "lift" basic values to their encoding
+	(unless some box is checked to prevent this behavior)
+
+	example:  "x == 3"  means:
+	"similar(x, { type: "value", tag: "value_prim", value: { type: "prim", tag: "float", value: 3.0 } })".
+
+	where similar is a recursive structural comparison function (not going through the heap)
+
+
+==========

@@ -34,6 +34,7 @@ let _ =
      failwith "The file name must be of the form *.ml";
    let basename = Filename.chop_suffix (Filename.basename sourcefile) ".ml" in
    let dirname = Filename.dirname sourcefile in
+   let pathname = if dirname = "" then basename else (dirname ^ "/" ^ basename) in
    let log_output, unlog_output, token_output =
      match !outputfile with
      | None -> Filename.concat dirname (basename ^ ".log.js"),
@@ -56,7 +57,7 @@ let _ =
       in
 
       match !current_mode with
-        | Mode_cmi -> Printf.printf "wrote cmi file\n"
+        | Mode_cmi -> Printf.printf "Wrote %s.cmi\n" pathname
         | _ ->
           let out = Js_of_ast.to_javascript basename module_name typedtree1 in
           let output_filename = match !current_mode with
@@ -66,4 +67,4 @@ let _ =
             | _ -> assert false
           in
           file_put_contents output_filename out;
-          Printf.printf "wrote %s\n" output_filename
+          Printf.printf "Wrote %s\n" output_filename

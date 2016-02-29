@@ -248,10 +248,9 @@ let ppf_path =
 let ppf_module content =
   Printf.sprintf "{@,%s@,}" content
 
-let ppf_module_wrap name content =
-  let modu = ppf_module content in
-  Printf.sprintf "var %s = %s;" name modu
-
+let ppf_module_wrap name content names_bound =
+  let bindings = show_list ", " (List.map (fun id -> Printf.sprintf "@\n  %s: %s" id id) names_bound) in
+  Printf.sprintf "var %s = (function() {@,@, %s @,@,@\nreturn {@\n %s };@,@\n})();@," name content bindings
 
 
 
@@ -472,13 +471,22 @@ let reject_inline dest =
 (****************************************************************)
 (* TRANSLATION *)
 
+(* takes a list of pairs made of: list of strings, and list of strings, 
+   and return a pair of a string (the string concat with newlines of the fst strings),
+   and a list of strings (the list flatten of the snd strings) *)
+
+let combine_list_output args = 
+   let (strs,bss) = List.split args in
+   (show_list "@,@," strs), (List.flatten bss)
+
 let rec js_of_structure s =
-  show_list_f (fun strct -> js_of_structure_item strct) "@,@," s.str_items
+   combine_list_output (List.map (fun strct -> js_of_structure_item strct) s.str_items)
 
 and js_of_submodule m =
+  Printf.printf "warning: code generation is incorrect for local modules\n"; 
   let loc = m.mod_loc in
   match m.mod_desc with
-  | Tmod_structure  s -> ppf_module (js_of_structure s)
+  | Tmod_structure  s -> ppf_module (fst (*TODO*) (js_of_structure s))
   | Tmod_functor (id, _, mtyp, mexp) -> ppf_function (ppf_ident id) (js_of_submodule mexp)
   | Tmod_apply (m1, m2, _) -> ppf_apply (js_of_submodule m1) (js_of_submodule m2)
   | Tmod_ident (p,_) -> ppf_path p
@@ -491,31 +499,38 @@ and show_value_binding ctx vb = (* dest is Ignore *)
 and js_of_structure_item s =
   let loc = s.str_loc in
   match s.str_desc with
-  | Tstr_eval (e, _)     -> Printf.sprintf "%s" @@ js_of_expression ctx_initial Dest_ignore e
-  | Tstr_value (_, vb_l) -> String.concat "@,@," @@ List.map (fun vb -> 
-     (* let (id, sdecl) = show_value_binding ctx_initial vb in *)
-     Printf.sprintf "@\n@\n%s: %s," (ident_of_pat vb.vb_pat) (js_of_expression_inline_or_wrap ctx_initial vb.vb_expr))
-     @@ vb_l
+  | Tstr_eval (e, _)     -> 
+     let str = Printf.sprintf "%s" @@ js_of_expression ctx_initial Dest_ignore e in
+     (str, [])
+  | Tstr_value (_, vb_l) -> 
+     combine_list_output (~~ List.map vb_l (fun vb -> 
+        let id = ident_of_pat vb.vb_pat in
+        let sbody = js_of_expression_inline_or_wrap ctx_initial vb.vb_expr in
+        let s = Printf.sprintf "@\n@\n var %s = %s;" id sbody in
+        (s, [id])))
   | Tstr_type decls -> 
-     (* function id( f1, f2) { return { typ: t, tag: x, "f1": f1, "f2": f2 } } *)
-     String.concat "@,@," @@ (List.map (fun decl -> 
+     combine_list_output (~~ List.map decls (fun decl -> 
         match decl.typ_type.type_kind with
         | Type_variant cstr_decls ->
            let styp = decl.typ_name.txt in
-           String.concat "@,@," @@ (List.map (fun (cd:Types.constructor_declaration) -> 
+           combine_list_output (~~ List.map cstr_decls (fun (cd:Types.constructor_declaration) -> 
               let cstr_name = cd.Types.cd_id.Ident.name in
               let fields = extract_cstr_attrs_basic cstr_name cd.cd_attributes in
               let sargs = show_list ", " fields in
               let sbindings = map_filter_fields_elements ppf_cstr fields fields in
               let rest = show_list ", " sbindings in
               let sobj = ppf_cstrs styp cstr_name rest in 
-              Printf.sprintf "function %s(%s) { return %s; }" cstr_name sargs sobj))
-          @@ cstr_decls
-        | _ -> ""))
-     @@ decls
-  | Tstr_open       _  -> "" (* Handle modules by use of multiple compilation/linking *)
-  | Tstr_modtype    _  -> ""
-  | Tstr_module     b  -> ppf_decl (ppf_ident b.mb_id) (js_of_submodule b.mb_expr)
+              let sbody = Printf.sprintf "function %s(%s) { return %s; }" cstr_name sargs sobj in
+              (sbody, [cstr_name])
+              ))
+        | _ -> ("", [])
+        ))
+  | Tstr_open       _  -> ("",[]) (* Handle modules by use of multiple compilation/linking *)
+  | Tstr_modtype    _  -> ("",[])
+  | Tstr_module     b  -> 
+     let id = ppf_ident b.mb_id in
+     let sbody = ppf_decl id (js_of_submodule b.mb_expr) in
+     (sbody, [id])
   | Tstr_primitive  _  -> out_of_scope loc "primitive functions"
   | Tstr_typext     _  -> out_of_scope loc "type extensions"
   | Tstr_exception  _  -> out_of_scope loc "exceptions"
@@ -832,8 +847,8 @@ and js_of_pattern pat obj =
 
 let to_javascript basename module_name typedtree =
   token_register_basename basename;
-  let content = js_of_structure typedtree in
-  let pre_res = ppf_module_wrap module_name content in
+  let (content,names_bound) = js_of_structure typedtree in
+  let pre_res = ppf_module_wrap module_name content names_bound in
   let str_ppf = Format.str_formatter in
   Format.fprintf str_ppf (Scanf.format_from_string pre_res "");
   Format.flush_str_formatter ()
