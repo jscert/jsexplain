@@ -116,8 +116,8 @@ let gather_tokens basename input_lines =
     switch (filename) {
       case "foo.js": 
         switch (token) {
-          case 2: return {start: {line: 12, col: 9}, stop: {line: 13, col: 2}};
-          case 19: return {start: {line: 15, col: 9}, stop: {line: 14, col: 5}};
+          case 2: return {file: "foo.js", start: {line: 12, col: 9}, stop: {line: 13, col: 2}};
+          case 19: return {file: "foo.js", start: {line: 15, col: 9}, stop: {line: 14, col: 5}};
           default: throw "lineof does not know token " + token + " in file: " + filename
         }
         break;
@@ -133,8 +133,8 @@ let generate_lineof_function output_file : string =
   let aux_pos pos =
     Printf.sprintf "{ line: %d, col: %d }" pos.pos_line pos.pos_col 
     in
-  let aux_key key pos_start pos_stop =
-    Printf.sprintf "case %d: return {start: %s, stop: %s};" key (aux_pos pos_start) (aux_pos pos_stop)
+  let aux_key filename key pos_start pos_stop =
+    Printf.sprintf "case %d: return {file: \"%s\", start: %s, stop: %s};" key filename (aux_pos pos_start) (aux_pos pos_stop)
     in
   let aux_file (basename, tokens_start, tokens_stop) =
     let filename = basename ^ ".js" in
@@ -146,7 +146,7 @@ let generate_lineof_function output_file : string =
      let pos_stop = try Hashtbl.find tokens_stop key
         with Not_found -> Printf.printf "Warning (error): unclosed token %d in file %s; using pos_start instead.\n" key filename; pos_start
         in 
-      aux_key key pos_start pos_stop)) in
+      aux_key filename key pos_start pos_stop)) in
     let skeyerr = "@,  default: throw \"lineof does not know token \" + token + \" in file: \" + filename;" in
     Printf.sprintf "case \"%s\": switch (token) { @, @;<1 2>@[<v 0>%s@,%s@]@, }@, break;" 
       filename skeycases skeyerr

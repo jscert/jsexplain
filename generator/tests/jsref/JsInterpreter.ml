@@ -4983,7 +4983,7 @@ let run_stat_for_var runs0 s c labs ds eo2 eo3 t =
 
 (** val run_expr : runs_type -> state -> execution_ctx -> expr -> result **)
 
-let run_expr runs0 s c _foo_ = match _foo_ with
+let run_expr runs0 s c _term_ = match _term_ with
 | Coq_expr_this ->
   result_out (Coq_out_ter (s, (res_val c.execution_ctx_this_binding)))
 | Coq_expr_identifier x ->
@@ -5013,7 +5013,7 @@ let run_expr runs0 s c _foo_ = match _foo_ with
 
 (** val run_stat : runs_type -> state -> execution_ctx -> stat -> result **)
 
-let run_stat runs0 s c _foo_ = match _foo_ with
+let run_stat runs0 s c _term_ = match _term_ with
 | Coq_stat_expr e ->
   if_spec (run_expr_get_value runs0 s c e) (fun s0 r ->
     res_ter s0 (res_val r))
@@ -5065,7 +5065,7 @@ let rec run_elements runs0 s c _foo_ = match _foo_ with
 
 (** val run_prog : runs_type -> state -> execution_ctx -> prog -> result **)
 
-let run_prog runs0 s c _foo_ = match _foo_ with
+let run_prog runs0 s c _term_ = match _term_ with
 | Coq_prog_intro (str, els) -> run_elements runs0 s c (rev els)
 
 (** val push :
