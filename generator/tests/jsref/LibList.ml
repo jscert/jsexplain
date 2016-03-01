@@ -48,7 +48,7 @@ let rev l =
 (** val length : 'a1 list -> int **)
 
 let length l =
-  fold_right (fun x acc -> plus (Pervasives.succ 0) acc) 0 l
+  fold_right (fun x acc -> plus 1 acc) 0 l
 
 (** val take_drop_last : 'a1 list -> 'a1 list * 'a1 **)
 

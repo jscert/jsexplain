@@ -1,6 +1,8 @@
 open Fappli_IEEE_bits
 open LibReflect
 
+let nat_eq = int_eq
+
 type number = binary64
 
 (** val nan : number **)

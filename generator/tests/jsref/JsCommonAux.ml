@@ -4,7 +4,6 @@ open JsNumber
 open JsSyntax
 open JsSyntaxAux
 open LibList
-open LibNat
 open LibOption
 open LibReflect
 open LibString
@@ -207,7 +206,7 @@ let object_binds_pickable_option s l =
     state -> env_loc -> env_record coq_Pickable_option **)
 
 let env_record_binds_pickable_option s l =
-  Heap.read_option nat_comparable s.state_env_record_heap l
+  Heap.read_option nat_eq s.state_env_record_heap l
 
 (** val decl_env_record_pickable_option :
     decl_env_record -> prop_name -> (mutability * value) coq_Pickable_option **)

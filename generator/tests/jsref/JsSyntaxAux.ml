@@ -1,7 +1,6 @@
 open JsNumber
 open JsSyntax
 open LibList
-open LibNat
 open LibReflect
 open LibString
 
@@ -395,7 +394,7 @@ let object_loc_compare l1 l2 =
   match l1 with
   | Coq_object_loc_normal ln1 ->
     (match l2 with
-     | Coq_object_loc_normal ln2 -> nat_comparable ln1 ln2
+     | Coq_object_loc_normal ln2 -> nat_eq ln1 ln2
      | Coq_object_loc_prealloc p -> false)
   | Coq_object_loc_prealloc bl1 ->
     (match l2 with
@@ -515,7 +514,7 @@ let ref_base_type_compare rb1 rb2 =
   | Coq_ref_base_type_env_loc l1 ->
     (match rb2 with
      | Coq_ref_base_type_value v -> false
-     | Coq_ref_base_type_env_loc l2 -> nat_comparable l1 l2)
+     | Coq_ref_base_type_env_loc l2 -> nat_eq l1 l2)
 
 (** val ref_base_type_comparable : ref_base_type coq_Comparable **)
 

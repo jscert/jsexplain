@@ -1,4 +1,3 @@
-open BinInt
 open Datatypes
 open JsCommon
 open JsCommonAux
@@ -11,9 +10,7 @@ open JsSyntaxAux
 open JsSyntaxInfos
 open LibBool
 open LibFunc
-open LibInt
 open LibList
-open LibNat
 open LibOption
 open LibProd
 open LibReflect
@@ -2225,7 +2222,7 @@ let run_construct_prealloc runs0 s c b args =
                   attributes_data_configurable = false }))) (fun s0 ->
               res_ter s0 (res_val (Coq_value_object l)))) (fun follow ->
             let_binding (LibList.length args) (fun arg_len ->
-              if nat_comparable arg_len (Pervasives.succ 0)
+              if nat_eq arg_len 1
               then let_binding (get_arg 0 args) (fun v ->
                      match v with
                      | Coq_value_prim p0 ->
@@ -2360,7 +2357,7 @@ let run_construct_prealloc runs0 s c b args =
                     (Coq_attributes_data_of lenDesc))) (fun s' ->
                 res_ter s' (res_val (Coq_value_object l)))))) (fun follow ->
           let_binding (LibList.length args) (fun arg_len ->
-            if nat_comparable arg_len 0
+            if nat_eq arg_len 0
             then follow s ""
             else let_binding (get_arg 0 args) (fun arg ->
                    if_string (to_string runs0 s c arg) (fun s0 s1 ->
@@ -2673,7 +2670,7 @@ let rec binding_inst_function_decls runs0 s c l fds str bconfig =
                 if_bool (env_record_has_binding runs0 s1 c l fname)
                   (fun s2 has ->
                   if has
-                  then if nat_comparable l env_loc_global_env_record
+                  then if nat_eq l env_loc_global_env_record
                        then if_spec
                               (run_object_get_prop runs0 s2 c
                                 (Coq_object_loc_prealloc Coq_prealloc_global)
@@ -5377,7 +5374,7 @@ let run_call_prealloc runs0 s c b vthis args =
       match v with
       | Coq_value_prim p -> run_error s Coq_native_error_type
       | Coq_value_object l ->
-        if_string (to_string runs0 s c (get_arg (Pervasives.succ 0) args))
+        if_string (to_string runs0 s c (get_arg 1 args))
           (fun s1 x ->
           if_spec (runs0.runs_type_object_get_own_prop s1 c l x) (fun s2 d ->
             from_prop_descriptor runs0 s2 c d)))
@@ -5399,8 +5396,8 @@ let run_call_prealloc runs0 s c b vthis args =
           (" not yet implemented")))
   | Coq_prealloc_object_define_prop ->
     let_binding (get_arg 0 args) (fun o ->
-      let_binding (get_arg (Pervasives.succ 0) args) (fun p ->
-        let_binding (get_arg (Pervasives.succ (Pervasives.succ 0)) args)
+      let_binding (get_arg 1 args) (fun p ->
+        let_binding (get_arg 2 args)
           (fun attr ->
           match o with
           | Coq_value_prim p0 -> run_error s Coq_native_error_type
@@ -5580,7 +5577,7 @@ let run_call_prealloc runs0 s c b vthis args =
     else run_error s Coq_native_error_type
   | Coq_prealloc_function_proto_apply ->
     let_binding (get_arg 0 args) (fun thisArg ->
-      let_binding (get_arg (Pervasives.succ 0) args) (fun argArray ->
+      let_binding (get_arg 1 args) (fun argArray ->
         if is_callable_dec s vthis
         then (match vthis with
               | Coq_value_prim p ->

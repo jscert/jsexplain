@@ -4,7 +4,6 @@ open JsNumber
 open JsSyntax
 open JsSyntaxAux
 open LibList
-open LibNat
 open LibOption
 open LibString
 open List0
@@ -354,7 +353,7 @@ let decl_env_record_rem ed x =
     state -> env_loc -> prop_name -> mutability -> value -> state **)
 
 let env_record_write_decl_env s l x mu v =
-  match Heap.read nat_comparable s.state_env_record_heap l with
+  match Heap.read nat_eq s.state_env_record_heap l with
   | Coq_env_record_decl ed ->
     let env' = decl_env_record_write ed x mu v in
     env_record_write s l (Coq_env_record_decl env')
@@ -559,7 +558,7 @@ let rec elision_head_count _foo_ = match _foo_ with
 | o :: ol' ->
   (match o with
    | Some t -> 0
-   | None -> Pervasives.succ (elision_head_count ol'))
+   | None -> 1 + (elision_head_count ol'))
 
 (** val elision_head_remove : 'a1 option list -> 'a1 option list **)
 

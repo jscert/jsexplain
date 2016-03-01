@@ -3,7 +3,6 @@ open JsNumber
 open JsPreliminary
 open JsSyntax
 open JsSyntaxAux
-open LibInt
 
 (** Val prop_attributes_for_global_object : value -> attributes_data **)
 

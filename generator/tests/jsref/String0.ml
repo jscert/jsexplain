@@ -32,7 +32,7 @@ let rec append s1 s2 =
 
 let rec length l = match l with
 | [] -> 0
-| c::s' -> Pervasives.succ (length s')
+| c::s' -> 1 + (length s')
 
 (** val substring : int -> int -> string -> string **)
 
