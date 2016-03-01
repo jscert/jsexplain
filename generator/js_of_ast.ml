@@ -678,7 +678,10 @@ and js_of_expression ctx dest e =
   | Texp_construct (p, cd, el) ->
     let cstr_fullname = string_of_longident p.txt in
     let cstr_name = cd.cstr_name in
-    let cstr_fullname = if cstr_fullname = "::" then "mk_cons" else cstr_fullname in  (* TODO: clean up this hack *)
+    let cstr_fullname = 
+      if cstr_fullname = "[]" then "mk_nil" 
+      else if cstr_fullname = "::" then "mk_cons" 
+      else cstr_fullname in  (* TODO: clean up this hack *)
     (*let styp = string_of_type_exp e.exp_type in*)
     let sexp =
       if is_sbool cstr_name then cstr_name else

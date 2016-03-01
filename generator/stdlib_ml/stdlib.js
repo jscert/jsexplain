@@ -1,4 +1,8 @@
 
+
+var max_float = Number.MAX_VALUE; // TODO: find absolute value for this
+
+
 var mk_nil = function() {
    return { type: "list", tag: "[]" };
 };

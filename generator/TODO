@@ -1,4 +1,10 @@
 
+- clean up stdlib.ml
+
+- implement stdlib.js to match all functions of stdlib.ml
+
+- remove JsNumber by binding a set of operations in stdlib.js 
+  implemented using builtin JS primitives
 
 - reactivate
 	  default: throw "No matching case for switch";
@@ -15,13 +21,11 @@
   => TODO: look for code that already does this for esprima.
 
 
-
-
 - check in Shared.ml whether we need to take absolute values
 	let string_sub s n l =
 	  substring (int_abs n) (int_abs l) s
 
-- 
+- here:
    string_sub str (int_of_float k0) 1
    => TODO: check k0 is not negative 
 

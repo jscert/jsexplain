@@ -1,7 +1,7 @@
 open Fappli_IEEE_bits
 open LibReflect
 
-let nat_eq = int_eq
+let nat_eq x y = int_eq x y 
 
 type number = binary64
 
