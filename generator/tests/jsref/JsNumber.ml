@@ -129,6 +129,8 @@ let number_comparable = (fun n1 n2 -> int_eq 0  (float_compare n1 n2))
 
 let of_int = fun x -> x
 
+let number_of_int = fun x -> float_of_int x
+
 (** val to_int32 : number -> float **)
 
 

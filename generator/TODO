@@ -7,7 +7,13 @@
 
 
 
+- check in Shared.ml whether we need to take absolute values
+	let string_sub s n l =
+	  substring (int_abs n) (int_abs l) s
 
+- 
+   string_sub str (int_of_float k0) 1
+   => TODO: check k0 is not negative 
 
 
 =========================================================

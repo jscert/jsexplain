@@ -632,7 +632,7 @@ let object_can_put runs0 s c l x =
 
 let run_object_define_own_prop_array_loop runs0 s c l newLen oldLen newLenDesc newWritable throw def =
   if lt_int_decidable newLen oldLen
-  then let_binding (Z.sub oldLen 1.) (fun oldLen' ->
+  then let_binding (oldLen -. 1.) (fun oldLen' ->
          if_string
            (to_string runs0 s c (Coq_value_prim (Coq_prim_number
              (of_int oldLen')))) (fun s0 slen ->
@@ -641,7 +641,7 @@ let run_object_define_own_prop_array_loop runs0 s c l newLen oldLen newLenDesc n
              if not_decidable (bool_decidable deleteSucceeded)
              then let_binding
                     (descriptor_with_value newLenDesc (Some (Coq_value_prim
-                      (Coq_prim_number (of_int (Z.add oldLen' 1.))))))
+                      (Coq_prim_number (of_int (oldLen' +. 1.))))))
                     (fun newLenDesc0 ->
                     let_binding
                       (if not_decidable (bool_decidable newWritable)
@@ -872,7 +872,7 @@ let object_define_own_prop runs0 s c l x desc throw =
                                   (fun s2 slen ->
                                   if and_decidable (string_comparable x slen)
                                        (not_decidable
-                                         (int_comparable ilen
+                                         (float_eq ilen 
                                            ((fun p -> 1. +. (2. *. p))
                                            ((fun p -> 1. +. (2. *. p))
                                            ((fun p -> 1. +. (2. *. p))
@@ -932,8 +932,7 @@ let object_define_own_prop runs0 s c l x desc throw =
                                                               (Coq_value_prim
                                                               (Coq_prim_number
                                                               (of_int
-                                                                (Z.add index
-                                                                  1.)))))
+                                                                (index +. 1.)))))
                                                           in
                                                           default s4
                                                             ("length")
@@ -1118,7 +1117,7 @@ let prim_new_object s _foo_ = match _foo_ with
             Heap.write p ("length")
               (Coq_attributes_data_of
               (attributes_data_intro_constant (Coq_value_prim
-                (Coq_prim_number (of_int (my_Z_of_nat (length s0)))))))))
+                (Coq_prim_number (number_of_int (length s0))))))))
           (fun s' -> res_ter s' (res_val (Coq_value_object l))))))
 
 (** val to_object : state -> value -> result **)
@@ -1672,7 +1671,7 @@ let rec array_args_map_loop runs0 s c l args ind =
       (object_heap_map_properties_pickable_option s l (fun p ->
         Heap.write p (JsNumber.to_string (of_int ind))
           (Coq_attributes_data_of (attributes_data_intro_all_true h))))
-      (fun s' -> array_args_map_loop runs0 s' c l rest (Z.add ind 1.))
+      (fun s' -> array_args_map_loop runs0 s' c l rest (ind +. 1.))
 
 (** val string_of_prealloc : prealloc -> string **)
 
@@ -2238,7 +2237,7 @@ let run_construct_prealloc runs0 s c b args =
                               Heap.write p1 ("0") (Coq_attributes_data_of
                                 (attributes_data_intro_all_true v))))
                             (fun s0 ->
-                            follow s0 (my_Z_of_nat (Pervasives.succ 0)))
+                            follow s0 1.0)
                         | Coq_prim_null ->
                           if_some
                             (object_heap_map_properties_pickable_option s' l
@@ -2246,7 +2245,7 @@ let run_construct_prealloc runs0 s c b args =
                               Heap.write p1 ("0") (Coq_attributes_data_of
                                 (attributes_data_intro_all_true v))))
                             (fun s0 ->
-                            follow s0 (my_Z_of_nat (Pervasives.succ 0)))
+                            follow s0 1.0)
                         | Coq_prim_bool b0 ->
                           if_some
                             (object_heap_map_properties_pickable_option s' l
@@ -2254,7 +2253,7 @@ let run_construct_prealloc runs0 s c b args =
                               Heap.write p1 ("0") (Coq_attributes_data_of
                                 (attributes_data_intro_all_true v))))
                             (fun s0 ->
-                            follow s0 (my_Z_of_nat (Pervasives.succ 0)))
+                            follow s0 1.0)
                         | Coq_prim_number vlen ->
                           if_spec
                             (to_uint32 runs0 s' c (Coq_value_prim
@@ -2269,14 +2268,14 @@ let run_construct_prealloc runs0 s c b args =
                               Heap.write p1 ("0") (Coq_attributes_data_of
                                 (attributes_data_intro_all_true v))))
                             (fun s1 ->
-                            follow s1 (my_Z_of_nat (Pervasives.succ 0))))
+                            follow s1 1.0))
                      | Coq_value_object o0 ->
                        if_some
                          (object_heap_map_properties_pickable_option s' l
                            (fun p0 ->
                            Heap.write p0 ("0") (Coq_attributes_data_of
                              (attributes_data_intro_all_true v)))) (fun s0 ->
-                         follow s0 (my_Z_of_nat (Pervasives.succ 0))))
+                         follow s0 1.0))
               else if_some
                      (object_heap_map_properties_pickable_option s' l
                        (fun p0 ->
@@ -2284,7 +2283,7 @@ let run_construct_prealloc runs0 s c b args =
                          ("length")
                          (Coq_attributes_data_of { attributes_data_value =
                          (Coq_value_prim (Coq_prim_number
-                         (of_int (my_Z_of_nat arg_len))));
+                         (number_of_int arg_len)));
                          attributes_data_writable = true;
                          attributes_data_enumerable = false;
                          attributes_data_configurable = false }))) (fun s0 ->
@@ -2353,7 +2352,7 @@ let run_construct_prealloc runs0 s c b args =
             let (l, s2) = object_alloc s0 o in
             let_binding
               (attributes_data_intro_constant (Coq_value_prim
-                (Coq_prim_number (of_int (my_Z_of_nat (length s1))))))
+                (Coq_prim_number (number_of_int (length s1)))))
               (fun lenDesc ->
               if_some
                 (object_heap_map_properties_pickable_option s2 l (fun p ->
@@ -2594,7 +2593,7 @@ let creating_function_object runs0 s c names bd x str =
             let (l, s1) = p in
             let_binding { attributes_data_value = (Coq_value_prim
               (Coq_prim_number
-              (of_int (my_Z_of_nat (LibList.length names)))));
+              (number_of_int (LibList.length names))));
               attributes_data_writable = false; attributes_data_enumerable =
               false; attributes_data_configurable = false } (fun a1 ->
               if_bool
@@ -2772,7 +2771,7 @@ let rec arguments_object_map_loop runs0 s c l xs len args x str lmap xsmap =
           if_bool
             (object_define_own_prop runs0 s c l
               (convert_prim_to_string (Coq_prim_number
-                (of_int (my_Z_of_nat len'))))
+                (number_of_int len')))
               (descriptor_of_attributes (Coq_attributes_data_of a)) false)
             (fun s1 b ->
             if ge_nat_decidable len' (LibList.length xs)
@@ -2795,7 +2794,7 @@ let rec arguments_object_map_loop runs0 s c l xs len args x str lmap xsmap =
                               if_bool
                                 (object_define_own_prop runs0 s3 c lmap
                                   (convert_prim_to_string (Coq_prim_number
-                                    (of_int (my_Z_of_nat len'))))
+                                    (number_of_int len')))
                                   (descriptor_of_attributes
                                     (Coq_attributes_accessor_of a')) false)
                                 (fun s4 b' ->
@@ -2825,7 +2824,7 @@ let create_arguments_object runs0 s c lf xs args x str =
     let_binding (object_alloc s o) (fun p ->
       let (l, s') = p in
       let_binding { attributes_data_value = (Coq_value_prim (Coq_prim_number
-        (of_int (my_Z_of_nat (LibList.length args)))));
+        (number_of_int (LibList.length args))));
         attributes_data_writable = true; attributes_data_enumerable = false;
         attributes_data_configurable = true } (fun a ->
         if_bool
@@ -3080,7 +3079,7 @@ let run_object_get_own_prop runs0 s c l x =
               (fun s1 k ->
               if_string
                 (runs0.runs_type_to_string s1 c (Coq_value_prim
-                  (Coq_prim_number (of_int (my_Z_of_nat (Z.abs_nat k))))))
+                  (Coq_prim_number (abs_float k))))
                 (fun s2 s3 ->
                 if not_decidable (string_comparable x s3)
                 then res_spec s2 Coq_full_descriptor_undef
@@ -3088,12 +3087,12 @@ let run_object_get_own_prop runs0 s c l x =
                        if_spec
                          (to_int32 runs0 s4 c (Coq_value_prim
                            (Coq_prim_string x))) (fun s5 k0 ->
-                         let_binding (Z.of_nat (length str)) (fun len ->
+                         let_binding (number_of_int (length str)) (fun len ->
                            if le_int_decidable len k0
                            then res_spec s5 Coq_full_descriptor_undef
                            else let resultStr =
-                                  string_sub str k0
-                                    (my_Z_of_nat (Pervasives.succ 0))
+                                  string_sub str (int_of_float k0) 1
+                                  (* TODO: check k0 is not negative *)
                                 in
                                 let a = { attributes_data_value =
                                   (Coq_value_prim (Coq_prim_string
@@ -4335,7 +4334,7 @@ let run_array_element_list runs0 s c l oes n =
              if_spec (to_uint32 runs0 s1 c vlen) (fun s2 ilen ->
                if_string
                  (to_string runs0 s2 c (Coq_value_prim (Coq_prim_number
-                   (of_int (Z.add ilen n))))) (fun s3 slen ->
+                   (ilen +. n)))) (fun s3 slen ->
                  let_binding { attributes_data_value = v;
                    attributes_data_writable = true;
                    attributes_data_enumerable = true;
@@ -4349,7 +4348,7 @@ let run_array_element_list runs0 s c l oes n =
      | None ->
        let_binding (elision_head_count (None :: oes')) (fun firstIndex ->
          runs0.runs_type_array_element_list s c l
-           (elision_head_remove (None :: oes')) (my_Z_of_nat firstIndex)))
+           (elision_head_remove (None :: oes')) (number_of_int firstIndex)))
 
 (** val init_array :
     runs_type -> state -> execution_ctx -> object_loc -> expr option list ->
@@ -4366,7 +4365,7 @@ let init_array runs0 s c l oes =
           if_spec (to_uint32 runs0 s1 c vlen) (fun s2 ilen ->
             if_spec
               (to_uint32 runs0 s2 c (Coq_value_prim (Coq_prim_number
-                (of_int (Z.add ilen (my_Z_of_nat elisionLength))))))
+                (ilen +. number_of_int elisionLength))))
               (fun s3 len ->
               if_not_throw
                 (object_put runs0 s3 c l0
@@ -5085,7 +5084,7 @@ let rec push runs0 s c l args ilen =
       if_string (to_string runs0 s c (Coq_value_prim (Coq_prim_number vlen)))
         (fun s0 slen ->
         if_not_throw (object_put runs0 s0 c l slen v throw_true) (fun s1 x ->
-          push runs0 s1 c l vs (Z.add ilen 1.))))
+          push runs0 s1 c l vs (ilen +. 1.))))
 
 (** val run_object_is_sealed :
     runs_type -> state -> execution_ctx -> object_loc -> prop_name list ->
@@ -5228,7 +5227,7 @@ let run_get_args_for_apply runs0 s c l index n =
            (of_int index)))) (fun s0 sindex ->
          if_value (run_object_get runs0 s0 c l sindex) (fun s1 v ->
            let_binding
-             (runs0.runs_type_get_args_for_apply s1 c l (Z.add index 1.) n)
+             (runs0.runs_type_get_args_for_apply s1 c l (index +. 1.) n)
              (fun tail_args ->
              if_spec tail_args (fun s2 tail -> res_spec s2 (v :: tail)))))
   else res_spec s []
@@ -5266,7 +5265,7 @@ let run_array_join_elements runs0 s c l k length0 sep sR =
          let_binding (valueToStringForJoin runs0 s c l k) (fun sE ->
            if_spec sE (fun s0 element ->
              let_binding (append ss element) (fun sR0 ->
-               runs0.runs_type_array_join_elements s0 c l (Z.add k 1.)
+               runs0.runs_type_array_join_elements s0 c l (k +. 1.)
                  length0 sep sR0))))
   else res_ter s (res_val (Coq_value_prim (Coq_prim_string sR)))
 
@@ -5679,12 +5678,11 @@ let run_call_prealloc runs0 s c b vthis args =
                                          (Coq_prim_number n)))
                                        (fun s'1 ilen ->
                                        if lt_int_decidable ilen
-                                            (my_Z_of_nat (LibList.length a))
+                                            (number_of_int (LibList.length a))
                                        then res_spec s'1 0.
                                        else res_spec s'1
-                                              (Z.sub ilen
-                                                (my_Z_of_nat
-                                                  (LibList.length a)))))
+                                              (ilen -.
+                                                (number_of_int (LibList.length a)))))
                               else res_spec s' 0.)) (fun vlength ->
                             if_spec vlength (fun s'0 length0 ->
                               let_binding { attributes_data_value =
@@ -5940,7 +5938,7 @@ let run_call_prealloc runs0 s c b vthis args =
                then vsep
                else Coq_value_prim (Coq_prim_string (","))) (fun rsep ->
               if_string (to_string runs0 s2 c rsep) (fun s3 sep ->
-                if int_comparable ilen (my_Z_of_nat 0)
+                if float_eq ilen 0.0
                 then res_ter s3
                        (res_val (Coq_value_prim (Coq_prim_string "")))
                 else let_binding (valueToStringForJoin runs0 s3 c l 0.)
@@ -5953,7 +5951,7 @@ let run_call_prealloc runs0 s c b vthis args =
         (run_object_get runs0 s0 c l
           ("length")) (fun s1 vlen ->
         if_spec (to_uint32 runs0 s1 c vlen) (fun s2 ilen ->
-          if int_comparable ilen (my_Z_of_nat 0)
+          if float_eq ilen 0.0
           then if_not_throw
                  (object_put runs0 s2 c l
                    ("length")
@@ -5963,7 +5961,7 @@ let run_call_prealloc runs0 s c b vthis args =
                    (res_val (Coq_value_prim Coq_prim_undef)))))
           else if_string
                  (to_string runs0 s2 c (Coq_value_prim (Coq_prim_number
-                   (of_int (Z.sub ilen 1.))))) (fun s3 sindx ->
+                   (of_int (ilen -. 1.))))) (fun s3 sindx ->
                  if_value (run_object_get runs0 s3 c l sindx)
                    (fun s4 velem ->
                    if_not_throw

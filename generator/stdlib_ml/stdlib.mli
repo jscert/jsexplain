@@ -36,6 +36,8 @@ val min : float -> float -> float
 val max : float -> float -> float
 val classify_float : float -> fpclass
 
+val int_abs : int -> int
+
 val float_of_int : int -> float
 val float_of_string : string -> float
 val int_of_char : char -> int

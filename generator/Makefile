@@ -111,6 +111,8 @@ $(JSREF_PATH)/lineof.js: lineof.byte $(JSREF_ML:.ml=.token.js)
 
 main: main.byte
 
+cmi: $(JSREF_ML:.ml=.cmi) $(JSREF_MLI:.mli=.cmi) 
+
 full: $(JSREF_ML:.ml=.log.js) $(JSREF_ML:.ml=.unlog.js) $(JSREF_ML:.ml=.token.js)
 
 unlog: $(JSREF_ML:.ml=.unlog.js) 
