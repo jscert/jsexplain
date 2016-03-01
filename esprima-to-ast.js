@@ -44,13 +44,35 @@ function esprimaToAST(prog) {
                   elements: toList(blockStat.body.map(trStatAsElement))};
       r.body = {loc: loc, type: "funcbody", tag: "Coq_funcbody_intro",
                 prog: prog, source: ""};
-    } else if (stat.type === "Statement") {
+    } else /* if (stat.type <: "Statement") */  {
       r.tag = "Coq_element_stat";
       r.stat = trStat(stat);
-    } else {
-      throw ("trStatAsElement error: " + stat.type);
-    }
+    } // else {
+    //   throw ("trStatAsElement error: " + stat.type);
+    // }
     return r;
+  };
+
+  // return string
+  var trPattern = function (pat) {
+    if (pat.type === "Identifier") {
+      return pat.name;
+    } else {
+      throw ("trPattern error: " + pat.type);
+    }
+  };
+
+  // return the encoding of a pair
+  var trVarDecl = function (decl) {
+    var id = trPattern(decl.id);
+    var eo = {type: "option"};
+    if (decl.init === null) {
+      eo.tag = "None";
+    } else {
+      eo.tag = "Some";
+      eo.value = trExpr(decl.init);
+    }
+    return [id,eo];
   };
 
   var trStat = function (stat) {
@@ -62,6 +84,9 @@ function esprimaToAST(prog) {
     } else if (stat.type === "BlockStatement") {
       r.tag = "Coq_stat_block";
       r.stats = toList(stat.body.map(trStat));
+    } else if (stat.type === "VariableDeclaration") {
+      r.tag = "Coq_stat_var_decl";
+      r.decls = toList(stat.declarations.map(trVarDecl));
     } else {
       throw ("trStat error: " + stat.type);
     };
@@ -86,16 +111,17 @@ function esprimaToAST(prog) {
     } else {
       throw ("trExprAsLiteral error: " + t);
     };
+    return r;
   };
 
   var trExpr = function (expr) {
     var r = {loc: toLoc(expr.loc), type: "expr"};
     if (expr.type === "ThisExpression") {
       r.tag = "Coq_expr_this";
-    } else if (expr.tag === "Identifier") {
+    } else if (expr.type === "Identifier") {
       r.tag = "Coq_expr_identifier";
       r.name = expr.name;
-    } else if (expr.tag === "Literal") {
+    } else if (expr.type === "Literal") {
       r.tag = "Coq_expr_literal";
       r.value = trExprAsLiteral(expr);
     } else {
@@ -105,4 +131,10 @@ function esprimaToAST(prog) {
   };
 
   return trProg(prog);
+}
+
+function testParse(s) {
+  var p = esprima.parse(s,{loc: true});
+  console.log(p);
+  console.log(esprimaToAST(p));
 }
