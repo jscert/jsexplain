@@ -16,10 +16,6 @@ let option_case d f o = match o with
 
 let int_of_char = (fun c -> float_of_int (int_of_char c))
 
-(** val ascii_comparable : char coq_Comparable **)
-
-let ascii_comparable = (=)
-
 (** val string_sub : string -> int -> int -> string **)
 
 let string_sub s n l =
@@ -27,15 +23,15 @@ let string_sub s n l =
 
 (** val lt_int_decidable : float -> float -> coq_Decidable **)
 
-let lt_int_decidable = (<)
+let lt_int_decidable x y = float_lt x y
 
 (** val le_int_decidable : float -> float -> coq_Decidable **)
 
-let le_int_decidable = (<=)
+let le_int_decidable x y = float_le x y
 
 (** val ge_nat_decidable : int -> int -> coq_Decidable **)
 
-let ge_nat_decidable = int_ge
+let ge_nat_decidable x y = int_ge x y
 
 type 'a coq_Pickable_option =
   'a option

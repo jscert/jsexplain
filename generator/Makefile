@@ -110,6 +110,10 @@ $(JSREF_PATH)/assembly.js: assembly.byte $(JSREF_ML:.ml=.log.js) $(JSREF_ML:.ml=
 	./assembly.byte -o $@ -stdlib $(STDLIB_DIR)/stdlib.js $(JSREF_ML:.ml=)
 
 
+# maybe useful
+
+tests/jsref/%.log.js: tests/jsref/%.ml 
+
 
 #####################################################################
 # Short targets
@@ -136,8 +140,9 @@ tests: $(TESTS_ML:.ml=.log.js) $(TESTS_ML:.ml=.token.js)
 
 DIRTY_EXTS := cmi,token.js,log.js,unlog.js,d,ml.d,mli.d
 
-clean_lineof:
+clean_genjs:
 	rm -f $(JSREF_PATH)/lineof.js
+	rm -f $(JSREF_PATH)/assembly.js
 
 clean_tests:
 	bash -c "rm -f $(TESTS_DIR)/*.{$(DIRTY_EXTS)}"
@@ -146,7 +151,7 @@ clean_tests:
 clean_stdlib:
 	rm -f $(STDLIB_DIR)/*.cmi
 
-clean: clean_lineof clean_tests clean_stdlib
+clean: clean_genjs clean_tests clean_stdlib
 	rm -rf _build
 	rm -f *.native *.byte
 

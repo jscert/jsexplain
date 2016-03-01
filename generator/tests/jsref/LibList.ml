@@ -1,6 +1,5 @@
 open LibOperation
 open LibReflect
-open Peano
 
 (** val list_eq_nil_decidable : 'a1 list -> coq_Decidable **)
 
@@ -48,7 +47,7 @@ let rev l =
 (** val length : 'a1 list -> int **)
 
 let length l =
-  fold_right (fun x acc -> plus 1 acc) 0 l
+  fold_right (fun x acc -> 1 + acc) 0 l
 
 (** val take_drop_last : 'a1 list -> 'a1 list * 'a1 **)
 

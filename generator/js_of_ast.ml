@@ -142,7 +142,9 @@ let ppf_match value cases const =
     | Mode_cmi -> assert false
     | Mode_unlogged -> cases
     | Mode_line_token
-    | Mode_logged -> cases ^ "@,default: throw \"No matching case for switch\";"
+    | Mode_logged -> cases 
+      (* TODO: put back if there is not already a default case:
+          ^ "@,default: throw \"No matching case for switch\";" *)
     in
   let s = Printf.sprintf "switch (%s%s) {@;<1 2>@[<v 0>%s@]@,}@,"
     value cons_fld cases
@@ -163,7 +165,7 @@ let ppf_array values =
 let ppf_tuple = ppf_array
 
 let ppf_ifthen cond iftrue =
-  Printf.sprintf "(function () {@;<1 2>@[<v 2>@,if (%s) {@,return  %s;@,}@]@,})()"
+  Printf.sprintf "(function () {@;<1 2>@[<v 2>@,if (%s) {@,return %s;@,}@]@,})()"
                  cond iftrue
 
 let ppf_ifthenelse cond iftrue iffalse =
@@ -212,7 +214,7 @@ let ppf_cstrs styp cstr_name rest =
     | Mode_line_token
     | Mode_logged -> Printf.sprintf "type: \"%s\", " styp
     in
-  Printf.sprintf "@[<v 2>{%stag: \"%s\"%s %s}@]"
+  Printf.sprintf "{@[<v 2>%stag: \"%s\"%s %s@]}" (* TODO: cleanup *)
     styp_full cstr_name comma rest
 
 let ppf_cstrs_fct cstr_fullname args =
@@ -220,7 +222,7 @@ let ppf_cstrs_fct cstr_fullname args =
 
 let ppf_record llde =
   let rec aux acc = function
-    | []               -> Printf.sprintf "@[<v 2>{@;<1 2>%s@]@,}" acc
+    | []               -> Printf.sprintf "{@[<v 0>%s@]@,}" (*"@[<v 2>{@;<1 2>%s@]@,}"*) (* TODO: cleanup *) acc
     | (lbl, exp) :: [] -> aux (acc ^ Printf.sprintf "%s: %s" lbl exp) []
     | (lbl, exp) :: xs -> aux (acc ^ Printf.sprintf "%s: %s,@," lbl exp) xs
   in aux "" llde
@@ -353,7 +355,7 @@ let generate_logged_return ctx sbody =
      Printf.sprintf "%sreturn %s; %s" token_start sbody token_stop
   | Mode_logged ->
     let id = id_fresh "_return_" in
-    Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, {\"return_value\", %s}), \"return\");@,return %s; "
+    Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, [{key: \"return_value\", value: %s}]), \"return\");@,return %s; "
       id sbody token_lineof ctx id id
   | Mode_unlogged -> 
      Printf.sprintf "return %s; " sbody
@@ -676,6 +678,7 @@ and js_of_expression ctx dest e =
   | Texp_construct (p, cd, el) ->
     let cstr_fullname = string_of_longident p.txt in
     let cstr_name = cd.cstr_name in
+    let cstr_fullname = if cstr_fullname = "::" then "mk_cons" else cstr_fullname in  (* TODO: clean up this hack *)
     (*let styp = string_of_type_exp e.exp_type in*)
     let sexp =
       if is_sbool cstr_name then cstr_name else
@@ -698,7 +701,10 @@ and js_of_expression ctx dest e =
     (* ppf_while (js_of_expression cd) (js_of_expression body) *)
   | Texp_for        (id, _, st, ed, fl, body) -> out_of_scope loc "for"
     (* ppf_for (ppf_ident id) (js_of_expression st) (js_of_expression ed) fl (js_of_expression body) *)
-  | Texp_record     (llde,_)          -> ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, inline_of_wrap exp)) llde)
+  | Texp_record     (llde,_)          -> 
+      let sexp = ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, inline_of_wrap exp)) llde) in
+      apply_dest ctx dest sexp
+
   | Texp_field      (exp, _, lbl)     -> ppf_field_access (inline_of_wrap exp) lbl.lbl_name
   | Texp_assert      e                -> 
       let sexp = inline_of_wrap e in
@@ -753,7 +759,7 @@ and js_of_expression ctx dest e =
 and js_of_constant = function
   | Const_int       n     -> string_of_int n
   | Const_char      c     -> String.make 1 c
-  | Const_string   (s, _) -> "\"" ^ s ^ "\""
+  | Const_string   (s, _) -> "\"" ^ (String.escaped (String.escaped s)) ^ "\"" (* Warning: 2 levels of printf *)
   | Const_float     f     -> f
   | Const_int32     n     -> Int32.to_string n
   | Const_int64     n     -> Int64.to_string n
@@ -768,6 +774,7 @@ and js_of_longident loc =
   | "~-." -> "-"
   | "/."  -> "/"
   | "="   -> "=="
+  | "^"   -> "+" (* !!TODO: we want to claim ability to type our sublanguage, so we should not use this *)
   | res   -> ppf_ident_name res
 
 and is_primitive_comparison e =

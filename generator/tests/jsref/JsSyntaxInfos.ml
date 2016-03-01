@@ -58,7 +58,7 @@ and add_infos_stat str labs t =
    | Coq_stat_block ts -> Coq_stat_block (map f ts)
    | Coq_stat_var_decl vars ->
      Coq_stat_var_decl
-       (map (fun var -> let (s, eo) = var in (s, (opt fe eo))) vars)
+       (map (fun x -> let (s, eo) = x in (s, (opt fe eo))) vars)
    | Coq_stat_if (e, t0, to0) -> Coq_stat_if ((fe e), (f t0), (opt f to0))
    | Coq_stat_do_while (l, t0, e) ->
      Coq_stat_do_while ((label_set_add_empty labs), (f t0), (fe e))
@@ -69,15 +69,15 @@ and add_infos_stat str labs t =
    | Coq_stat_return eo -> Coq_stat_return (opt fe eo)
    | Coq_stat_break lopt -> Coq_stat_break lopt
    | Coq_stat_continue lopt -> Coq_stat_continue lopt
-   | Coq_stat_try (t0, catch, to0) ->
+   | Coq_stat_try (t0, catch_stat, to0) ->
      Coq_stat_try ((f t0),
-       (opt (fun c -> let (cs, t1) = c in (cs, (f t1))) catch), (opt f to0))
+       (opt (fun c -> let (cs, t1) = c in (cs, (f t1))) catch_stat), (opt f to0))
    | Coq_stat_for (l, eo1, eo2, eo3, t0) ->
      Coq_stat_for ((label_set_add_empty labs), (opt fe eo1), (opt fe eo2),
        (opt fe eo3), (f t0))
    | Coq_stat_for_var (l, vars, eo2, eo3, t0) ->
      Coq_stat_for_var ((label_set_add_empty labs),
-       (map (fun var -> let (s, eo) = var in (s, (opt fe eo))) vars), (opt fe eo2),
+       (map (fun x -> let (s, eo) = x in (s, (opt fe eo))) vars), (opt fe eo2),
        (opt fe eo3), (f t0))
    | Coq_stat_for_in (l, e1, e2, t0) ->
      Coq_stat_for_in ((label_set_add_empty labs), (fe e1), (fe e2), (f t0))

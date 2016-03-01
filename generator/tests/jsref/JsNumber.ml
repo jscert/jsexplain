@@ -85,7 +85,7 @@ let to_string = (fun f ->
 
 (** val neg : number -> number **)
 
-let neg = (~-.)
+let neg = (float_neg)
 
 (** val floor : number -> number **)
 
@@ -99,29 +99,32 @@ let absolute = abs_float
 
 let sign = (fun f -> float_of_int (float_compare f 0.))
 
-(** val lt_bool : number -> number -> bool **)
+(*
+   (** val lt_bool : number -> number -> bool **)
 
-let lt_bool = (<)
+   let lt_bool = (<)
 
-(** val add : number -> number -> number **)
+   (** val add : number -> number -> number **)
 
-let add = (+.)
+   let add = (+.)
 
-(** val sub : number -> number -> number **)
+   (** val sub : number -> number -> number **)
 
-let sub = (-.)
+   let sub = (-.)
 
-(** val fmod : number -> number -> number **)
+   (** val fmod : number -> number -> number **)
 
-let fmod = mod_float
+   let fmod = mod_float
 
-(** val mult : number -> number -> number **)
+   (** val mult : number -> number -> number **)
 
-let mult = ( *. )
+   let mult = ( *. )
 
-(** val div : number -> number -> number **)
+   (** val div : number -> number -> number **)
 
-let div = (/.)
+   let div = (/.)
+
+*)
 
 (** val number_comparable : number coq_Comparable **)
 
@@ -147,8 +150,8 @@ let classify_float n =
 let to_int32 = fun n ->
   match classify_float n with
   | FP_normal -> (* ARTHUR hacked this from | FP_normal | FP_subnormal *)
-    let i32 = 2. ** 32. in
-    let i31 = 2. ** 31. in
+    let i32 = float_exp 2. 32. in
+    let i31 = float_exp 2. 31. in
     let posint = (if n < 0. then (-1.) else 1.) *. (floor (abs_float n)) in
     let int32bit =
       let smod = mod_float posint i32 in
@@ -162,7 +165,7 @@ let to_int32 = fun n ->
 let to_uint32 = fun n ->
   match classify_float n with
   | FP_normal -> (* ARTHUR hacked this from | FP_normal | FP_subnormal *)
-    let i32 = 2. ** 32. in
+    let i32 = float_exp 2. 32. in
     let posint = (if n < 0. then (-1.) else 1.) *. (floor (abs_float n)) in
     let int32bit =
       let smod = mod_float posint i32 in
@@ -202,8 +205,8 @@ let int32_right_shift = (fun x y -> Int32.to_float (Int32.shift_right (Int32.of_
 (** val uint32_right_shift : float -> float -> float **)
 
 let uint32_right_shift = (fun x y ->
-  let i31 = 2. ** 31. in
-  let i32 = 2. ** 32. in
+  let i31 = float_exp 2. 31. in
+  let i32 = float_exp 2. 32. in
   let newx = if x >= i31 then x -. i32 else x in
   let r = Int32.to_float (Int32.shift_right_logical (Int32.of_float newx) (int_of_float y)) in
   if r < 0. then r +. i32 else r)

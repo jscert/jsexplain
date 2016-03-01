@@ -376,10 +376,10 @@ let attributes_change_accessor_on_non_configurable_dec aa desc =
 let run_function_get_error_case s x = function
 | Coq_value_prim w -> false
 | Coq_value_object l ->
-  (&&)
     (if string_comparable x ("caller")
      then true
      else false)
+  &&
     (option_case false (fun o ->
       option_case false (fun bd -> funcbody_is_strict bd) o.object_code_)
       (object_binds_pickable_option s l))

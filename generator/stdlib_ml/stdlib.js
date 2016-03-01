@@ -1,3 +1,12 @@
+
+var mk_nil = function() {
+   return { type: "list", tag: "[]" };
+};
+
+var mk_cons = function(head, tail) {
+   return { type: "list", tag: "::", head: head, tail: tail };
+};
+
 var add = function (a, b) { return a + b }
 var sub = function (a, b) { return a - b }
 var mul = function (a, b) { return a * b }

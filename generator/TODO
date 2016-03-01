@@ -1,4 +1,14 @@
 
+
+- reactivate
+	  default: throw "No matching case for switch";
+  by having js_of_pattern return an additional boolean indicating
+  whether there was a default case or not.
+	
+- optimize the lineof file to generate code that, at initialization
+  fills in an array with brute data, and a function that performs
+  look ups in the array to get the output
+
 - update the code that translates esprima syntax to recognize
   "use strict" directives, which come as first statement of
   a body, in hte form of a raw expression of raw type "use script".

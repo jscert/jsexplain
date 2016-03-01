@@ -336,14 +336,14 @@ let object_get_builtin runs0 s c b vthis l x =
                | Coq_prim_number n -> Coq_result_impossible
                | Coq_prim_string s2 -> Coq_result_impossible)
             | Coq_value_object lf -> runs0.runs_type_call s1 c lf vthis []))))
-    (fun default ->
+    (fun def ->
     let_binding (fun s0 ->
-      if_value (default s0 l) (fun s' v ->
+      if_value (def s0 l) (fun s' v ->
         if spec_function_get_error_case_dec s' x v
         then run_error s' Coq_native_error_type
         else res_ter s' (res_val v))) (fun function0 ->
       match b with
-      | Coq_builtin_get_default -> default s l
+      | Coq_builtin_get_default -> def s l
       | Coq_builtin_get_function -> function0 s
       | Coq_builtin_get_args_obj ->
         if_some (run_object_method object_parameter_map_ s l) (fun lmapo ->
@@ -627,7 +627,7 @@ let object_can_put runs0 s c l x =
     descriptor -> bool -> bool -> (state -> prop_name -> descriptor ->
     strictness_flag -> __ specres) -> result **)
 
-let run_object_define_own_prop_array_loop runs0 s c l newLen oldLen newLenDesc newWritable throw def =
+let run_object_define_own_prop_array_loop runs0 s c l newLen oldLen newLenDesc newWritable throwcont def =
   if lt_int_decidable newLen oldLen
   then let_binding (oldLen -. 1.) (fun oldLen' ->
          if_string
@@ -647,10 +647,10 @@ let run_object_define_own_prop_array_loop runs0 s c l newLen oldLen newLenDesc n
                       if_bool
                         (def s1 ("length")
                           newLenDesc1 false) (fun s2 x ->
-                        out_error_or_cst s2 throw Coq_native_error_type
+                        out_error_or_cst s2 throwcont Coq_native_error_type
                           (Coq_value_prim (Coq_prim_bool false)))))
              else runs0.runs_type_object_define_own_prop_array_loop s1 c l
-                    newLen oldLen' newLenDesc newWritable throw def)))
+                    newLen oldLen' newLenDesc newWritable throwcont def)))
   else if not_decidable (bool_decidable newWritable)
        then def s ("length")
               { descriptor_value = None; descriptor_writable = (Some false);
@@ -663,11 +663,11 @@ let run_object_define_own_prop_array_loop runs0 s c l newLen oldLen newLenDesc n
     runs_type -> state -> execution_ctx -> object_loc -> prop_name ->
     descriptor -> strictness_flag -> result **)
 
-let object_define_own_prop runs0 s c l x desc throw =
-  let_binding (fun s0 throw0 ->
-    out_error_or_cst s0 throw0 Coq_native_error_type (Coq_value_prim
+let object_define_own_prop runs0 s c l x desc throwcont =
+  let_binding (fun s0 throwcont0 ->
+    out_error_or_cst s0 throwcont0 Coq_native_error_type (Coq_value_prim
       (Coq_prim_bool false))) (fun reject ->
-    let_binding (fun s0 x0 desc0 throw0 ->
+    let_binding (fun s0 x0 desc0 throwcont0 ->
       if_spec (runs0.runs_type_object_get_own_prop s0 c l x0) (fun s1 d ->
         if_some (run_object_method object_extensible_ s1 l) (fun ext ->
           match d with
@@ -686,7 +686,7 @@ let object_define_own_prop runs0 s c l x desc throw =
                        (fun p -> Heap.write p x0 a)) (fun s2 ->
                      res_ter s2
                        (res_val (Coq_value_prim (Coq_prim_bool true)))))
-            else reject s1 throw0
+            else reject s1 throwcont0
           | Coq_full_descriptor_some a ->
             let_binding (fun s2 a0 ->
               let a' = attributes_update a0 desc0 in
@@ -699,7 +699,7 @@ let object_define_own_prop runs0 s c l x desc throw =
               then res_ter s1 (res_val (Coq_value_prim (Coq_prim_bool true)))
               else if attributes_change_enumerable_on_non_configurable_dec a
                         desc0
-                   then reject s1 throw0
+                   then reject s1 throwcont0
                    else if descriptor_is_generic_dec desc0
                         then object_define_own_prop_write s1 a
                         else if not_decidable
@@ -722,14 +722,14 @@ let object_define_own_prop runs0 s c l x desc throw =
                                              s1 l (fun p ->
                                              Heap.write p x0 a')) (fun s2 ->
                                            object_define_own_prop_write s2 a'))
-                                  else reject s1 throw0
+                                  else reject s1 throwcont0
                              else if and_decidable (attributes_is_data_dec a)
                                        (descriptor_is_data_dec desc0)
                                   then (match a with
                                         | Coq_attributes_data_of ad ->
                                           if attributes_change_data_on_non_configurable_dec
                                                ad desc0
-                                          then reject s1 throw0
+                                          then reject s1 throwcont0
                                           else object_define_own_prop_write
                                                  s1 a
                                         | Coq_attributes_accessor_of a0 ->
@@ -755,7 +755,7 @@ let object_define_own_prop runs0 s c l x desc throw =
                                              | Coq_attributes_accessor_of aa ->
                                                if attributes_change_accessor_on_non_configurable_dec
                                                     aa desc0
-                                               then reject s1 throw0
+                                               then reject s1 throwcont0
                                                else object_define_own_prop_write
                                                       s1 a)
                                        else (fun s message ->
@@ -764,10 +764,10 @@ let object_define_own_prop runs0 s c l x desc throw =
   Coq_result_impossible)
                                               s0
                                               ("cases are mutually exclusives in [defineOwnProperty]")))))
-      (fun default ->
+      (fun def ->
       if_some (run_object_method object_define_own_prop_ s l) (fun b ->
         match b with
-        | Coq_builtin_define_own_prop_default -> default s x desc throw
+        | Coq_builtin_define_own_prop_default -> def s x desc throwcont
         | Coq_builtin_define_own_prop_array ->
           if_spec
             (runs0.runs_type_object_get_own_prop s c l
@@ -810,13 +810,13 @@ let object_define_own_prop runs0 s c l x desc throw =
                                             (fun newLenDesc ->
                                             if le_int_decidable oldLen0
                                                  newLen
-                                            then default s2
+                                            then def s2
                                                    ("length")
-                                                   newLenDesc throw
+                                                   newLenDesc throwcont
                                             else if not_decidable
                                                       (bool_decidable
                                                         a.attributes_data_writable)
-                                                 then reject s2 throw
+                                                 then reject s2 throwcont
                                                  else let_binding
                                                         (match newLenDesc.descriptor_writable with
                                                          | Some b0 ->
@@ -835,10 +835,10 @@ let object_define_own_prop runs0 s c l x desc throw =
                                                            else newLenDesc)
                                                           (fun newLenDesc0 ->
                                                           if_bool
-                                                            (default s2
+                                                            (def s2
                                                               ("length")
                                                               newLenDesc0
-                                                              throw)
+                                                              throwcont)
                                                             (fun s3 succ ->
                                                             if not_decidable
                                                                  (bool_decidable
@@ -854,12 +854,12 @@ let object_define_own_prop runs0 s c l x desc throw =
                                                                    oldLen0
                                                                    newLenDesc0
                                                                    newWritable
-                                                                   throw
-                                                                   default))))))
+                                                                   throwcont
+                                                                   def))))))
                                | None ->
-                                 default s0
+                                 def s0
                                    ("length")
-                                   desc throw)
+                                   desc throwcont)
                          else if_spec
                                 (to_uint32 runs0 s0 c (Coq_value_prim
                                   (Coq_prim_string x))) (fun s1 ilen ->
@@ -912,13 +912,13 @@ let object_define_own_prop runs0 s c l x desc throw =
                                               (not_decidable
                                                 (bool_decidable
                                                   a.attributes_data_writable))
-                                         then reject s3 throw
+                                         then reject s3 throwcont
                                          else if_bool
-                                                (default s3 x desc false)
+                                                (def s3 x desc false)
                                                 (fun s4 b0 ->
                                                 if not_decidable
                                                      (bool_decidable b0)
-                                                then reject s4 throw
+                                                then reject s4 throwcont
                                                 else if le_int_decidable
                                                           oldLen0 index
                                                      then let a0 =
@@ -931,7 +931,7 @@ let object_define_own_prop runs0 s c l x desc throw =
                                                               (of_int
                                                                 (index +. 1.)))))
                                                           in
-                                                          default s4
+                                                          def s4
                                                             ("length")
                                                             a0 false
                                                      else res_ter s4
@@ -939,7 +939,7 @@ let object_define_own_prop runs0 s c l x desc throw =
                                                               (Coq_value_prim
                                                               (Coq_prim_bool
                                                               true)))))
-                                  else default s2 x desc throw))))
+                                  else def s2 x desc throwcont))))
                    | Coq_value_object l0 ->
                      (fun s message ->
   print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
@@ -959,7 +959,7 @@ let object_define_own_prop runs0 s c l x desc throw =
             if_some lmapo (fun lmap ->
               if_spec (runs0.runs_type_object_get_own_prop s c lmap x)
                 (fun s0 d ->
-                if_bool (default s0 x desc false) (fun s1 b0 ->
+                if_bool (def s0 x desc false) (fun s1 b0 ->
                   if b0
                   then let_binding (fun s2 ->
                          res_ter s2
@@ -984,9 +984,9 @@ let object_define_own_prop runs0 s c l x desc throw =
                                   | Some v ->
                                     if_void
                                       (runs0.runs_type_object_put s1 c lmap x
-                                        v throw) (fun s2 -> follow0 s2)
+                                        v throwcont) (fun s2 -> follow0 s2)
                                   | None -> follow0 s1))
-                  else reject s1 throw)))))))
+                  else reject s1 throwcont)))))))
 
 (** val run_to_descriptor :
     runs_type -> state -> execution_ctx -> value -> descriptor specres **)
@@ -2535,18 +2535,18 @@ let run_construct runs0 s c co l args =
 let run_call_default runs0 s c lf =
   let_binding
     (result_out (Coq_out_ter (s, (res_val (Coq_value_prim Coq_prim_undef)))))
-    (fun default ->
+    (fun def ->
     if_some (run_object_method object_code_ s lf) (fun oC ->
       match oC with
       | Some bd ->
         if list_eq_nil_decidable (prog_elements (funcbody_prog bd))
-        then default
+        then def
         else if_success_or_return
                (runs0.runs_type_prog s c (funcbody_prog bd)) (fun s' ->
                result_out (Coq_out_ter (s',
                  (res_val (Coq_value_prim Coq_prim_undef))))) (fun s' rv ->
                result_out (Coq_out_ter (s', (res_normal rv))))
-      | None -> default))
+      | None -> def))
 
 (** val creating_function_object_proto :
     runs_type -> state -> execution_ctx -> object_loc -> result **)
@@ -3035,11 +3035,11 @@ let run_object_get_own_prop runs0 s c l x =
           (if_some_or_default
             (convert_option_attributes
               (Heap.read_option string_comparable p x))
-            Coq_full_descriptor_undef id))) (fun default ->
+            Coq_full_descriptor_undef id))) (fun def ->
       match b with
-      | Coq_builtin_get_own_prop_default -> default s
+      | Coq_builtin_get_own_prop_default -> def s
       | Coq_builtin_get_own_prop_args_obj ->
-        if_spec (default s) (fun s1 d ->
+        if_spec (def s) (fun s1 d ->
           match d with
           | Coq_full_descriptor_undef ->
             res_spec s1 Coq_full_descriptor_undef
@@ -3068,7 +3068,7 @@ let run_object_get_own_prop runs0 s c l x =
                             s3
                             ("[run_object_get_own_prop]:  received an accessor property descriptor in a point where the specification suppose it never happens.")))))))
       | Coq_builtin_get_own_prop_string ->
-        if_spec (default s) (fun s0 d ->
+        if_spec (def s) (fun s0 d ->
           match d with
           | Coq_full_descriptor_undef ->
             if_spec
@@ -4523,7 +4523,7 @@ let run_expr_function runs0 s c fo args bd =
 
 let entering_eval_code runs0 s c direct bd k =
   let_binding
-    (coq_or (funcbody_is_strict bd) ((&&) direct c.execution_ctx_strict))
+    (coq_or (funcbody_is_strict bd) ( direct && c.execution_ctx_strict))
     (fun str ->
     let_binding (if direct then c else execution_ctx_initial str) (fun c' ->
       let_binding
@@ -4879,8 +4879,8 @@ let run_stat_try runs0 s c t1 t2o t3o =
     match t3o with
     | Some t3 ->
       if_success (runs0.runs_type_stat s1 c t3) (fun s2 rv' -> res_ter s2 r)
-    | None -> res_ter s1 r) (fun finally ->
-    if_any_or_throw (runs0.runs_type_stat s c t1) finally (fun s1 v ->
+    | None -> res_ter s1 r) (fun finallycont ->
+    if_any_or_throw (runs0.runs_type_stat s c t1) finallycont (fun s1 v ->
       match t2o with
       | Some y ->
         let (x, t2) = y in
@@ -4900,8 +4900,8 @@ let run_stat_try runs0 s c t1 t2o t3o =
                  (env_record_create_set_mutable_binding runs0 s' c l x None v
                    throw_irrelevant) (fun s2 ->
                  let c' = execution_ctx_with_lex c lex' in
-                 if_ter (runs0.runs_type_stat s2 c' t2) finally))))
-      | None -> finally s1 (res_throw (Coq_resvalue_value v))))
+                 if_ter (runs0.runs_type_stat s2 c' t2) finallycont))))
+      | None -> finallycont s1 (res_throw (Coq_resvalue_value v))))
 
 (** val run_stat_throw :
     runs_type -> state -> execution_ctx -> expr -> result **)
@@ -5587,14 +5587,14 @@ let run_call_prealloc runs0 s c b vthis args =
   Coq_result_impossible)
                   s
                   ("Value is callable, but isn\'t an object.")
-              | Coq_value_object this ->
+              | Coq_value_object thisobj ->
                 (match argArray with
                  | Coq_value_prim p ->
                    (match p with
                     | Coq_prim_undef ->
-                      runs0.runs_type_call s c this thisArg []
+                      runs0.runs_type_call s c thisobj thisArg []
                     | Coq_prim_null ->
-                      runs0.runs_type_call s c this thisArg []
+                      runs0.runs_type_call s c thisobj thisArg []
                     | Coq_prim_bool b0 -> run_error s Coq_native_error_type
                     | Coq_prim_number n -> run_error s Coq_native_error_type
                     | Coq_prim_string s0 -> run_error s Coq_native_error_type)
@@ -5607,7 +5607,7 @@ let run_call_prealloc runs0 s c b vthis args =
                        if_spec
                          (run_get_args_for_apply runs0 s1 c array 0. ilen)
                          (fun s2 arguments ->
-                         runs0.runs_type_call s2 c this thisArg arguments)))))
+                         runs0.runs_type_call s2 c thisobj thisArg arguments)))))
         else run_error s Coq_native_error_type))
   | Coq_prealloc_function_proto_call ->
     if is_callable_dec s vthis
@@ -5619,9 +5619,9 @@ let run_call_prealloc runs0 s c b vthis args =
   Coq_result_impossible)
               s
               ("Value is callable, but isn\'t an object.")
-          | Coq_value_object this ->
+          | Coq_value_object thisobj ->
             let (thisArg, a) = get_arg_first_and_rest args in
-            runs0.runs_type_call s c this thisArg a)
+            runs0.runs_type_call s c thisobj thisArg a)
     else run_error s Coq_native_error_type
   | Coq_prealloc_function_proto_bind ->
     if is_callable_dec s vthis
@@ -5633,7 +5633,7 @@ let run_call_prealloc runs0 s c b vthis args =
   Coq_result_impossible)
               s
               ("Value is callable, but isn\'t an object.")
-          | Coq_value_object this ->
+          | Coq_value_object thisobj ->
             let (vthisArg, a) = get_arg_first_and_rest args in
             let_binding
               (object_new (Coq_value_object (Coq_object_loc_prealloc
@@ -5642,7 +5642,7 @@ let run_call_prealloc runs0 s c b vthis args =
               let_binding (object_with_get o1 Coq_builtin_get_function)
                 (fun o2 ->
                 let_binding
-                  (object_with_details o2 None None None (Some this) (Some
+                  (object_with_details o2 None None None (Some thisobj) (Some
                     vthisArg) (Some a) None) (fun o3 ->
                   let_binding
                     (object_set_class o3
@@ -5662,12 +5662,12 @@ let run_call_prealloc runs0 s c b vthis args =
                           let (l, s') = object_alloc s o7 in
                           let_binding
                             (if_some
-                              (run_object_method object_class_ s' this)
+                              (run_object_method object_class_ s' thisobj)
                               (fun class0 ->
                               if string_comparable class0
                                    ("Function")
                               then if_number
-                                     (run_object_get runs0 s' c this
+                                     (run_object_get runs0 s' c thisobj
                                        ("length"))
                                      (fun s'0 n ->
                                      if_spec

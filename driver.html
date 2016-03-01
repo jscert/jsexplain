@@ -23,6 +23,7 @@
 <script src="https://cdn.rawgit.com/jquery/esprima/1.2/esprima.js"></script>
 <script type = "text/javascript" src="esprima-to-ast.js"></script>
 <script type = "text/javascript" src="source-driver.js"></script>
+
 <!-- <script src="interp-poc.js"></script> -->
 
 <!-- <style> -->
@@ -85,56 +86,58 @@
 <h2>Mini-ML Interpreter</h2>
 
 
-<!-- <div class='source_div'> -->
+<div class='source_div'>
 
-<!-- <table id='main_table'><tr> -->
-<!-- <td> -->
-<!--    <textarea id='source_code' class='source' rows='6' cols='60'>source code here</textarea> -->
-<!-- </td> -->
-<!-- <td width='600'> -->
-<!--    <div class="scroll-pane" style="height: 10em"> -->
-<!--    <div id='disp_env'>ctx here</div> -->
-<!--    </div> -->
-<!-- </td> -->
-<!-- </tr></table> -->
-<!-- </div> -->
-
-
-
-<!-- <br/> -->
-<!-- <div> -->
-<!-- <input type="button" id="button_run" value="RUN" /> -->
-<!-- Navigation: -->
-<!-- <input type="textbox" id='navigation_step' style="width:3em" value="0"/> -->
-<!-- / <span id="navigation_total"></span> -->
-<!-- <input type="button" id='button_reset' value="Reset" /> -->
-<!-- <input type="button" id='button_prev' value="Prev" /> -->
-<!-- <input type="button" id='button_next' value="Next" /> -->
-<!-- Reach condition: -->
-<!-- <input type="textbox" id='text_condition' style="width:30em" /> -->
-<!-- <input type="button" id='button_reach' value="Reach" /> -->
-<!-- <span id="reach_output"></span> -->
-<!-- </div> -->
-
-<!-- <div id="action_output"></div> -->
-<!-- <br/> -->
-
-<!-- <div class='source_div'> -->
-
-<!-- <table id='main_table'><tr> -->
-<!-- <td> -->
-<!--    <div id='file_list'></div> -->
-<!--    <textarea id='interpreter_code' class='source' rows='20' cols='60'></textarea> -->
-<!-- </td> -->
-<!-- <td width='600'> -->
-<!--    <div id='disp_infos'></div> -->
-<!--    <div id='disp_ctx'>ctx here</div> -->
-<!-- </td> -->
-<!-- </tr></table> -->
-<!-- </div> -->
+<table id='main_table'><tr>
+<td>
+   <textarea id='source_code' class='source' rows='6' cols='60'>source code here</textarea>
+</td>
+<td width='600'>
+   <div class="scroll-pane" style="height: 10em">
+   <div id='disp_env'>ctx here</div>
+   </div>
+</td>
+</tr></table>
+</div>
 
 
-<!-- <script src="navig-poc.js"></script> -->
+
+<br/>
+<div>
+<input type="button" id="button_run" value="RUN" />
+Navigation:
+<input type="textbox" id='navigation_step' style="width:3em" value="0"/>
+/ <span id="navigation_total"></span>
+<input type="button" id='button_reset' value="Reset" />
+<input type="button" id='button_prev' value="Prev" />
+<input type="button" id='button_next' value="Next" />
+Reach condition:
+<input type="textbox" id='text_condition' style="width:30em" />
+<input type="button" id='button_reach' value="Reach" />
+<span id="reach_output"></span>
+</div>
+
+<div id="action_output"></div>
+<br/>
+
+<div class='source_div'>
+
+<table id='main_table'><tr>
+<td>
+   <div id='file_list'></div>
+   <textarea id='interpreter_code' class='source' rows='20' cols='60'></textarea>
+</td>
+<td width='600'>
+   <div id='disp_infos'></div>
+   <div id='disp_ctx'>ctx here</div>
+</td>
+</tr></table>
+</div>
+
+<script src="generator/tests/jsref/lineof.js"></script> 
+<script src="generator/tests/jsref/assembly.js"></script> 
+<script src="navig-driver.js"></script> 
+
 
 <!-- <\!-- -->
 <!-- <script language="javascript"> -->

@@ -1,7 +1,7 @@
 (** val hd : 'a1 -> 'a1 list -> 'a1 **)
 
-let hd default l = match l with
-| [] -> default
+let hd d l = match l with
+| [] -> d
 | x :: l0 -> x
 
 (** val tl : 'a1 list -> 'a1 list **)

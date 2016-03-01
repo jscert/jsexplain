@@ -336,7 +336,7 @@ let object_for_array o defineownproperty =
     coq_object -> object_loc -> builtin_get -> builtin_get_own_prop ->
     builtin_define_own_prop -> builtin_delete -> coq_object **)
 
-let object_for_args_object o paramsmap get getownproperty defineownproperty delete =
+let object_for_args_object o paramsmap get getownproperty defineownproperty delete_prop =
   let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
     object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
     object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
@@ -350,7 +350,7 @@ let object_for_args_object o paramsmap get getownproperty defineownproperty dele
   { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
   object_prim_value_ = x4; object_properties_ = x5; object_get_ = get;
   object_get_own_prop_ = getownproperty; object_get_prop_ = x8; object_put_ =
-  x9; object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = delete;
+  x9; object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = delete_prop;
   object_default_value_ = x13; object_define_own_prop_ = defineownproperty;
   object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
   object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;

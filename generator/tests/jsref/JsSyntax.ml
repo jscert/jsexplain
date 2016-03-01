@@ -109,7 +109,7 @@ and stat =
 | Coq_stat_switch  [@f labels, arg, body] of label_set * expr * switchbody (** Auto Generated Attributes **)
 and switchbody =
 | Coq_switchbody_nodefault  [@f clauses] of switchclause list (** Auto Generated Attributes **)
-| Coq_switchbody_withdefault  [@f clauses_before, default, clauses_after] of switchclause list * stat list * switchclause list (** Auto Generated Attributes **)
+| Coq_switchbody_withdefault  [@f clauses_before, clause_default, clauses_after] of switchclause list * stat list * switchclause list (** Auto Generated Attributes **)
 and switchclause =
 | Coq_switchclause_intro  [@f arg, stats] of expr * stat list (** Auto Generated Attributes **)
 and prog =

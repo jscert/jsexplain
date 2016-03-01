@@ -62,10 +62,28 @@ val ( >= ) : float -> float -> bool
 
 val bool_eq : bool -> bool -> bool
 val int_eq : int -> int -> bool
+val int_lt : int -> int -> bool
 val int_ge : int -> int -> bool
 val string_eq : string -> string -> bool
 val float_eq : float -> float -> bool
+val float_lt : float -> float -> bool
+val float_le : float -> float -> bool
 val float_compare : float -> float -> int
+
+val string_concat : string -> string -> string
+
+
+val float_neg : float -> float (* ~-.*)
+
+val lt_bool : float -> float -> bool (*   (<) *)
+val add : float -> float -> float (*  (+.) *)
+val sub : float -> float -> float (*  (-.) *)
+val mult : float -> float -> float (*  ( *. ) *)
+val div : float -> float -> float (*  (/.) *)
+val fmod : float -> float -> float (*  mod_float *)
+val float_exp : float -> float -> float (* ( ** ) *)
+
+
 
 val ( && ) : bool -> bool -> bool
 val not : bool -> bool
