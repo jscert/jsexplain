@@ -10,11 +10,11 @@
 
 // type ctx = {tag: "ctx_nil"} | {tag: "ctx_cons", next: ctx, bindings: bindings};
 // type bindings = [{key: string, val: any}]
-//   A context is a linked list of arrays, with the top of stack located at the 
+//   A context is a linked list of arrays, with the top of stack located at the
 //   head of the list, and where each array stores a set of bindings, with the
 //   more recent binding at the tail of the array.
 
-// type event_item = { type: event_type, loc: loc, ctx: ctx, 
+// type event_item = { type: event_type, loc: loc, ctx: ctx,
 //                     state: JsSyntax.state, env: JsSyntax.env,
 //                     source_loc: loc }
 //   Event items are created on every call to the "log_event" function.
@@ -22,7 +22,7 @@
 //   Fields "state" and "env" are snapshots of the state at the time of the event.
 //   Field "ctx" describes the state of the variables from the interpreter,
 //   and this description is constructed by the instrumented code in "*.log.js".
-//   The "source_loc" fields are filled in by function "assignSourceLogInTrace". 
+//   The "source_loc" fields are filled in by function "assignSourceLocInTrace".
 
 // type trace = [event_item]
 //   In this file, "datalog" and "tracer_items" have type trace.
@@ -120,7 +120,7 @@ var parsedTree;
   function goToPred(pred) {
 
     function check(i){
-      var item = datalog[i];
+      var item = tracer_items[i];
       var state = item.state;
       // the goal here is to take the environment and make it available to the
       // user
@@ -151,19 +151,19 @@ var parsedTree;
 
     var error = 0;
 
-    if (datalog.length === 0)
+    if (tracer_items.length === 0)
       return false;
 
-    for (var i = (tracer_pos + 1) % datalog.length, current = tracer_pos;
+    for (var i = (tracer_pos + 1) % tracer_items.length, current = tracer_pos;
          i !== current;
-         i++, i %= datalog.length)
+         i++, i %= tracer_items.length)
       if (check(i))
         return true;
 
     if (check(tracer_pos))
       return true;
 
-    if (error === datalog.length)
+    if (error === tracer_items.length)
       return "There was an execution error at every execution of your condition: are you sure that this is a valid JavaScript code?";
 
     return "Not found";
@@ -494,10 +494,10 @@ var parsedTree;
 
   // --------------- Main run method ----------------
 
-  function assignSourceLogInTrace(items) {
+  function assignSourceLocInTrace(items) {
     var last = undefined;
-    for (var k = 0; k < datalog.length; k++) {
-      var item = datalog[k];
+    for (var k = 0; k < tracer_items.length; k++) {
+      var item = tracer_items[k];
       item.source_loc = last;
       if (item.ctx !== undefined) {
         var ctx_as_array = array_of_env(item.ctx);
@@ -516,7 +516,7 @@ var parsedTree;
 
   function run() {
     JsInterpreter.run_javascript(JsInterpreter.runs, program);
-    assignSourceLogInTrace(datalog);
+    assignSourceLocInTrace(datalog);
     tracer_items = datalog;
     tracer_length = tracer_items.length;
     $("#navigation_total").html(tracer_length - 1);
