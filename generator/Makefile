@@ -117,7 +117,7 @@ tests/jsrefunlog: tests/jsref/JsInterpreter.unlog.js
 ######### lineof target #########
 
 tests/jsref/lineof.js: lineof.byte $(ML_JSREF:.ml=.token.js)
-	lineof.byte -o $@ $(ML_JSREF:.ml=.token.js)
+	./lineof.byte -o $@ $(ML_JSREF:.ml=.token.js)
 
 
 ######### short targets #########
