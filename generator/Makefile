@@ -104,6 +104,11 @@ tests/%.token.js: tests/%.ml main.byte stdlib tests/%.cmi
 $(JSREF_PATH)/lineof.js: lineof.byte $(JSREF_ML:.ml=.token.js)
 	./lineof.byte -o $@ $(JSREF_ML:.ml=.token.js)
 
+##### Rule for assembly.js
+
+$(JSREF_PATH)/assembly.js: assembly.byte $(JSREF_ML:.ml=.log.js) $(JSREF_ML:.ml=.unlog.js) 
+	./assembly.byte -o $@ -stdlib $(STDLIB_DIR)/stdlib.js $(JSREF_ML:.ml=)
+
 
 
 #####################################################################
@@ -118,6 +123,8 @@ full: $(JSREF_ML:.ml=.log.js) $(JSREF_ML:.ml=.unlog.js) $(JSREF_ML:.ml=.token.js
 unlog: $(JSREF_ML:.ml=.unlog.js) 
 
 lineof: $(JSREF_PATH)/lineof.js
+
+assembly: $(JSREF_PATH)/assembly.js
 
 stdlib: $(STDLIB_DIR)/stdlib.cmi
 
