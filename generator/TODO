@@ -1,4 +1,16 @@
 
+- update the code that translates esprima syntax to recognize
+  "use strict" directives, which come as first statement of
+  a body, in hte form of a raw expression of raw type "use script".
+  => TODO: look for code that already does this for esprima.
+
+
+
+
+
+
+
+=========================================================
 
 
 LATER
