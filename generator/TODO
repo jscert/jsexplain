@@ -1,96 +1,147 @@
 
-- clean up stdlib.ml
 
-- implement stdlib.js to match all functions of stdlib.ml
-
-- remove JsNumber by binding a set of operations in stdlib.js 
-  implemented using builtin JS primitives
-
-- reactivate
-	  default: throw "No matching case for switch";
-  by having js_of_pattern return an additional boolean indicating
-  whether there was a default case or not.
-	
-- optimize the lineof file to generate code that, at initialization
-  fills in an array with brute data, and a function that performs
-  look ups in the array to get the output
-
-- update the code that translates esprima syntax to recognize
-  "use strict" directives, which come as first statement of
-  a body, in hte form of a raw expression of raw type "use script".
-  => TODO: look for code that already does this for esprima.
-
-
-- check in Shared.ml whether we need to take absolute values
-	let string_sub s n l =
-	  substring (int_abs n) (int_abs l) s
-
-- here:
-   string_sub str (int_of_float k0) 1
-   => TODO: check k0 is not negative 
 
 
 =========================================================
+FIRST
+
+- remove intermediate folder "miniml" in "../jsjsref/miniml/.."
 
 
-LATER
-- cases seem to be in reversed order, check and fix
-   => corriger à la main le jour où on s'amuse à relire le code.
-	=> order in pattern matching extraction seems to follow
-	   order from the definition of the inductive type,
-		instead of the order of the code.
+=========================================================
+ARTHUR
 
-LATER
-- untab closing bracket for fun def
-  => later maybe
+- reimplement "lineof" using a table
 
+- generate the escaped source code
 
+- control which file should feature logging 
 
-- Choose a small example
+=========================================================
+NEXT
 
+- introduce testing functions called
+	- test_lineof("filename", "token") -> returns a "pos" object
+	- test_parse("code") -> log esprima parse and log convert
+	- test_exec("code") -> parse, convert, build trace, log trace
+
+- clean up stdlib.ml
+	- remove unused functions
+	- sort out remaining ones
+
+- implement stdlib.js
+	- need to have one function for each one of stdlib.ml
+	- number related functions are implemented with JS counterpart directly
+
+- display JS values/env/heap/ctx in html 
+	- contexts: essentially as before
+	- environments: need to follow the list of environment records
+	- heap: same as before, and do not attempt at first to show
+	  additional information in the heap appart from key/value bindings.
+
+- fill in the "esprima-to-ast.js" file, following the template
+  (throw an exception, caught and displayed as an alert message,
+   in case the source program uses for-in).
+
+- test langage features one by one, using minimal input programs;
+  these programs should be stored in an "examples/" folder;
+  for each example, check the AST, check step-by-step the execution.
+
+- test a compound example, e.g.:
     var x = 3;
     x = 4;
     if (x === 4) {
       while (true) {}
     }
 
-- write a JS function that takes an esprima AST as input (sub-language for the
-  moment) that generates an AST in our syntax (encoded of concrete types):
-    { type : constructor; label0 : value ; … }
-  this should remember locations
 
-- edit JsSyntax.ml to put readable labels
+=========================================================
+LATER
 
-- write a driver in JS
-  - take a program in the text area
-  - parse to esprima
-  - translate to our syntax
-  - call JsInterpreter.js using the correct function (see run_js.ml)
+- update the code that translates esprima syntax to recognize
+  "use strict" directives, which come as first statement of
+  a body, in hte form of a raw expression of raw type "use script".
+  (look on the web for code that already does this for esprima).
 
-- translate stdlib.ml into stdlib.js
+- set up the call to the appropriate function for propagating the
+  "strictness" info in the AST.
 
-- correct the Makefile to make sure we do not generate everything all the time
+- add a combo box above the source textbox for loading in one click
+  a particular example. The source code for the examples is obtained
+  by including a JS file that contains an array of source code,
+  this file being generated from the contents of the "examples" folder.
+
+- put online the tool on the jscert website
+	  - make sure to describe the supported features 
+	    (ecma5 minus for-in and a few other things)
+     - explain that currently JS files are generated
+	    from ML files and thus should not be edited,
+		 although this might change in the future.
+
+- full display	of heap information
+	  add a "+details" button 
+	  to show additional information about an object, like the
+	  getter and setter methods, and also for each field we need
+	  to see additional information like enumerable/configurable...
+
+- search by predicate in the trace
+	- remove the "with (obj)" hack that is currently there
+	- introduce functions
+	   - INTERP_RAW("x") : returns the value bound to "x" in the
+		  current context, by looking up the linked list of arrays
+		- PROG_RAW("x") : returns the value bound to "x" in the
+		  environment, using the prototype chain resolution function
+		- JSOF(v) : lift the encoding of a JS value to the corresponding JS value
+		- INTERP_VAL("x") = JSOF(INTERP_RAW("x"))
+		- PROG_VAL("x") = JSOF(PROG_RAW("x"))
+
+- Reactivate the generation of the lines of the form:
+	  default: throw "No matching case for switch";
+  by having js_of_pattern return an additional boolean 
+  indicating whether there was a default case or not.
+  This is needed to detect bugs in the spec where the
+  switch are missing useful cases.
+
+
+=========================================================
+LATER LATER
+
+- There is one place where we compute a "substring" in the code;
+  need to check whether the argument is always nonnegative.
+
+- Coq extraction has generated cases in the order of the definition
+  of the constructors in the inductive definition; this is not the
+  same order as in the original coq files; we should put back in
+  the right order, i'm afraid we need to do this by hand.
+
+- Investigate generation of english sentences from esprima AST
+  of the code of the interpreter, with live visualization of
+  the sentences being executed.
+
+
+=========================================================
+OPTIMIZATIONS
+
+- The representation of the heap could be optimized by
+  having "remove" nodes in the list describing a heap,
+  this would avoid filtering through the heap in O(n).
+
+- Optimize heap representations using trees, to improve
+  lookups from O(n) to O(log n).
+
+- Only introduce logging instructions in files for which
+  they are going to be used.
+
+
+=========================================================
+NEVER
+
+- There is an extra tab when closing bracket for fun def
 
 
 
-- => binder qq part vers une comparaison --- dans un fichier js
-  _compare_JsSyntax_native_error
-  _compare_JsSyntax_prealloc
+
+=========================================================
 
 
 
-==========
-
-TODO: demo of double clicking goes to the right page in ecma in english
-
-TODO: interpretation of comparison function in the search by "predicate"
-   might want to automatically "lift" basic values to their encoding
-	(unless some box is checked to prevent this behavior)
-
-	example:  "x == 3"  means:
-	"similar(x, { type: "value", tag: "value_prim", value: { type: "prim", tag: "float", value: 3.0 } })".
-
-	where similar is a recursive structural comparison function (not going through the heap)
-
-
-==========
