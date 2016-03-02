@@ -19,6 +19,7 @@ val nan : float
 val infinity : float
 val neg_infinity : float
 val max_float : float
+val min_float : float
 val ( ~+. ) : float -> float
 val ( ~-. ) : float -> float
 val ( +. ) : float -> float -> float
@@ -72,6 +73,10 @@ val float_compare : float -> float -> int
 
 val string_concat : string -> string -> string
 
+
+val pi : float
+val e : float
+val ln2 : float
 
 val float_neg : float -> float (* ~-.*)
 

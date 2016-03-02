@@ -55,8 +55,8 @@ let result_out o =
 
 (** val get_arg : int -> value list -> value **)
 
-let get_arg =
-  nth_def (Coq_value_prim Coq_prim_undef)
+let get_arg x l =
+  nth_def (Coq_value_prim Coq_prim_undef) x l
 
 (** val get_arg_first_and_rest : value list -> value * value list **)
 
@@ -431,8 +431,8 @@ let if_prim w k =
 (** val convert_option_attributes :
     attributes option -> full_descriptor option **)
 
-let convert_option_attributes =
-  map (fun a -> Coq_full_descriptor_some a)
+let convert_option_attributes o =
+  map (fun a -> Coq_full_descriptor_some a) o
 
 (** val if_abort : out -> (unit -> 'a1 resultof) -> 'a1 resultof **)
 

@@ -35,19 +35,22 @@ let max_value = max_float
 
 (** val min_value : number **)
 
-let min_value = (Int64.float_of_bits Int64.one)
+let min_value = min_float (* (Int64.float_of_bits Int64.one) *)
 
-(** val pi : number **)
+(*
+   (** val pi : number **)
 
-let pi = (4. *. atan 1.)
+   let pi = (4. *. atan 1.)
 
-(** val e : number **)
+   (** val e : number **)
 
-let e = (exp 1.)
+   let e = (exp 1.)
 
-(** val ln2 : number **)
+   (** val ln2 : number **)
 
-let ln2 = (log 2.)
+   let ln2 = (log 2.)
+
+*)
 
 (** val from_string : string -> number **)
 
@@ -85,19 +88,19 @@ let to_string = (fun f ->
 
 (** val neg : number -> number **)
 
-let neg = (float_neg)
+let neg x = float_neg x
 
 (** val floor : number -> number **)
 
-let floor = floor
+let floor x = floor x
 
 (** val absolute : number -> number **)
 
-let absolute = abs_float
+let absolute x = abs_float x
 
 (** val sign : number -> number **)
 
-let sign = (fun f -> float_of_int (float_compare f 0.))
+let sign = (fun x -> float_of_int (float_compare x 0.))
 
 (*
    (** val lt_bool : number -> number -> bool **)

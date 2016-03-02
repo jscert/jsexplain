@@ -23,7 +23,10 @@ JSREF_MLI   := $(wildcard $(TESTS_DIR)/$(JSREF_DIR)/*.mli)
 ###############################################################
 # Global options
 
-.PHONY: all full log unlog clean .log.js .unlog.js  .token.js
+.PHONY: all clean .log.js .unlog.js .token.js
+   # all gen log unlog 
+
+all: everything
 
 # Do not delete intermediate files.
 .SECONDARY:
@@ -54,8 +57,6 @@ endif
 
 ###############################################################
 # Rules
-
-all: main.byte
 
 ##### Compilation of STDLIB
 
@@ -118,11 +119,15 @@ tests/jsref/%.log.js: tests/jsref/%.ml
 #####################################################################
 # Short targets
 
+everything: gen assembly lineof
+
 main: main.byte
 
 cmi: $(JSREF_ML:.ml=.cmi) $(JSREF_MLI:.mli=.cmi) 
 
-full: $(JSREF_ML:.ml=.log.js) $(JSREF_ML:.ml=.unlog.js) $(JSREF_ML:.ml=.token.js)
+gen: $(JSREF_ML:.ml=.log.js) $(JSREF_ML:.ml=.unlog.js) $(JSREF_ML:.ml=.token.js)
+
+log: $(TESTS_ML:.ml=.log.js) $(TESTS_ML:.ml=.token.js)
 
 unlog: $(JSREF_ML:.ml=.unlog.js) 
 
@@ -132,7 +137,6 @@ assembly: $(JSREF_PATH)/assembly.js
 
 stdlib: $(STDLIB_DIR)/stdlib.cmi
 
-tests: $(TESTS_ML:.ml=.log.js) $(TESTS_ML:.ml=.token.js)
 
 
 #####################################################################
