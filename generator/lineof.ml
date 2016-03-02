@@ -73,7 +73,12 @@ let hashtbl_keys t =
 
 (*#########################################################################*)
 
-(* Gather the position of all tokens the form #<324#  and #324># *)
+(* Gather the position of all tokens the form #<324# and #324>#.
+   The tokens are placed in a list, with entries of the form
+   ( filename , tokens_start , tokens_stop )  where
+   tokens_start is a hashmap that gives for each token id its
+   opening positions (line and col), and tokens_stop similarly
+   gives the closing positions. *)
 
 type pos = { pos_line: int; pos_col: int }
 type tokens_start = (int, pos) Hashtbl.t
@@ -110,56 +115,111 @@ let gather_tokens basename input_lines =
 
 (*#########################################################################*)
 
-(* Generate a JS function of the following form:
+(* Generate a JS file of the following form:
 
-  function lineof(filename, token) {
-    switch (filename) {
-      case "foo.js": 
-        switch (token) {
-          case 2: return {file: "foo.js", start: {line: 12, col: 9}, stop: {line: 13, col: 2}};
-          case 19: return {file: "foo.js", start: {line: 15, col: 9}, stop: {line: 14, col: 5}};
-          default: throw "lineof does not know token " + token + " in file: " + filename
-        }
-        break;
-      case "bar.js": 
-        ...
-      default:
-        throw "lineof does not know file: " + filename
-    }
-  }
+     var lineof_data = {};
+     var lineof_temp;
+
+        lineof_temp = [];
+        lineof_temp[2] = [12, 9, 13, 2];
+        lineof_temp[19] = [15, 9, 14, 5];
+     lineof_data["foo.js"] = lineof_temp;
+
+        lineof_temp = [];
+        lineof_temp[3] = [3, 9, 5, 2];
+     lineof_data["bar.js"] = lineof_temp;
+
+  Then the lineof function can be implemented as follows:
+
+     function lineof(filename, token) {
+        var d = lineof_data[filename][token];
+        return { file: filename,
+                 start: {line: d[0], col: d[1]}, 
+                 stop: {line: d[2], col: d[3]} };
+     }
+
 *)
 
-let generate_lineof_function output_file : string =
-  let aux_pos pos =
-    Printf.sprintf "{ line: %d, col: %d }" pos.pos_line pos.pos_col 
-    in
-  let aux_key filename key pos_start pos_stop =
-    Printf.sprintf "case %d: return {file: \"%s\", start: %s, stop: %s};" key filename (aux_pos pos_start) (aux_pos pos_stop)
-    in
-  let aux_file (basename, tokens_start, tokens_stop) =
-    let filename = basename ^ ".js" in
-    let keys = hashtbl_keys tokens_start in
-    let skeycases = String.concat "@," (~~ List.map keys (fun key -> 
-     let pos_start = try Hashtbl.find tokens_start key
-        with Not_found -> assert false (* searching for a key that is there *)
-        in
-     let pos_stop = try Hashtbl.find tokens_stop key
-        with Not_found -> Printf.printf "Warning (error): unclosed token %d in file %s; using pos_start instead.\n" key filename; pos_start
-        in 
-      aux_key filename key pos_start pos_stop)) in
-    let skeyerr = "@,  default: throw \"lineof does not know token \" + token + \" in file: \" + filename;" in
-    Printf.sprintf "case \"%s\": switch (token) { @, @;<1 2>@[<v 0>%s@,%s@]@, }@, break;" 
-      filename skeycases skeyerr
-    in
-  let sfilecases = String.concat "@," (List.map aux_file !tokens) in
-  let sfileerr = "throw \"lineof does not know file: \" + filename;" in
-  let sfiles = Printf.sprintf "switch (filename) { @;<1 2>@[<v 0>%s@]@,default: %s@,}@,"
-    sfilecases sfileerr in
-  let sfull = Printf.sprintf "function lineof(filename, token) {@;<1 2>@[<v 0>%s@]@,}@," sfiles in
-  (* TODO: use an auxiliary function for the next 3 lines of code *)
-  let str_ppf = Format.str_formatter in
-  Format.fprintf str_ppf (Scanf.format_from_string sfull "");
-  Format.flush_str_formatter ()
+
+let generate_lineof_function put =
+   put "var lineof_data = {};";
+   put "var lineof_temp;";
+   ~~ List.iter !tokens (fun (basename, tokens_start, tokens_stop) ->
+     put "   lineof_temp = [];";
+     let filename = basename ^ ".js" in
+     let keys = hashtbl_keys tokens_start in
+     ~~ List.iter keys (fun key -> 
+        let pos_start = try Hashtbl.find tokens_start key
+           with Not_found -> assert false (* searching for a key that is there *)
+           in
+        let pos_stop = try Hashtbl.find tokens_stop key
+           with Not_found -> Printf.printf "Warning (error): unclosed token %d in file %s; using pos_start instead.\n" key filename; pos_start
+           in 
+        put (Printf.sprintf "   lineof_temp[\"%d\"] = [%d,%d,%d,%d];" 
+               key pos_start.pos_line pos_start.pos_col  
+                   pos_stop.pos_line  pos_stop.pos_col);
+     );
+     put (Printf.sprintf "lineof_data[\"%s\"] = lineof_temp;" filename);
+  )
+ 
+
+
+(*#########################################################################*)
+(* DEPRECATED *)
+
+    (* Generate a JS function of the following form:
+
+     function lineof(filename, token) {
+       switch (filename) {
+         case "foo.js": 
+           switch (token) {
+             case 2: return {file: "foo.js", start: {line: 12, col: 9}, stop: {line: 13, col: 2}};
+             case 19: return {file: "foo.js", start: {line: 15, col: 9}, stop: {line: 14, col: 5}};
+             default: throw "lineof does not know token " + token + " in file: " + filename
+           }
+           break;
+         case "bar.js": 
+           ...
+         default:
+           throw "lineof does not know file: " + filename
+       }
+     }
+
+   let generate_lineof_function output_file =
+     let aux_pos pos =
+       Printf.sprintf "{ line: %d, col: %d }" pos.pos_line pos.pos_col 
+       in
+     let aux_key filename key pos_start pos_stop =
+       Printf.sprintf "case %d: return {file: \"%s\", start: %s, stop: %s};" key filename (aux_pos pos_start) (aux_pos pos_stop)
+       in
+     let aux_file (basename, tokens_start, tokens_stop) =
+       let filename = basename ^ ".js" in
+       let keys = hashtbl_keys tokens_start in
+       let skeycases = String.concat "@," (~~ List.map keys (fun key -> 
+        let pos_start = try Hashtbl.find tokens_start key
+           with Not_found -> assert false (* searching for a key that is there *)
+           in
+        let pos_stop = try Hashtbl.find tokens_stop key
+           with Not_found -> Printf.printf "Warning (error): unclosed token %d in file %s; using pos_start instead.\n" key filename; pos_start
+           in 
+         aux_key filename key pos_start pos_stop)) in
+       let skeyerr = "@,  default: throw \"lineof does not know token \" + token + \" in file: \" + filename;" in
+       Printf.sprintf "case \"%s\": switch (token) { @, @;<1 2>@[<v 0>%s@,%s@]@, }@, break;" 
+         filename skeycases skeyerr
+       in
+     let sfilecases = String.concat "@," (List.map aux_file !tokens) in
+     let sfileerr = "throw \"lineof does not know file: \" + filename;" in
+     let sfiles = Printf.sprintf "switch (filename) { @;<1 2>@[<v 0>%s@]@,default: %s@,}@,"
+       sfilecases sfileerr in
+     let sfull = Printf.sprintf "function lineof(filename, token) {@;<1 2>@[<v 0>%s@]@,}@," sfiles in
+     (* TODO: use an auxiliary function for the next 3 lines of code *)
+     let str_ppf = Format.str_formatter in
+     Format.fprintf str_ppf (Scanf.format_from_string sfull "");
+     let output = Format.flush_str_formatter () in
+     XFile.put_contents output_file output
+      
+  ==> generate_lineof_function output_filename 
+*)
 
 
 (*#########################################################################*)
@@ -206,10 +266,19 @@ let _ =
    );
 
    (*---------------------------------------------------*)
+   (* open output file for writing *)
+
+    let outchannel = open_out output_filename in
+    let put str =
+       output_string outchannel str;
+       output_string outchannel "\n" in
+
+
+   (*---------------------------------------------------*)
    (* generating output file *)
 
-   let output = generate_lineof_function () in
-   XFile.put_contents output_filename output;
+   generate_lineof_function put;
+   close_out outchannel;
    Printf.printf "Wrote file: %s\n" output_filename;
 
 

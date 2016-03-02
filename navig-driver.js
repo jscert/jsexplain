@@ -28,6 +28,18 @@
 // type trace = [event_item]
 //   In this file, "datalog" and "tracer_items" have type trace.
 
+
+// ----------- Lineof ----------------
+
+// see "generator/lineof.ml" and "lineof.js" 
+function lineof(filename, token) {
+   var d = lineof_data[filename][token];
+   return { file: filename,
+            start: {line: d[0], col: d[1]}, 
+            stop: {line: d[2], col: d[3]} };
+};
+
+
 // ----------- Datalog ----------------
 
 var datalog = [];
@@ -531,3 +543,18 @@ var parsedTree;
 }));
 
 
+
+
+// -------------- Testing ----------------
+
+// usage: testParse("var x = 3");
+function testParse(s) {
+  var p = esprima.parse(s,{loc: true});
+  console.log(p);
+  console.log(esprimaToAST(p));
+}
+
+// usage: testLineof("Datatypes.js", 9);
+function testLineof(filename, token) {
+  console.log(lineof("Datatypes.js", 9));
+}

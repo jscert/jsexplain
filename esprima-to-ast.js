@@ -132,9 +132,3 @@ function esprimaToAST(prog) {
 
   return trProg(prog);
 }
-
-function testParse(s) {
-  var p = esprima.parse(s,{loc: true});
-  console.log(p);
-  console.log(esprimaToAST(p));
-}

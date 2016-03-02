@@ -11,8 +11,6 @@ FIRST
 =========================================================
 ARTHUR
 
-- reimplement "lineof" using a table
-
 - generate the escaped source code
 
 - control which file should feature logging 
@@ -20,9 +18,7 @@ ARTHUR
 =========================================================
 NEXT
 
-- introduce testing functions called
-	- test_lineof("filename", "token") -> returns a "pos" object
-	- test_parse("code") -> log esprima parse and log convert
+- introduce testing functions called:
 	- test_exec("code") -> parse, convert, build trace, log trace
 
 - clean up stdlib.ml
