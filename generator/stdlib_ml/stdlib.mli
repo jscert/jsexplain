@@ -135,7 +135,69 @@ module Int32 : sig
   val to_float : int32 -> float
 end
 
-(* should not be needed if we do'nt use JsNumber.ml *)
+
+(*--------------------*)
+(* string operations *)
+
+(* let string_dec s1 s2 = (string_eq s1 s2) *)
+val string_dec : string -> string -> bool
+
+
+(* let append s1 s2 = String.append s1 s2 *)
+val append : string -> string -> string 
+
+(* let length s = String.length s *)
+val length : string -> int
+
+(* let substring n m s = String.sub s n m *)
+val substring : int -> int -> string -> string
+
+
+
+(*--------------------*)
+
+(* figure out how to deal with parser *)
+
+module Parser_syntax : sig (* needed by translate_syntax.mli and by parser_main (below) *)
+  type unary_op
+  type arith_op
+  type bin_op
+  type exp
+end
+
+module Parser_main : sig 
+  val exp_from_string : ?force_strict:bool -> string -> Parser_syntax.exp
+end 
+
+(* ARTHUR: not needed -- tocheck
+   module Parser : sig
+     exception ParserFailure of string
+     exception InvalidArgument
+   end
+
+*)
+
+
+(*--------------------*)
+(* JSRef specific functions, useful for debugging *)
+
+val print_endline : string -> unit
+val __LOC__ : string
+
+val prerr_string : string -> unit
+val prerr_newline : unit -> unit
+val prerr_endline : string -> unit
+
+val raise : exn -> 'a
+
+
+
+
+(*--------------------*)
+(* deprecated *)
+
+(* should not be needed if we don't use JsNumber.ml *)
+(*
 module Int64 : sig 
   val one : int64
   val float_of_bits : int64 -> float
@@ -156,40 +218,4 @@ module String : sig (* should rely on String0 instead *)
   val get : string -> int -> char
 end
 
-(* Coq outputs exceptions in the place of arbitrary *)
-val raise : exn -> 'a
-
-(* JSRef specific functions *)
-val prerr_string : string -> unit
-val prerr_newline : unit -> unit
-val prerr_endline : string -> unit
-
-
-module Parser_syntax : sig (* needed by translate_syntax.mli and by parser_main (below) *)
-  type unary_op
-  type arith_op
-  type bin_op
-  type exp
-end
-
-module Parser_main : sig 
-  val exp_from_string : ?force_strict:bool -> string -> Parser_syntax.exp
-end 
-
-(* ARTHUR: not needed
-module Parser : sig
-  exception ParserFailure of string
-  exception InvalidArgument
-end
-
 *)
-
-module Obj : sig (* should not be needed *)
-  type t
-end
-
-
-(* only used for debug*)
-
-val print_endline : string -> unit
-val __LOC__ : string

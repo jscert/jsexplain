@@ -1,13 +1,4 @@
 
-(* ARTHUR: hacked this file *)
-
-let string_dec s1 s2 = (string_eq s1 s2)
-
-let append s1 s2 = String.append s1 s2
-
-let length s = String.length s
-
-let substring n m s = String.sub s n m
 
 (*
 

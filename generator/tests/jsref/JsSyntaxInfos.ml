@@ -3,9 +3,6 @@ open JsSyntaxAux
 open LibBool
 open List0
 
-(*
-let __ = let rec f _ = Obj.repr f in Obj.repr f
-*)
 
 (** val add_infos_exp : strictness_flag -> expr -> expr **)
 

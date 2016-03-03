@@ -18,7 +18,7 @@ open LibString
 open LibTactics
 open List0
 open Shared
-open String0
+(*open String0*)
 
 type __ = unit
 let __ = ()
