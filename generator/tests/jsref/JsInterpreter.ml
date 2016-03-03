@@ -19,6 +19,8 @@ open LibTactics
 open List0
 open Shared
 (*open String0*)
+let append x y = strappend x y (* hack for compatibility, to do cleanup *)
+let length x = strlength x (* hack for compatibility, to do cleanup *)
 
 type __ = unit
 let __ = ()
@@ -1114,7 +1116,7 @@ let prim_new_object s _foo_ = match _foo_ with
             Heap.write p ("length")
               (Coq_attributes_data_of
               (attributes_data_intro_constant (Coq_value_prim
-                (Coq_prim_number (number_of_int (length s0))))))))
+                (Coq_prim_number (number_of_int (strlength s0))))))))
           (fun s' -> res_ter s' (res_val (Coq_value_object l))))))
 
 (** val to_object : state -> value -> result **)
@@ -2349,7 +2351,7 @@ let run_construct_prealloc runs0 s c b args =
             let (l, s2) = object_alloc s0 o in
             let_binding
               (attributes_data_intro_constant (Coq_value_prim
-                (Coq_prim_number (number_of_int (length s1)))))
+                (Coq_prim_number (number_of_int (strlength s1)))))
               (fun lenDesc ->
               if_some
                 (object_heap_map_properties_pickable_option s2 l (fun p ->
@@ -3084,7 +3086,7 @@ let run_object_get_own_prop runs0 s c l x =
                        if_spec
                          (to_int32 runs0 s4 c (Coq_value_prim
                            (Coq_prim_string x))) (fun s5 k0 ->
-                         let_binding (number_of_int (length str)) (fun len ->
+                         let_binding (number_of_int (strlength str)) (fun len ->
                            if le_int_decidable len k0
                            then res_spec s5 Coq_full_descriptor_undef
                            else let resultStr =

@@ -33,7 +33,6 @@ ASSEMBLY_JS := \
 	LibOperation.log.js \
 	LibList.log.js \
 	Heap.log.js \
-	String0.log.js \
 	Shared.log.js \
 	LibString.log.js \
 	LibOption.log.js \

@@ -41,6 +41,9 @@ NEXT
      (ask Alan for Int32 and Int64 implementation tricks)
 	- include JsNumber.js in assembly.js by modifying ASSEMBLY_JS in Makefile
 
+- remove useless files such as LibReflect LibString etc...
+
+- in JsInterpreter let append = strappend (* hack for compatibility, to do cleanup *)
 
 [thomas, biggest piece, ask if anything problematic]
 - fill in the "esprima-to-ast.js" file, following the template

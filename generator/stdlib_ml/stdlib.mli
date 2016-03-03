@@ -144,10 +144,10 @@ val string_dec : string -> string -> bool
 
 
 (* let append s1 s2 = String.append s1 s2 *)
-val append : string -> string -> string 
+val strappend : string -> string -> string 
 
-(* let length s = String.length s *)
-val length : string -> int
+(* let strlength s = String.length s *)
+val strlength : string -> int
 
 (* let substring n m s = String.sub s n m *)
 val substring : int -> int -> string -> string

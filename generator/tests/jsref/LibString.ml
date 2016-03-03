@@ -1,5 +1,5 @@
 open LibReflect
-open String0
+(*open String0*)
 
 (** val string_comparable : string coq_Comparable **)
 
