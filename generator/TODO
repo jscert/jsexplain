@@ -1,66 +1,88 @@
 
 
-
-
 =========================================================
 FIRST
+[Thomas]
 
 - remove intermediate folder "miniml" in "../jsjsref/miniml/.."
 
-- include a local copy of esprima so that one can work offline
+- include a local copy of esprima so that we can work offline
+
+- remove stdlib_js/*   => probably drop it
 
 
 =========================================================
 ARTHUR
 
+- remove "open JsNumber" to more easily trace occurences
+
+- generate "type: " in smart contsructors
+
 - generate the escaped source code
 
 - control which file should feature logging 
 
+- lineof_temp["5"]  => 5 should be int
+
+[arthur will do a first pass]
+- clean up stdlib.ml
+- implement stdlib.js
+	- remove unused functions
+	- sort out remaining ones
+	- need to have one function for each one of stdlib.ml
+	- number related functions are implemented with JS counterpart directly
+     JsNumber.ml should be replaced by JsNumber.mli (we might want to keep
+	   JsNumber.ml for future use, though), and we implement by hand JsNumber.js,
+	  which would then be included directly in assembly.js.
+   - Int32 and Int64 implem [alan] directly in JS
+
+
 =========================================================
 NEXT
 
-- introduce testing functions called:
+[thomas, biggest piece, ask if anything problematic]
+- fill in the "esprima-to-ast.js" file, following the template
+  (throw an exception, caught and displayed as an alert message,
+   in case the source program uses for-in).
+- update the code that translates esprima syntax to recognize
+  "use strict" directives, which come as first statement of
+  a body, in hte form of a raw expression of raw type "use script".
+  (look on the web for code that already does this for esprima).
+
+[alan or thomas]
+- figure out what to do for Parser_syntax Parser_main
+
+
+[our goal is to build trace for]
+- Introduce testing functions called:
 	- test_exec("code") -> parse, convert, build trace, log trace
+- Test first "var x = 3".
+- Test a compound example, e.g.:
+    var x = 3;
+    x = 4;
+    if (x === 4) {
+      while (false) {}
+    }
+- Test langage features one by one, using minimal input programs;
+  these programs should be stored in an "examples/" folder;
+  for each example, check the AST, check step-by-step the execution.
+  => to see if the right things get highlighted
 
-- clean up stdlib.ml
-	- remove unused functions
-	- sort out remaining ones
-
-- implement stdlib.js
-	- need to have one function for each one of stdlib.ml
-	- number related functions are implemented with JS counterpart directly
-
+[second biggest, only once we manage to build the trace]
 - display JS values/env/heap/ctx in html 
 	- contexts: essentially as before
 	- environments: need to follow the list of environment records
 	- heap: same as before, and do not attempt at first to show
 	  additional information in the heap appart from key/value bindings.
 
-- fill in the "esprima-to-ast.js" file, following the template
-  (throw an exception, caught and displayed as an alert message,
-   in case the source program uses for-in).
-
-- test langage features one by one, using minimal input programs;
-  these programs should be stored in an "examples/" folder;
-  for each example, check the AST, check step-by-step the execution.
-
-- test a compound example, e.g.:
-    var x = 3;
-    x = 4;
-    if (x === 4) {
-      while (true) {}
-    }
-
 
 =========================================================
 LATER
 
-- update the code that translates esprima syntax to recognize
-  "use strict" directives, which come as first statement of
-  a body, in hte form of a raw expression of raw type "use script".
-  (look on the web for code that already does this for esprima).
+[thomas]
+- bigger test262 testing.
 
+[thomas and alan]
 - set up the call to the appropriate function for propagating the
   "strictness" info in the AST.
 
@@ -75,6 +97,7 @@ LATER
      - explain that currently JS files are generated
 	    from ML files and thus should not be edited,
 		 although this might change in the future.
+    - assembly.js should have a header
 
 - full display	of heap information
 	  add a "+details" button 
@@ -93,16 +116,17 @@ LATER
 		- INTERP_VAL("x") = JSOF(INTERP_RAW("x"))
 		- PROG_VAL("x") = JSOF(PROG_RAW("x"))
 
+
+
+=========================================================
+LATER LATER
+
 - Reactivate the generation of the lines of the form:
 	  default: throw "No matching case for switch";
   by having js_of_pattern return an additional boolean 
   indicating whether there was a default case or not.
   This is needed to detect bugs in the spec where the
   switch are missing useful cases.
-
-
-=========================================================
-LATER LATER
 
 - There is one place where we compute a "substring" in the code;
   need to check whether the argument is always nonnegative.

@@ -54,11 +54,14 @@ val ( > ) : 'a -> 'a -> bool
 val ( <= ) : 'a -> 'a -> bool 
 val ( >= ) : 'a -> 'a -> bool
 *)
+
+(* no need to implement those in stdlib.js because JS has them already *)
 val ( = ) : float -> float -> bool
 val ( < ) : float -> float -> bool
 val ( > ) : float -> float -> bool
 val ( <= ) : float -> float -> bool 
 val ( >= ) : float -> float -> bool
+
 (*val compare : 'a -> 'a -> int*)
 
 val bool_eq : bool -> bool -> bool
@@ -103,11 +106,13 @@ val ref : 'a -> 'a ref
 val (:=) : 'a ref -> 'a -> unit
 val (!) : 'a ref -> 'a
 
-(* Coq extraction builtins refer directly to Pervasives at times *)
+
+(* no longer needed it seems *)
 module Pervasives : sig
   val succ : int -> int
 end
 
+(* should not be needed if we do'nt use JsNumber.ml *)
 module Int32 : sig
   val logand : int32 -> int32 -> int32
   val lognot : int32 -> int32
@@ -120,17 +125,18 @@ module Int32 : sig
   val to_float : int32 -> float
 end
 
-module Int64 : sig
+(* should not be needed if we do'nt use JsNumber.ml *)
+module Int64 : sig 
   val one : int64
   val float_of_bits : int64 -> float
 end
 
-module List : sig
+module List : sig (* should rely on List0 instead *)
   val map : ('a -> 'b) -> 'a list -> 'b list
   val rev : 'a list -> 'a list
 end
 
-module String : sig
+module String : sig (* should rely on String0 instead *)
   val length : string -> int
   val append : string -> string -> string
   val sub : string -> int -> int -> string
@@ -149,7 +155,7 @@ val prerr_newline : unit -> unit
 val prerr_endline : string -> unit
 
 
-module Parser_syntax : sig (* ARTHUR: to implement *)
+module Parser_syntax : sig (* needed by translate_syntax.mli and by parser_main (below) *)
   type unary_op
   type arith_op
   type bin_op
@@ -168,10 +174,12 @@ end
 
 *)
 
-module Obj : sig
+module Obj : sig (* should not be needed *)
   type t
 end
 
-val print_endline : string -> unit
 
+(* only used for debug*)
+
+val print_endline : string -> unit
 val __LOC__ : string

@@ -1,3 +1,5 @@
+//https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API
+
 function esprimaToAST(prog) {
   var toList = function (array) {
     var r = {tag: "[]"};

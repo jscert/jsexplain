@@ -484,6 +484,7 @@ var parsedTree;
   }
 
   function run() {
+     // TODO:parse
     JsInterpreter.run_javascript(JsInterpreter.runs, program);
     assignSourceLocInTrace(datalog);
     tracer_items = datalog;

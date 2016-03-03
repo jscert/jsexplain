@@ -40,14 +40,14 @@ ASSEMBLY_JS := \
 	JsNumber.log.js \
 	JsSyntax.log.js \
 	JsSyntaxAux.log.js \
-	Translate_syntax.js \
+  Translate_syntax.js \
 	List0.log.js \
 	JsSyntaxInfos.log.js \
 	JsCommon.log.js \
 	JsCommonAux.log.js \
 	JsPreliminary.log.js \
 	JsInit.log.js \
-	Prheap.js \
+  Prheap.js \
 	LibTactics.log.js \
 	LibProd.log.js \
 	LibFunc.log.js \
