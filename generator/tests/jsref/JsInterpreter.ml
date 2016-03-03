@@ -3,7 +3,7 @@ open JsCommon
 open JsCommonAux
 open JsInit
 open JsInterpreterMonads
-open JsNumber
+(*open JsNumber*) 
 open JsPreliminary
 open JsSyntax
 open JsSyntaxAux
@@ -520,13 +520,13 @@ let to_integer runs0 s c v =
     runs_type -> state -> execution_ctx -> value -> float specres **)
 
 let to_int32 runs0 s c v =
-  if_number (to_number runs0 s c v) (fun s' n -> res_spec s' (to_int32 n))
+  if_number (to_number runs0 s c v) (fun s' n -> res_spec s' (JsNumber.to_int32 n))
 
 (** val to_uint32 :
     runs_type -> state -> execution_ctx -> value -> float specres **)
 
 let to_uint32 runs0 s c v =
-  if_number (to_number runs0 s c v) (fun s' n -> res_spec s' (to_uint32 n))
+  if_number (to_number runs0 s c v) (fun s' n -> res_spec s' (JsNumber.to_uint32 n))
 
 (** val to_string :
     runs_type -> state -> execution_ctx -> value -> result **)
@@ -2150,7 +2150,7 @@ let run_construct_prealloc runs0 s c b args =
           result_out (Coq_out_ter (s1, (res_val (Coq_value_object l)))))))
       (fun follow ->
       if list_eq_nil_decidable args
-      then follow s (Coq_value_prim (Coq_prim_number zero))
+      then follow s (Coq_value_prim (Coq_prim_number JsNumber.zero))
       else let_binding (get_arg 0 args) (fun v ->
              if_number (to_number runs0 s c v) (fun x x0 ->
                follow x (Coq_value_prim (Coq_prim_number x0)))))
@@ -3330,9 +3330,9 @@ let get_shift_op _foo_ = match _foo_ with
 | Coq_binary_op_mod -> None
 | Coq_binary_op_add -> None
 | Coq_binary_op_sub -> None
-| Coq_binary_op_left_shift -> Some (false, int32_left_shift)
-| Coq_binary_op_right_shift -> Some (false, int32_right_shift)
-| Coq_binary_op_unsigned_right_shift -> Some (true, uint32_right_shift)
+| Coq_binary_op_left_shift -> Some (false, JsNumber.int32_left_shift)
+| Coq_binary_op_right_shift -> Some (false, JsNumber.int32_right_shift)
+| Coq_binary_op_unsigned_right_shift -> Some (true, JsNumber.uint32_right_shift)
 | Coq_binary_op_lt -> None
 | Coq_binary_op_gt -> None
 | Coq_binary_op_le -> None
@@ -3371,9 +3371,9 @@ let get_bitwise_op _foo_ = match _foo_ with
 | Coq_binary_op_disequal -> None
 | Coq_binary_op_strict_equal -> None
 | Coq_binary_op_strict_disequal -> None
-| Coq_binary_op_bitwise_and -> Some int32_bitwise_and
-| Coq_binary_op_bitwise_or -> Some int32_bitwise_or
-| Coq_binary_op_bitwise_xor -> Some int32_bitwise_xor
+| Coq_binary_op_bitwise_and -> Some JsNumber.int32_bitwise_and
+| Coq_binary_op_bitwise_or -> Some JsNumber.int32_bitwise_or
+| Coq_binary_op_bitwise_xor -> Some JsNumber.int32_bitwise_xor
 | Coq_binary_op_and -> None
 | Coq_binary_op_or -> None
 | Coq_binary_op_coma -> None
@@ -3508,7 +3508,7 @@ let run_binary_op runs0 s c op v1 v2 =
                      ((if b_unsigned then to_uint32 else to_int32) runs0 s c
                        v1) (fun s1 k1 ->
                      if_spec (to_uint32 runs0 s1 c v2) (fun s2 k2 ->
-                       let k2' = modulo_32 k2 in
+                       let k2' = JsNumber.modulo_32 k2 in
                        res_ter s2
                          (res_val (Coq_value_prim (Coq_prim_number
                            (of_int (f k1 k2'))))))))
@@ -3740,7 +3740,7 @@ let run_unary_op runs0 s c op e =
               if_spec (to_int32 runs0 s1 c v) (fun s2 k ->
                 res_ter s2
                   (res_val (Coq_value_prim (Coq_prim_number
-                    (of_int (int32_bitwise_not k))))))
+                    (of_int (JsNumber.int32_bitwise_not k))))))
             | Coq_unary_op_not ->
               res_ter s1
                 (res_val (Coq_value_prim (Coq_prim_bool
@@ -3826,7 +3826,7 @@ let run_unary_op runs0 s c op e =
               if_spec (to_int32 runs0 s1 c v) (fun s2 k ->
                 res_ter s2
                   (res_val (Coq_value_prim (Coq_prim_number
-                    (of_int (int32_bitwise_not k))))))
+                    (of_int (JsNumber.int32_bitwise_not k))))))
             | Coq_unary_op_not ->
               res_ter s1
                 (res_val (Coq_value_prim (Coq_prim_bool
@@ -3888,7 +3888,7 @@ let run_unary_op runs0 s c op e =
               if_spec (to_int32 runs0 s1 c v) (fun s2 k ->
                 res_ter s2
                   (res_val (Coq_value_prim (Coq_prim_number
-                    (of_int (int32_bitwise_not k))))))
+                    (of_int (JsNumber.int32_bitwise_not k))))))
             | Coq_unary_op_not ->
               res_ter s1
                 (res_val (Coq_value_prim (Coq_prim_bool
@@ -3950,7 +3950,7 @@ let run_unary_op runs0 s c op e =
               if_spec (to_int32 runs0 s1 c v) (fun s2 k ->
                 res_ter s2
                   (res_val (Coq_value_prim (Coq_prim_number
-                    (of_int (int32_bitwise_not k))))))
+                    (of_int (JsNumber.int32_bitwise_not k))))))
             | Coq_unary_op_not ->
               res_ter s1
                 (res_val (Coq_value_prim (Coq_prim_bool
@@ -4012,7 +4012,7 @@ let run_unary_op runs0 s c op e =
               if_spec (to_int32 runs0 s1 c v) (fun s2 k ->
                 res_ter s2
                   (res_val (Coq_value_prim (Coq_prim_number
-                    (of_int (int32_bitwise_not k))))))
+                    (of_int (JsNumber.int32_bitwise_not k))))))
             | Coq_unary_op_not ->
               res_ter s1
                 (res_val (Coq_value_prim (Coq_prim_bool
@@ -4074,7 +4074,7 @@ let run_unary_op runs0 s c op e =
               if_spec (to_int32 runs0 s1 c v) (fun s2 k ->
                 res_ter s2
                   (res_val (Coq_value_prim (Coq_prim_number
-                    (of_int (int32_bitwise_not k))))))
+                    (of_int (JsNumber.int32_bitwise_not k))))))
             | Coq_unary_op_not ->
               res_ter s1
                 (res_val (Coq_value_prim (Coq_prim_bool
@@ -4136,7 +4136,7 @@ let run_unary_op runs0 s c op e =
               if_spec (to_int32 runs0 s1 c v) (fun s2 k ->
                 res_ter s2
                   (res_val (Coq_value_prim (Coq_prim_number
-                    (of_int (int32_bitwise_not k))))))
+                    (of_int (JsNumber.int32_bitwise_not k))))))
             | Coq_unary_op_not ->
               res_ter s1
                 (res_val (Coq_value_prim (Coq_prim_bool
@@ -4198,7 +4198,7 @@ let run_unary_op runs0 s c op e =
               if_spec (to_int32 runs0 s1 c v) (fun s2 k ->
                 res_ter s2
                   (res_val (Coq_value_prim (Coq_prim_number
-                    (of_int (int32_bitwise_not k))))))
+                    (of_int (JsNumber.int32_bitwise_not k))))))
             | Coq_unary_op_not ->
               res_ter s1
                 (res_val (Coq_value_prim (Coq_prim_bool
@@ -4260,7 +4260,7 @@ let run_unary_op runs0 s c op e =
               if_spec (to_int32 runs0 s1 c v) (fun s2 k ->
                 res_ter s2
                   (res_val (Coq_value_prim (Coq_prim_number
-                    (of_int (int32_bitwise_not k))))))
+                    (of_int (JsNumber.int32_bitwise_not k))))))
             | Coq_unary_op_not ->
               res_ter s1
                 (res_val (Coq_value_prim (Coq_prim_bool
@@ -5310,15 +5310,15 @@ let run_call_prealloc runs0 s c b vthis args =
         res_ter s0
           (res_val (Coq_value_prim (Coq_prim_bool
             (neg
-              (or_decidable (number_comparable n nan)
-                (or_decidable (number_comparable n infinity)
-                  (number_comparable n neg_infinity)))))))))
+              (or_decidable (number_comparable n JsNumber.nan)
+                (or_decidable (number_comparable n JsNumber.infinity)
+                  (number_comparable n JsNumber.neg_infinity)))))))))
   | Coq_prealloc_global_is_nan ->
     let_binding (get_arg 0 args) (fun v ->
       if_number (to_number runs0 s c v) (fun s0 n ->
         res_ter s0
           (res_val (Coq_value_prim (Coq_prim_bool
-            (number_comparable n nan))))))
+            (number_comparable n JsNumber.nan))))))
   | Coq_prealloc_global_decode_uri ->
     (fun s ->
   print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
@@ -5809,7 +5809,7 @@ let run_call_prealloc runs0 s c b vthis args =
   | Coq_prealloc_number ->
     if list_eq_nil_decidable args
     then result_out (Coq_out_ter (s,
-           (res_val (Coq_value_prim (Coq_prim_number zero)))))
+           (res_val (Coq_value_prim (Coq_prim_number JsNumber.zero)))))
     else let v = get_arg 0 args in to_number runs0 s c v
   | Coq_prealloc_number_proto ->
     (fun s ->
@@ -5952,7 +5952,7 @@ let run_call_prealloc runs0 s c b vthis args =
           then if_not_throw
                  (object_put runs0 s2 c l
                    ("length")
-                   (Coq_value_prim (Coq_prim_number zero)) throw_true)
+                   (Coq_value_prim (Coq_prim_number JsNumber.zero)) throw_true)
                  (fun s3 x ->
                  result_out (Coq_out_ter (s3,
                    (res_val (Coq_value_prim Coq_prim_undef)))))

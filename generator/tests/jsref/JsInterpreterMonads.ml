@@ -1,5 +1,5 @@
 open JsCommon
-open JsNumber
+(*open JsNumber*)
 open JsSyntax
 open JsSyntaxAux
 open LibList

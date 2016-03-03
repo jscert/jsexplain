@@ -73,8 +73,18 @@ val float_eq : float -> float -> bool
 val float_lt : float -> float -> bool
 val float_le : float -> float -> bool
 val float_compare : float -> float -> int
+(** val number_comparable : number coq_Comparable **)
+val number_comparable : float -> float -> bool  (* = (fun n1 n2 -> int_eq 0  (float_compare n1 n2)) *)
+
+(** val of_int : float -> number **)
+val of_int : float -> float (* = fun x -> x *)
+
+val number_of_int : int -> float  (* = fun x -> float_of_int x *)
+
 
 val string_concat : string -> string -> string
+
+val nat_eq : int -> int -> bool (* nat_eq x y = int_eq x y  *)
 
 
 val pi : float

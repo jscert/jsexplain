@@ -155,7 +155,7 @@ let generate_lineof_function put =
         let pos_stop = try Hashtbl.find tokens_stop key
            with Not_found -> Printf.printf "Warning (error): unclosed token %d in file %s; using pos_start instead.\n" key filename; pos_start
            in 
-        put (Printf.sprintf "   lineof_temp[\"%d\"] = [%d,%d,%d,%d];" 
+        put (Printf.sprintf "   lineof_temp[%d] = [%d,%d,%d,%d];" 
                key pos_start.pos_line pos_start.pos_col  
                    pos_stop.pos_line  pos_stop.pos_col);
      );

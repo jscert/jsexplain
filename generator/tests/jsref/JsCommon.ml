@@ -1,6 +1,6 @@
 
 open Datatypes
-open JsNumber
+(*open JsNumber*)
 open JsSyntax
 open JsSyntaxAux
 open LibList
@@ -520,12 +520,12 @@ let throw_irrelevant =
 (** val add_one : number -> number **)
 
 let add_one n =
-  add n one
+  add n JsNumber.one
 
 (** val sub_one : number -> number **)
 
 let sub_one n =
-  sub n one
+  sub n JsNumber.one
 
 (** val is_syntactic_eval : expr -> bool **)
 

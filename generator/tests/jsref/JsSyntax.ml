@@ -1,4 +1,4 @@
-open JsNumber
+(*open JsNumber*)
 open Heap
 open LibReflect
 open Shared
@@ -45,7 +45,7 @@ type binary_op =
 type literal =
 | Coq_literal_null [@f]  (** Auto Generated Attributes **)
 | Coq_literal_bool  [@f value] of bool (** Auto Generated Attributes **)
-| Coq_literal_number  [@f value] of number (** Auto Generated Attributes **)
+| Coq_literal_number  [@f value] of JsNumber.number (** Auto Generated Attributes **)
 | Coq_literal_string  [@f value] of string (** Auto Generated Attributes **)
 
 type label =
@@ -64,7 +64,7 @@ let strictness_false =
 type propname =
 | Coq_propname_identifier  [@f value] of string (** Auto Generated Attributes **)
 | Coq_propname_string  [@f value] of string (** Auto Generated Attributes **)
-| Coq_propname_number  [@f value] of number (** Auto Generated Attributes **)
+| Coq_propname_number  [@f value] of JsNumber.number (** Auto Generated Attributes **)
 
 type expr =
 | Coq_expr_this [@f]  (** Auto Generated Attributes **)
@@ -279,7 +279,7 @@ type prim =
 | Coq_prim_undef [@f]  (** Auto Generated Attributes **)
 | Coq_prim_null [@f]  (** Auto Generated Attributes **)
 | Coq_prim_bool  [@f value] of bool (** Auto Generated Attributes **)
-| Coq_prim_number  [@f value] of number (** Auto Generated Attributes **)
+| Coq_prim_number  [@f value] of JsNumber.number (** Auto Generated Attributes **)
 | Coq_prim_string  [@f value] of string (** Auto Generated Attributes **)
 
 type value =

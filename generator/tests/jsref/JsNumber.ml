@@ -1,8 +1,6 @@
 open Fappli_IEEE_bits
 open LibReflect
 
-let nat_eq x y = int_eq x y 
-
 type number = binary64
 
 (** val nan : number **)
@@ -37,20 +35,19 @@ let max_value = max_float
 
 let min_value = min_float (* (Int64.float_of_bits Int64.one) *)
 
-(*
-   (** val pi : number **)
 
-   let pi = (4. *. atan 1.)
+(** val pi : number **)
 
-   (** val e : number **)
+let pi = 3.141592654 (* (4. *. atan 1.) *)
 
-   let e = (exp 1.)
+(** val e : number **)
 
-   (** val ln2 : number **)
+let e = 2.718281828 (* (exp 1.) *)
 
-   let ln2 = (log 2.)
+(** val ln2 : number **)
 
-*)
+let ln2 = 0.693147181 (* (log 2.) *)
+
 
 (** val from_string : string -> number **)
 
@@ -129,15 +126,8 @@ let sign = (fun x -> float_of_int (float_compare x 0.))
 
 *)
 
-(** val number_comparable : number coq_Comparable **)
 
-let number_comparable = (fun n1 n2 -> int_eq 0  (float_compare n1 n2))
 
-(** val of_int : float -> number **)
-
-let of_int = fun x -> x
-
-let number_of_int = fun x -> float_of_int x
 
 (** val to_int32 : number -> float **)
 

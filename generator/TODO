@@ -16,29 +16,31 @@ ARTHUR
 
 - remove "open JsNumber" to more easily trace occurences
 
-- generate "type: " in smart contsructors
+- generate "type: " in smart constructors [optional until display is needed]
 
 - generate the escaped source code
 
 - control which file should feature logging 
 
-- lineof_temp["5"]  => 5 should be int
-
-[arthur will do a first pass]
-- clean up stdlib.ml
-- implement stdlib.js
-	- remove unused functions
-	- sort out remaining ones
-	- need to have one function for each one of stdlib.ml
-	- number related functions are implemented with JS counterpart directly
-     JsNumber.ml should be replaced by JsNumber.mli (we might want to keep
-	   JsNumber.ml for future use, though), and we implement by hand JsNumber.js,
-	  which would then be included directly in assembly.js.
-   - Int32 and Int64 implem [alan] directly in JS
 
 
 =========================================================
 NEXT
+
+[arthur did a first pass on JsNumber.ml to make explicit paths
+ and on stdlib.ml]
+- continue cleaning up stdlib.ml
+- implement stdlib.js
+	- remove unused functions
+	- sort out remaining ones
+	- need to have one function for each one of stdlib.ml
+	- replace JsNumber by a corresponding JsNumber.mli
+	  (keep JsNumber saved somewhere else for future use)
+	- implement JsNumber.js by hand to match signature of JsNumber.mli,
+	  by implementing number related functions using JS counterpart directly
+     (ask Alan for Int32 and Int64 implementation tricks)
+	- include JsNumber.js in assembly.js by modifying ASSEMBLY_JS in Makefile
+
 
 [thomas, biggest piece, ask if anything problematic]
 - fill in the "esprima-to-ast.js" file, following the template

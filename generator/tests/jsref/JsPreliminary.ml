@@ -1,5 +1,5 @@
 open JsCommon
-open JsNumber
+(*open JsNumber*)
 open JsSyntax
 open JsSyntaxAux
 open LibReflect
@@ -9,9 +9,9 @@ open Shared
 (** val convert_number_to_bool : number -> bool **)
 
 let convert_number_to_bool n =
-  if or_decidable (number_comparable n zero)
-       (or_decidable (number_comparable n neg_zero)
-         (number_comparable n nan))
+  if or_decidable (number_comparable n JsNumber.zero)
+       (or_decidable (number_comparable n JsNumber.neg_zero)
+         (number_comparable n JsNumber.nan))
   then false
   else true
 
@@ -39,23 +39,23 @@ let convert_value_to_boolean _foo_ = match _foo_ with
 (** val convert_prim_to_number : prim -> number **)
 
 let convert_prim_to_number _foo_ = match _foo_ with
-| Coq_prim_undef -> nan
-| Coq_prim_null -> zero
-| Coq_prim_bool b -> if b then one else zero
+| Coq_prim_undef -> JsNumber.nan
+| Coq_prim_null -> JsNumber.zero
+| Coq_prim_bool b -> if b then JsNumber.one else JsNumber.zero
 | Coq_prim_number n -> n
-| Coq_prim_string s -> from_string s
+| Coq_prim_string s -> JsNumber.from_string s
 
 (** val convert_number_to_integer : number -> number **)
 
 let convert_number_to_integer n =
-  if number_comparable n nan
-  then zero
-  else if or_decidable (number_comparable n zero)
-            (or_decidable (number_comparable n neg_zero)
-              (or_decidable (number_comparable n infinity)
-                (number_comparable n neg_infinity)))
+  if number_comparable n JsNumber.nan
+  then JsNumber.zero
+  else if or_decidable (number_comparable n JsNumber.zero)
+            (or_decidable (number_comparable n JsNumber.neg_zero)
+              (or_decidable (number_comparable n JsNumber.infinity)
+                (number_comparable n JsNumber.neg_infinity)))
        then n
-       else mult (sign n) (floor (absolute n))
+       else mult (JsNumber.sign n) (floor (JsNumber.absolute n))
 
 (** val convert_bool_to_string : bool -> string **)
 
@@ -70,7 +70,7 @@ let convert_prim_to_string _foo_ = match _foo_ with
   "undefined"
 | Coq_prim_null -> "null"
 | Coq_prim_bool b -> convert_bool_to_string b
-| Coq_prim_number n -> to_string n
+| Coq_prim_number n -> JsNumber.to_string n
 | Coq_prim_string s -> s
 
 (** val equality_test_for_same_type : coq_type -> value -> value -> bool **)
@@ -95,16 +95,16 @@ let equality_test_for_same_type ty v1 v2 =
               | Coq_prim_null -> false
               | Coq_prim_bool b -> false
               | Coq_prim_number n2 ->
-                if number_comparable n1 nan
+                if number_comparable n1 JsNumber.nan
                 then false
-                else if number_comparable n2 nan
+                else if number_comparable n2 JsNumber.nan
                      then false
-                     else if and_decidable (number_comparable n1 zero)
-                               (number_comparable n2 neg_zero)
+                     else if and_decidable (number_comparable n1 JsNumber.zero)
+                               (number_comparable n2 JsNumber.neg_zero)
                           then true
                           else if and_decidable
-                                    (number_comparable n1 neg_zero)
-                                    (number_comparable n2 zero)
+                                    (number_comparable n1 JsNumber.neg_zero)
+                                    (number_comparable n2 JsNumber.zero)
                                then true
                                else number_comparable n1 n2
               | Coq_prim_string s -> false)
@@ -126,23 +126,23 @@ let strict_equality_test v1 v2 =
 (** val inequality_test_number : number -> number -> prim **)
 
 let inequality_test_number n1 n2 =
-  if or_decidable (number_comparable n1 nan) (number_comparable n2 nan)
+  if or_decidable (number_comparable n1 JsNumber.nan) (number_comparable n2 nan)
   then Coq_prim_undef
   else if number_comparable n1 n2
        then Coq_prim_bool false
-       else if and_decidable (number_comparable n1 zero)
-                 (number_comparable n2 neg_zero)
+       else if and_decidable (number_comparable n1 JsNumber.zero)
+                 (number_comparable n2 JsNumber.neg_zero)
             then Coq_prim_bool false
-            else if and_decidable (number_comparable n1 neg_zero)
-                      (number_comparable n2 zero)
+            else if and_decidable (number_comparable n1 JsNumber.neg_zero)
+                      (number_comparable n2 JsNumber.zero)
                  then Coq_prim_bool false
-                 else if number_comparable n1 infinity
+                 else if number_comparable n1 JsNumber.infinity
                       then Coq_prim_bool false
-                      else if number_comparable n2 infinity
+                      else if number_comparable n2 JsNumber.infinity
                            then Coq_prim_bool true
-                           else if number_comparable n2 neg_infinity
+                           else if number_comparable n2 JsNumber.neg_infinity
                                 then Coq_prim_bool false
-                                else if number_comparable n1 neg_infinity
+                                else if number_comparable n1 JsNumber.neg_infinity
                                      then Coq_prim_bool true
                                      else Coq_prim_bool (lt_bool n1 n2)
 
@@ -213,7 +213,7 @@ let typeof_prim _foo_ = match _foo_ with
 let string_of_propname _foo_ = match _foo_ with
 | Coq_propname_identifier s -> s
 | Coq_propname_string s -> s
-| Coq_propname_number n -> to_string n
+| Coq_propname_number n -> JsNumber.to_string n
 
 (** val string_of_native_error : native_error -> string **)
 

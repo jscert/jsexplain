@@ -1,6 +1,6 @@
 open Datatypes
 open JsCommon
-open JsNumber
+(*open JsNumber*)
 open JsSyntax
 open JsSyntaxAux
 open LibList
@@ -43,7 +43,7 @@ let same_value_dec v1 v2 =
                let h2 =
                  and_decidable
                    (value_comparable v1 (Coq_value_prim (Coq_prim_number
-                     nan)))
+                     JsNumber.nan)))
                    (value_comparable v2 (Coq_value_prim (Coq_prim_number
                      nan)))
                in
@@ -53,9 +53,9 @@ let same_value_dec v1 v2 =
                        let h3 =
                          and_decidable
                            (value_comparable v1 (Coq_value_prim
-                             (Coq_prim_number zero)))
+                             (Coq_prim_number JsNumber.zero)))
                            (value_comparable v2 (Coq_value_prim
-                             (Coq_prim_number neg_zero)))
+                             (Coq_prim_number JsNumber.neg_zero)))
                        in
                        (if h3
                         then (fun _ -> false_decidable)
@@ -63,9 +63,9 @@ let same_value_dec v1 v2 =
                                let h4 =
                                  and_decidable
                                    (value_comparable v1 (Coq_value_prim
-                                     (Coq_prim_number neg_zero)))
+                                     (Coq_prim_number JsNumber.neg_zero)))
                                    (value_comparable v2 (Coq_value_prim
-                                     (Coq_prim_number zero)))
+                                     (Coq_prim_number JsNumber.zero)))
                                in
                                (if h4
                                 then (fun _ -> false_decidable)

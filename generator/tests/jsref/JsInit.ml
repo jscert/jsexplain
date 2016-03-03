@@ -1,5 +1,5 @@
 open JsCommon
-open JsNumber
+(*open JsNumber*)
 open JsPreliminary
 open JsSyntax
 open JsSyntaxAux
@@ -79,12 +79,12 @@ let object_prealloc_global_class = "GlobalClass"
 let object_prealloc_global_properties =
   let p =
     write_constant Heap.empty ("NaN") (Coq_value_prim
-      (Coq_prim_number nan))
+      (Coq_prim_number JsNumber.nan))
   in
   let p0 =
     write_constant p
       ("Infinity")
-      (Coq_value_prim (Coq_prim_number infinity))
+      (Coq_value_prim (Coq_prim_number JsNumber.infinity))
   in
   let p1 =
     write_constant p0
@@ -601,27 +601,27 @@ let object_prealloc_number =
   in
   let p0 =
     write_constant p ("NaN") (Coq_value_prim (Coq_prim_number
-      nan))
+      JsNumber.nan))
   in
   let p1 =
     write_constant p0
       ("NEGATIVE_INFINITY")
-      (Coq_value_prim (Coq_prim_number neg_infinity))
+      (Coq_value_prim (Coq_prim_number JsNumber.neg_infinity))
   in
   let p2 =
     write_constant p1
       ("POSITIVE_INFINITY")
-      (Coq_value_prim (Coq_prim_number infinity))
+      (Coq_value_prim (Coq_prim_number JsNumber.infinity))
   in
   let p3 =
     write_constant p2
       ("MAX_VALUE")
-      (Coq_value_prim (Coq_prim_number max_value))
+      (Coq_value_prim (Coq_prim_number JsNumber.max_value))
   in
   let p4 =
     write_constant p3
       ("MIN_VALUE")
-      (Coq_value_prim (Coq_prim_number min_value))
+      (Coq_value_prim (Coq_prim_number JsNumber.min_value))
   in
   object_create_prealloc_constructor Coq_prealloc_number (Coq_value_prim
     (Coq_prim_number 1.0)) p4
@@ -649,7 +649,7 @@ let object_prealloc_number_proto =
       Coq_prealloc_object_proto))
       ("Number") p1
   in
-  object_with_primitive_value o (Coq_value_prim (Coq_prim_number zero))
+  object_with_primitive_value o (Coq_value_prim (Coq_prim_number JsNumber.zero))
 
 (** val number_proto_to_string_function_object : coq_object **)
 
@@ -847,12 +847,12 @@ let bool_proto_value_of_function_object =
 let object_prealloc_math =
   let p =
     write_constant Heap.empty ("PI") (Coq_value_prim
-      (Coq_prim_number pi))
+      (Coq_prim_number JsNumber.pi))
   in
-  let p0 = write_constant p ("E") (Coq_value_prim (Coq_prim_number e)) in
+  let p0 = write_constant p ("E") (Coq_value_prim (Coq_prim_number JsNumber.e)) in
   let p1 =
     write_constant p0 ("LN2") (Coq_value_prim
-      (Coq_prim_number ln2))
+      (Coq_prim_number JsNumber.ln2))
   in
   object_create_builtin (Coq_value_object (Coq_object_loc_prealloc
     Coq_prealloc_object_proto)) ("Math") p1
