@@ -1,7 +1,14 @@
+
 open Params
 open Format
 open Mytools
 open Parse_type
+
+(*
+   Remark: field name attributes for builtins (eg: ::) are defined in attributes.ml
+   Remark: field name attributes should not be "type" or "tag".
+*)
+
 
 (*#########################################################################*)
 

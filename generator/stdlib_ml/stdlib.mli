@@ -1,6 +1,9 @@
-(*
-Field name attributes for builtins (eg: ::) are defined in attributes.ml
-*)
+
+(*--------------------*)
+(* number operations *)
+
+(* todo : factorize and clean up *)
+
 
 val ( ~+ ) : int -> int
 val ( ~- ) : int -> int
@@ -46,14 +49,6 @@ val int_of_float : float -> int
 val string_of_float : float -> string
 val string_of_int : int -> string
 
-(* We use this to compare types that are not known by stdlib, like Native_error *)
-val ( === ) : 'a -> 'a -> bool
-(*val ( <> ) : 'a -> 'a -> bool*)
-(*val ( < ) : 'a -> 'a -> bool
-val ( > ) : 'a -> 'a -> bool
-val ( <= ) : 'a -> 'a -> bool 
-val ( >= ) : 'a -> 'a -> bool
-*)
 
 (* no need to implement those in stdlib.js because JS has them already *)
 val ( = ) : float -> float -> bool
@@ -64,11 +59,10 @@ val ( >= ) : float -> float -> bool
 
 (*val compare : 'a -> 'a -> int*)
 
-val bool_eq : bool -> bool -> bool
 val int_eq : int -> int -> bool
 val int_lt : int -> int -> bool
 val int_ge : int -> int -> bool
-val string_eq : string -> string -> bool
+
 val float_eq : float -> float -> bool
 val float_lt : float -> float -> bool
 val float_le : float -> float -> bool
@@ -81,11 +75,7 @@ val of_int : float -> float (* = fun x -> x *)
 
 val number_of_int : int -> float  (* = fun x -> float_of_int x *)
 
-
-val string_concat : string -> string -> string
-
 val nat_eq : int -> int -> bool (* nat_eq x y = int_eq x y  *)
-
 
 val pi : float
 val e : float
@@ -102,27 +92,68 @@ val fmod : float -> float -> float (*  mod_float *)
 val float_exp : float -> float -> float (* ( ** ) *)
 
 
+(*--------------------*)
+(* bool operations *)
 
-val ( && ) : bool -> bool -> bool
+val bool_eq : bool -> bool -> bool (* should be "===" in  JS *)
+val ( && ) : bool -> bool -> bool  (* beware of strict vs lazy semantics: todo discuss*)
 val not : bool -> bool
-val stuck : string -> 'a
 
-(* Structural equality, need to be careful with implementation 
-val (=) : 'a -> 'a -> bool*)
+
+(*--------------------*)
+(* string operations *)
+
+(* todo : factorize and clean up *)
+
+val string_eq : string -> string -> bool
+
+val string_concat : string -> string -> string
 
 val (^) : string -> string -> string
+
+(* let string_dec s1 s2 = (string_eq s1 s2) *)
+val string_dec : string -> string -> bool
+
+(* let append s1 s2 = String.append s1 s2 *)
+val strappend : string -> string -> string 
+
+(* let strlength s = String.length s *)
+val strlength : string -> int
+
+(* let substring n m s = String.sub s n m *)
+val substring : int -> int -> string -> string
+
+
+
+(*--------------------*)
+(* for future use for the global heap *)
 
 val ref : 'a -> 'a ref
 val (:=) : 'a ref -> 'a -> unit
 val (!) : 'a ref -> 'a
 
 
-(* no longer needed it seems *)
+(*--------------------*)
+(* special operations *)
+
+(* We use this to compare types that are not known by stdlib, like Native_error;
+  should be implemented in JS by comparing the objects, to see if they have the same
+  "tag" fields (there should be no other fields, except perhaps "type") *)
+val ( === ) : 'a -> 'a -> bool
+
+
+
+
+(*--------------------*)
+
+(* no longer needed it seems 
 module Pervasives : sig
   val succ : int -> int
 end
+*)
 
-(* should not be needed if we do'nt use JsNumber.ml *)
+(*--------------------*)
+(* todo: remove when JsNumber.ml becomes .mli file *)
 module Int32 : sig
   val logand : int32 -> int32 -> int32
   val lognot : int32 -> int32
@@ -135,22 +166,6 @@ module Int32 : sig
   val to_float : int32 -> float
 end
 
-
-(*--------------------*)
-(* string operations *)
-
-(* let string_dec s1 s2 = (string_eq s1 s2) *)
-val string_dec : string -> string -> bool
-
-
-(* let append s1 s2 = String.append s1 s2 *)
-val strappend : string -> string -> string 
-
-(* let strlength s = String.length s *)
-val strlength : string -> int
-
-(* let substring n m s = String.sub s n m *)
-val substring : int -> int -> string -> string
 
 
 
@@ -189,6 +204,7 @@ val prerr_newline : unit -> unit
 val prerr_endline : string -> unit
 
 val raise : exn -> 'a
+val stuck : string -> 'a
 
 
 
