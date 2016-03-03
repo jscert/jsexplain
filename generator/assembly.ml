@@ -77,7 +77,7 @@ let hashtbl_keys t =
 
 let files = ref ([]:string list)
 let outputfile = ref None
-let stdlibfile = ref None
+(*let stdlibfile = ref None*)
 
 (* TODO: might be useful to take "basename" from the command line *)
 
@@ -89,15 +89,17 @@ let _ =
    Arg.parse
      [ (* ("-I", Arg.String (fun i -> Clflags.include_dirs := i :: !Clflags.include_dirs),
                       "includes a directory where to look for interface files"); *)
-       ("-stdlib", Arg.String (fun s -> stdlibfile := Some s), "set the stdlib file name");
+       (* ("-stdlib", Arg.String (fun s -> stdlibfile := Some s), "set the stdlib file name"); *)
        ("-o", Arg.String (fun s -> outputfile := Some s), "set the output file name");
        (* ("-debug", Arg.Set debug, "trace the various steps"); *)
        (* ("-mode", Arg.String (fun s -> set_current_mode s), "current mode: unlog, log, or token")*)
      ]
      (fun f -> files := f :: !files)
-     ("usage: [..other options..] -o lineof.js -stdlib file.js file1 file2 ..; \n assuming fileN.log.js and fileN.unlog.js exist.");
+     ("usage: [..other options..] -o lineof.js file1.js file2.js ...");
+     (* -stdlib file.js *)
    if !files = [] then
      failwith "No input file provided";
+   files := List.rev !files;
    let input_filename1 = List.hd !files in
    let dirname = Filename.dirname input_filename1 in
    let output_filename = 
@@ -124,6 +126,7 @@ let _ =
    (*---------------------------------------------------*)
    (* include of stdlib source *)
 
+(*
    begin match !stdlibfile with
    | None -> ()
    | Some filename ->
@@ -131,12 +134,16 @@ let _ =
       put "\n/* --------------------- stdlib --------------------- */\n";
       puts lines;
    end;
+*)
+
+(*  LATER, for escaping sources
+        if Filename.check_suffix filename ".log.js" 
+*)
 
    (*---------------------------------------------------*)
    (* include of logged js files *)
 
-   ~~ List.iter !files (fun filename_noext ->
-      let filename = filename_noext ^ ".log.js" in
+   ~~ List.iter !files (fun filename ->
       let lines = XFile.get_lines filename in
       put (Printf.sprintf "\n/* --------------------- %s --------------------- */\n" filename);
       puts lines;

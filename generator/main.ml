@@ -43,8 +43,16 @@ let _ =
      | Some f -> f ^ ".log.js", f ^ ".unlog.js", f ^ ".token.js"
    in
 
+   (*---------------------------------------------------*)
+   (* set flags *)
+
    if !current_mode <> Mode_cmi
       then Clflags.dont_write_files := true;
+
+   (* TODO: does not work because we don't have easy access to the fully qualified path of constructors
+   if !current_mode <> Mode_unlogged 
+      then generate_qualified_names := true;
+   *)
 
    (*---------------------------------------------------*)
    (* "reading and typing source file" *)

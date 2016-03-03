@@ -21,3 +21,5 @@ let set_current_mode s =
     | "unlog" -> Mode_unlogged
     | "token" -> Mode_line_token
     | _ -> failwith "Invalid mode, chose log, unlog, or token"
+
+let generate_qualified_names = ref false

@@ -1,3 +1,11 @@
+var None = function() {
+   return { type: "option", tag: "None" };
+};
+
+var Some = function(value) {
+   return { type: "option", tag: "Some", value: value };
+};
+
 
 
 var max_float = Number.MAX_VALUE; // TODO: find absolute value for this

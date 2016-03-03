@@ -7,6 +7,8 @@ FIRST
 
 - remove intermediate folder "miniml" in "../jsjsref/miniml/.."
 
+- include a local copy of esprima so that one can work offline
+
 
 =========================================================
 ARTHUR

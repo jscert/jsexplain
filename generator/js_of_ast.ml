@@ -482,7 +482,17 @@ let combine_list_output args =
    (show_list "@,@," strs), (List.flatten bss)
 
 let rec js_of_structure s =
-   combine_list_output (List.map (fun strct -> js_of_structure_item strct) s.str_items)
+   let rec extract_opens acc items =
+      match items with
+      | { str_desc = Tstr_open od }::items2 ->
+         extract_opens (od.open_path::acc) items2
+      | _ -> (List.rev acc, items)
+      in
+   let open_paths, items = extract_opens [] s.str_items in
+   let contents, namesbound = combine_list_output (List.map (fun strct -> js_of_structure_item strct) items) in
+   let prefix = List.fold_left (fun str path -> str ^ "with (" ^ ppf_path path ^ ") {@\n") "" open_paths in
+   let postfix = List.fold_left (fun str path -> str ^ "@\n}// end of with " ^ ppf_path path) "" open_paths in
+   (prefix ^ contents ^ postfix, namesbound)
 
 and js_of_submodule m =
   Printf.printf "warning: code generation is incorrect for local modules\n"; 
@@ -560,8 +570,8 @@ and js_of_expression_wrapped ctx e = (* dest = Dest_return *)
 
 and js_of_expression_naming_argument_if_non_variable ctx obj name_prefix = 
   match obj.exp_desc with
-  | Texp_ident (_, ident,  _) -> 
-      "", (js_of_longident ident)
+  | Texp_ident (path, ident,  _) -> 
+      "", (js_of_path_longident path ident)
   | _ ->  (* generate  var id = sexp;  *)
       let id = id_fresh "_switch_arg_" in
       let sintro = js_of_expression ctx (Dest_assign id) obj in
@@ -572,8 +582,8 @@ and js_of_expression ctx dest e =
   let loc = e.exp_loc in
   match e.exp_desc with
 
-  | Texp_ident (_, ident,  _) -> 
-      let sexp = js_of_longident ident in
+  | Texp_ident (path, ident,  _) -> 
+      let sexp = js_of_path_longident path ident in
       apply_dest ctx dest sexp
 
   | Texp_constant c -> 
@@ -768,8 +778,9 @@ and js_of_constant = function
   | Const_int64     n     -> Int64.to_string n
   | Const_nativeint n     -> Nativeint.to_string n
 
-and js_of_longident loc =
-  match String.concat "." @@ Longident.flatten loc.txt with
+
+and js_of_path_longident path ident =
+  match String.concat "." @@ Longident.flatten ident.txt with
   | "()"  -> unit_repr
   | "+."  -> "+"
   | "*."  -> "*"
@@ -778,13 +789,17 @@ and js_of_longident loc =
   | "/."  -> "/"
   | "="   -> "=="
   | "^"   -> "+" (* !!TODO: we want to claim ability to type our sublanguage, so we should not use this *)
-  | res   -> ppf_ident_name res
+  | res   -> 
+      let res = if !generate_qualified_names && (Path.head path).name <> "Stdlib" 
+                   then ppf_path path else res in
+      ppf_ident_name res
 
 and is_primitive_comparison e =
    match e.exp_desc with
-   | Texp_ident (_, ident,  _) ->
-      let sexp = js_of_longident ident in
+   | Texp_ident (path, ident,  _) ->
+      let sexp = js_of_path_longident path ident in
       sexp = "==="
+      (* TODO: this text could be optimized *)
    | _ -> false
 
 and ident_of_pat pat = match pat.pat_desc with
