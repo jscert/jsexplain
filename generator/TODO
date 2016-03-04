@@ -4,8 +4,6 @@
 FIRST
 [Thomas]
 
-- remove intermediate folder "miniml" in "../jsjsref/miniml/.."
-
 - remove stdlib_js/*   => probably drop it
 
 
