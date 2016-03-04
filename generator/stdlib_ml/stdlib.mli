@@ -4,7 +4,6 @@
 
 (* todo : factorize and clean up *)
 
-
 val ( ~+ ) : int -> int
 val ( ~- ) : int -> int
 val ( + ) : int -> int -> int
@@ -12,17 +11,29 @@ val ( - ) : int -> int -> int
 val ( * ) : int -> int -> int
 val ( / ) : int -> int -> int
 
+(* Alan: I don't think fpclass is needed *)
+
 type fpclass =
   | FP_normal
   | FP_subnormal
   | FP_zero
   | FP_infinite
   | FP_nan
+
+(* Alan: these can be implemented directly, using NaN, Infinity, -Infinity *)
+
 val nan : float
 val infinity : float
 val neg_infinity : float
+
+(* Alan: Do we need these ? *)
+
 val max_float : float
 val min_float : float
+
+(* Alan: these should all be implemented along with the int operations as the JS
+   ones. ** is Math.pow *)
+
 val ( ~+. ) : float -> float
 val ( ~-. ) : float -> float
 val ( +. ) : float -> float -> float
@@ -30,17 +41,32 @@ val ( -. ) : float -> float -> float
 val ( *. ) : float -> float -> float
 val ( /. ) : float -> float -> float
 val ( ** ) : float -> float -> float
+
+(* Alan: Math.abs, if we need it *)
+
 val abs_float : float -> float
+
+(* Alan: % infix *)
+
 val mod_float : float -> float -> float
+
+(* Alan: Why do we need these? If need be, they are all in Math *)
+
 val atan : float -> float
 val exp : float -> float
 val log : float -> float
 val floor : float -> float
 val min : float -> float -> float
 val max : float -> float -> float
+
+(* Alan: do we need this? *)
+
 val classify_float : float -> fpclass
 
 val int_abs : int -> int
+
+(* Alan: Ideally we would add these to the spec, but for the moment conversion
+   to a string is doing a foo+"", and conversion to an int is doing +foo *)
 
 val float_of_int : int -> float
 val float_of_string : string -> float
@@ -76,6 +102,9 @@ val of_int : float -> float (* = fun x -> x *)
 val number_of_int : int -> float  (* = fun x -> float_of_int x *)
 
 val nat_eq : int -> int -> bool (* nat_eq x y = int_eq x y  *)
+
+
+(* Alan: why are these here? *)
 
 val pi : float
 val e : float
@@ -154,6 +183,9 @@ end
 
 (*--------------------*)
 (* todo: remove when JsNumber.ml becomes .mli file *)
+
+(* Alan: I'll do this *)
+
 module Int32 : sig
   val logand : int32 -> int32 -> int32
   val lognot : int32 -> int32
