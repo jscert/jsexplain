@@ -11,7 +11,10 @@ val ( - ) : int -> int -> int
 val ( * ) : int -> int -> int
 val ( / ) : int -> int -> int
 
-(* Alan: I don't think fpclass is needed *)
+(* Alan: I don't think fpclass is needed. To compare numbers, we can use
+   - isNaN https://es5.github.io/#x15.1.2.4
+   - === with Number.POSITIVE_INFINITY or NUMBER.NEGATIVE_INFINITY
+   - === to 0 *)
 
 type fpclass =
   | FP_normal
@@ -20,13 +23,15 @@ type fpclass =
   | FP_infinite
   | FP_nan
 
-(* Alan: these can be implemented directly, using NaN, Infinity, -Infinity *)
+(* Alan: these can be implemented directly, using Number.NaN,
+   Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY *)
 
 val nan : float
 val infinity : float
 val neg_infinity : float
 
-(* Alan: Do we need these ? *)
+(* Alan: Do we need these ? If so, they are Number.MAX_VALUE and
+   Number.MIN_VALUE *)
 
 val max_float : float
 val min_float : float
