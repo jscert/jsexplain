@@ -134,3 +134,6 @@ function esprimaToAST(prog) {
 
   return trProg(prog);
 }
+
+// For testing purposes with node
+module.exports = esprimaToAST;
