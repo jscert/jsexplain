@@ -4,53 +4,53 @@ open LibReflect
 open Shared
 
 type unary_op =
-| Coq_unary_op_delete [@f]  (** Auto Generated Attributes **)
-| Coq_unary_op_void [@f]  (** Auto Generated Attributes **)
-| Coq_unary_op_typeof [@f]  (** Auto Generated Attributes **)
-| Coq_unary_op_post_incr [@f]  (** Auto Generated Attributes **)
-| Coq_unary_op_post_decr [@f]  (** Auto Generated Attributes **)
-| Coq_unary_op_pre_incr [@f]  (** Auto Generated Attributes **)
-| Coq_unary_op_pre_decr [@f]  (** Auto Generated Attributes **)
-| Coq_unary_op_add [@f]  (** Auto Generated Attributes **)
-| Coq_unary_op_neg [@f]  (** Auto Generated Attributes **)
-| Coq_unary_op_bitwise_not [@f]  (** Auto Generated Attributes **)
-| Coq_unary_op_not [@f]  (** Auto Generated Attributes **)
+| Coq_unary_op_delete [@f]
+| Coq_unary_op_void [@f]
+| Coq_unary_op_typeof [@f]
+| Coq_unary_op_post_incr [@f]
+| Coq_unary_op_post_decr [@f]
+| Coq_unary_op_pre_incr [@f]
+| Coq_unary_op_pre_decr [@f]
+| Coq_unary_op_add [@f]
+| Coq_unary_op_neg [@f]
+| Coq_unary_op_bitwise_not [@f]
+| Coq_unary_op_not [@f]
 
 type binary_op =
-| Coq_binary_op_mult [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_div [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_mod [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_add [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_sub [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_left_shift [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_right_shift [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_unsigned_right_shift [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_lt [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_gt [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_le [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_ge [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_instanceof [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_in [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_equal [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_disequal [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_strict_equal [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_strict_disequal [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_bitwise_and [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_bitwise_or [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_bitwise_xor [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_and [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_or [@f]  (** Auto Generated Attributes **)
-| Coq_binary_op_coma [@f]  (** Auto Generated Attributes **)
+| Coq_binary_op_mult [@f]
+| Coq_binary_op_div [@f]
+| Coq_binary_op_mod [@f]
+| Coq_binary_op_add [@f]
+| Coq_binary_op_sub [@f]
+| Coq_binary_op_left_shift [@f]
+| Coq_binary_op_right_shift [@f]
+| Coq_binary_op_unsigned_right_shift [@f]
+| Coq_binary_op_lt [@f]
+| Coq_binary_op_gt [@f]
+| Coq_binary_op_le [@f]
+| Coq_binary_op_ge [@f]
+| Coq_binary_op_instanceof [@f]
+| Coq_binary_op_in [@f]
+| Coq_binary_op_equal [@f]
+| Coq_binary_op_disequal [@f]
+| Coq_binary_op_strict_equal [@f]
+| Coq_binary_op_strict_disequal [@f]
+| Coq_binary_op_bitwise_and [@f]
+| Coq_binary_op_bitwise_or [@f]
+| Coq_binary_op_bitwise_xor [@f]
+| Coq_binary_op_and [@f]
+| Coq_binary_op_or [@f]
+| Coq_binary_op_coma [@f]
 
 type literal =
-| Coq_literal_null [@f]  (** Auto Generated Attributes **)
-| Coq_literal_bool  [@f value] of bool (** Auto Generated Attributes **)
-| Coq_literal_number  [@f value] of JsNumber.number (** Auto Generated Attributes **)
-| Coq_literal_string  [@f value] of string (** Auto Generated Attributes **)
+| Coq_literal_null [@f]
+| Coq_literal_bool  [@f value] of bool
+| Coq_literal_number  [@f value] of JsNumber.number
+| Coq_literal_string  [@f value] of string
 
 type label =
-| Coq_label_empty [@f]  (** Auto Generated Attributes **)
-| Coq_label_string  [@f value] of string (** Auto Generated Attributes **)
+| Coq_label_empty [@f]
+| Coq_label_string  [@f value] of string
 
 type label_set = label list
 
@@ -62,61 +62,61 @@ let strictness_false =
   false
 
 type propname =
-| Coq_propname_identifier  [@f value] of string (** Auto Generated Attributes **)
-| Coq_propname_string  [@f value] of string (** Auto Generated Attributes **)
-| Coq_propname_number  [@f value] of JsNumber.number (** Auto Generated Attributes **)
+| Coq_propname_identifier  [@f value] of string
+| Coq_propname_string  [@f value] of string
+| Coq_propname_number  [@f value] of JsNumber.number
 
 type expr =
-| Coq_expr_this [@f]  (** Auto Generated Attributes **)
-| Coq_expr_identifier  [@f name] of string (** Auto Generated Attributes **)
-| Coq_expr_literal  [@f value] of literal (** Auto Generated Attributes **)
-| Coq_expr_object  [@f fields] of (propname * propbody) list (** Auto Generated Attributes **)
-| Coq_expr_array  [@f elements] of expr option list (** Auto Generated Attributes **)
-| Coq_expr_function  [@f func_name_opt, arg_names, body] of string option * string list * funcbody (** Auto Generated Attributes **)
-| Coq_expr_access  [@f obj, field] of expr * expr (** Auto Generated Attributes **)
-| Coq_expr_member  [@f obj, field_name] of expr * string (** Auto Generated Attributes **)
-| Coq_expr_new  [@f func, args] of expr * expr list (** Auto Generated Attributes **)
-| Coq_expr_call  [@f func, args] of expr * expr list (** Auto Generated Attributes **)
-| Coq_expr_unary_op  [@f op, arg] of unary_op * expr (** Auto Generated Attributes **)
-| Coq_expr_binary_op  [@f arg1, op, arg2] of expr * binary_op * expr (** Auto Generated Attributes **)
-| Coq_expr_conditional  [@f cond, then_branch, else_branch] of expr * expr * expr (** Auto Generated Attributes **)
-| Coq_expr_assign  [@f left_expr, op_opt, right_expr] of expr * binary_op option * expr (** Auto Generated Attributes **)
+| Coq_expr_this [@f]
+| Coq_expr_identifier  [@f name] of string
+| Coq_expr_literal  [@f value] of literal
+| Coq_expr_object  [@f fields] of (propname * propbody) list
+| Coq_expr_array  [@f elements] of expr option list
+| Coq_expr_function  [@f func_name_opt, arg_names, body] of string option * string list * funcbody
+| Coq_expr_access  [@f obj, field] of expr * expr
+| Coq_expr_member  [@f obj, field_name] of expr * string
+| Coq_expr_new  [@f func, args] of expr * expr list
+| Coq_expr_call  [@f func, args] of expr * expr list
+| Coq_expr_unary_op  [@f op, arg] of unary_op * expr
+| Coq_expr_binary_op  [@f arg1, op, arg2] of expr * binary_op * expr
+| Coq_expr_conditional  [@f cond, then_branch, else_branch] of expr * expr * expr
+| Coq_expr_assign  [@f left_expr, op_opt, right_expr] of expr * binary_op option * expr
 and propbody =
-| Coq_propbody_val  [@f expr] of expr (** Auto Generated Attributes **)
-| Coq_propbody_get  [@f body] of funcbody (** Auto Generated Attributes **)
-| Coq_propbody_set  [@f names, body] of string list * funcbody (** Auto Generated Attributes **)
+| Coq_propbody_val  [@f expr] of expr
+| Coq_propbody_get  [@f body] of funcbody
+| Coq_propbody_set  [@f names, body] of string list * funcbody
 and funcbody =
-| Coq_funcbody_intro  [@f prog, source] of prog * string (** Auto Generated Attributes **)
+| Coq_funcbody_intro  [@f prog, source] of prog * string
 and stat =
-| Coq_stat_expr  [@f expr] of expr (** Auto Generated Attributes **)
-| Coq_stat_label  [@f label, stat] of string * stat (** Auto Generated Attributes **)
-| Coq_stat_block  [@f stats] of stat list (** Auto Generated Attributes **)
-| Coq_stat_var_decl  [@f decls] of (string * expr option) list (** Auto Generated Attributes **)
-| Coq_stat_if  [@f cond, then_branch, else_branch] of expr * stat * stat option (** Auto Generated Attributes **)
-| Coq_stat_do_while  [@f labels, body, cond] of label_set * stat * expr (** Auto Generated Attributes **)
-| Coq_stat_while  [@f labels, cond, body] of label_set * expr * stat (** Auto Generated Attributes **)
-| Coq_stat_with  [@f obj, stat] of expr * stat (** Auto Generated Attributes **)
-| Coq_stat_throw  [@f arg] of expr (** Auto Generated Attributes **)
-| Coq_stat_return  [@f arg_opt] of expr option (** Auto Generated Attributes **)
-| Coq_stat_break  [@f label] of label (** Auto Generated Attributes **)
-| Coq_stat_continue  [@f label] of label (** Auto Generated Attributes **)
-| Coq_stat_try  [@f body, catch_stats_opt, finally_opt] of stat * (string * stat) option * stat option (** Auto Generated Attributes **)
-| Coq_stat_for  [@f labels, init, cond, step, body] of label_set * expr option * expr option * expr option * stat (** Auto Generated Attributes **)
-| Coq_stat_for_var  [@f labels, init, cond, step, body] of label_set * (string * expr option) list * expr option * expr option * stat (** Auto Generated Attributes **)
-| Coq_stat_for_in  [@f labels, id, obj, body] of label_set * expr * expr * stat (** Auto Generated Attributes **)
-| Coq_stat_for_in_var  [@f labels, id, init, obj, body] of label_set * string * expr option * expr * stat (** Auto Generated Attributes **)
-| Coq_stat_debugger [@f]  (** Auto Generated Attributes **)
-| Coq_stat_switch  [@f labels, arg, body] of label_set * expr * switchbody (** Auto Generated Attributes **)
+| Coq_stat_expr  [@f expr] of expr
+| Coq_stat_label  [@f label, stat] of string * stat
+| Coq_stat_block  [@f stats] of stat list
+| Coq_stat_var_decl  [@f decls] of (string * expr option) list
+| Coq_stat_if  [@f cond, then_branch, else_branch] of expr * stat * stat option
+| Coq_stat_do_while  [@f labels, body, cond] of label_set * stat * expr
+| Coq_stat_while  [@f labels, cond, body] of label_set * expr * stat
+| Coq_stat_with  [@f obj, stat] of expr * stat
+| Coq_stat_throw  [@f arg] of expr
+| Coq_stat_return  [@f arg_opt] of expr option
+| Coq_stat_break  [@f label] of label
+| Coq_stat_continue  [@f label] of label
+| Coq_stat_try  [@f body, catch_stats_opt, finally_opt] of stat * (string * stat) option * stat option
+| Coq_stat_for  [@f labels, init, cond, step, body] of label_set * expr option * expr option * expr option * stat
+| Coq_stat_for_var  [@f labels, init, cond, step, body] of label_set * (string * expr option) list * expr option * expr option * stat
+| Coq_stat_for_in  [@f labels, id, obj, body] of label_set * expr * expr * stat
+| Coq_stat_for_in_var  [@f labels, id, init, obj, body] of label_set * string * expr option * expr * stat
+| Coq_stat_debugger [@f]
+| Coq_stat_switch  [@f labels, arg, body] of label_set * expr * switchbody
 and switchbody =
-| Coq_switchbody_nodefault  [@f clauses] of switchclause list (** Auto Generated Attributes **)
-| Coq_switchbody_withdefault  [@f clauses_before, clause_default, clauses_after] of switchclause list * stat list * switchclause list (** Auto Generated Attributes **)
+| Coq_switchbody_nodefault  [@f clauses] of switchclause list
+| Coq_switchbody_withdefault  [@f clauses_before, clause_default, clauses_after] of switchclause list * stat list * switchclause list
 and switchclause =
-| Coq_switchclause_intro  [@f arg, stats] of expr * stat list (** Auto Generated Attributes **)
+| Coq_switchclause_intro  [@f arg, stats] of expr * stat list
 and prog =
-| Coq_prog_intro  [@f strictness, elements] of strictness_flag * element list (** Auto Generated Attributes **)
+| Coq_prog_intro  [@f strictness, elements] of strictness_flag * element list
 and element =
-| Coq_element_stat  [@f stat] of stat (** Auto Generated Attributes **)
-| Coq_element_func_decl  [@f func_name, arg_names, body] of string * string list * funcbody (** Auto Generated Attributes **)
+| Coq_element_stat  [@f stat] of stat
+| Coq_element_func_decl  [@f func_name, arg_names, body] of string * string list * funcbody
 
 type propdefs = (propname * propbody) list
 
@@ -139,160 +139,160 @@ let funcdecl_parameters x = x.funcdecl_parameters
 let funcdecl_body x = x.funcdecl_body
 
 type mathop =
-| Coq_mathop_abs [@f]  (** Auto Generated Attributes **)
+| Coq_mathop_abs [@f]
 
 type native_error =
-| Coq_native_error_eval [@f]  (** Auto Generated Attributes **)
-| Coq_native_error_range [@f]  (** Auto Generated Attributes **)
-| Coq_native_error_ref [@f]  (** Auto Generated Attributes **)
-| Coq_native_error_syntax [@f]  (** Auto Generated Attributes **)
-| Coq_native_error_type [@f]  (** Auto Generated Attributes **)
-| Coq_native_error_uri [@f]  (** Auto Generated Attributes **)
+| Coq_native_error_eval [@f]
+| Coq_native_error_range [@f]
+| Coq_native_error_ref [@f]
+| Coq_native_error_syntax [@f]
+| Coq_native_error_type [@f]
+| Coq_native_error_uri [@f]
 
 type prealloc =
-| Coq_prealloc_global [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_global_eval [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_global_parse_int [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_global_parse_float [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_global_is_finite [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_global_is_nan [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_global_decode_uri [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_global_decode_uri_component [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_global_encode_uri [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_global_encode_uri_component [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_get_proto_of [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_get_own_prop_descriptor [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_get_own_prop_name [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_create [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_define_prop [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_define_props [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_seal [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_freeze [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_prevent_extensions [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_is_sealed [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_is_frozen [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_is_extensible [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_keys [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_keys_call [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_proto [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_proto_to_string [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_proto_value_of [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_proto_has_own_prop [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_proto_is_prototype_of [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_object_proto_prop_is_enumerable [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_function [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_function_proto [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_function_proto_to_string [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_function_proto_apply [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_function_proto_call [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_function_proto_bind [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_bool [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_bool_proto [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_bool_proto_to_string [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_bool_proto_value_of [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_number [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_number_proto [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_number_proto_to_string [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_number_proto_value_of [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_number_proto_to_fixed [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_number_proto_to_exponential [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_number_proto_to_precision [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_array [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_array_is_array [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_array_proto [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_array_proto_to_string [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_array_proto_join [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_array_proto_pop [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_array_proto_push [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_string [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_string_proto [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_string_proto_to_string [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_string_proto_value_of [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_string_proto_char_at [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_string_proto_char_code_at [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_math [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_mathop  [@f mathop] of mathop (** Auto Generated Attributes **)
-| Coq_prealloc_date [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_regexp [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_error [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_error_proto [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_native_error  [@f error] of native_error (** Auto Generated Attributes **)
-| Coq_prealloc_native_error_proto  [@f error] of native_error (** Auto Generated Attributes **)
-| Coq_prealloc_error_proto_to_string [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_throw_type_error [@f]  (** Auto Generated Attributes **)
-| Coq_prealloc_json [@f]  (** Auto Generated Attributes **)
+| Coq_prealloc_global [@f]
+| Coq_prealloc_global_eval [@f]
+| Coq_prealloc_global_parse_int [@f]
+| Coq_prealloc_global_parse_float [@f]
+| Coq_prealloc_global_is_finite [@f]
+| Coq_prealloc_global_is_nan [@f]
+| Coq_prealloc_global_decode_uri [@f]
+| Coq_prealloc_global_decode_uri_component [@f]
+| Coq_prealloc_global_encode_uri [@f]
+| Coq_prealloc_global_encode_uri_component [@f]
+| Coq_prealloc_object [@f]
+| Coq_prealloc_object_get_proto_of [@f]
+| Coq_prealloc_object_get_own_prop_descriptor [@f]
+| Coq_prealloc_object_get_own_prop_name [@f]
+| Coq_prealloc_object_create [@f]
+| Coq_prealloc_object_define_prop [@f]
+| Coq_prealloc_object_define_props [@f]
+| Coq_prealloc_object_seal [@f]
+| Coq_prealloc_object_freeze [@f]
+| Coq_prealloc_object_prevent_extensions [@f]
+| Coq_prealloc_object_is_sealed [@f]
+| Coq_prealloc_object_is_frozen [@f]
+| Coq_prealloc_object_is_extensible [@f]
+| Coq_prealloc_object_keys [@f]
+| Coq_prealloc_object_keys_call [@f]
+| Coq_prealloc_object_proto [@f]
+| Coq_prealloc_object_proto_to_string [@f]
+| Coq_prealloc_object_proto_value_of [@f]
+| Coq_prealloc_object_proto_has_own_prop [@f]
+| Coq_prealloc_object_proto_is_prototype_of [@f]
+| Coq_prealloc_object_proto_prop_is_enumerable [@f]
+| Coq_prealloc_function [@f]
+| Coq_prealloc_function_proto [@f]
+| Coq_prealloc_function_proto_to_string [@f]
+| Coq_prealloc_function_proto_apply [@f]
+| Coq_prealloc_function_proto_call [@f]
+| Coq_prealloc_function_proto_bind [@f]
+| Coq_prealloc_bool [@f]
+| Coq_prealloc_bool_proto [@f]
+| Coq_prealloc_bool_proto_to_string [@f]
+| Coq_prealloc_bool_proto_value_of [@f]
+| Coq_prealloc_number [@f]
+| Coq_prealloc_number_proto [@f]
+| Coq_prealloc_number_proto_to_string [@f]
+| Coq_prealloc_number_proto_value_of [@f]
+| Coq_prealloc_number_proto_to_fixed [@f]
+| Coq_prealloc_number_proto_to_exponential [@f]
+| Coq_prealloc_number_proto_to_precision [@f]
+| Coq_prealloc_array [@f]
+| Coq_prealloc_array_is_array [@f]
+| Coq_prealloc_array_proto [@f]
+| Coq_prealloc_array_proto_to_string [@f]
+| Coq_prealloc_array_proto_join [@f]
+| Coq_prealloc_array_proto_pop [@f]
+| Coq_prealloc_array_proto_push [@f]
+| Coq_prealloc_string [@f]
+| Coq_prealloc_string_proto [@f]
+| Coq_prealloc_string_proto_to_string [@f]
+| Coq_prealloc_string_proto_value_of [@f]
+| Coq_prealloc_string_proto_char_at [@f]
+| Coq_prealloc_string_proto_char_code_at [@f]
+| Coq_prealloc_math [@f]
+| Coq_prealloc_mathop  [@f mathop] of mathop
+| Coq_prealloc_date [@f]
+| Coq_prealloc_regexp [@f]
+| Coq_prealloc_error [@f]
+| Coq_prealloc_error_proto [@f]
+| Coq_prealloc_native_error  [@f error] of native_error
+| Coq_prealloc_native_error_proto  [@f error] of native_error
+| Coq_prealloc_error_proto_to_string [@f]
+| Coq_prealloc_throw_type_error [@f]
+| Coq_prealloc_json [@f]
 
 type call =
-| Coq_call_default [@f]  (** Auto Generated Attributes **)
-| Coq_call_after_bind [@f]  (** Auto Generated Attributes **)
-| Coq_call_prealloc  [@f prealloc] of prealloc (** Auto Generated Attributes **)
+| Coq_call_default [@f]
+| Coq_call_after_bind [@f]
+| Coq_call_prealloc  [@f prealloc] of prealloc
 
 type construct =
-| Coq_construct_default [@f]  (** Auto Generated Attributes **)
-| Coq_construct_after_bind [@f]  (** Auto Generated Attributes **)
-| Coq_construct_prealloc  [@f prealloc] of prealloc (** Auto Generated Attributes **)
+| Coq_construct_default [@f]
+| Coq_construct_after_bind [@f]
+| Coq_construct_prealloc  [@f prealloc] of prealloc
 
 type builtin_has_instance =
-| Coq_builtin_has_instance_function [@f]  (** Auto Generated Attributes **)
-| Coq_builtin_has_instance_after_bind [@f]  (** Auto Generated Attributes **)
+| Coq_builtin_has_instance_function [@f]
+| Coq_builtin_has_instance_after_bind [@f]
 
 type builtin_get =
-| Coq_builtin_get_default [@f]  (** Auto Generated Attributes **)
-| Coq_builtin_get_function [@f]  (** Auto Generated Attributes **)
-| Coq_builtin_get_args_obj [@f]  (** Auto Generated Attributes **)
+| Coq_builtin_get_default [@f]
+| Coq_builtin_get_function [@f]
+| Coq_builtin_get_args_obj [@f]
 
 type builtin_get_own_prop =
-| Coq_builtin_get_own_prop_default [@f]  (** Auto Generated Attributes **)
-| Coq_builtin_get_own_prop_args_obj [@f]  (** Auto Generated Attributes **)
-| Coq_builtin_get_own_prop_string [@f]  (** Auto Generated Attributes **)
+| Coq_builtin_get_own_prop_default [@f]
+| Coq_builtin_get_own_prop_args_obj [@f]
+| Coq_builtin_get_own_prop_string [@f]
 
 type builtin_get_prop =
-| Coq_builtin_get_prop_default [@f]  (** Auto Generated Attributes **)
+| Coq_builtin_get_prop_default [@f]
 
 type builtin_put =
-| Coq_builtin_put_default [@f]  (** Auto Generated Attributes **)
+| Coq_builtin_put_default [@f]
 
 type builtin_can_put =
-| Coq_builtin_can_put_default [@f]  (** Auto Generated Attributes **)
+| Coq_builtin_can_put_default [@f]
 
 type builtin_has_prop =
-| Coq_builtin_has_prop_default [@f]  (** Auto Generated Attributes **)
+| Coq_builtin_has_prop_default [@f]
 
 type builtin_delete =
-| Coq_builtin_delete_default [@f]  (** Auto Generated Attributes **)
-| Coq_builtin_delete_args_obj [@f]  (** Auto Generated Attributes **)
+| Coq_builtin_delete_default [@f]
+| Coq_builtin_delete_args_obj [@f]
 
 type builtin_default_value =
-| Coq_builtin_default_value_default [@f]  (** Auto Generated Attributes **)
+| Coq_builtin_default_value_default [@f]
 
 type builtin_define_own_prop =
-| Coq_builtin_define_own_prop_default [@f]  (** Auto Generated Attributes **)
-| Coq_builtin_define_own_prop_array [@f]  (** Auto Generated Attributes **)
-| Coq_builtin_define_own_prop_args_obj [@f]  (** Auto Generated Attributes **)
+| Coq_builtin_define_own_prop_default [@f]
+| Coq_builtin_define_own_prop_array [@f]
+| Coq_builtin_define_own_prop_args_obj [@f]
 
 type object_loc =
-| Coq_object_loc_normal  [@f address] of int (** Auto Generated Attributes **)
-| Coq_object_loc_prealloc  [@f prealloc] of prealloc (** Auto Generated Attributes **)
+| Coq_object_loc_normal  [@f address] of int
+| Coq_object_loc_prealloc  [@f prealloc] of prealloc
 
 type prim =
-| Coq_prim_undef [@f]  (** Auto Generated Attributes **)
-| Coq_prim_null [@f]  (** Auto Generated Attributes **)
-| Coq_prim_bool  [@f value] of bool (** Auto Generated Attributes **)
-| Coq_prim_number  [@f value] of JsNumber.number (** Auto Generated Attributes **)
-| Coq_prim_string  [@f value] of string (** Auto Generated Attributes **)
+| Coq_prim_undef [@f]
+| Coq_prim_null [@f]
+| Coq_prim_bool  [@f value] of bool
+| Coq_prim_number  [@f value] of JsNumber.number
+| Coq_prim_string  [@f value] of string
 
 type value =
-| Coq_value_prim  [@f value] of prim (** Auto Generated Attributes **)
-| Coq_value_object  [@f value] of object_loc (** Auto Generated Attributes **)
+| Coq_value_prim  [@f value] of prim
+| Coq_value_object  [@f value] of object_loc
 
 type coq_type =
-| Coq_type_undef [@f]  (** Auto Generated Attributes **)
-| Coq_type_null [@f]  (** Auto Generated Attributes **)
-| Coq_type_bool [@f]  (** Auto Generated Attributes **)
-| Coq_type_number [@f]  (** Auto Generated Attributes **)
-| Coq_type_string [@f]  (** Auto Generated Attributes **)
-| Coq_type_object [@f]  (** Auto Generated Attributes **)
+| Coq_type_undef [@f]
+| Coq_type_null [@f]
+| Coq_type_bool [@f]
+| Coq_type_number [@f]
+| Coq_type_string [@f]
+| Coq_type_object [@f]
 
 type attributes_data = { attributes_data_value : value;
                          attributes_data_writable : bool;
@@ -337,8 +337,8 @@ let attributes_accessor_enumerable x = x.attributes_accessor_enumerable
 let attributes_accessor_configurable x = x.attributes_accessor_configurable
 
 type attributes =
-| Coq_attributes_data_of [@f value] of attributes_data (** Auto Generated Attributes **)
-| Coq_attributes_accessor_of [@f value] of attributes_accessor (** Auto Generated Attributes **)
+| Coq_attributes_data_of [@f value] of attributes_data
+| Coq_attributes_accessor_of [@f value] of attributes_accessor
 
 type descriptor = { descriptor_value : value option;
                     descriptor_writable : bool option;
@@ -372,22 +372,22 @@ let descriptor_enumerable x = x.descriptor_enumerable
 let descriptor_configurable x = x.descriptor_configurable
 
 type full_descriptor =
-| Coq_full_descriptor_undef [@f]  (** Auto Generated Attributes **)
-| Coq_full_descriptor_some  [@f value] of attributes (** Auto Generated Attributes **)
+| Coq_full_descriptor_undef [@f]
+| Coq_full_descriptor_some  [@f value] of attributes
 
 type mutability =
-| Coq_mutability_uninitialized_immutable [@f]  (** Auto Generated Attributes **)
-| Coq_mutability_immutable [@f]  (** Auto Generated Attributes **)
-| Coq_mutability_nondeletable [@f]  (** Auto Generated Attributes **)
-| Coq_mutability_deletable [@f]  (** Auto Generated Attributes **)
+| Coq_mutability_uninitialized_immutable [@f]
+| Coq_mutability_immutable [@f]
+| Coq_mutability_nondeletable [@f]
+| Coq_mutability_deletable [@f]
 
 type decl_env_record = (string, mutability * value) Heap.heap
 
 type provide_this_flag = bool
 
 type env_record =
-| Coq_env_record_decl  [@f value] of decl_env_record (** Auto Generated Attributes **)
-| Coq_env_record_object  [@f value, provide_this] of object_loc * provide_this_flag (** Auto Generated Attributes **)
+| Coq_env_record_decl  [@f value] of decl_env_record
+| Coq_env_record_object  [@f value, provide_this] of object_loc * provide_this_flag
 
 type env_loc = int
 
@@ -421,8 +421,8 @@ let execution_ctx_strict x = x.execution_ctx_strict
 type prop_name = string
 
 type ref_base_type =
-| Coq_ref_base_type_value  [@f value] of value (** Auto Generated Attributes **)
-| Coq_ref_base_type_env_loc  [@f value] of env_loc (** Auto Generated Attributes **)
+| Coq_ref_base_type_value  [@f value] of value
+| Coq_ref_base_type_env_loc  [@f value] of env_loc
 
 type ref = { ref_base : ref_base_type; ref_name : prop_name;
              ref_strict : bool }
@@ -564,10 +564,10 @@ let object_bound_args_ x = x.object_bound_args_
 let object_parameter_map_ x = x.object_parameter_map_
 
 type event =
-| Coq_delete_event  [@f loc, name, locopt] of object_loc * prop_name * object_loc option (** Auto Generated Attributes **)
-| Coq_mutateproto_event  [@f loc, fields] of object_loc * (object_loc * prop_name) list (** Auto Generated Attributes **)
+| Coq_delete_event  [@f loc, name, locopt] of object_loc * prop_name * object_loc option
+| Coq_mutateproto_event  [@f loc, fields] of object_loc * (object_loc * prop_name) list
    * (object_loc * prop_name) list
-| Coq_enumchange_event  [@f loc, name] of object_loc * prop_name (** Auto Generated Attributes **)
+| Coq_enumchange_event  [@f loc, name] of object_loc * prop_name
 
 type state = { state_object_heap : (object_loc, coq_object) Heap.heap;
                state_env_record_heap : (env_loc, env_record) Heap.heap;
@@ -583,16 +583,16 @@ let state_object_heap x = x.state_object_heap
 let state_env_record_heap x = x.state_env_record_heap
 
 type restype =
-| Coq_restype_normal [@f]  (** Auto Generated Attributes **)
-| Coq_restype_break [@f]  (** Auto Generated Attributes **)
-| Coq_restype_continue [@f]  (** Auto Generated Attributes **)
-| Coq_restype_return [@f]  (** Auto Generated Attributes **)
-| Coq_restype_throw [@f]  (** Auto Generated Attributes **)
+| Coq_restype_normal [@f]
+| Coq_restype_break [@f]
+| Coq_restype_continue [@f]
+| Coq_restype_return [@f]
+| Coq_restype_throw [@f]
 
 type resvalue =
-| Coq_resvalue_empty [@f]  (** Auto Generated Attributes **)
-| Coq_resvalue_value  [@f value] of value (** Auto Generated Attributes **)
-| Coq_resvalue_ref  [@f value] of ref (** Auto Generated Attributes **)
+| Coq_resvalue_empty [@f]
+| Coq_resvalue_value  [@f value] of value
+| Coq_resvalue_ref  [@f value] of ref
 
 type res = { res_type : restype; res_value : resvalue; res_label : label }
 
@@ -657,8 +657,8 @@ let res_throw v =
     Coq_label_empty }
 
 type out =
-| Coq_out_div [@f]  (** Auto Generated Attributes **)
-| Coq_out_ter  [@f state, res] of state * res (** Auto Generated Attributes **)
+| Coq_out_div [@f]
+| Coq_out_ter  [@f state, res] of state * res
 
 (** val out_void : state -> out **)
 
@@ -666,11 +666,11 @@ let out_void s =
   Coq_out_ter (s, res_empty)
 
 type 't specret =
-| Coq_specret_val  [@f state, res] of state * 't (** Auto Generated Attributes **)
-| Coq_specret_out  [@f out] of out (** Auto Generated Attributes **)
+| Coq_specret_val  [@f state, res] of state * 't
+| Coq_specret_out  [@f out] of out
 
 type codetype =
-| Coq_codetype_func [@f]  (** Auto Generated Attributes **)
-| Coq_codetype_global [@f]  (** Auto Generated Attributes **)
-| Coq_codetype_eval [@f]  (** Auto Generated Attributes **)
+| Coq_codetype_func [@f]
+| Coq_codetype_global [@f]
+| Coq_codetype_eval [@f]
 
