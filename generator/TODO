@@ -42,9 +42,9 @@ NEXT
 - in JsInterpreter let append = strappend (* hack for compatibility, to do cleanup *)
 
 [thomas, biggest piece, ask if anything problematic]
-- fill in the "esprima-to-ast.js" file, following the template
-  (throw an exception, caught and displayed as an alert message,
-   in case the source program uses for-in).
+- esprima-to-ast.js outstanding issues:
+  - switch (horrific)
+  - function body source
 - update the code that translates esprima syntax to recognize
   "use strict" directives, which come as first statement of
   a body, in hte form of a raw expression of raw type "use script".

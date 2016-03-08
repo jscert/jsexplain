@@ -266,12 +266,17 @@ function esprimaToAST(prog) {
       // This is precisely what interp/src/translate_syntax.ml does...
       r.labels = toList([]);
     } else if (stat.type === "ForInStatement") {
+      throw new UnsupportedSyntaxError("We don't support for-in.", stat);
+
+      // Everything below here is for when we do support for-in ;P
+
       if (stat.left.type === "VariableDeclaration") {
         r.tag = "Coq_stat_for_in_var";
         if (stat.left.declarations.length != 1) {
           throw new EsprimaToASTError("ForInStatement: Wrong number of declarations.", stat);
         }
-        // FIXME: Technically, the declaration should be executed, but this doesn't match our JsSyntax type signature
+        // TODO: Technically, the declaration should be executed, but this
+        // doesn't match our (current, broken) JsSyntax type signature
         r.id = trStat(stat.left).decls.head[0];
       } else {
         r.tag = "Coq_stat_for_in";
@@ -280,6 +285,7 @@ function esprimaToAST(prog) {
       r.obj = trExpr(stat.right);
       r.body = trStat(stat.body);
       r.labels = toList([]);
+
     } else if (stat.type === "VariableDeclaration") {
       r.tag = "Coq_stat_var_decl";
       if ("kind" in stat && stat.kind !== "var") {
