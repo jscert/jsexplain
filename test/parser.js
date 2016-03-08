@@ -148,6 +148,12 @@ function typecheckAST(ast) {
       return type;
     }
 
+    // Test for tuple types
+    if (type.endsWith(')')) {
+      type = type.substring(1, type.length - 1);
+      return type.split('*').map(s => s.trim());
+    }
+
     // Test for poly type
     var i = type.lastIndexOf(' ');
     if (i >= 0) {
@@ -170,14 +176,13 @@ function typecheckAST(ast) {
     }
   };
 
-  var errorMsg = function (value, msg) {
-    return _ => esprimaToAST.toString(value, 1) + " " + msg;
-  };
-
   var typecheck = function(type, value) {
     var t = getType(type);
     if (isBaseType(t)) {
       assert(t === typeof value, errorMsg(value, "was expected to have type of "+t));
+    } else if (t instanceof Array) {
+      assert.instanceOf(value, Array);
+      t.forEach((type, index) => typecheck(type, value[index]));
     } else {
       assert(value.hasOwnProperty("type"), errorMsg(value, "doesn't have a type property"));
       assert.strictEqual(t._typeName, value.type);
@@ -192,6 +197,10 @@ function typecheckAST(ast) {
         typecheck(constructor[field], value[field]);
       });
     }
+  };
+
+  var errorMsg = function (value, msg) {
+    return _ => esprimaToAST.toString(value, 3) + " " + msg;
   };
 
   return typecheck("prog", ast);
@@ -241,6 +250,7 @@ walk(test262path)
           } catch (e) {
             if (e instanceof esprimaToAST.UnsupportedSyntaxError) {
             } else {
+              console.log(JSON.stringify(ast, null, 2));
               throw e;
             }
           }
