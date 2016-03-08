@@ -4,9 +4,9 @@
 
 function esprimaToAST(prog) {
   var toList = function (array) {
-    var r = {tag: "[]"};
+    var r = {type: "list", tag: "[]"};
     for (var i = array.length - 1; i >= 0; i--) {
-      r = {tag: "::", head: array[i], tail: r};
+      r = {type: "list", tag: "::", head: array[i], tail: r};
     }
     return r;
   };
