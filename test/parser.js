@@ -13,7 +13,7 @@ var tests = [];
  * Returns: a string if type of failure specified, true, or false
  */
 function testNegativity(str) {
-  var result = /@negative\s*(\w*)?\s*$/m.exec(str);
+  var result = /@negative[ \t]*(\S*)?[ \t]*$/m.exec(str);
   if(result) {
     result = result[1] || true;
   } else {
@@ -48,15 +48,15 @@ walk(test262path)
         before(function(done) {
           fs.readFile(item).then(
             data => {
-              source = data;
-              negative = isParserNegativeTest(data);
+              source = data.toString();
+              negative = isParserNegativeTest(source);
             }
           ).then(done);
         });
 
         it('parses', function() {
           try {
-            esprima.parse(source);
+            esprima.parse(source, {loc: true});
           } catch(e) {
             if (!negative) {
               throw e;
@@ -64,13 +64,20 @@ walk(test262path)
           }
         });
 
-        it('converts', function(done) {
+        it('converts', function() {
           var prog;
           try {
-            prog = esprima.parse(source);
-          } catch(e) {}
+            prog = esprima.parse(source, {loc: true});
+          } catch(e) { return; }
 
-          esprimaToAST(prog);
+          try {
+            esprimaToAST.esprimaToAST(prog);
+          } catch (e) {
+            if (e instanceof esprimaToAST.UnsupportedSyntaxError) {
+            } else {
+              throw e;
+            }
+          }
         });
       })
     });
