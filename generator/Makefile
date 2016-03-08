@@ -179,7 +179,7 @@ stdlib: $(STDLIB_DIR)/stdlib.cmi
 #####################################################################
 # Clean
 
-DIRTY_EXTS := cmi,token.js,log.js,unlog.js,d,ml.d,mli.d
+DIRTY_EXTS := cmi,token.js,log.js,unlog.js,d,ml.d,mli.d,js.pre
 
 clean_genjs:
 	rm -f $(JSREF_PATH)/lineof.js
