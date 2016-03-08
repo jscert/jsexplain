@@ -75,7 +75,7 @@ function esprimaToAST(prog) {
     var r = {loc: loc, type: "element"};
     if (stat.type === "FunctionDeclaration") {
       r.tag = "Coq_element_func_decl";
-      r.func_name = stat.id;
+      r.func_name = trIdentifier(stat.id);
       r.arg_names = trParams(stat.params);
       // TODO this could be detected by stat.expression of type bool
       r.body = trBlockStatAsFuncbody(stat.body);
@@ -120,11 +120,19 @@ function esprimaToAST(prog) {
   // return string until ES6 support is required
   var trPattern = function (pat) {
     if (pat.type === "Identifier") {
-      return pat.name;
+      return trIdentifier(pat);
     } else {
       throw new EsprimaToASTError("trPattern error: " + pat.type, pat);
     }
   };
+
+  var trIdentifier = function (ident) {
+    if (ident.type === "Identifier") {
+      return ident.name;
+    } else {
+      throw new EsprimaToASTError("Expected Identifier, got: " + ident.type);
+    }
+  }
 
   // return the encoding of a pair
   var trVarDecl = function (decl) {
@@ -145,7 +153,7 @@ function esprimaToAST(prog) {
     if (property.key.type === "Literal") {
       name = property.key.value; // value cannot be null due to parse tree
     } else if (property.key.type === "Identifier") {
-      name = property.key.name;
+      name = trIdentifier(property.key);
     } else {
       throw new EsprimaToASTError("trProperty called with wrong identifier type: " + property.type);
     }
@@ -397,17 +405,14 @@ function esprimaToAST(prog) {
     } else if (expr.type === "MemberExpression" && !expr.computed) {
       r.tag = "Coq_expr_member";
       r.obj = trExpr(expr.object);
-      if (expr.property.type !== "Identifier") {
-        throw new EsprimaToASTError("MemberExpression expected Identifier type for property, got: " + expr.property);
-      }
-      r.field_name = expr.property.name;
+      r.field_name = trIdentifier(expr.property);
     } else if (expr.type === "MemberExpression" && expr.computed) {
       r.tag = "Coq_expr_access";
       r.obj = trExpr(expr.object);
       r.field = trExpr(expr.property);
     } else if (expr.type === "Identifier") {
       r.tag = "Coq_expr_identifier";
-      r.name = expr.name;
+      r.name = trIdentifier(expr);
     } else if (expr.type === "Literal") {
       r.tag = "Coq_expr_literal";
       r.value = trExprAsLiteral(expr);
