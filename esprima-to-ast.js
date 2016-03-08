@@ -508,26 +508,31 @@ function esprimaToAST(prog) {
 
 
 /* Custom Error handler with JSON pretty-printing */
-function ASTErrorJSONReplacer(key, value, depth) {
-  if (depth === undefined) { depth = 3; }
 
-  if (typeof value === "object") {
-    if (depth > 0) {
-      for (var nestKey in value) {
-        value[nestKey] = ASTErrorJSONReplacer(nestKey, value[nestKey], depth - 1);
+function toString(ast, maxDepth) {
+  if (maxDepth === undefined) { maxDepth = 3; }
+
+  return JSON.stringify(ast, function ASTErrorJSONReplacer(key, value, depth) {
+    if (depth === undefined) { depth = maxDepth; }
+
+    if (typeof value === "object") {
+      if (depth > 0) {
+        for (var nestKey in value) {
+          value[nestKey] = ASTErrorJSONReplacer(nestKey, value[nestKey], depth - 1);
+        }
+      } else {
+        value = "RECURSION TRUNCATED";
       }
-    } else {
-      value = "RECURSION TRUNCATED";
     }
-  }
 
-  return value;
+    return value;
+  }, 2);
 }
 
 function NewASTErrorType(name, parentError) {
   var error = function (message, expr) {
     this.name = name;
-    this.message = message + "\n" + JSON.stringify(expr, ASTErrorJSONReplacer, 2);
+    this.message = message + "\n" + toString(expr);
     if (Error.captureStackTrace) { Error.captureStackTrace(this, error); }
   }
   error.prototype = Object.create(parentError.prototype);
@@ -541,3 +546,4 @@ var UnsupportedSyntaxError = NewASTErrorType("UnsupportedSyntaxError", EsprimaTo
 module.exports.esprimaToAST = esprimaToAST;
 module.exports.EsprimaToASTError = EsprimaToASTError;
 module.exports.UnsupportedSyntaxError = UnsupportedSyntaxError;
+module.exports.toString = toString;
