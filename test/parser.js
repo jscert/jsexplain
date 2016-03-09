@@ -247,7 +247,6 @@ walk(test262path)
           } catch (e) {
             if (e instanceof esprimaToAST.UnsupportedSyntaxError) {
             } else {
-              console.log(JSON.stringify(ast, null, 2));
               throw e;
             }
           }

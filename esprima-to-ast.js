@@ -191,6 +191,20 @@ function esprimaToAST(prog) {
     return [trPattern(clause.param), trBlockStat(clause.body)];
   };
 
+  var trSwitchCase = function (scase) {
+    if (scase.type !== "SwitchCase") {
+      throw new EsprimaToASTError("trSwitchCase called with wrong type: " + clause.type);
+    }
+    return {
+      type: "switchclause",
+      tag: "Coq_switchclause_intro",
+      loc: toLoc(scase.loc),
+      arg: trExpr(scase.test),
+      stats: toList(scase.consequent.map(trStat))
+    };
+  }
+
+
   /*** Statements ***/
 
   var trBlockStat = function (stat) {
@@ -234,9 +248,23 @@ function esprimaToAST(prog) {
       r.obj = trExpr(stat.object);
       r.stat = trStat(stat.body);
     } else if (stat.type === "SwitchStatement") {
-      throw new EsprimaToASTError("switch");
       r.tag = "Coq_stat_switch";
       r.arg = trExpr(stat.discriminant);
+      r.labels = toList([]);
+      r.body = { type: "switchbody" };
+
+      // Find the index of the default clause (if any)
+      var index = stat.cases.findIndex(clause => clause.test === null);
+      if (index >= 0) {
+        r.body.tag = "Coq_switchbody_withdefault";
+        r.body.clauses_before = toList(stat.cases.slice(0, index).map(trSwitchCase));
+        r.body.clause_default = toList(stat.cases[index].consequent.map(trStat));
+        r.body.clauses_after  = toList(stat.cases.slice(index+1).map(trSwitchCase));
+      } else {
+        r.body.tag = "Coq_switchbody_nodefault";
+        r.body.clauses = toList(stat.cases.map(trSwitchCase));
+      }
+
     } else if (stat.type === "ReturnStatement") {
       r.tag = "Coq_stat_return";
       r.arg_opt = toOption(trExpr, stat.argument);
