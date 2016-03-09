@@ -357,7 +357,7 @@ function esprimaToAST(prog) {
       r.tag = "Coq_expr_function";
       r.func_name_opt = toOption(id, expr.id);
       r.arg_names = toList(expr.params.map(trPattern));
-      r.body = trBlockStat(expr.body);
+      r.body = trBlockStatAsFuncbody(expr.body);
       // TODO: USE STRICT
     } else if (expr.type === "SequenceExpression") {
       r = expr.expressions.map(trExpr).reduce(function (previousValue, currentValue) {
