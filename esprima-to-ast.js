@@ -365,7 +365,7 @@ function esprimaToAST(prog) {
           type: "expr",
           tag: "Coq_expr_binary_op",
           arg1: previousValue,
-          op: { type: "binary_op", tag: "Cow_binary_op_coma" },
+          op: { type: "binary_op", tag: "Coq_binary_op_coma" },
           arg2: currentValue,
           loc: {
             file: previousValue.loc.file,
