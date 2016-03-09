@@ -41,12 +41,6 @@ NEXT
 
 - in JsInterpreter let append = strappend (* hack for compatibility, to do cleanup *)
 
-[thomas, biggest piece, ask if anything problematic]
-- update the code that translates esprima syntax to recognize
-  "use strict" directives, which come as first statement of
-  a body, in hte form of a raw expression of raw type "use script".
-  (look on the web for code that already does this for esprima).
-
 [alan or thomas]
 - figure out what to do for Parser_syntax Parser_main
 

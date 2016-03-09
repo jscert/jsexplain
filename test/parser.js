@@ -9,9 +9,6 @@ var assert = require('chai').assert;
 var esprima = require('esprima');
 var esprimaToAST = require('../esprima-to-ast.js');
 
-var test262path = fs.readlinkSync(__dirname + '/test262');
-var tests = [];
-
 /* Tests whether a given test is negative.
  * Returns: a string if type of failure specified, true, or false
  */
@@ -203,6 +200,78 @@ function typecheckAST(ast) {
   return typecheck("prog", ast);
 }
 
+describe("Custom testcases", function() {
+  it("Extracts function body strings", function() {
+    var source =
+`function f() {
+  // body line 1
+a()};`;
+
+    var prog = esprima.parse(source, {loc: true, range: true});
+    var ast = esprimaToAST.esprimaToAST(prog, source);
+
+    var sourceBody = /{([^]*)}/.exec(source)[1];
+    assert.strictEqual(sourceBody, ast.elements.head.body.source);
+
+  });
+
+  [ { source: `"use strict";`                 , strict: true }
+  , { source: `'use strict';`                 , strict: true }
+  , { source: `"not strict"; "use strict";`   , strict: true }
+  , { source: `""; 0; "use strict";`          , strict: false }
+  , { source: `"use\\u0020strict";`           , strict: false }
+  ].forEach(function (test) {
+    it("Correctly parses that `" + test.source + "` is " + (test.strict ? " " : "not ") + "strict mode code.", function() {
+      var est = esprima.parse(test.source, {loc: true, range: true});
+      var ast = esprimaToAST.esprimaToAST(est, test.source);
+      assert.strictEqual(test.strict, ast.strictness);
+    });
+  });
+
+  var isFunction = function(stat) {
+    return stat.tag === "Coq_element_func_decl"
+      || (stat.tag === "Coq_element_stat" &&
+          stat.stat.tag === "Coq_stat_expr" &&
+          stat.stat.expr.tag === "Coq_expr_function");
+  };
+
+
+  var getFunctionStrictness = function(stat) {
+    if (stat.tag === "Coq_element_func_decl") {
+      return stat.body.prog.strictness;
+    } else if (stat.tag === "Coq_element_stat") {
+      return stat.stat.expr.body.prog.strictness;
+    } else {
+      assert.fail();
+    }
+  };
+
+  [ { source: `"use strict"; function x() {}`                , strict: [true] }
+  , { source: `'use strict'; (function() {})`                , strict: [true] }
+  , { source: `function x() {"use strict";}`                 , strict: [true] }
+  , { source: `(function() {"use strict";})`                 , strict: [true] }
+  , { source: `(function(){}); function x(){"use strict";};` , strict: [false, true] }
+  ].forEach(function (test) {
+    it("Correctly parses that `" + test.source + "` is " + (test.strict ? " " : "not ") + "strict mode code.", function() {
+      var est = esprima.parse(test.source, {loc: true, range: true});
+      var ast = esprimaToAST.esprimaToAST(est, test.source);
+
+      var listElem = ast.elements;
+      var index = 0;
+      while (listElem.tag === "::") {
+        if (isFunction(listElem.head)) {
+          assert.strictEqual(test.strict[index], getFunctionStrictness(listElem.head));
+          index++;
+        }
+        listElem = listElem.tail;
+      }
+    });
+  });
+});
+
+var test262path = fs.readlinkSync(__dirname + '/test262');
+var tests = [];
+
 walk(test262path)
 .pipe(filter.obj(file => file.stats.isFile() && file.path.endsWith(".js")))
 .on('readable', function() {
@@ -256,20 +325,4 @@ walk(test262path)
   });
 
   run();
-});
-
-describe("Custom testcases", function() {
-  it("Extracts function body strings", function() {
-    var source =
-`function f() {
-  // body line 1
-a()};`;
-
-    var prog = esprima.parse(source, {loc: true, range: true});
-    var ast = esprimaToAST.esprimaToAST(prog, source);
-
-    var sourceBody = /{([^]*)}/.exec(source)[1];
-    assert.strictEqual(sourceBody, ast.elements.head.body.source);
-
-  });
 });

@@ -3,6 +3,9 @@
 //https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API$revision/707671
 
 function esprimaToAST(prog, sourceText) {
+
+  var contextStrictMode = false;
+
   var toList = function (array) {
     var r = {type: "list", tag: "[]"};
     for (var i = array.length - 1; i >= 0; i--) {
@@ -37,6 +40,29 @@ function esprimaToAST(prog, sourceText) {
     return toOption(funcTr, (arr.length > 0 ? arr[0] : null));
   }
 
+  var isDirectivePrologue = function(stat) {
+    return stat.type === "ExpressionStatement" &&
+           stat.expression.type === "Literal" &&
+           (typeof stat.expression.value) === "string";
+  }
+
+  var isUseStrictDirective = function(stat) {
+    return isDirectivePrologue(stat) &&
+           /^["']use strict["']$/.test(stat.expression.raw);
+  }
+
+  var getDirectivePrologue = function(statArr) {
+    // statArr.takeWhile(isDirectivePrologue)
+    return statArr.filter(function(stat) {
+      this.ok = this.ok && isDirectivePrologue(stat);
+      return this.ok;
+    }, { ok: true });
+  };
+
+  var bodyIsStrict = function(statArr) {
+    return getDirectivePrologue(statArr).some(isUseStrictDirective);
+  }
+
   /*** Miscellaneous Helper Nodes ***/
 
   // The JSCert AST special-cases this instance of option
@@ -60,8 +86,7 @@ function esprimaToAST(prog, sourceText) {
     };
     var r = {loc: toLoc(prog.loc), type: "prog"};
     r.tag = "Coq_prog_intro";
-    // TODO deal with strictness
-    r.strictness = false;
+    r.strictness = contextStrictMode = bodyIsStrict(prog.body);
     r.elements = toList(prog.body.map(trStatAsElement));
     return r;
   };
@@ -92,16 +117,20 @@ function esprimaToAST(prog, sourceText) {
       }
 
       var loc = toLoc(stat.loc);
+      var prog = { loc: loc, type: "prog", tag: "Coq_prog_intro" };
+
+      var oldContextStrictMode = contextStrictMode;
+      contextStrictMode = contextStrictMode || bodyIsStrict(stat.body);
+      prog.strictness = contextStrictMode;
+      prog.elements = toList(stat.body.map(trStatAsElement));
+      contextStrictMode = oldContextStrictMode;
+
       var source = "";
       if (sourceText && stat.range) {
         // Esprima's range includes the { }
         source = sourceText.slice(stat.range[0]+1, stat.range[1]-1);
       }
 
-      // TODO strictness
-      var prog = {loc: loc, type: "prog", tag: "Coq_prog_intro",
-                  strictness: false,
-                  elements: toList(stat.body.map(trStatAsElement))};
       return {loc: loc, type: "funcbody", tag: "Coq_funcbody_intro",
                 prog: prog, source: source};
   };
