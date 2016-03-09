@@ -181,7 +181,7 @@ function esprimaToAST(prog) {
       throw new EsprimaToASTError("trCatchClause called with wrong type: " + clause.type);
     }
     // clause.guard is a custom Mozilla extension
-    return [clause.param, trBlockStat(clause.body)];
+    return [trPattern(clause.param), trBlockStat(clause.body)];
   };
 
   /*** Statements ***/
