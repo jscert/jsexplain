@@ -531,6 +531,7 @@ function toString(ast, maxDepth) {
 
     if (typeof value === "object") {
       if (depth > 0) {
+        value = Object.assign({}, value);
         for (var nestKey in value) {
           value[nestKey] = ASTErrorJSONReplacer(nestKey, value[nestKey], depth - 1);
         }

@@ -183,7 +183,7 @@ function typecheckAST(ast) {
       assert.instanceOf(value, Array);
       t.forEach((type, index) => typecheck(type, value[index]));
     } else {
-      assert.strictEqual(value.type, t._typeName);
+      assert(value.type === t._typeName, errorMsg(value, "was expected to have type of " + t._typeName));
       assert.notStrictEqual(value.tag, "_typeName");
       assert(t.hasOwnProperty(value.tag), value.tag + " is a not a valid constructor of " + t._typeName);
 
