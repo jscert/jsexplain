@@ -149,16 +149,25 @@ function esprimaToAST(prog) {
       throw new EsprimaToASTError("trProperty called with wrong type: " + property.type);
     }
 
-    var name;
+    var propname = { type: "propname", loc: toLoc(property.key.loc) };
     if (property.key.type === "Literal") {
-      name = property.key.value; // value cannot be null due to parse tree
+      propname.value = property.key.value;
+
+      if ((typeof propname.value) === "number") {
+        propname.tag = "Coq_propname_number";
+      } else if ((typeof propname.value) === "string") {
+        propname.tag = "Coq_propname_string";
+      } else {
+        throw new EsprimaToASTError("Property key may only be number or string, got: " + property.key.value);
+      }
     } else if (property.key.type === "Identifier") {
-      name = trIdentifier(property.key);
+      propname.tag = "Coq_propname_identifier";
+      propname.value = trIdentifier(property.key);
     } else {
       throw new EsprimaToASTError("trProperty called with wrong identifier type: " + property.type);
     }
 
-    var propbody = { loc: toLoc(property.loc), type: "propbody" }
+    var propbody = { loc: toLoc(property.value.loc), type: "propbody" }
     if (property.kind === "init") {
       propbody.tag = "Coq_propbody_val";
       propbody.expr = trExpr(property.value);
@@ -173,7 +182,7 @@ function esprimaToAST(prog) {
       throw new EsprimaToASTError("trProperty got unexpected kind: " + property.kind);
     }
 
-    return [name, propbody];
+    return [propname, propbody];
   };
 
   var trCatchClause = function (clause) {

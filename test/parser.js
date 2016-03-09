@@ -129,7 +129,6 @@ function typecheckAST(ast) {
       Coq_element_stat : {stat: "stat"},
       Coq_element_func_decl : {func_name: "string", arg_names: "string list", body: "funcbody"},
     },
-    propdefs: "(propname * propbody) list",
     elements: "element list",
     /* funcdecl: { { funcdecl_name : string;
        funcdecl_parameters : string list;
@@ -184,9 +183,7 @@ function typecheckAST(ast) {
       assert.instanceOf(value, Array);
       t.forEach((type, index) => typecheck(type, value[index]));
     } else {
-      assert(value.hasOwnProperty("type"), errorMsg(value, "doesn't have a type property"));
-      assert.strictEqual(t._typeName, value.type);
-      assert(value.hasOwnProperty("tag"), errorMsg(value, "doesn't have a tag property"));
+      assert.strictEqual(value.type, t._typeName);
       assert.notStrictEqual(value.tag, "_typeName");
       assert(t.hasOwnProperty(value.tag), value.tag + " is a not a valid constructor of " + t._typeName);
 
