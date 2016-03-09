@@ -2,7 +2,7 @@
 
 //https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API$revision/707671
 
-function esprimaToAST(prog) {
+function esprimaToAST(prog, sourceText) {
   var toList = function (array) {
     var r = {type: "list", tag: "[]"};
     for (var i = array.length - 1; i >= 0; i--) {
@@ -92,14 +92,18 @@ function esprimaToAST(prog) {
       }
 
       var loc = toLoc(stat.loc);
+      var source = "";
+      if (sourceText && stat.range) {
+        // Esprima's range includes the { }
+        source = sourceText.slice(stat.range[0]+1, stat.range[1]-1);
+      }
 
       // TODO strictness
       var prog = {loc: loc, type: "prog", tag: "Coq_prog_intro",
                   strictness: false,
                   elements: toList(stat.body.map(trStatAsElement))};
-      // TODO we don't know how to get source
       return {loc: loc, type: "funcbody", tag: "Coq_funcbody_intro",
-                prog: prog, source: ""};
+                prog: prog, source: source};
   };
 
   var trFuncExprAsFuncbody = function (expr) {

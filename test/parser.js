@@ -228,7 +228,7 @@ walk(test262path)
 
         it('parses', function() {
           try {
-            esprima.parse(source, {loc: true});
+            esprima.parse(source, {loc: true, range: true});
           } catch(e) {
             if (!negative) {
               throw e;
@@ -238,11 +238,11 @@ walk(test262path)
 
         it('converts', function() {
           try {
-            var prog = esprima.parse(source, {loc: true});
+            var prog = esprima.parse(source, {loc: true, range: true});
           } catch(e) { return; }
 
           try {
-            var ast = esprimaToAST.esprimaToAST(prog);
+            var ast = esprimaToAST.esprimaToAST(prog, source);
             typecheckAST(ast);
           } catch (e) {
             if (e instanceof esprimaToAST.UnsupportedSyntaxError) {
@@ -256,4 +256,20 @@ walk(test262path)
   });
 
   run();
+});
+
+describe("Custom testcases", function() {
+  it("Extracts function body strings", function() {
+    var source =
+`function f() {
+  // body line 1
+a()};`;
+
+    var prog = esprima.parse(source, {loc: true, range: true});
+    var ast = esprimaToAST.esprimaToAST(prog, source);
+
+    var sourceBody = /{([^]*)}/.exec(source)[1];
+    assert.strictEqual(sourceBody, ast.elements.head.body.source);
+
+  });
 });
