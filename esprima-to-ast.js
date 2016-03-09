@@ -18,8 +18,6 @@ function esprimaToAST(prog) {
             stop:  {line: pos.end.line, col: pos.end.column}};
   };
 
-  var id = function (i) { return i; }
-
   var toOption = function (funcTr, node) {
     var option = { type: "option" };
     if (node === null) {
@@ -48,7 +46,7 @@ function esprimaToAST(prog) {
       option.tag = "Coq_label_empty";
     } else {
       option.tag = "Coq_label_string";
-      option.value = label;
+      option.value = trIdentifier(label);
     }
     return option;
   };
@@ -223,7 +221,7 @@ function esprimaToAST(prog) {
       r.else_branch = toOption(trStat, stat.alternate);
     } else if (stat.type === "LabeledStatement") {
       r.tag = "Coq_stat_label";
-      r.label = stat.label;
+      r.label = trIdentifier(stat.label);
       r.stat = trStat(stat.body);
     } else if (stat.type === "BreakStatement") {
       r.tag = "Coq_stat_break";
@@ -355,7 +353,7 @@ function esprimaToAST(prog) {
     } else if (expr.type === "FunctionExpression") {
       checkFuncExpr(expr);
       r.tag = "Coq_expr_function";
-      r.func_name_opt = toOption(id, expr.id);
+      r.func_name_opt = toOption(trIdentifier, expr.id);
       r.arg_names = toList(expr.params.map(trPattern));
       r.body = trBlockStatAsFuncbody(expr.body);
       // TODO: USE STRICT
