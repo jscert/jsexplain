@@ -321,7 +321,7 @@ function esprimaToAST(prog) {
     var r = {loc: toLoc(expr.loc), type: "literal"};
     var v = expr.value;
     var t = typeof(v);
-    if (t === "null") {
+    if (t === "object" && expr.raw === "null") {
       r.tag = "Coq_literal_null";
     } else if (t === "boolean") {
       r.tag = "Coq_literal_bool";
@@ -332,8 +332,8 @@ function esprimaToAST(prog) {
     } else if (t === "string") {
       r.tag = "Coq_literal_string";
       r.value = v;
-    } else if (t === "object") {
-      throw new UnsupportedSyntaxError("Unsupported literal: " + expr.raw, expr);
+    } else if (t === "object" && expr.raw[0] === "/") {
+      throw new UnsupportedSyntaxError("Regular Expression literal: " + expr.raw, expr);
     } else {
       throw new EsprimaToASTError("trExprAsLiteral error: " + t, expr);
     };
