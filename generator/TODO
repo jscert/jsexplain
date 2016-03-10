@@ -1,13 +1,3 @@
-
-
-=========================================================
-FIRST
-[Thomas]
-
-- remove stdlib_js/*   => probably drop it
-
-
-=========================================================
 ARTHUR
 
 - remove "open JsNumber" to more easily trace occurences
