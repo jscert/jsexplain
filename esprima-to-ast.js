@@ -616,8 +616,12 @@ function NewASTErrorType(name, parentError) {
 var EsprimaToASTError = NewASTErrorType("EsprimaToASTError", Error);
 var UnsupportedSyntaxError = NewASTErrorType("UnsupportedSyntaxError", EsprimaToASTError);
 
-// For testing purposes with node
-module.exports.esprimaToAST = esprimaToAST;
-module.exports.EsprimaToASTError = EsprimaToASTError;
-module.exports.UnsupportedSyntaxError = UnsupportedSyntaxError;
-module.exports.toString = toString;
+try {
+  // For testing purposes with node
+  module.exports.esprimaToAST = esprimaToAST;
+  module.exports.EsprimaToASTError = EsprimaToASTError;
+  module.exports.UnsupportedSyntaxError = UnsupportedSyntaxError;
+  module.exports.toString = toString;
+} catch (e) {
+  // Ignore these, as we're not using node
+}
