@@ -506,9 +506,9 @@ var parsedTree;
 
 // usage: testParse("var x = 3");
 function testParse(s) {
-  var p = esprima.parse(s,{loc: true});
+  var p = esprima.parse(s,{loc: true, range: true});
   console.log(p);
-  console.log(esprimaToAST(p));
+  console.log(esprimaToAST(p, s));
 }
 
 // usage: testLineof("Datatypes.js", 9);
