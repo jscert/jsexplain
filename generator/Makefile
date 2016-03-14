@@ -36,7 +36,7 @@ ASSEMBLY_JS := \
 	Shared.log.js \
 	LibString.log.js \
 	LibOption.log.js \
-	JsNumber.log.js \
+	JsNumber.js \
 	JsSyntax.log.js \
 	JsSyntaxAux.log.js \
   Translate_syntax.js \
@@ -118,6 +118,9 @@ tests/%.cmi: tests/%.ml main.byte stdlib
 	./main.byte -mode cmi -I $(<D) $<
 
 ##### Custome cmi rules for compilation of mli files without ml source
+
+$(JSREF_PATH)/JsNumber.cmi: $(JSREF_PATH)/JsNumber.mli
+	ocamlc -I $(JSREF_PATH) $<
 
 $(JSREF_PATH)/Translate_syntax.cmi: $(JSREF_PATH)/Translate_syntax.mli $(JSREF_PATH)/JsSyntax.cmi stdlib
 	ocamlc -I $(JSREF_PATH) -I stdlib_ml -open Stdlib $<
