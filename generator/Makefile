@@ -39,14 +39,14 @@ ASSEMBLY_JS := \
 	JsNumber.log.js \
 	JsSyntax.log.js \
 	JsSyntaxAux.log.js \
-  Translate_syntax.js \
+	Translate_syntax.js \
 	List0.log.js \
 	JsSyntaxInfos.log.js \
 	JsCommon.log.js \
 	JsCommonAux.log.js \
 	JsPreliminary.log.js \
 	JsInit.log.js \
-  Prheap.js \
+	Prheap.js \
 	LibTactics.log.js \
 	LibProd.log.js \
 	LibFunc.log.js \
@@ -59,10 +59,10 @@ ASSEMBLY_JS := $(STDLIB_DIR)/stdlib.js $(addprefix tests/jsref/,$(ASSEMBLY_JS));
 ###############################################################
 # Global options
 
+all: everything
+
 .PHONY: all clean .log.js .unlog.js .token.js
    # all gen log unlog 
-
-all: everything
 
 # Do not delete intermediate files.
 .SECONDARY:
@@ -85,8 +85,7 @@ LINEOF := ./lineof.byte
 
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 -include $(TESTS_ML:.ml=.ml.d)
--include $(JSREF_ML:.ml=.ml.d)
--include $(JSREF_MLI:.mli=.mli.d)
+-include $(JSREF_PATH)/.depends
 endif
 
 
@@ -105,12 +104,12 @@ $(STDLIB_DIR)/stdlib.cmi: $(STDLIB_DIR)/stdlib.mli
 
 ##### Rule for dependencies
 
-tests/%.d: tests/%
-	$(OCAMLDEP) -all -I $(<D) $< > $@
+tests/%/.depends: tests/%/*
+	$(OCAMLDEP) -all -I $(<D) $(<D)/* > $@
 
 ##### Rule for cmi
 
-tests/%.cmi: tests/%.ml main.byte stdlib 
+tests/%.cmi: tests/%.ml main.byte stdlib
 	./main.byte -mode cmi -I $(<D) $<
 
 tests/%.cmi: tests/%.mli stdlib
@@ -121,10 +120,10 @@ tests/%.cmi: tests/%.mli stdlib
 tests/%.log.js: tests/%.ml main.byte stdlib tests/%.cmi
 	./main.byte -mode log -I $(<D) $<
 
-tests/%.unlog.js: tests/%.ml main.byte stdlib tests/%.cmi 
+tests/%.unlog.js: tests/%.ml main.byte stdlib tests/%.cmi
 	./main.byte -mode unlog -I $(<D) $<
 
-tests/%.token.js: tests/%.ml main.byte stdlib tests/%.cmi  
+tests/%.token.js: tests/%.ml main.byte stdlib tests/%.cmi
 	./main.byte -mode token -I $(<D) $<
 
 ##### Rule for lineof.js
@@ -179,6 +178,7 @@ clean_genjs:
 clean_tests:
 	bash -c "rm -f $(TESTS_DIR)/*.{$(DIRTY_EXTS)}"
 	bash -c "rm -f $(TESTS_DIR)/$(JSREF_DIR)/*.{$(DIRTY_EXTS)}"
+	bash -c "rm -f $(JSREF_PATH)/.depends"
 
 clean_stdlib:
 	rm -f $(STDLIB_DIR)/*.cmi
@@ -203,55 +203,16 @@ tests/%.all: tests/%.log.js tests/%.unlog.js tests/%.token.js
 	touch $@
 
 #####################################################################
-# Deprecated
-
-####
-#
-#%.inferred.mli: _tags
-#	$(OCAMLBUILD) $@
-#	cp _build/$@ .
-
-# tests/lambda: tests/lambda/Lambda.log.js
-
-
-#ifeq ($(findstring clean,$(MAKECMDGOALS)),)
-#-include $(JSREF_ML:.ml=.ml.d)
-#-include $(JSREF_MLI:.mli=.mli.d)
-#endif
-
-
-# ML_LAMBDA   := $(wildcard $(TEST_DIR)/lambda/*.ml)
-# DEPSED      := sed -e "s/cmo/log.js/; s/cmo/cmi/g; s/cmx/cmi/g"
-# -X $(TESTS_DIR)/jsref -X $(TESTS_DIR)/lambda 
-
-
-# 	bash -c "rm -f $(TESTS_DIR)/lambda/*.{$(DIRTY_EXTS)}"
-
-# clean_jsref:
-#	rm -f $(JSREF_PATH)/*.ml.d $(JSREF_PATH)/*.mli.d $(JSREF_PATH)/*.log.js $(JSREF_PATH)/*.unlog.js $(JSREF_PATH)/*.token.js  $(JSREF_PATH)/*.cmi
-
-# PRECIOUS probably not useful:
-# .PRECIOUS: $(JSREF_PATH)/*.ml $(JSREF_PATH)/*.log.js $(JSREF_PATH)/*.unlog.js  $(JSREF_PATH)/*.token.js
-# .PRECIOUS: *.vio
-#.PRECIOUS: tests/%.ml
-
-
+# Original Build of JSRef Coq to "Humanified" OCaml
 
 #tests/%.ml: tests/%.v
-#	$(MAKE) -C $(CURDIR)/../../../lib/tlc/src
-#	cd $(<D) && coqc -I $(CURDIR)/../../../lib/tlc/src $(<F)
+#	$(MAKE) -C $(CURDIR)/../../lib/tlc/src
+#	cd $(<D) && coqc -I $(CURDIR)/../../lib/tlc/src $(<F)
 #	cd $(@D) && rm *.mli
-#	cd $(@D) && $(CURDIR)/../../ml-add-cstr-annots.pl *.ml
-
-
-
+#	cd $(@D) && $(CURDIR)/../ml-add-cstr-annots.pl *.ml
 
 #$(JSREF_PATH)/%.ml:
-#	$(MAKE) -C $(CURDIR)/../../.. interpreter
-#	cp ../../../interp/src/extract/*.ml $(JSREF_PATH)/
-#	../../convert-ml-strings.pl $(JSREF_PATH)/*.ml
-#	cd $(@D) && $(CURDIR)/../../ml-add-cstr-annots.pl *.ml
-
-# tests/%.cmi: tests/%.log.js
-# $(JSREF_PATH)/%.cmi: $(JSREF_PATH)/%.log.js
-# $(JSREF_PATH)/BinNat.cmi : $(JSREF_PATH)/BinNat.log.js 
+#	$(MAKE) -C $(CURDIR)/../.. interpreter
+#	cp ../../interp/src/extract/*.ml $(JSREF_PATH)/
+#	../convert-ml-strings.pl $(JSREF_PATH)/*.ml
+#	cd $(@D) && $(CURDIR)/../ml-add-cstr-annots.pl *.ml
