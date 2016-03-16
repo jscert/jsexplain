@@ -73,7 +73,6 @@ all: everything
 
 CC          := ocamlc -c
 OCAMLDEP    := ocamldep -one-line
-DEPSED      := sed -e "s/cmx/cmi/; s/cmx/cmi/g"
 OCAMLBUILD := ocamlbuild -j 4 -classic-display -use-ocamlfind -X tests -X $(STDLIB_DIR)
 
 GENERATOR := ./main.byte
@@ -106,23 +105,15 @@ $(STDLIB_DIR)/stdlib.cmi: $(STDLIB_DIR)/stdlib.mli
 
 ##### Rule for dependencies
 
-tests/%.mli.d: tests/%.mli
-	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
-
-tests/%.ml.d: tests/%.ml
-	$(OCAMLDEP) -I $(<D) $< | $(DEPSED) > $@
+tests/%.d: tests/%
+	$(OCAMLDEP) -all -I $(<D) $< > $@
 
 ##### Rule for cmi
 
 tests/%.cmi: tests/%.ml main.byte stdlib 
 	./main.byte -mode cmi -I $(<D) $<
 
-##### Custome cmi rules for compilation of mli files without ml source
-
-$(JSREF_PATH)/Translate_syntax.cmi: $(JSREF_PATH)/Translate_syntax.mli $(JSREF_PATH)/JsSyntax.cmi stdlib
-	ocamlc -I $(JSREF_PATH) -I stdlib_ml -open Stdlib $<
-
-$(JSREF_PATH)/Prheap.cmi: $(JSREF_PATH)/Prheap.mli stdlib $(JSREF_PATH)/JsSyntax.cmi
+tests/%.cmi: tests/%.mli stdlib
 	ocamlc -I $(JSREF_PATH) -I stdlib_ml -open Stdlib $<
 
 ##### Rule for log/unlog/token

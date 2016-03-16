@@ -79,10 +79,7 @@ let destr_list l d f =
 let if_empty_label s r k =
   if label_comparable r.res_label Coq_label_empty
   then k ()
-  else (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+  else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
          s
          ("[if_empty_label] received a normal result with non-empty label.")
 
@@ -92,9 +89,7 @@ let if_some op k =
   match op with
   | Some a -> k a
   | None ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Stuck because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_impossible)
+    (fun s -> Debug.impossible_because __LOC__ s; Coq_result_impossible)
       ("[if_some] called with [None].")
 
 (** val if_some_or_default : 'a2 option -> 'a1 -> ('a2 -> 'a1) -> 'a1 **)
@@ -166,17 +161,11 @@ let if_void w k =
     match rv with
     | Coq_resvalue_empty -> k s
     | Coq_resvalue_value v ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
         ("[if_void called] with non-void result value.")
     | Coq_resvalue_ref r ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
         ("[if_void called] with non-void result value."))
 
@@ -205,18 +194,12 @@ let if_any_or_throw w k1 k2 =
     | Coq_restype_throw ->
       (match r.res_value with
        | Coq_resvalue_empty ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[if_any_or_throw] called with a non-value result.")
        | Coq_resvalue_value v -> if_empty_label s r (fun x -> k2 s v)
        | Coq_resvalue_ref r0 ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[if_any_or_throw] called with a non-value result.")))
 
@@ -250,18 +233,12 @@ let if_value w k =
   if_success w (fun s rv ->
     match rv with
     | Coq_resvalue_empty ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
         ("[if_value] called with non-value.")
     | Coq_resvalue_value v -> k s v
     | Coq_resvalue_ref r ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
         ("[if_value] called with non-value."))
 
@@ -273,39 +250,24 @@ let if_bool w k =
     | Coq_value_prim p ->
       (match p with
        | Coq_prim_undef ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[if_bool] called with non-boolean value.")
        | Coq_prim_null ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[if_bool] called with non-boolean value.")
        | Coq_prim_bool b -> k s b
        | Coq_prim_number n ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[if_bool] called with non-boolean value.")
        | Coq_prim_string s0 ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[if_bool] called with non-boolean value."))
     | Coq_value_object o ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
         ("[if_bool] called with non-boolean value."))
 
@@ -316,10 +278,7 @@ let if_object w k =
   if_value w (fun s v ->
     match v with
     | Coq_value_prim p ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
         ("[if_object] called on a primitive.")
     | Coq_value_object l -> k s l)
@@ -333,39 +292,24 @@ let if_string w k =
     | Coq_value_prim p ->
       (match p with
        | Coq_prim_undef ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[if_string] called on a non-string value.")
        | Coq_prim_null ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[if_string] called on a non-string value.")
        | Coq_prim_bool b ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[if_string] called on a non-string value.")
        | Coq_prim_number n ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[if_string] called on a non-string value.")
        | Coq_prim_string s0 -> k s s0)
     | Coq_value_object o ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
         ("[if_string] called on a non-string value."))
 
@@ -378,39 +322,24 @@ let if_number w k =
     | Coq_value_prim p ->
       (match p with
        | Coq_prim_undef ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[if_number] called with non-number value.")
        | Coq_prim_null ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[if_number] called with non-number value.")
        | Coq_prim_bool b ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[if_number] called with non-number value.")
        | Coq_prim_number n -> k s n
        | Coq_prim_string s0 ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[if_number] called with non-number value."))
     | Coq_value_object o ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
         ("[if_number] called with non-number value."))
 
@@ -421,10 +350,7 @@ let if_prim w k =
     match v with
     | Coq_value_prim w0 -> k s w0
     | Coq_value_object o ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
         ("[if_primitive] called on an object."))
 
@@ -441,10 +367,7 @@ let if_abort o k =
   | Coq_out_div -> k ()
   | Coq_out_ter (s0, r) ->
     if restype_comparable r.res_type Coq_restype_normal
-    then (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+    then (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s0
            ("[if_abort] received a normal result!")
     else k ()

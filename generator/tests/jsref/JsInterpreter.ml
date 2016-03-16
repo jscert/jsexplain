@@ -32,9 +32,7 @@ let build_error s vproto vmsg =
   let (l, s') = object_alloc s o in
   if value_comparable vmsg (Coq_value_prim Coq_prim_undef)
   then result_out (Coq_out_ter (s', (res_val (Coq_value_object l))))
-  else (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+  else (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
          ("Need [to_string] (this function shall be put in [runs_type].)")
 
 (** val run_error : state -> native_error -> 'a1 specres **)
@@ -67,7 +65,7 @@ let run_object_method proj s l =
 let run_object_method proj s l =
    let opt = object_binds_pickable_option s l in
      begin match opt with
-       | None -> prerr_endline ("Warning: in run_object_method the location" ^ (Prheap.prloc l) ^ " is unfetchable." )
+       | None -> Debug.run_object_method l
        | _ -> ()
      end;
      LibOption.map proj opt
@@ -82,7 +80,7 @@ let run_object_heap_set_extensible b s l =
 let run_object_heap_set_extensible b s l =
    let opt = object_binds_pickable_option s l in
      begin match opt with
-       | None -> prerr_endline ("Warning: in run_object_heap_set_extensible the location " ^ (Prheap.prloc l) ^ " is unfetchable." )
+       | None -> Debug.run_object_heap_set_extensible l
        | _ -> ()
      end;
      LibOption.map (fun o -> object_write s l (object_set_extensible o b)) opt
@@ -378,32 +376,20 @@ let run_object_get_prop runs0 s c l x =
              | Coq_value_prim p ->
                (match p with
                 | Coq_prim_undef ->
-                  (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                  (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                     s1
                     ("Found a non-null primitive value as a prototype in [run_object_get_prop].")
                 | Coq_prim_null -> res_spec s1 Coq_full_descriptor_undef
                 | Coq_prim_bool b0 ->
-                  (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                  (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                     s1
                     ("Found a non-null primitive value as a prototype in [run_object_get_prop].")
                 | Coq_prim_number n ->
-                  (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                  (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                     s1
                     ("Found a non-null primitive value as a prototype in [run_object_get_prop].")
                 | Coq_prim_string s0 ->
-                  (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                  (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                     s1
                     ("Found a non-null primitive value as a prototype in [run_object_get_prop]."))
              | Coq_value_object lproto ->
@@ -419,34 +405,22 @@ let object_proto_is_prototype_of runs0 s l0 l =
     | Coq_value_prim p ->
       (match p with
        | Coq_prim_undef ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[run_object_method] returned a primitive in [object_proto_is_prototype_of_body].")
        | Coq_prim_null ->
          result_out (Coq_out_ter (s,
            (res_val (Coq_value_prim (Coq_prim_bool false)))))
        | Coq_prim_bool b0 ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[run_object_method] returned a primitive in [object_proto_is_prototype_of_body].")
        | Coq_prim_number n ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[run_object_method] returned a primitive in [object_proto_is_prototype_of_body].")
        | Coq_prim_string s0 ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[run_object_method] returned a primitive in [object_proto_is_prototype_of_body]."))
     | Coq_value_object l' ->
@@ -558,34 +532,22 @@ let object_can_put runs0 s c l x =
           | Coq_value_prim p ->
             (match p with
              | Coq_prim_undef ->
-               (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+               (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                  s1
                  ("Non-null primitive get as a prototype value in [object_can_put].")
              | Coq_prim_null ->
                if_some (run_object_method object_extensible_ s1 l) (fun b0 ->
                  res_ter s1 (res_val (Coq_value_prim (Coq_prim_bool b0))))
              | Coq_prim_bool b0 ->
-               (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+               (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                  s1
                  ("Non-null primitive get as a prototype value in [object_can_put].")
              | Coq_prim_number n ->
-               (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+               (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                  s1
                  ("Non-null primitive get as a prototype value in [object_can_put].")
              | Coq_prim_string s0 ->
-               (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+               (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                  s1
                  ("Non-null primitive get as a prototype value in [object_can_put]."))
           | Coq_value_object lproto ->
@@ -735,10 +697,7 @@ let object_define_own_prop runs0 s c l x desc throwcont =
                                           else object_define_own_prop_write
                                                  s1 a
                                         | Coq_attributes_accessor_of a0 ->
-                                          (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                                          (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                                             s0
                                             ("data is not accessor in [defineOwnProperty]"))
                                   else if and_decidable
@@ -748,10 +707,7 @@ let object_define_own_prop runs0 s c l x desc throwcont =
                                               desc0)
                                        then (match a with
                                              | Coq_attributes_data_of a0 ->
-                                               (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                                               (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                                                  s0
                                                  ("accessor is not data in [defineOwnProperty]")
                                              | Coq_attributes_accessor_of aa ->
@@ -760,10 +716,7 @@ let object_define_own_prop runs0 s c l x desc throwcont =
                                                then reject s1 throwcont0
                                                else object_define_own_prop_write
                                                       s1 a)
-                                       else (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                                       else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                                               s0
                                               ("cases are mutually exclusives in [defineOwnProperty]")))))
       (fun def ->
@@ -776,10 +729,7 @@ let object_define_own_prop runs0 s c l x desc throwcont =
               ("length")) (fun s0 d ->
             match d with
             | Coq_full_descriptor_undef ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s0
                 ("Array length property descriptor cannot be undefined.")
             | Coq_full_descriptor_some attr ->
@@ -943,17 +893,11 @@ let object_define_own_prop runs0 s c l x desc throwcont =
                                                               true)))))
                                   else def s2 x desc throwcont))))
                    | Coq_value_object l0 ->
-                     (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                     (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                        s0
                        ("Spec asserts length of array is number."))
                | Coq_attributes_accessor_of a ->
-                 (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                 (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                    s0
                    ("Array length property descriptor cannot be accessor.")))
         | Coq_builtin_define_own_prop_args_obj ->
@@ -1064,17 +1008,11 @@ let run_to_descriptor runs0 s c _foo_ = match _foo_ with
 
 let prim_new_object s _foo_ = match _foo_ with
 | Coq_prim_undef ->
-  (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+  (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
     s
     ("[prim_new_object] received an null or undef.")
 | Coq_prim_null ->
-  (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+  (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
     s
     ("[prim_new_object] received an null or undef.")
 | Coq_prim_bool b ->
@@ -1293,10 +1231,7 @@ let env_record_get_binding_value runs0 s c l x str =
 
 let ref_get_value runs0 s c _foo_ = match _foo_ with
 | Coq_resvalue_empty ->
-  (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+  (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
     s
     ("[ref_get_value] received an empty result.")
 | Coq_resvalue_value v -> res_spec s v
@@ -1308,28 +1243,19 @@ let ref_get_value runs0 s c _foo_ = match _foo_ with
       then if_value (prim_value_get runs0 s c v r.ref_name) res_spec
       else (match v with
             | Coq_value_prim p ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s
                 ("[ref_get_value] received a primitive value whose kind is not primitive.")
             | Coq_value_object l ->
               if_value (run_object_get runs0 s c l r.ref_name) res_spec)
     | Coq_ref_base_type_env_loc l ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
         ("[ref_get_value] received a reference to a value whose base type is an environnment record."))
     (fun for_base_or_object ->
     match ref_kind_of r with
     | Coq_ref_kind_null ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
         ("[ref_get_value] received a reference whose base is [null].")
     | Coq_ref_kind_undef -> throw_result (run_error s Coq_native_error_ref)
@@ -1338,10 +1264,7 @@ let ref_get_value runs0 s c _foo_ = match _foo_ with
     | Coq_ref_kind_env_record ->
       (match r.ref_base with
        | Coq_ref_base_type_value v ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[ref_get_value] received a reference to an environnment record whose base type is a value.")
        | Coq_ref_base_type_env_loc l ->
@@ -1358,7 +1281,7 @@ let ref_get_value runs s c r =
            | Coq_value_prim cvp ->
              begin match cvp with
                | Coq_prim_undef ->
-           prerr_string ("Warning: ref_get_value returns the undefined value on "); prerr_string (Prheap.prresvalue r); prerr_newline(); res
+           Debug.ref_get_value_2 r; res
                | _ -> res
              end
          | _ -> res
@@ -1403,10 +1326,7 @@ let object_put_complete runs0 b s c vthis l x v str =
                     | Coq_attributes_accessor_of aa' ->
                       (match aa'.attributes_accessor_set with
                        | Coq_value_prim p ->
-                         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                            s3
                            ("[object_put_complete] found a primitive in an `set\' accessor.")
                        | Coq_value_object lfsetter ->
@@ -1471,10 +1391,7 @@ let prim_value_put runs0 s c w x v str =
 let ref_put_value runs0 s c rv v =
   match rv with
   | Coq_resvalue_empty ->
-    (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+    (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
       s
       ("[ref_put_value] received an empty result.")
   | Coq_resvalue_value v0 -> run_error s Coq_native_error_ref
@@ -1498,35 +1415,23 @@ let ref_put_value runs0 s c rv v =
                        | Coq_value_prim w ->
                          prim_value_put runs0 s c w r.ref_name v r.ref_strict
                        | Coq_value_object o ->
-                         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                            s
                            ("[ref_put_value] impossible case"))
                  else (match v' with
                        | Coq_value_prim p ->
-                         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                            s
                            ("[ref_put_value] impossible case")
                        | Coq_value_object l ->
                          object_put runs0 s c l r.ref_name v r.ref_strict)
                | Coq_ref_base_type_env_loc l ->
-                 (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                 (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                    s
                    ("[ref_put_value] contradicts ref_is_property"))
          else (match r.ref_base with
                | Coq_ref_base_type_value v0 ->
-                 (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                 (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                    s
                    ("[ref_put_value] impossible spec")
                | Coq_ref_base_type_env_loc l ->
@@ -1543,10 +1448,7 @@ let env_record_create_mutable_binding runs0 s c l x deletable_opt =
       match e with
       | Coq_env_record_decl ed ->
         if Heap.indom_decidable string_comparable ed x
-        then (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+        then (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                s
                ("Already declared environnment record in [env_record_create_mutable_binding].")
         else let_binding
@@ -1556,10 +1458,7 @@ let env_record_create_mutable_binding runs0 s c l x deletable_opt =
       | Coq_env_record_object (l0, pt) ->
         if_bool (object_has_prop runs0 s c l0 x) (fun s1 has ->
           if has
-          then (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+          then (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                  s1
                  ("Already declared binding in [env_record_create_mutable_binding].")
           else let_binding { attributes_data_value = (Coq_value_prim
@@ -1587,10 +1486,7 @@ let env_record_create_immutable_binding s l x =
     match e with
     | Coq_env_record_decl ed ->
       if Heap.indom_decidable string_comparable ed x
-      then (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      then (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
              s
              ("Already declared environnment record in [env_record_create_immutable_binding].")
       else res_void
@@ -1598,10 +1494,7 @@ let env_record_create_immutable_binding s l x =
                Coq_mutability_uninitialized_immutable (Coq_value_prim
                Coq_prim_undef))
     | Coq_env_record_object (o, p) ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
         ("[env_record_create_immutable_binding] received an environnment record object."))
 
@@ -1619,17 +1512,11 @@ let env_record_initialize_immutable_binding s l x v =
         then let_binding
                (env_record_write_decl_env s l x Coq_mutability_immutable v)
                (fun s' -> res_void s')
-        else (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+        else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                s
                ("Non suitable binding in [env_record_initialize_immutable_binding]."))
     | Coq_env_record_object (o, p) ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
         ("[env_record_initialize_immutable_binding] received an environnment record object."))
 
@@ -1814,81 +1701,61 @@ let string_of_prealloc _foo_ = match _foo_ with
 let run_construct_prealloc runs0 s c b args =
   match b with
   | Coq_prealloc_global ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_global_eval ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_global_parse_int ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_global_parse_float ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_global_is_finite ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_global_is_nan ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_global_decode_uri ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_global_decode_uri_component ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_global_encode_uri ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_global_encode_uri_component ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
@@ -1896,209 +1763,157 @@ let run_construct_prealloc runs0 s c b args =
   | Coq_prealloc_object ->
     let_binding (get_arg 0 args) (fun v -> call_object_new s v)
   | Coq_prealloc_object_get_proto_of ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_get_own_prop_descriptor ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_get_own_prop_name ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_create ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_define_prop ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_define_props ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_seal ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_freeze ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_prevent_extensions ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_is_sealed ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_is_frozen ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_is_extensible ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_keys ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_keys_call ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_proto ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_proto_to_string ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_proto_value_of ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_proto_has_own_prop ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_proto_is_prototype_of ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_object_proto_prop_is_enumerable ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_function ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_function_proto ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_function_proto_to_string ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_function_proto_apply ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_function_proto_call ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_function_proto_bind ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
@@ -2118,25 +1933,19 @@ let run_construct_prealloc runs0 s c b args =
                 let (l, s') = p in
                 Coq_out_ter (s', (res_val (Coq_value_object l)))))))))
   | Coq_prealloc_bool_proto ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_bool_proto_to_string ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_bool_proto_value_of ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
@@ -2157,49 +1966,37 @@ let run_construct_prealloc runs0 s c b args =
              if_number (to_number runs0 s c v) (fun x x0 ->
                follow x (Coq_value_prim (Coq_prim_number x0)))))
   | Coq_prealloc_number_proto ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_number_proto_to_string ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_number_proto_value_of ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_number_proto_to_fixed ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_number_proto_to_exponential ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_number_proto_to_precision ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
@@ -2289,49 +2086,37 @@ let run_construct_prealloc runs0 s c b args =
                      if_void (array_args_map_loop runs0 s0 c l args 0.)
                        (fun s1 -> res_ter s1 (res_val (Coq_value_object l)))))))))
   | Coq_prealloc_array_is_array ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_array_proto ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_array_proto_to_string ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_array_proto_join ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_array_proto_pop ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_array_proto_push ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
@@ -2365,73 +2150,55 @@ let run_construct_prealloc runs0 s c b args =
                    if_string (to_string runs0 s c arg) (fun s0 s1 ->
                      follow s0 s1))))))
   | Coq_prealloc_string_proto ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_string_proto_to_string ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_string_proto_value_of ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_string_proto_char_at ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_string_proto_char_code_at ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_math ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_mathop m ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_date ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_regexp ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
@@ -2441,9 +2208,7 @@ let run_construct_prealloc runs0 s c b args =
       build_error s (Coq_value_object (Coq_object_loc_prealloc
         Coq_prealloc_error_proto)) v)
   | Coq_prealloc_error_proto ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
@@ -2453,33 +2218,25 @@ let run_construct_prealloc runs0 s c b args =
       build_error s (Coq_value_object (Coq_object_loc_prealloc
         (Coq_prealloc_native_error_proto ne))) v)
   | Coq_prealloc_native_error_proto n ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_error_proto_to_string ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_throw_type_error ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented.")))
   | Coq_prealloc_json ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Construct prealloc_")
         (append (string_of_prealloc b)
@@ -2679,10 +2436,7 @@ let rec binding_inst_function_decls runs0 s c l fds str bconfig =
                                 fname) (fun s3 d ->
                               match d with
                               | Coq_full_descriptor_undef ->
-                                (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                                (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                                   s3
                                   ("Undefined full descriptor in [binding_inst_function_decls].")
                               | Coq_full_descriptor_some a ->
@@ -2908,10 +2662,7 @@ let rec binding_inst_var_decls runs0 s c l vds bconfig str =
 let execution_ctx_binding_inst runs0 s c ct funco p args =
   match c.execution_ctx_variable_env with
   | [] ->
-    (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+    (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
       s
       ("Empty [execution_ctx_variable_env] in [execution_ctx_binding_inst].")
   | l :: l0 ->
@@ -2943,10 +2694,7 @@ let execution_ctx_binding_inst runs0 s c ct funco p args =
                      | None ->
                        if bdefined
                        then follow2 s2
-                       else (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                       else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                               s2
                               ("Weird `arguments\' object in [execution_ctx_binding_inst]."))
                   | Coq_codetype_global -> follow2 s2
@@ -2962,29 +2710,20 @@ let execution_ctx_binding_inst runs0 s c ct funco p args =
                    (binding_inst_formal_params runs0 s c l args names str)
                    (fun s' -> follow s' names)))
            | None ->
-             (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+             (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                s
                ("Non coherent functionnal code type in [execution_ctx_binding_inst]."))
         | Coq_codetype_global ->
           (match funco with
            | Some o ->
-             (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+             (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                s
                ("Non coherent non-functionnal code type in [execution_ctx_binding_inst].")
            | None -> follow s [])
         | Coq_codetype_eval ->
           (match funco with
            | Some o ->
-             (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+             (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                s
                ("Non coherent non-functionnal code type in [execution_ctx_binding_inst].")
            | None -> follow s [])))
@@ -3063,10 +2802,7 @@ let run_object_get_own_prop runs0 s c l x =
                           follow s3 (Coq_attributes_data_of
                             (attributes_data_with_value ad v))
                         | Coq_attributes_accessor_of aa ->
-                          (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                          (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                             s3
                             ("[run_object_get_own_prop]:  received an accessor property descriptor in a point where the specification suppose it never happens.")))))))
       | Coq_builtin_get_own_prop_string ->
@@ -3114,33 +2850,21 @@ let run_function_has_instance runs0 s lv _foo_ = match _foo_ with
     | Coq_value_prim p ->
       (match p with
        | Coq_prim_undef ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("Primitive found in the prototype chain in [run_object_has_instance_loop].")
        | Coq_prim_null ->
          res_ter s (res_val (Coq_value_prim (Coq_prim_bool false)))
        | Coq_prim_bool b ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("Primitive found in the prototype chain in [run_object_has_instance_loop].")
        | Coq_prim_number n ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("Primitive found in the prototype chain in [run_object_has_instance_loop].")
        | Coq_prim_string s0 ->
-         (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("Primitive found in the prototype chain in [run_object_has_instance_loop]."))
     | Coq_value_object proto ->
@@ -3613,10 +3337,7 @@ let run_binary_op runs0 s c op v1 v2 =
                                                                 (Coq_out_ter
                                                                 (s,
                                                                 (res_val v2)))
-                                                         else (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                                                         else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                                                                 s
                                                                 ("Undealt lazy operator in [run_binary_op].")
 
@@ -3689,47 +3410,29 @@ let run_unary_op runs0 s c op e =
           if_spec (run_expr_get_value runs0 s c e) (fun s1 v ->
             match op with
             | Coq_unary_op_delete ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_void ->
               res_ter s1 (res_val (Coq_value_prim Coq_prim_undef))
             | Coq_unary_op_typeof ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_add -> to_number runs0 s1 c v
@@ -3751,10 +3454,7 @@ let run_unary_op runs0 s c op e =
           if_success (runs0.runs_type_expr s c e) (fun s1 rv ->
             match rv with
             | Coq_resvalue_empty ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Empty result for a `typeof\' in [run_unary_op].")
             | Coq_resvalue_value v ->
@@ -3775,47 +3475,29 @@ let run_unary_op runs0 s c op e =
           if_spec (run_expr_get_value runs0 s c e) (fun s1 v ->
             match op with
             | Coq_unary_op_delete ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_void ->
               res_ter s1 (res_val (Coq_value_prim Coq_prim_undef))
             | Coq_unary_op_typeof ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_add -> to_number runs0 s1 c v
@@ -3837,47 +3519,29 @@ let run_unary_op runs0 s c op e =
           if_spec (run_expr_get_value runs0 s c e) (fun s1 v ->
             match op with
             | Coq_unary_op_delete ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_void ->
               res_ter s1 (res_val (Coq_value_prim Coq_prim_undef))
             | Coq_unary_op_typeof ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_add -> to_number runs0 s1 c v
@@ -3899,47 +3563,29 @@ let run_unary_op runs0 s c op e =
           if_spec (run_expr_get_value runs0 s c e) (fun s1 v ->
             match op with
             | Coq_unary_op_delete ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_void ->
               res_ter s1 (res_val (Coq_value_prim Coq_prim_undef))
             | Coq_unary_op_typeof ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_add -> to_number runs0 s1 c v
@@ -3961,47 +3607,29 @@ let run_unary_op runs0 s c op e =
           if_spec (run_expr_get_value runs0 s c e) (fun s1 v ->
             match op with
             | Coq_unary_op_delete ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_void ->
               res_ter s1 (res_val (Coq_value_prim Coq_prim_undef))
             | Coq_unary_op_typeof ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_add -> to_number runs0 s1 c v
@@ -4023,47 +3651,29 @@ let run_unary_op runs0 s c op e =
           if_spec (run_expr_get_value runs0 s c e) (fun s1 v ->
             match op with
             | Coq_unary_op_delete ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_void ->
               res_ter s1 (res_val (Coq_value_prim Coq_prim_undef))
             | Coq_unary_op_typeof ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_add -> to_number runs0 s1 c v
@@ -4085,47 +3695,29 @@ let run_unary_op runs0 s c op e =
           if_spec (run_expr_get_value runs0 s c e) (fun s1 v ->
             match op with
             | Coq_unary_op_delete ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_void ->
               res_ter s1 (res_val (Coq_value_prim Coq_prim_undef))
             | Coq_unary_op_typeof ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_add -> to_number runs0 s1 c v
@@ -4147,47 +3739,29 @@ let run_unary_op runs0 s c op e =
           if_spec (run_expr_get_value runs0 s c e) (fun s1 v ->
             match op with
             | Coq_unary_op_delete ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_void ->
               res_ter s1 (res_val (Coq_value_prim Coq_prim_undef))
             | Coq_unary_op_typeof ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_add -> to_number runs0 s1 c v
@@ -4209,47 +3783,29 @@ let run_unary_op runs0 s c op e =
           if_spec (run_expr_get_value runs0 s c e) (fun s1 v ->
             match op with
             | Coq_unary_op_delete ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_void ->
               res_ter s1 (res_val (Coq_value_prim Coq_prim_undef))
             | Coq_unary_op_typeof ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_post_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_incr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_pre_decr ->
-              (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
                 ("Undealt regular operator in [run_unary_op].")
             | Coq_unary_op_add -> to_number runs0 s1 c v
@@ -4459,20 +4015,14 @@ let run_expr_assign runs0 s c opo e1 e2 =
     let_binding (fun s0 rv' ->
       match rv' with
       | Coq_resvalue_empty ->
-        (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+        (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
           s0
           ("Non-value result in [run_expr_assign].")
       | Coq_resvalue_value v ->
         if_void (ref_put_value runs0 s0 c rv1 v) (fun s' ->
           result_out (Coq_out_ter (s', (res_val v))))
       | Coq_resvalue_ref r ->
-        (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+        (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
           s0
           ("Non-value result in [run_expr_assign]."))
       (fun follow ->
@@ -4508,10 +4058,7 @@ let run_expr_function runs0 s c fo args bd =
                   (res_val (Coq_value_object l0))))))))
       in
       destr_list lex' (fun x ->
-        (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+        (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
           s'
           ("Empty lexical environnment allocated in [run_expr_function]."))
         (fun l x -> follow l) ())
@@ -4574,31 +4121,19 @@ let run_eval runs0 s c is_direct_call vs =
                      res_ter s2 (res_val (Coq_value_prim Coq_prim_undef))
                    | Coq_resvalue_value v -> res_ter s2 (res_val v)
                    | Coq_resvalue_ref r0 ->
-                     (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                     (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                        s2
                        ("Reference found in the result of an `eval\' in [run_eval]."))
                | Coq_restype_break ->
-                 (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                 (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                    s2
                    ("Forbidden result type returned by an `eval\' in [run_eval].")
                | Coq_restype_continue ->
-                 (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                 (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                    s2
                    ("Forbidden result type returned by an `eval\' in [run_eval].")
                | Coq_restype_return ->
-                 (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                 (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                    s2
                    ("Forbidden result type returned by an `eval\' in [run_eval].")
                | Coq_restype_throw -> res_ter s2 (res_throw r.res_value)))
@@ -4625,10 +4160,7 @@ let run_expr_call runs0 s c e1 e2s =
                    else runs0.runs_type_call s3 c l vthis vs) (fun follow ->
                    match rv with
                    | Coq_resvalue_empty ->
-                     (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                     (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                        s3
                        ("[run_expr_call] unable to call an  empty result.")
                    | Coq_resvalue_value v ->
@@ -4645,10 +4177,7 @@ let run_expr_call runs0 s c e1 e2s =
                                (ref_kind_comparable (ref_kind_of r)
                                  Coq_ref_kind_object))
                         then follow v
-                        else (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                        else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                                s3
                                ("[run_expr_call] unable to call a non-property function.")
                       | Coq_ref_base_type_env_loc l0 ->
@@ -4891,10 +4420,7 @@ let run_stat_try runs0 s c t1 t2o t3o =
             let (lex', s') = p in
             (match lex' with
              | [] ->
-               (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+               (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                  s'
                  ("Empty lexical environnment in [run_stat_try].")
              | l :: oldlex ->
@@ -5035,14 +4561,10 @@ let run_stat runs0 s c _term_ = match _term_ with
 | Coq_stat_for_var (ls, ds, eo2, eo3, s0) ->
   run_stat_for_var runs0 s c ls ds eo2 eo3 s0
 | Coq_stat_for_in (ls, e1, e2, s0) ->
-  (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+  (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
     ("stat_for_in")
 | Coq_stat_for_in_var (ls, x, e1o, e2, s0) ->
-  (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+  (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
     ("stat_for_in_var")
 | Coq_stat_debugger -> result_out (Coq_out_ter (s, res_empty))
 | Coq_stat_switch (labs, e, sb) -> run_stat_switch runs0 s c labs e sb
@@ -5097,10 +4619,7 @@ let rec run_object_is_sealed runs0 s c l _foo_ = match _foo_ with
   if_spec (runs0.runs_type_object_get_own_prop s c l x) (fun s0 d ->
     match d with
     | Coq_full_descriptor_undef ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s0
         ("[run_object_is_sealed]:  Undefined descriptor found in a place where it shouldn\'t.")
     | Coq_full_descriptor_some a ->
@@ -5120,10 +4639,7 @@ let rec run_object_seal runs0 s c l _foo_ = match _foo_ with
   if_spec (runs0.runs_type_object_get_own_prop s c l x) (fun s0 d ->
     match d with
     | Coq_full_descriptor_undef ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s0
         ("[run_object_seal]:  Undefined descriptor found in a place where it shouldn\'t.")
     | Coq_full_descriptor_some a ->
@@ -5153,10 +4669,7 @@ let rec run_object_freeze runs0 s c l _foo_ = match _foo_ with
   if_spec (runs0.runs_type_object_get_own_prop s c l x) (fun s0 d ->
     match d with
     | Coq_full_descriptor_undef ->
-      (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s0
         ("[run_object_freeze]:  Undefined descriptor found in a place where it shouldn\'t.")
     | Coq_full_descriptor_some a ->
@@ -5200,10 +4713,7 @@ let rec run_object_is_frozen runs0 s c l _foo_ = match _foo_ with
       else run_object_is_frozen runs0 s0 c l xs') (fun check_configurable ->
       match d with
       | Coq_full_descriptor_undef ->
-        (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+        (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
           s0
           ("[run_object_is_frozen]:  Undefined descriptor found in a place where it shouldn\'t.")
       | Coq_full_descriptor_some a ->
@@ -5275,33 +4785,25 @@ let run_array_join_elements runs0 s c l k length0 sep sR =
 let run_call_prealloc runs0 s c b vthis args =
   match b with
   | Coq_prealloc_global ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_global_eval ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_global_parse_int ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_global_parse_float ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
@@ -5322,33 +4824,25 @@ let run_call_prealloc runs0 s c b vthis args =
           (res_val (Coq_value_prim (Coq_prim_bool
             (number_comparable n JsNumber.nan))))))
   | Coq_prealloc_global_decode_uri ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_global_decode_uri_component ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_global_encode_uri ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_global_encode_uri_component ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
@@ -5381,17 +4875,13 @@ let run_call_prealloc runs0 s c b vthis args =
           if_spec (runs0.runs_type_object_get_own_prop s1 c l x) (fun s2 d ->
             from_prop_descriptor runs0 s2 c d)))
   | Coq_prealloc_object_get_own_prop_name ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_object_create ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
@@ -5409,9 +4899,7 @@ let run_call_prealloc runs0 s c b vthis args =
                 if_bool (object_define_own_prop runs0 s2 c l name desc true)
                   (fun s3 x -> res_ter s3 (res_val (Coq_value_object l))))))))
   | Coq_prealloc_object_define_props ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
@@ -5461,25 +4949,19 @@ let run_call_prealloc runs0 s c b vthis args =
         if_some (run_object_method object_extensible_ s l) (fun r ->
           res_ter s (res_val (Coq_value_prim (Coq_prim_bool r)))))
   | Coq_prealloc_object_keys ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_object_keys_call ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_object_proto ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
@@ -5561,9 +5043,7 @@ let run_call_prealloc runs0 s c b vthis args =
                 (res_val (Coq_value_prim (Coq_prim_bool
                   (attributes_enumerable a))))))))
   | Coq_prealloc_function ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
@@ -5572,9 +5052,7 @@ let run_call_prealloc runs0 s c b vthis args =
     result_out (Coq_out_ter (s, (res_val (Coq_value_prim Coq_prim_undef))))
   | Coq_prealloc_function_proto_to_string ->
     if is_callable_dec s vthis
-    then (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    then (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
            ("Function.prototype.toString() is implementation dependent.")
     else run_error s Coq_native_error_type
   | Coq_prealloc_function_proto_apply ->
@@ -5583,10 +5061,7 @@ let run_call_prealloc runs0 s c b vthis args =
         if is_callable_dec s vthis
         then (match vthis with
               | Coq_value_prim p ->
-                (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                   s
                   ("Value is callable, but isn\'t an object.")
               | Coq_value_object thisobj ->
@@ -5615,10 +5090,7 @@ let run_call_prealloc runs0 s c b vthis args =
     if is_callable_dec s vthis
     then (match vthis with
           | Coq_value_prim p ->
-            (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+            (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
               s
               ("Value is callable, but isn\'t an object.")
           | Coq_value_object thisobj ->
@@ -5629,10 +5101,7 @@ let run_call_prealloc runs0 s c b vthis args =
     if is_callable_dec s vthis
     then (match vthis with
           | Coq_value_prim p ->
-            (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+            (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
               s
               ("Value is callable, but isn\'t an object.")
           | Coq_value_object thisobj ->
@@ -5730,9 +5199,7 @@ let run_call_prealloc runs0 s c b vthis args =
         (res_val (Coq_value_prim (Coq_prim_bool
           (convert_value_to_boolean v)))))))
   | Coq_prealloc_bool_proto ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
@@ -5814,17 +5281,13 @@ let run_call_prealloc runs0 s c b vthis args =
            (res_val (Coq_value_prim (Coq_prim_number JsNumber.zero)))))
     else let v = get_arg 0 args in to_number runs0 s c v
   | Coq_prealloc_number_proto ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_number_proto_to_string ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
@@ -5862,25 +5325,19 @@ let run_call_prealloc runs0 s c b vthis args =
                 | None -> run_error s Coq_native_error_type)
          else run_error s Coq_native_error_type))
   | Coq_prealloc_number_proto_to_fixed ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_number_proto_to_exponential ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_number_proto_to_precision ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
@@ -5898,9 +5355,7 @@ let run_call_prealloc runs0 s c b vthis args =
           then res_ter s (res_val (Coq_value_prim (Coq_prim_bool true)))
           else res_ter s (res_val (Coq_value_prim (Coq_prim_bool false)))))
   | Coq_prealloc_array_proto ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
@@ -5913,10 +5368,7 @@ let run_call_prealloc runs0 s c b vthis args =
         if is_callable_dec s1 vfunc
         then (match vfunc with
               | Coq_value_prim p ->
-                (fun s message ->
-  print_endline (__LOC__ ^ ": Stuck!\nState:  " ^ Prheap.prstate true s
-    ^ "\nMessage:\t" ^ Prheap.string_of_char_list message) ;
-  Coq_result_impossible)
+                (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                   s1
                   ("Value is callable, but isn\'t an object.")
               | Coq_value_object func ->
@@ -5986,9 +5438,7 @@ let run_call_prealloc runs0 s c b vthis args =
            if_string (to_string runs0 s c value0) (fun s0 s1 ->
              res_ter s0 (res_val (Coq_value_prim (Coq_prim_string s1)))))
   | Coq_prealloc_string_proto ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
@@ -6016,49 +5466,37 @@ let run_call_prealloc runs0 s c b vthis args =
          then run_object_prim_value s l
          else run_error s Coq_native_error_type))
   | Coq_prealloc_string_proto_char_at ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_string_proto_char_code_at ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_math ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_mathop m ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_date ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_regexp ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
@@ -6068,9 +5506,7 @@ let run_call_prealloc runs0 s c b vthis args =
       build_error s (Coq_value_object (Coq_object_loc_prealloc
         Coq_prealloc_error_proto)) v)
   | Coq_prealloc_error_proto ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
@@ -6080,26 +5516,20 @@ let run_call_prealloc runs0 s c b vthis args =
       build_error s (Coq_value_object (Coq_object_loc_prealloc
         (Coq_prealloc_native_error_proto ne))) v)
   | Coq_prealloc_native_error_proto n ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_error_proto_to_string ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
           (" not yet implemented")))
   | Coq_prealloc_throw_type_error -> run_error s Coq_native_error_type
   | Coq_prealloc_json ->
-    (fun s ->
-  print_endline (__LOC__ ^ ": Not implemented because: " ^ Prheap.string_of_char_list s) ;
-  Coq_result_not_yet_implemented)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (append
         ("Call prealloc_")
         (append (string_of_prealloc b)
