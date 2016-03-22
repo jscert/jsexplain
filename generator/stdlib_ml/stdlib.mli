@@ -3,9 +3,11 @@
 (* int operations *)
 
 (* todo : factorize and clean up *)
-
+(*
 val ( ~+ ) : int -> int
 val ( ~- ) : int -> int
+*)
+
 val ( + ) : int -> int -> int
 val ( - ) : int -> int -> int
 val ( * ) : int -> int -> int
@@ -23,31 +25,35 @@ val int_ge : int -> int -> bool
 
 (* Alan: these can be implemented directly, using Number.NaN,
    Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY *)
-
+(*
 val nan : float
 val infinity : float
 val neg_infinity : float
+*)
 
 (* Alan: Do we need these ? If so, they are Number.MAX_VALUE and
-   Number.MIN_VALUE *)
+   Number.MIN_VALUE
 
 val max_float : float
 val min_float : float
 
+ *)
+
+
 (* Alan: these should all be implemented along with the int operations as the JS
    ones. ** is Math.pow *)
 
+(*
 val ( ~+. ) : float -> float
 val ( ~-. ) : float -> float
+*)
+
 val ( +. ) : float -> float -> float
 val ( -. ) : float -> float -> float
 val ( *. ) : float -> float -> float
 val ( /. ) : float -> float -> float
-val ( ** ) : float -> float -> float
+(* val ( ** ) : float -> float -> float *)
 
-(* Alan: Math.abs, if we need it *)
-
-val abs_float : float -> float
 
 (*
 val mod_float : float -> float -> float (* Alan: % infix *)
@@ -67,7 +73,7 @@ val max : float -> float -> float
 (* Alan: Ideally we would add these to the spec, but for the moment conversion
    to a string is doing a foo+"", and conversion to an int is doing +foo *)
 
-val int_of_float : float -> int
+val int_of_float : float -> int (* will be removed, since only used by substring *)
 val number_of_int : int -> float  (* = fun x -> float_of_int x *)
 
 (** val of_int : float -> number **)

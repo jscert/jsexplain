@@ -2814,7 +2814,7 @@ let run_object_get_own_prop runs0 s c l x =
               (fun s1 k ->
               if_string
                 (runs0.runs_type_to_string s1 c (Coq_value_prim
-                  (Coq_prim_number (abs_float k))))
+                  (Coq_prim_number (JsNumber.absolute k))))
                 (fun s2 s3 ->
                 if not_decidable (string_comparable x s3)
                 then res_spec s2 Coq_full_descriptor_undef
@@ -2996,7 +2996,7 @@ let is_lazy_op _foo_ = match _foo_ with
 let get_puremath_op _foo_ = match _foo_ with
 | Coq_binary_op_mult -> Some (fun x y -> x *. y)
 | Coq_binary_op_div -> Some (fun x y -> x /. y)
-| Coq_binary_op_mod -> Some fmod
+| Coq_binary_op_mod -> Some JsNumber.fmod
 | Coq_binary_op_add -> None
 | Coq_binary_op_sub -> Some (fun x y -> x -. y)
 | Coq_binary_op_left_shift -> None

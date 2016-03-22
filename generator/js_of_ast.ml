@@ -781,13 +781,27 @@ and js_of_constant = function
 
 and js_of_path_longident path ident =
   match String.concat "." @@ Longident.flatten ident.txt with
+  (* for unit: *)
   | "()"  -> unit_repr
+  (* for bool: *)
+  | "&&"  -> "&&"
+  | "||"  -> "||"
+  (* for float: *)
   | "+."  -> "+"
   | "*."  -> "*"
   | "-."  -> "-"
   | "~-." -> "-"
   | "/."  -> "/"
-  | "="   -> "=="
+  | "<"   -> "<"
+  | ">"   -> ">"
+  | "<="   -> "<="
+  | ">="   -> ">="
+  (* for int: *)
+  | "+"  -> "+"
+  | "*"  -> "*"
+  | "-"  -> "-"
+  | "/"  -> "/"
+  (* for string *)
   | "^"   -> "+" (* !!TODO: we want to claim ability to type our sublanguage, so we should not use this *)
   | res   -> 
       let res = if !generate_qualified_names && (Path.head path).name <> "Stdlib" 

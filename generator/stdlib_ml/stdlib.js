@@ -1,3 +1,6 @@
+
+//----------------------------------------------------------------------------
+
 var None = function() {
    return { type: "option", tag: "None" };
 };
@@ -6,11 +9,7 @@ var Some = function(value) {
    return { type: "option", tag: "Some", value: value };
 };
 
-
-
-var max_float = Number.MAX_VALUE; // TODO: find absolute value for this
-var min_float = Number.MIN_VALUE; // TODO: find absolute value for this
-
+//----------------------------------------------------------------------------
 
 var mk_nil = function() {
    return { type: "list", tag: "[]" };
@@ -20,83 +19,84 @@ var mk_cons = function(head, tail) {
    return { type: "list", tag: "::", head: head, tail: tail };
 };
 
-var add = function (a, b) { return a + b }
-var sub = function (a, b) { return a - b }
-var mul = function (a, b) { return a * b }
-var div = function (a, b) { return a / b }
+//----------------------------------------------------------------------------
 
-var eq = function (a, b) { return a === b }
-var le = function (a, b) { return a < b }
-var ge = function (a, b) { return a > b }
+// var print = function (x) { console.log(x) }
 
-var leq = function (a, b) { return a <= b }
-var geq = function (a, b) { return a >= b }
+// var stuck = function (msg) { throw {type:'stuck', msg:msg} }
 
-var print = function (x) { console.log(x) }
+// var to_string = function (x) { return String(x) }
 
-var stuck = function (msg) { throw {type:'stuck', msg:msg} }
+//----------------------------------------------------------------------------
 
-var to_string = function (x) { return String(x) }
+/* automatically dealt with js_of_ast.ml
 
-var parse = function (source) {
-    var ast = require('esprima').parse(source).body[0].expression;
+val ( + ) : int -> int -> int
+val ( - ) : int -> int -> int
+val ( * ) : int -> int -> int
+val ( / ) : int -> int -> int
+val ( +. ) : float -> float -> float
+val ( -. ) : float -> float -> float
+val ( *. ) : float -> float -> float
+val ( /. ) : float -> float -> float
+val ( = ) : float -> float -> bool
+val ( < ) : float -> float -> bool
+val ( > ) : float -> float -> bool
+val ( <= ) : float -> float -> bool 
+val ( >= ) : float -> float -> bool
+*/
 
-    // Esprima does it's little thing. To be handled by auto generated code we need to 
-    // reshape the tree structure to match the labels and expected content.
+//----------------------------------------------------------------------------
 
-    function transform (tree) {
-        if (tree === undefined) {
-        } else {
-            // Javascript style instructions are well handled with no additional creation.
-            switch (tree.operator) {
-                case '+':
-                    tree.type = "Add"; tree.operator = undefined; break;
-                case '-':
-                    tree.type = "Sub"; tree.operator = undefined; break;
-                case "*":
-                    tree.type = "Mul"; tree.operator = undefined; break;
-                case "/":
-                    tree.type = "Div"; tree.operator = undefined; break;
-                default: break;
-            }
+var nat_eq = function(x, y) { return x === y; };
+var int_eq = function(x, y) { return x === y; };
+var int_ge = function(x, y) { return x >= y; };
 
-            if (tree.type === "Literal") {
-                tree.type = "Const";
-            }
+//----------------------------------------------------------------------------
 
-            // tree.left and tree.right from parser interpretation
-            if (tree.left !== undefined) tree.left = transform(tree.left);
-            if (tree.right !== undefined) tree.right = transform(tree.right);
+var int_of_float = function(x) { return x; };
+var number_of_int = function(x) { return x; };
+var of_int = function(x) { return x; };
 
-            // Esprima sees these standalone type instructions as Identifiers
-            if (tree.type === "Identifier") {
-                switch (tree.name) {
-                    case "Emp":
-                        tree.type = "Emp"; break;
-                    default: console.log("Unknown ident"); break;
-                }
-            }
+//----------------------------------------------------------------------------
 
-            // Esprima generates a function type structure that needs reshaping to the
-            // automatically generated structure, respecting label names!
-            if (tree.type === "CallExpression") {
-                switch (tree.callee.name) {
-                    case "Push":
-                        tree.type = "Push"; 
-                        tree.value = transform(tree.arguments[0]);
-                        tree.stack = transform(tree.arguments[1]);
-                        break;
-                    case "Pop":
-                        tree.type = "Pop"; 
-                        tree.stack = transform(tree.arguments[0]);
-                        break;
-                    default: console.log("Unknown callexpr"); break;
-                }   
-            }
+var number_comparable = function(x, y) { return x === y; };
 
-            return tree;
-        }
-    }
+//----------------------------------------------------------------------------
 
-    return transform(ast);
-}
+var bool_eq = function(x, y) { return x === y; };
+
+var not = function(x) { return !x; };
+
+
+//----------------------------------------------------------------------------
+
+var string_eq = function(x, y) { return x === y; };
+
+var strappend = function(x, y) { return x + y; };
+
+var strlength = function(x) { return x.length; };
+
+var substring = function(n, m, s) { return s.slice(n, n+m); };
+
+
+//----------------------------------------------------------------------------
+
+/*
+(* We use this to compare types that are not known by stdlib, like Native_error;
+  should be implemented in JS by comparing the objects, to see if they have the same
+  "tag" fields (there should be no other fields, except perhaps "type") *)
+val ( === ) : 'a -> 'a -> bool  (* becomes === in js *)
+
+*/
+
+//----------------------------------------------------------------------------
+
+
+var __LOC__ = "___LOC___"
+
+var raise = function(x) { throw "Not_found"; };
+
+
+
+

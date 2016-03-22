@@ -36,3 +36,5 @@ val sign : number -> number
 val absolute : number -> number
 
 val modulo_32 : number -> number
+
+val fmod : number -> number -> number

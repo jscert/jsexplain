@@ -126,7 +126,7 @@ let strict_equality_test v1 v2 =
 (** val inequality_test_number : number -> number -> prim **)
 
 let inequality_test_number n1 n2 =
-  if or_decidable (number_comparable n1 JsNumber.nan) (number_comparable n2 nan)
+  if or_decidable (number_comparable n1 JsNumber.nan) (number_comparable n2 JsNumber.nan)
   then Coq_prim_undef
   else if number_comparable n1 n2
        then Coq_prim_bool false

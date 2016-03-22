@@ -45,7 +45,7 @@ let same_value_dec v1 v2 =
                    (value_comparable v1 (Coq_value_prim (Coq_prim_number
                      JsNumber.nan)))
                    (value_comparable v2 (Coq_value_prim (Coq_prim_number
-                     nan)))
+                     JsNumber.nan)))
                in
                (if h2
                 then (fun _ -> true_decidable)
