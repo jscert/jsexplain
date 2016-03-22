@@ -41,13 +41,13 @@ let rem h1 l k =
 (** val read_option :
    'a1 coq_Comparable -> ('a1, 'a2) heap -> 'a1 -> 'a2 option **)
 
-let read_option h =
+let read_option h l k =
  let rec read_option0 l k =
    match l with
    | [] -> None
    | p :: l' ->
      let (x, v) = p in if h x k then Some v else read_option0 l' k
- in read_option0
+ in read_option0 l k
 
 (** val mem_assoc :
    'a2 coq_Comparable -> 'a2 -> ('a2 * 'a1) list -> bool **)
