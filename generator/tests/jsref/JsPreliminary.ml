@@ -55,7 +55,7 @@ let convert_number_to_integer n =
               (or_decidable (number_comparable n JsNumber.infinity)
                 (number_comparable n JsNumber.neg_infinity)))
        then n
-       else mult (JsNumber.sign n) (floor (JsNumber.absolute n))
+       else  (JsNumber.sign n) *. (JsNumber.floor (JsNumber.absolute n))
 
 (** val convert_bool_to_string : bool -> string **)
 
@@ -144,7 +144,7 @@ let inequality_test_number n1 n2 =
                                 then Coq_prim_bool false
                                 else if number_comparable n1 JsNumber.neg_infinity
                                      then Coq_prim_bool true
-                                     else Coq_prim_bool (lt_bool n1 n2)
+                                     else Coq_prim_bool (n1 < n2)
 
 (** val inequality_test_string : string -> string -> bool **)
 

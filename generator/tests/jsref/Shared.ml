@@ -14,7 +14,7 @@ let option_case d f o = match o with
 
 (** val int_of_char : char -> float **)
 
-let int_of_char = (fun c -> float_of_int (int_of_char c))
+  (* let int_of_char = (fun c -> float_of_int (int_of_char c)) *)
 
 (** val string_sub : string -> int -> int -> string **)
 
@@ -23,11 +23,11 @@ let string_sub s n l =
 
 (** val lt_int_decidable : float -> float -> coq_Decidable **)
 
-let lt_int_decidable x y = float_lt x y
+let lt_int_decidable x y =  x < y
 
 (** val le_int_decidable : float -> float -> coq_Decidable **)
 
-let le_int_decidable x y = float_le x y
+let le_int_decidable x y =  x <= y
 
 (** val ge_nat_decidable : int -> int -> coq_Decidable **)
 

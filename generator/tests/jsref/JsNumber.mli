@@ -1,5 +1,8 @@
 type number = float
 
+val floor : float -> float
+
+
 val zero: number
 val neg_zero : number
 val one : number

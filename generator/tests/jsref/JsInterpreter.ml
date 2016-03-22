@@ -592,7 +592,7 @@ let object_can_put runs0 s c l x =
     strictness_flag -> __ specres) -> result **)
 
 let run_object_define_own_prop_array_loop runs0 s c l newLen oldLen newLenDesc newWritable throwcont def =
-  if lt_int_decidable newLen oldLen
+  if  newLen < oldLen
   then let_binding (oldLen -. 1.) (fun oldLen' ->
          if_string
            (to_string runs0 s c (Coq_value_prim (Coq_prim_number
@@ -821,7 +821,7 @@ let object_define_own_prop runs0 s c l x desc throwcont =
                                   (fun s2 slen ->
                                   if and_decidable (string_comparable x slen)
                                        (not_decidable
-                                         (float_eq ilen 
+                                         ( ilen =
                                            ((fun p -> 1. +. (2. *. p))
                                            ((fun p -> 1. +. (2. *. p))
                                            ((fun p -> 1. +. (2. *. p))
@@ -2994,11 +2994,11 @@ let is_lazy_op _foo_ = match _foo_ with
     binary_op -> (number -> number -> number) option **)
 
 let get_puremath_op _foo_ = match _foo_ with
-| Coq_binary_op_mult -> Some mult
-| Coq_binary_op_div -> Some div
+| Coq_binary_op_mult -> Some (fun x y -> x *. y)
+| Coq_binary_op_div -> Some (fun x y -> x /. y)
 | Coq_binary_op_mod -> Some fmod
 | Coq_binary_op_add -> None
-| Coq_binary_op_sub -> Some sub
+| Coq_binary_op_sub -> Some (fun x y -> x -. y)
 | Coq_binary_op_left_shift -> None
 | Coq_binary_op_right_shift -> None
 | Coq_binary_op_unsigned_right_shift -> None
@@ -3220,7 +3220,7 @@ let run_binary_op runs0 s c op v1 v2 =
                   (Coq_value_prim w2)) (fun s2 nn ->
                 let (n1, n2) = nn in
                 res_out (Coq_out_ter (s2,
-                  (res_val (Coq_value_prim (Coq_prim_number (add n1 n2))))))))
+                  (res_val (Coq_value_prim (Coq_prim_number (n1 +. n2))))))))
   else if issome (get_puremath_op op)
        then if_some (get_puremath_op op) (fun mop ->
               if_spec (convert_twice_number runs0 s c v1 v2) (fun s1 nn ->
@@ -4730,7 +4730,7 @@ let rec run_object_is_frozen runs0 s c l _foo_ = match _foo_ with
     value list specres **)
 
 let run_get_args_for_apply runs0 s c l index n =
-  if lt_int_decidable index n
+  if  index < n
   then if_string
          (to_string runs0 s c (Coq_value_prim (Coq_prim_number
            (of_int index)))) (fun s0 sindex ->
@@ -4769,7 +4769,7 @@ let valueToStringForJoin runs0 s c l k =
     string -> string -> result **)
 
 let run_array_join_elements runs0 s c l k length0 sep sR =
-  if lt_int_decidable k length0
+  if  k < length0
   then let_binding (append sR sep) (fun ss ->
          let_binding (valueToStringForJoin runs0 s c l k) (fun sE ->
            if_spec sE (fun s0 element ->
@@ -5145,7 +5145,7 @@ let run_call_prealloc runs0 s c b vthis args =
                                        (to_int32 runs0 s'0 c (Coq_value_prim
                                          (Coq_prim_number n)))
                                        (fun s'1 ilen ->
-                                       if lt_int_decidable ilen
+                                       if  ilen <
                                             (number_of_int (LibList.length a))
                                        then res_spec s'1 0.
                                        else res_spec s'1
@@ -5389,7 +5389,7 @@ let run_call_prealloc runs0 s c b vthis args =
                then vsep
                else Coq_value_prim (Coq_prim_string (","))) (fun rsep ->
               if_string (to_string runs0 s2 c rsep) (fun s3 sep ->
-                if float_eq ilen 0.0
+                if ilen = 0.0
                 then res_ter s3
                        (res_val (Coq_value_prim (Coq_prim_string "")))
                 else let_binding (valueToStringForJoin runs0 s3 c l 0.)
@@ -5402,7 +5402,7 @@ let run_call_prealloc runs0 s c b vthis args =
         (run_object_get runs0 s0 c l
           ("length")) (fun s1 vlen ->
         if_spec (to_uint32 runs0 s1 c vlen) (fun s2 ilen ->
-          if float_eq ilen 0.0
+          if ilen = 0.0
           then if_not_throw
                  (object_put runs0 s2 c l
                    ("length")

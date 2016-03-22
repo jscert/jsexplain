@@ -520,12 +520,12 @@ let throw_irrelevant =
 (** val add_one : number -> number **)
 
 let add_one n =
-  add n JsNumber.one
+  n +. JsNumber.one
 
 (** val sub_one : number -> number **)
 
 let sub_one n =
-  sub n JsNumber.one
+  n -. JsNumber.one
 
 (** val is_syntactic_eval : expr -> bool **)
 
