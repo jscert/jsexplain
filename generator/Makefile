@@ -20,40 +20,46 @@ TESTS_ML    := $(wildcard $(TESTS_DIR)/*.ml)
 JSREF_ML    := $(wildcard $(TESTS_DIR)/$(JSREF_DIR)/*.ml) 
 JSREF_MLI   := $(wildcard $(TESTS_DIR)/$(JSREF_DIR)/*.mli)
 
+###############################################################
+
 # ASSEMBLY_JS must respect dependencies order
-ASSEMBLY_JS := \
-	Ascii.log.js \
-	BinNums.log.js \
-	Bool0.log.js \
-	Datatypes.log.js \
-	Fappli_IEEE_bits.log.js \
-	Fappli_IEEE.log.js \
-	LibBool.log.js \
-	LibReflect.log.js \
-	LibOperation.log.js \
-	LibList.log.js \
-	Heap.log.js \
-	Shared.log.js \
-	LibString.log.js \
-	LibOption.log.js \
+ASSEMBLY_JS_FILES := \
+	BinNums.unlog.js \
+	Bool0.unlog.js \
+	List0.unlog.js \
+	Datatypes.unlog.js \
+	Fappli_IEEE_bits.unlog.js \
+	Fappli_IEEE.unlog.js \
+	LibBool.unlog.js \
+	LibReflect.unlog.js \
+	LibOperation.unlog.js \
+	LibList.unlog.js \
+	LibString.unlog.js \
+	LibOption.unlog.js \
+	LibTactics.unlog.js \
+	LibProd.unlog.js \
+	LibFunc.unlog.js \
+	Heap.unlog.js \
+	Shared.unlog.js \
 	JsNumber.js \
-	JsSyntax.log.js \
-	JsSyntaxAux.log.js \
+	JsSyntax.unlog.js \
+	JsSyntaxAux.unlog.js \
 	Translate_syntax.js \
-	List0.log.js \
-	JsSyntaxInfos.log.js \
-	JsCommon.log.js \
-	JsCommonAux.log.js \
+	JsSyntaxInfos.unlog.js \
+	JsCommon.unlog.js \
+	JsCommonAux.unlog.js \
 	JsPreliminary.log.js \
-	JsInit.log.js \
-	Prheap.js \
-	LibTactics.log.js \
-	LibProd.log.js \
-	LibFunc.log.js \
-	JsInterpreterMonads.log.js \
-	JsInterpreter.log.js \
-	Specif.log.js
-ASSEMBLY_JS := $(STDLIB_DIR)/stdlib.js $(addprefix tests/jsref/,$(ASSEMBLY_JS));
+	JsInit.unlog.js \
+	JsInterpreterMonads.unlog.js \
+	JsInterpreter.log.js
+ASSEMBLY_JS := $(STDLIB_DIR)/stdlib.js $(addprefix tests/jsref/,$(ASSEMBLY_JS_FILES));
+
+
+###############################################################
+
+# --> todo arthur include src files
+#	JsPreliminary.log.js \
+#	JsInterpreter.log.js
 
 
 ###############################################################

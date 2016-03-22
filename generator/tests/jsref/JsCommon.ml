@@ -584,7 +584,7 @@ let elision_tail_remove ol =
 let parse_pickable = (fun s strict ->
     let str = s in
     (* try  ARTHUR HACK *)
-      let parserExp = Parser_main.exp_from_string ~force_strict:strict str in
+      let parserExp = Translate_syntax.Parser_main.exp_from_string ~force_strict:strict str in
       Some (JsSyntaxInfos.add_infos_prog strict
         (Translate_syntax.exp_to_prog parserExp))
     (* with

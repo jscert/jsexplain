@@ -1,41 +1,32 @@
-ARTHUR
 
-- remove "open JsNumber" to more easily trace occurences
 
-- generate "type: " in smart constructors [optional until display is needed]
+
+
+
+NEW TODO
+
+- parse pickage in JsCommon needed for eval
+
+- optimize ML code for 
+      type_compare mutability_compare prim_compare 
+  and test for prim_compare if we can match on pairs of arguments, with a catchall
+
+- move prim_compare and value_compare to a higher file because it is interesting and should be logged
+- move same_value_dec from jscommonaux to a higher file
 
 - generate the escaped source code
 
-- control which file should feature logging 
+- LATER: inline the "%able" functions
 
+- LATER: remove useless files such as LibReflect LibString etc...
+
+
+- BONUS  -- generate "type: " in smart constructors [optional until display is needed]
 
 
 =========================================================
-NEXT
-
-[arthur did a first pass on JsNumber.ml to make explicit paths
- and on stdlib.ml]
-- continue cleaning up stdlib.ml
-- implement stdlib.js
-	- remove unused functions
-	- sort out remaining ones
-	- need to have one function for each one of stdlib.ml
-	- replace JsNumber by a corresponding JsNumber.mli
-	  (keep JsNumber saved somewhere else for future use)
-	- implement JsNumber.js by hand to match signature of JsNumber.mli,
-	  by implementing number related functions using JS counterpart directly
-     (ask Alan for Int32 and Int64 implementation tricks)
-	- include JsNumber.js in assembly.js by modifying ASSEMBLY_JS in Makefile
-
-- remove useless files such as LibReflect LibString etc...
-
-- in JsInterpreter let append = strappend (* hack for compatibility, to do cleanup *)
-
-[alan or thomas]
-- figure out what to do for Parser_syntax Parser_main
 
 
-[our goal is to build trace for]
 - Introduce testing functions called:
 	- test_exec("code") -> parse, convert, build trace, log trace
 - Test first "var x = 3".
@@ -50,12 +41,15 @@ NEXT
   for each example, check the AST, check step-by-step the execution.
   => to see if the right things get highlighted
 
-[second biggest, only once we manage to build the trace]
 - display JS values/env/heap/ctx in html 
 	- contexts: essentially as before
 	- environments: need to follow the list of environment records
 	- heap: same as before, and do not attempt at first to show
 	  additional information in the heap appart from key/value bindings.
+
+- BONUS in JsInterpreter let append = strappend (* hack for compatibility, to do cleanup *)
+
+
 
 
 =========================================================

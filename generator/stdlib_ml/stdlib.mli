@@ -176,16 +176,6 @@ val (!) : 'a ref -> 'a
 val ( === ) : 'a -> 'a -> bool
 
 
-
-
-(*--------------------*)
-
-(* no longer needed it seems 
-module Pervasives : sig
-  val succ : int -> int
-end
-*)
-
 (*--------------------*)
 (* todo: remove when JsNumber.ml becomes .mli file *)
 
@@ -204,32 +194,6 @@ module Int32 : sig
 end
 
 
-
-
-(*--------------------*)
-
-(* figure out how to deal with parser *)
-
-module Parser_syntax : sig (* needed by translate_syntax.mli and by parser_main (below) *)
-  type unary_op
-  type arith_op
-  type bin_op
-  type exp
-end
-
-module Parser_main : sig 
-  val exp_from_string : ?force_strict:bool -> string -> Parser_syntax.exp
-end 
-
-(* ARTHUR: not needed -- tocheck
-   module Parser : sig
-     exception ParserFailure of string
-     exception InvalidArgument
-   end
-
-*)
-
-
 (*--------------------*)
 (* JSRef specific functions, useful for debugging *)
 
@@ -243,32 +207,3 @@ val prerr_endline : string -> unit
 val raise : exn -> 'a
 val stuck : string -> 'a
 
-
-
-
-(*--------------------*)
-(* deprecated *)
-
-(* should not be needed if we don't use JsNumber.ml *)
-(*
-module Int64 : sig 
-  val one : int64
-  val float_of_bits : int64 -> float
-end
-
-module List : sig (* should rely on List0 instead *)
-  val map : ('a -> 'b) -> 'a list -> 'b list
-  val rev : 'a list -> 'a list
-end
-
-module String : sig (* should rely on String0 instead *)
-  val length : string -> int
-  val append : string -> string -> string
-  val sub : string -> int -> int -> string
-  val concat : string -> string list -> string
-  val iter : (char -> unit) -> string -> unit
-  val make : int -> char -> string
-  val get : string -> int -> char
-end
-
-*)
