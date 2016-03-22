@@ -62,6 +62,7 @@ let out_error_or_cst s str ne v =
 let run_object_method proj s l =
   LibOption.map proj (object_binds_pickable_option s l)
 
+(*---DEBUG
 let run_object_method proj s l =
    let opt = object_binds_pickable_option s l in
      begin match opt with
@@ -69,7 +70,9 @@ let run_object_method proj s l =
        | _ -> ()
      end;
      LibOption.map proj opt
- 
+ *)
+
+
  (** val run_object_heap_set_extensible :
     bool -> state -> object_loc -> state option **)
 
@@ -77,6 +80,7 @@ let run_object_heap_set_extensible b s l =
   LibOption.map (fun o -> object_write s l (object_set_extensible o b))
     (object_binds_pickable_option s l)
 
+(* DEBUG
 let run_object_heap_set_extensible b s l =
    let opt = object_binds_pickable_option s l in
      begin match opt with
@@ -84,7 +88,8 @@ let run_object_heap_set_extensible b s l =
        | _ -> ()
      end;
      LibOption.map (fun o -> object_write s l (object_set_extensible o b)) opt
- 
+ *)
+
  type runs_type = { runs_type_expr : (state -> execution_ctx -> expr ->
                                     result);
                    runs_type_stat : (state -> execution_ctx -> stat ->
@@ -1272,6 +1277,7 @@ let ref_get_value runs0 s c _foo_ = match _foo_ with
            (env_record_get_binding_value runs0 s c l r.ref_name r.ref_strict)
            res_spec))
 
+(* DEBUG
 let ref_get_value runs s c r =
    let res = ref_get_value runs s c r in match res with
    | JsInterpreterMonads.Coq_result_some crs ->
@@ -1280,8 +1286,7 @@ let ref_get_value runs s c r =
          begin match rs with
            | Coq_value_prim cvp ->
              begin match cvp with
-               | Coq_prim_undef ->
-           Debug.ref_get_value_2 r; res
+               | Coq_prim_undef -> Debug.ref_get_value_2 r; res
                | _ -> res
              end
          | _ -> res
@@ -1289,7 +1294,9 @@ let ref_get_value runs s c r =
        | _ -> res
      end
      | _ -> res
- 
+*)
+
+
  (** val run_expr_get_value :
     runs_type -> state -> execution_ctx -> expr -> value specres **)
 

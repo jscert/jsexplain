@@ -5,9 +5,8 @@
 
 NEW TODO
 
-- fix décalage sur token de jsinterpreter
 
-
+- utiliser "=" comme comparison primitive? ou supprimer les occurences?
 
 - parse pickage in JsCommon needed for eval
 
@@ -27,6 +26,19 @@ NEW TODO
 
 - BONUS  -- generate "type: " in smart constructors [optional until display is needed]
 
+
+=========================================================
+BROWSER LIMIT WITH STACK SIZE:
+
+execute:
+	var i=0;
+	function inc() {
+		 i++;
+		 inc();
+	}
+	inc();
+
+then print value of "i".
 
 =========================================================
 

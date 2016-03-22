@@ -234,6 +234,9 @@ let out_of_scope loc s =
 
 let error ?loc s =
   option_iter (Location.print_error err_formatter) loc;
-  failwith ("error: " ^ s ^ ".")
+  failwith ("Error: " ^ s ^ ".")
 
+let warning ?loc s =
+  option_iter (Location.print_loc err_formatter) loc;
+  Printf.printf "%s\n" ("Warning: " ^ s ^ ".")
 

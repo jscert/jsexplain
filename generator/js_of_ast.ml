@@ -18,6 +18,23 @@ let string_of_longident i =
 
 
 (****************************************************************)
+(* SHADOWING CHECKER *)
+
+let report_shadowing = 
+  !current_mode = Mode_cmi
+
+let check_shadowing ?loc env id =
+  if report_shadowing then begin
+     let is_shadowing =
+       try ignore (Env.lookup_value (Lident id) env); true
+       with Not_found -> false
+       in
+     if is_shadowing 
+       then warning ?loc:loc (" !!!!! shadowing of variable: " ^ id);
+  end
+
+
+(****************************************************************)
 (* STRING UTILITIES *)
 
 (**
@@ -495,7 +512,7 @@ let rec js_of_structure s =
    (prefix ^ contents ^ postfix, namesbound)
 
 and js_of_submodule m =
-  Printf.printf "warning: code generation is incorrect for local modules\n"; 
+  warning "code generation is incorrect for local modules\n"; 
   let loc = m.mod_loc in
   match m.mod_desc with
   | Tmod_structure  s -> ppf_module (fst (*TODO*) (js_of_structure s))
@@ -517,6 +534,7 @@ and js_of_structure_item s =
   | Tstr_value (_, vb_l) -> 
      combine_list_output (~~ List.map vb_l (fun vb -> 
         let id = ident_of_pat vb.vb_pat in
+        check_shadowing ~loc:loc s.str_env id;
         let sbody = js_of_expression_inline_or_wrap ctx_initial vb.vb_expr in
         let s = Printf.sprintf "@\n@\n var %s = %s;" id sbody in
         (s, [id])))
@@ -669,7 +687,7 @@ and js_of_expression ctx dest e =
      let sl = sl_clean |> List.map (fun ei -> inline_of_wrap ei) in
      let se = inline_of_wrap f in
      let sexp = 
-        if is_primitive_comparison f then begin
+        if is_triple_equal_comparison f then begin
           if (List.length exp_l <> 2) 
             then out_of_scope loc "=== should be applied to 2 arguments";
           let typ = (List.hd sl_clean).exp_type in
@@ -820,7 +838,7 @@ and js_of_path_longident path ident =
                    then ppf_path path else res in
       ppf_ident_name res
 
-and is_primitive_comparison e =
+and is_triple_equal_comparison e =
    match e.exp_desc with
    | Texp_ident (path, ident,  _) ->
       let sexp = js_of_path_longident path ident in
@@ -850,6 +868,7 @@ and js_of_let_pattern ctx pat expr =
     | Tpat_lazy _ -> Printf.printf "warning: unsupported let-lazy\n"; ""
       (*  error ~loc:pat.pat_loc "let can't deconstruct values"  *)
     in
+  check_shadowing ~loc:pat.pat_loc pat.pat_env id;
   (id, js_of_expression ctx (Dest_assign id) expr)
 
   (* LATER: for   let (x,y) = e,  encode as  translate(e,assign z); x = z[0]; y=z[1] 
