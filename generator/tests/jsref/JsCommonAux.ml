@@ -401,7 +401,7 @@ let run_callable s = function
 (** val is_callable_dec : state -> value -> coq_Decidable **)
 
 let is_callable_dec s v =
-  option_case false (option_case false (fun x -> true)) (run_callable s v)
+  option_case false (fun o -> option_case false (fun x -> true) o) (run_callable s v)
 
 (** val object_properties_keys_as_list_pickable_option :
     state -> object_loc -> prop_name list coq_Pickable_option **)

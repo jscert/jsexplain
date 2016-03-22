@@ -7,7 +7,7 @@ open List0
 (** val add_infos_exp : strictness_flag -> expr -> expr **)
 
 let rec add_infos_exp str e =
-  let f = add_infos_exp str in
+  let f e = add_infos_exp str e in
   (match e with
    | Coq_expr_this -> e
    | Coq_expr_identifier s -> e
@@ -44,9 +44,9 @@ and add_infos_stat str labs t =
     | Some smth0 -> Some (f smth0)
     | None -> None
   in
-  let f = add_infos_stat str label_set_empty in
-  let fe = add_infos_exp str in
-  let fsb = add_infos_switchbody str in
+  let f e = add_infos_stat str label_set_empty e in
+  let fe e = add_infos_exp str e in
+  let fsb e = add_infos_switchbody str e in
   (match t with
    | Coq_stat_expr e -> Coq_stat_expr (fe e)
    | Coq_stat_label (l, t0) ->
@@ -89,8 +89,8 @@ and add_infos_stat str labs t =
     strictness_flag -> switchbody -> switchbody **)
 
 and add_infos_switchbody str ts =
-  let fe = add_infos_exp str in
-  let fs = add_infos_stat str label_set_empty in
+  let fe e = add_infos_exp str e in
+  let fs e = add_infos_stat str label_set_empty e in
   let f sc = match sc with
   | Coq_switchclause_intro (e, l) ->
     Coq_switchclause_intro ((fe e), (map fs l))
@@ -105,7 +105,7 @@ and add_infos_switchbody str ts =
 and add_infos_prog str p = match p with
 | Coq_prog_intro (str', els) ->
   let str'' = coq_or str str' in
-  Coq_prog_intro (str'', (map (add_infos_element str'') els))
+  Coq_prog_intro (str'', (map (fun e -> add_infos_element str'' e) els))
 
 (** val add_infos_element : strictness_flag -> element -> element **)
 

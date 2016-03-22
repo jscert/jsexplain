@@ -4910,14 +4910,14 @@ let run_call_prealloc runs0 s c b vthis args =
       | Coq_value_prim p -> run_error s Coq_native_error_type
       | Coq_value_object l ->
         if_some (object_properties_keys_as_list_pickable_option s l)
-          (run_object_seal runs0 s c l))
+          (fun _x_ -> run_object_seal runs0 s c l _x_))
   | Coq_prealloc_object_freeze ->
     let_binding (get_arg 0 args) (fun v ->
       match v with
       | Coq_value_prim p -> run_error s Coq_native_error_type
       | Coq_value_object l ->
         if_some (object_properties_keys_as_list_pickable_option s l)
-          (run_object_freeze runs0 s c l))
+          (fun _x_ -> run_object_freeze runs0 s c l _x_))
   | Coq_prealloc_object_prevent_extensions ->
     let_binding (get_arg 0 args) (fun v ->
       match v with
@@ -4933,14 +4933,14 @@ let run_call_prealloc runs0 s c b vthis args =
       | Coq_value_prim p -> run_error s Coq_native_error_type
       | Coq_value_object l ->
         if_some (object_properties_keys_as_list_pickable_option s l)
-          (run_object_is_sealed runs0 s c l))
+          (fun _x_ -> run_object_is_sealed runs0 s c l _x_))
   | Coq_prealloc_object_is_frozen ->
     let_binding (get_arg 0 args) (fun v ->
       match v with
       | Coq_value_prim p -> run_error s Coq_native_error_type
       | Coq_value_object l ->
         if_some (object_properties_keys_as_list_pickable_option s l)
-          (run_object_is_frozen runs0 s c l))
+          (fun _x_ -> run_object_is_frozen runs0 s c l _x_))
   | Coq_prealloc_object_is_extensible ->
     let_binding (get_arg 0 args) (fun v ->
       match v with

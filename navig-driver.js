@@ -177,8 +177,9 @@ var parsedTree;
       // console.log(program);
       run();
       $("#action_output").html("Run successful!");
-    } catch(_){
+    } catch(e){
       $("#action_output").html("Error during the run.");
+      throw(e);   
     };
     var timeoutID = window.setTimeout(function() { $("#run_output").html(""); }, 1000);
   });
@@ -513,5 +514,5 @@ function testParse(s) {
 
 // usage: testLineof("Datatypes.js", 9);
 function testLineof(filename, token) {
-  console.log(lineof("Datatypes.js", 9));
+  console.log(lineof(filename, token));
 }

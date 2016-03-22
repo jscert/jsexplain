@@ -648,6 +648,16 @@ and js_of_expression ctx dest e =
     apply_dest ctx dest sexp
 
   | Texp_apply (f, exp_l) ->
+     (* first check not partial application *)
+     let is_result_arrow = 
+        let ty = e.exp_type in
+        let ty = Ctype.repr ty in
+        match ty.desc with
+        | Tarrow(l, ty1, ty2, _) -> true
+        | _ -> false
+        in
+     if is_result_arrow then out_of_scope loc "partial application";
+     
      let sl' = exp_l  (* only used to know if infix *)
                |> List.map (fun (_, eo, _) -> match eo with 
                                               | None -> out_of_scope loc "optional apply arguments"
