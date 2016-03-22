@@ -5,3 +5,4 @@
 *.pre
 tests/jsref/assembly.js
 tests/jsref/lineof.js
+tests/jsref/.depends
