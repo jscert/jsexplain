@@ -77,7 +77,7 @@ let hashtbl_keys t =
    The tokens are placed in a list, with entries of the form
    ( filename , tokens_start , tokens_stop )  where
    tokens_start is a hashmap that gives for each token id its
-   opening positions (line and col), and tokens_stop similarly
+   opening positions (line and column), and tokens_stop similarly
    gives the closing positions. *)
 
 type pos = { pos_line: int; pos_col: int }
@@ -134,8 +134,8 @@ let gather_tokens basename input_lines =
      function lineof(filename, token) {
         var d = lineof_data[filename][token];
         return { file: filename,
-                 start: {line: d[0], col: d[1]}, 
-                 stop: {line: d[2], col: d[3]} };
+                 start: {line: d[0], column: d[1]}, 
+                 end: {line: d[2], column: d[3]} };
      }
 
 *)
@@ -159,7 +159,7 @@ let generate_lineof_function put =
                key pos_start.pos_line pos_start.pos_col  
                    pos_stop.pos_line  pos_stop.pos_col);
      );
-     put (Printf.sprintf "lineof_data[\"%s\"] = lineof_temp;" basename);
+     put (Printf.sprintf "lineof_data[\"%s\"] = lineof_temp;" filename);
   )
  
 

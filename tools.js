@@ -5,8 +5,8 @@
 function lineof(filename, token) {
    var d = lineof_data[filename][token];
    return { file: filename,
-            start: {line: d[0], col: d[1]}, 
-            stop: {line: d[2], col: d[3]} };
+            start: {line: d[0], column: d[1]}, 
+            end: {line: d[2], column: d[3]} };
 };
 
 

@@ -17,8 +17,9 @@ function esprimaToAST(prog, sourceText) {
   var toLoc = function (pos) {
     if (pos === null) {throw "null position in esprima AST";};
     return {file: "input.js",
-            start: {line: pos.start.line, col: pos.start.column},
-            stop:  {line: pos.end.line, col: pos.end.column}};
+            start: {line: pos.start.line, column: pos.start.column},
+            end:  {line: pos.end.line, column: pos.end.column}};
+    // TODO : could reuse the start and end object
   };
 
   var toOption = function (funcTr, node) {
@@ -429,7 +430,7 @@ function esprimaToAST(prog, sourceText) {
           loc: {
             file: previousValue.loc.file,
             start: previousValue.loc.start,
-            stop: currentValue.loc.stop
+            end: currentValue.loc.end
           }
         };
       });

@@ -162,7 +162,7 @@ tests/jsref/%.log.js: tests/jsref/%.ml
 #####################################################################
 # Short targets
 
-everything: gen assembly lineof
+everything: gen assembly lineof display
 
 main: main.byte
 

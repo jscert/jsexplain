@@ -311,7 +311,6 @@ function updateSourceSelection() {
   if (source_select === undefined) {
     return; 
   }
-  // TODO: rename column into col
   var anchor = {line: source_select.start.line-1 , ch: source_select.start.column };
   var head = {line: source_select.end.line-1, ch: source_select.end.column };
   source.setSelection(anchor, head);

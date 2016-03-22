@@ -439,7 +439,7 @@ let generate_logged_enter arg_ids ctx newctx sbody =
     | Mode_unlogged -> ("", "", "")
   in
   let args = String.concat ", " arg_ids in
-  Printf.sprintf "%sfunction (%s)%s {@;<1 2>@[<v 0>%s%s@]@,}" shead1 args shead2 sintro sbody
+  Printf.sprintf "%sfunction (%s)%s {@\n@;<1 2>@[<v 0>%s%s@]@,}" shead1 args shead2 sintro sbody
 
 (*
 

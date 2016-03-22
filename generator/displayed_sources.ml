@@ -147,10 +147,11 @@ let _ =
    put "var tracer_files = [";
 
    ~~ List.iter !files (fun filename ->
+      let basename = Filename.chop_suffix (Filename.basename filename) ".unlog.js" in
+      let showed_filename = basename ^ ".js" in
+      put (Printf.sprintf "\n/* --------------------- %s --------------------- */" showed_filename);
+      put_no_endline (Printf.sprintf "  { file: '%s', contents: '" showed_filename);
       let lines = XFile.get_lines filename in
-      let short_filename = Filename.chop_suffix (Filename.basename filename) ".unlog.js" in
-      put (Printf.sprintf "\n/* --------------------- %s --------------------- */" short_filename);
-      put_no_endline (Printf.sprintf "  { file: '%s', contents: '" short_filename);
       ~~ List.iter lines (fun line ->
          let line = Str.global_replace (Str.regexp "'") "\\'" line in
          put_no_endline line;
@@ -159,7 +160,7 @@ let _ =
       put "'},";
       );
 
-   put "];";
+   put "];"; 
 
    (*---------------------------------------------------*)
    (* generating output file *)
