@@ -41,6 +41,7 @@ ASSEMBLY_JS_FILES := \
 	LibFunc.unlog.js \
 	Heap.unlog.js \
 	Shared.unlog.js \
+	Debug.js \
 	JsNumber.js \
 	JsSyntax.unlog.js \
 	JsSyntaxAux.unlog.js \

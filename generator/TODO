@@ -61,11 +61,9 @@ LATER
 
 [thomas]
 - bigger test262 testing.
+- Flat to force esprima to parse in strict mode
 
 [thomas and alan]
-- set up the call to the appropriate function for propagating the
-  "strictness" info in the AST.
-
 - add a combo box above the source textbox for loading in one click
   a particular example. The source code for the examples is obtained
   by including a JS file that contains an array of source code,
