@@ -135,18 +135,19 @@ Reach condition:
 </div>
 
 <script src="tools.js"></script> 
+<script src="generator/tests/jsref/displayed_sources.js"></script> 
 <script src="generator/tests/jsref/lineof.js"></script> 
 <script src="generator/tests/jsref/assembly.js"></script> 
 <script src="navig-driver.js"></script> 
 
 
-<!--
+<!---
 <script language="javascript">
 $(function() {
 	$('.scroll-pane').jScrollPane();
 });
 </script>
--->
+--->
 
 <!--
 
@@ -166,19 +167,18 @@ $(function() {
 </html>
 
 
+<!--
+/*
+   $timeout(function() {codeMirror.refresh();});
 
-<!---
-$timeout(function() {codeMirror.refresh();});
+   this.codeMirrorInstance.setValue(content);
+   var that = this;
+   setTimeout(function() {
+       that.codeMirrorInstance.refresh();
+   },1);
 
-this.codeMirrorInstance.setValue(content);
-var that = this;
-setTimeout(function() {
-    that.codeMirrorInstance.refresh();
-},1);
-
-http://codemirror.net/demo/buffers.html
-
-//CodeMirror.Doc(text
+   http://codemirror.net/demo/buffers.html
+*/
 ---->
 
 

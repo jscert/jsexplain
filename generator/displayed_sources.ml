@@ -1,5 +1,4 @@
 
-
 (*#########################################################################*)
 
 (* Section COPIED FROM /home/charguer/pbench/xlib/XBase.ml *)
@@ -76,13 +75,27 @@ let hashtbl_keys t =
 (*#########################################################################*)
 
 
-
 (** DOCUMENTATION
   
     takes as argument a list of javascript filenames,
-    and catenate them into a target file.
+    and create a javascript file with a definition of
+    an array called "tracer_files", storing objects with
+    two fields: a filename, and a contents, with newline
+    and quotes properly escaped.
+
+
+   var tracer_files = [
+      { 
+         file: 'calc.js', 
+         contents: 'var Stack = {\n  is_empty: function (s) {\n    return s === {type: "N"};\n  },\n\n  push: function (x, stack) {\n    return {type: "C", value: x, stack: stack};\n  },\n\n ;\n};\n'
+      }
+   ];
 
  *)
+
+
+
+
 
 let files = ref ([]:string list)
 let outputfile = ref None
@@ -104,7 +117,7 @@ let _ =
        (* ("-mode", Arg.String (fun s -> set_current_mode s), "current mode: unlog, log, or token")*)
      ]
      (fun f -> files := f :: !files)
-     ("usage: [..other options..] -o lineof.js file1.js file2.js ...");
+     ("usage: [..other options..] -o sources.js file1.js file2.js ...");
      (* -stdlib file.js *)
    if !files = [] then
      failwith "No input file provided";
@@ -113,7 +126,7 @@ let _ =
    let dirname = Filename.dirname input_filename1 in
    let output_filename = 
      match !outputfile with
-     | None -> Filename.concat dirname "assembly.js"
+     | None -> Filename.concat dirname "displayed_sources.js"
      | Some f -> f
    in
 
@@ -121,20 +134,32 @@ let _ =
    (* open output file for writing *)
 
     let outchannel = open_out output_filename in
+    let put_no_endline str =
+       output_string outchannel str in
     let put str =
        output_string outchannel str;
        output_string outchannel "\n" in
-    let puts lines =
-       List.iter put lines in
+
 
    (*---------------------------------------------------*)
    (* include of logged js files *)
 
+   put "var tracer_files = [";
+
    ~~ List.iter !files (fun filename ->
       let lines = XFile.get_lines filename in
-      put (Printf.sprintf "\n/* --------------------- %s --------------------- */\n" filename);
-      puts lines;
+      let short_filename = Filename.chop_suffix (Filename.basename filename) ".unlog.js" in
+      put (Printf.sprintf "\n/* --------------------- %s --------------------- */" short_filename);
+      put_no_endline (Printf.sprintf "  { file: '%s', contents: '" short_filename);
+      ~~ List.iter lines (fun line ->
+         let line = Str.global_replace (Str.regexp "'") "\\'" line in
+         put_no_endline line;
+         put_no_endline "\\n";
       );
+      put "'},";
+      );
+
+   put "];";
 
    (*---------------------------------------------------*)
    (* generating output file *)

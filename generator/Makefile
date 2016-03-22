@@ -59,9 +59,11 @@ ASSEMBLY_JS := $(STDLIB_DIR)/stdlib.js $(addprefix tests/jsref/,$(ASSEMBLY_JS_FI
 
 ###############################################################
 
-# --> todo arthur include src files
-#	JsPreliminary.log.js \
-#	JsInterpreter.log.js
+DISPLAYED_JS_FILES := \
+	JsPreliminary.unlog.js \
+	JsInterpreter.unlog.js
+
+DISPLAYED_JS := $(addprefix tests/jsref/,$(DISPLAYED_JS_FILES));
 
 
 ###############################################################
@@ -146,7 +148,13 @@ $(JSREF_PATH)/assembly.js: assembly.byte $(ASSEMBLY_JS)
 	./assembly.byte -o $@ $(ASSEMBLY_JS)
 # -stdlib $(STDLIB_DIR)/stdlib.js 
 
-# maybe useful
+##### Rule for displayed_sources.js
+
+$(JSREF_PATH)/displayed_sources.js: displayed_sources.byte $(DISPLAYED_JS)
+	./displayed_sources.byte -o $@ $(DISPLAYED_JS)
+
+
+#### maybe useful ??
 
 tests/jsref/%.log.js: tests/jsref/%.ml 
 
@@ -169,6 +177,8 @@ unlog: $(JSREF_ML:.ml=.unlog.js)
 lineof: $(JSREF_PATH)/lineof.js
 
 assembly: $(JSREF_PATH)/assembly.js
+
+display: $(JSREF_PATH)/displayed_sources.js
 
 stdlib: $(STDLIB_DIR)/stdlib.cmi
 

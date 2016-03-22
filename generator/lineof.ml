@@ -159,7 +159,7 @@ let generate_lineof_function put =
                key pos_start.pos_line pos_start.pos_col  
                    pos_stop.pos_line  pos_stop.pos_col);
      );
-     put (Printf.sprintf "lineof_data[\"%s\"] = lineof_temp;" filename);
+     put (Printf.sprintf "lineof_data[\"%s\"] = lineof_temp;" basename);
   )
  
 

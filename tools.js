@@ -14,6 +14,10 @@ function lineof(filename, token) {
 
 var datalog = [];
 
+function reset_datalog() {
+  datalog = [];
+}
+
 function log_event(loc, ctx, type) {
   // TODO populate state with object_heap, env_record_heap, fresh_locations, and populate env
   var event = {loc : loc, ctx : ctx, type : type, state: {}, env: {}};

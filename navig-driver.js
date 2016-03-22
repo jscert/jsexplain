@@ -68,12 +68,14 @@ var tracer_length = 0;
 var tracer_pos = 0;
 
 // Core Mirror objects
-var source = null;
+var source = "";
 var interpreter = null;
+
 
 // --------------- Initialization ----------------
 
-// file displayed initially
+// WARNING: do not move this initialization further down in the file
+// source code displayed initially
 $("#source_code").val(source_file);
 
 
@@ -250,14 +252,18 @@ function finish() { shared_next(+1, -1); }
 // load files in CodeMirror view
 var docs = {};
 for (var i = 0; i < tracer_files.length; i++) {
- var file = tracer_files[i].file;
- var txt = tracer_files[i].contents;
- docs[file] = CodeMirror.Doc(txt, 'js');
+  var file = tracer_files[i].file;
+  var txt = tracer_files[i].contents;
+  docs[file] = CodeMirror.Doc(txt, 'js');
 }
 
 function viewFile(file) {
  if (curfile !== file) {
    curfile = file;
+   if (docs[curfile] == undefined) {
+     console.log("Cannot view file " + curfile);
+     return;
+   }
    interpreter.swapDoc(docs[curfile]);
    interpreter.focus();
    updateFileList();
@@ -355,12 +361,12 @@ function updateContext(targetid, heap, env) {
 
 // --------------- Selection view ----------------
 
-function updateSelection(codeMirrorObj, loc) {
+function updateSelectionInCodeMirror(codeMirrorObj, loc) {
  if (loc === undefined) {
    return; 
  }
- var anchor = {line: loc.start.line-1 , ch: loc.start.column };
- var head = {line: loc.stop.line-1, ch: loc.stop.column };
+ var anchor = {line: loc.start.line-1 , ch: loc.start.col };
+ var head = {line: loc.stop.line-1, ch: loc.stop.col };
  codeMirrorObj.setSelection(anchor, head);
 }
 
@@ -371,30 +377,33 @@ function updateSelection() {
  if (item !== undefined) {
    // console.log(item);
    // $("#disp_infos").html();
-   if (item.line === undefined)
-     alert("missing line in log event");
+   if (item.source_loc === undefined) {
+     console.log("Error: missing line in log event");
 
-   // source panel
-   source_loc_selected = item.source_loc;
-   updateSelection(source, source_loc_selected);
-   // console.log(source_loc_selected);
+   } else {
 
-   // source heap/env panel
-   updateContext("#disp_env", item.heap, item.env);
+     // source panel
+     source_loc_selected = item.source_loc;
+     updateSelectionInCodeMirror(source, source_loc_selected);
+     // console.log(source_loc_selected);
 
-   // interpreter ctx panel
-   updateContext("#disp_ctx", item.heap, item.ctx);
+     // source heap/env panel
+     updateContext("#disp_env", item.heap, item.env);
 
-   // interpreter code panel
-   viewFile(item.file);
-   //console.log("pos: " + tracer_pos);
+     // interpreter ctx panel
+     updateContext("#disp_ctx", item.heap, item.ctx);
 
-   var color = '#F3F781';
-      // possible to use different colors depending on event type
-      // var color = (item.type === 'enter') ? '#F3F781' : '#CCCCCC';
-   $('.CodeMirror-selected').css({ background: color });
-   $('.CodeMirror-focused .CodeMirror-selected').css({ background: color });
-   updateSelection(interpreter, item.loc);
+     // interpreter code panel
+     viewFile(item.loc.file);
+     //console.log("pos: " + tracer_pos);
+
+     var color = '#F3F781';
+        // possible to use different colors depending on event type
+        // var color = (item.type === 'enter') ? '#F3F781' : '#CCCCCC';
+     $('.CodeMirror-selected').css({ background: color });
+     $('.CodeMirror-focused .CodeMirror-selected').css({ background: color });
+     updateSelectionInCodeMirror(interpreter, item.loc);
+   }
 
    // navig panel
    $("#navigation_step").val(tracer_pos);
@@ -456,32 +465,35 @@ interpreter.focus();
 
 // --------------- Main run method ----------------
 
-function assignSourceLocInTrace(items) {
- var last = undefined;
+// Functions run_prog, run_expr and run_stat have a last argument
+// called "_term_"; we try to find items in the trace that correspond
+// to the binding of this argument in the context, so as to extract
+// the corresponding location from the piece of AST that corresponds.
+// These locations are used for source highlighting.
+function assignSourceLocInTrace() {
+ var last = { start: { line: 1, col: 0}, stop: { line: 1, col: 0 } };
  for (var k = 0; k < tracer_items.length; k++) {
    var item = tracer_items[k];
-   item.source_loc = last;
-   if (item.ctx !== undefined) {
-     var ctx_as_array = array_of_env(item.ctx);
-     // only considers _term_ as top of ctx
-     if (ctx_as_array.length > 0 && ctx_as_array[0].key === "_term_") {
-       var t = ctx_as_array[0].val;
-       if (! (t === undefined || t.loc === undefined)) {
-         item.source_loc = t.loc;
-         // t.loc = {start : int, end : int}
-         last = t;
+   if (item.ctx !== undefined && item.ctx.bindings !== undefined) {
+     var bindings = item.ctx.bindings;
+     var binding = bindings[bindings.length-1];
+     if (binding !== undefined && binding.key === "_term_") {
+       var t = binding.val;
+       if (t.loc != undefined) {
+         last = t.loc;
        }
      }
    }
+   item.source_loc = last;
  }
 }
 
 function run() {
-  // TODO:parse
+ reset_datalog();
  JsInterpreter.run_javascript(JsInterpreter.runs, program);
- assignSourceLocInTrace(datalog);
  tracer_items = datalog;
  tracer_length = tracer_items.length;
+ assignSourceLocInTrace();
  $("#navigation_total").html(tracer_length - 1);
  stepTo(0); // calls updateSelection(); 
 }
@@ -497,6 +509,18 @@ function readSourceParseAndRun() {
    // console.log(program);
    run();
 }
+
+
+// --------------- Initialization, continuted ----------------
+
+
+// interpreter file displayed initially
+viewFile(tracer_files[0].file);
+
+//$timeout(function() {codeMirror.refresh();});
+
+
+
 
 // -------------- Testing ----------------
 
