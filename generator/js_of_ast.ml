@@ -727,8 +727,10 @@ and js_of_expression ctx dest e =
   | Texp_record     (llde,_)          -> 
       let sexp = ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, inline_of_wrap exp)) llde) in
       apply_dest ctx dest sexp
-
-  | Texp_field      (exp, _, lbl)     -> ppf_field_access (inline_of_wrap exp) lbl.lbl_name
+  | Texp_field      (exp, _, lbl)     ->
+      let sexp = ppf_field_access (inline_of_wrap exp) lbl.lbl_name in
+      apply_dest ctx dest sexp
+      
   | Texp_assert      e                -> 
       let sexp = inline_of_wrap e in
       Printf.sprintf "throw %s;" sexp
