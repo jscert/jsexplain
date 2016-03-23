@@ -182,11 +182,11 @@ let ppf_array values =
 let ppf_tuple = ppf_array
 
 let ppf_ifthen cond iftrue =
-  Printf.sprintf "(function () {@;<1 2>@[<v 2>@,if (%s) {@,return %s;@,}@]@,})()"
+  Printf.sprintf "(function () {@[<v 2>if (%s) {@,return %s;@,}@]@,})()"
                  cond iftrue
 
 let ppf_ifthenelse cond iftrue iffalse =
-  Printf.sprintf "@[<v 2>@,if (%s) {@, %s @,} else {@, %s @,} @]@,"
+  Printf.sprintf "@[<v 0>if (%s) {@;<1 2>@[<v 0>%s@]@,} else {@;<1 2>@[<v 0>%s@]@,}@]"
                  cond iftrue iffalse
 
 let ppf_sequence exp1 exp2 =
@@ -239,7 +239,7 @@ let ppf_cstrs_fct cstr_fullname args =
 
 let ppf_record llde =
   let rec aux acc = function
-    | []               -> Printf.sprintf "{@[<v 0>%s@]@,}" (*"@[<v 2>{@;<1 2>%s@]@,}"*) (* TODO: cleanup *) acc
+    | []               -> Printf.sprintf "{@;<1 2>@[<v 0>%s@]@,}" (*"@[<v 2>{@;<1 2>%s@]@,}"*) (* TODO: cleanup *) acc
     | (lbl, exp) :: [] -> aux (acc ^ Printf.sprintf "%s: %s" lbl exp) []
     | (lbl, exp) :: xs -> aux (acc ^ Printf.sprintf "%s: %s,@," lbl exp) xs
   in aux "" llde
@@ -268,8 +268,8 @@ let ppf_module content =
   Printf.sprintf "{@,%s@,}" content
 
 let ppf_module_wrap name content names_bound =
-  let bindings = show_list ", " (List.map (fun id -> Printf.sprintf "@\n  %s: %s" id id) names_bound) in
-  Printf.sprintf "var %s = (function() {@,@, %s @,@,@\nreturn {@\n %s };@,@\n})();@," name content bindings
+  let bindings = show_list ", " (List.map (fun id -> Printf.sprintf "@;<0 2>%s: %s" id id) names_bound) in
+  Printf.sprintf "@[<v 0>var %s = (function() {@,%s@,@,return {%s};@,})();@,@]" name content bindings
 
 
 
@@ -439,7 +439,7 @@ let generate_logged_enter arg_ids ctx newctx sbody =
     | Mode_unlogged -> ("", "", "")
   in
   let args = String.concat ", " arg_ids in
-  Printf.sprintf "%sfunction (%s)%s {@\n@;<1 2>@[<v 0>%s%s@]@,}" shead1 args shead2 sintro sbody
+  Printf.sprintf "%sfunction (%s)%s {@;<1 2>@[<v 0>%s%s@]@,}" shead1 args shead2 sintro sbody
 
 (*
 
@@ -507,9 +507,9 @@ let rec js_of_structure s =
       in
    let open_paths, items = extract_opens [] s.str_items in
    let contents, namesbound = combine_list_output (List.map (fun strct -> js_of_structure_item strct) items) in
-   let prefix = List.fold_left (fun str path -> str ^ "with (" ^ ppf_path path ^ ") {@\n") "" open_paths in
-   let postfix = List.fold_left (fun str path -> str ^ "@\n}// end of with " ^ ppf_path path) "" open_paths in
-   (prefix ^ contents ^ postfix, namesbound)
+   let prefix = List.fold_left (fun str path -> str ^ "with (" ^ ppf_path path ^ ") {@,") "" open_paths in
+   let postfix = List.fold_left (fun str path -> str ^ "@,}// end of with " ^ ppf_path path) "" open_paths in
+   (prefix ^ "@," ^ contents ^ postfix, namesbound)
 
 and js_of_submodule m =
   warning "code generation is incorrect for local modules\n"; 
@@ -536,7 +536,7 @@ and js_of_structure_item s =
         let id = ident_of_pat vb.vb_pat in
         check_shadowing ~loc:loc s.str_env id;
         let sbody = js_of_expression_inline_or_wrap ctx_initial vb.vb_expr in
-        let s = Printf.sprintf "@\n@\n var %s = %s;" id sbody in
+        let s = Printf.sprintf "@[<v 0>var %s = %s;@]" id sbody in
         (s, [id])))
   | Tstr_type decls -> 
      combine_list_output (~~ List.map decls (fun decl -> 
