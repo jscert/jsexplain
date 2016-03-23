@@ -145,7 +145,7 @@ let ppf_function args body=
   (L.log_line (Printf.sprintf "function (%s) {" args) [L.Enter; (L.CreateCtx args)]) ^ (Printf.sprintf "@;<1 2>@[<v 0>return %s;@]@,}" body)
 
 let ppf_apply f args =
-  Printf.sprintf "%s(%s)"
+  Printf.sprintf "%s(@[<hv>%s@])"
                  f args
 
 let ppf_apply_infix f arg1 arg2 =
@@ -227,15 +227,15 @@ let ppf_cstrs styp cstr_name rest =
   let styp_full =
     match !current_mode with
     | Mode_cmi -> assert false
-    | Mode_unlogged -> ""
-    | Mode_line_token
+    | Mode_unlogged
+    | Mode_line_token -> ""
     | Mode_logged -> Printf.sprintf "type: \"%s\", " styp
     in
   Printf.sprintf "{@[<v 2>%stag: \"%s\"%s %s@]}" (* TODO: cleanup *)
     styp_full cstr_name comma rest
 
 let ppf_cstrs_fct cstr_fullname args =
-   ppf_apply cstr_fullname (show_list ", " args)
+   ppf_apply cstr_fullname (show_list ",@ " args)
 
 let ppf_record llde =
   let rec aux acc = function
@@ -292,8 +292,8 @@ let token_register_basename basename =
 let token_fresh =
   let r = ref 0 in
   fun () -> (incr r; 
-    let token_start = Printf.sprintf "#<%d#" !r in
-    let token_stop = Printf.sprintf "#%d>#" !r in
+    let token_start = Printf.sprintf "@{<%d>" !r in
+    let token_stop = "@}" in
     let token_lineof = Printf.sprintf "lineof(\"%s.js\", %d)" !token_basename_ref !r in  
     (token_start, token_stop, token_lineof))
 
@@ -693,11 +693,11 @@ and js_of_expression ctx dest e =
           let typ = (List.hd sl_clean).exp_type in
           let stype = Print_type.string_of_type_exp typ in
           let stype = Str.global_replace (Str.regexp "\\.") "_" stype in
-          ppf_apply ("_compare_" ^ stype) (String.concat ", " sl)
+          ppf_apply ("_compare_" ^ stype) (String.concat ",@ " sl)
         end else if is_infix f sl' && List.length exp_l = 2 then begin
            ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
         end else begin
-           ppf_apply se (String.concat ", " sl)
+           ppf_apply se (String.concat ",@ " sl)
         end in
      apply_dest ctx dest sexp
 
@@ -920,6 +920,15 @@ let to_javascript basename module_name typedtree =
   let (content,names_bound) = js_of_structure typedtree in
   let pre_res = ppf_module_wrap module_name content names_bound in
   let str_ppf = Format.str_formatter in
+  if (!current_mode = Mode_line_token) then begin
+  Format.pp_set_tags str_ppf true;
+  Format.pp_set_mark_tags str_ppf true;
+  Format.pp_set_formatter_tag_functions str_ppf
+    {Format.mark_open_tag = (fun t -> Printf.sprintf "#<%s#" t);
+     Format.mark_close_tag = (fun t -> Printf.sprintf "#%s>#" t);
+     Format.print_open_tag = (fun _ -> ());
+     Format.print_close_tag = (fun _ -> ())};
+  end;
   Format.fprintf str_ppf (Scanf.format_from_string pre_res "");
   Format.flush_str_formatter ()
 
