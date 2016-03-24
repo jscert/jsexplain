@@ -145,7 +145,7 @@ let ppf_function args body=
   (L.log_line (Printf.sprintf "function (%s) {" args) [L.Enter; (L.CreateCtx args)]) ^ (Printf.sprintf "@;<1 2>@[<v 0>return %s;@]@,}" body)
 
 let ppf_apply f args =
-  Printf.sprintf "%s(@[<hv>%s@])"
+  Printf.sprintf "@[<hov 2>%s(@,%s)@]"
                  f args
 
 let ppf_apply_infix f arg1 arg2 =
