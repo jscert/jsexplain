@@ -48,6 +48,14 @@ function log_event(filename, token, ctx, type) {
   var event = { token: token, locByExt: { "ml": mlloc, "js": jsloc },
                 ctx : ctx, type : type, state: {}, env: {}};
   datalog.push(event);
+
+  // for debug
+  if (event.type == "return" && 
+     // event.ctx.bindings[0].key == "#RETURN_VALUE#"   must be true
+     event.ctx.bindings[0].val === undefined) {
+    console.log("Return event carrying undefined");
+    console.log(event);
+   }
 }
 
 
@@ -60,6 +68,15 @@ function ctx_empty() {
 }
 
 function ctx_push(ctx, bindings) {
+  // for debug
+  for (var i = 0; i < bindings.length; i++) {
+    if (bindings[i].val === undefined) {
+      console.log("ctx_push with undefined value");
+      console.log(ctx);
+      console.log(bindings);
+    }
+  }
+
   return {tag: "ctx_cons", next: ctx, bindings: bindings};
 }
 

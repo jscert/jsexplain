@@ -76,6 +76,7 @@ var source_file = 'var x = 2;\nx';
 
 var source_file = ' var t = {}; for (var i = 0; i < 3; i++) { t[i] = function() { return i; } }; t[0](); ';
 var source_file = '{}';
+var source_file = '{} + {}';
 
 
 // --------------- Initialization ----------------
@@ -175,7 +176,7 @@ $("#navigation_step").change(function(e) {
 $("#button_run").click(function() {
   var message = readSourceParseAndRun();
   $("#action_output").html(message);
-  var timeoutID = window.setTimeout(function() { $("#run_output").html(""); }, 1000);
+  var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 1000);
 });
 
 $("#button_reset").click(function() { reset(); }); 
@@ -545,14 +546,31 @@ function assignSourceLocInTrace() {
  }
 }
 
+function runDebug() {
+  reset_datalog();
+  JsInterpreter.run_javascript(JsInterpreter.runs, program);
+}
+
 function run() {
  reset_datalog();
- JsInterpreter.run_javascript(JsInterpreter.runs, program);
+ var success = true;
+ try {
+    JsInterpreter.run_javascript(JsInterpreter.runs, program);
+ } catch (e) {
+   success = false;
+   // alert("Error during the run");
+   console.log(e);
+   console.log("execute runDebug() to get the trace.");
+   // throw e;
+   // LATER: return "Error during the run.";
+ }
+
  tracer_items = datalog;
  tracer_length = tracer_items.length;
  assignSourceLocInTrace();
  $("#navigation_total").html(tracer_length - 1);
- stepTo(0); // calls updateSelection(); 
+ stepTo(tracer_length-1);
+ return (success) ? "Run successful!" : "Error during the run!";
 }
 
 function readSourceParseAndRun() {
@@ -570,15 +588,7 @@ function readSourceParseAndRun() {
    // TODO handle out of scope errors
    program = esprimaToAST(parsedTree);
    // console.log(program);
-
-   try {
-     run();
-   } catch (e) {
-     throw e;
-     // LATER: return "Error during the run.";
-   }
-   
-   return "Run successful!";
+   return run();
 }
 
 

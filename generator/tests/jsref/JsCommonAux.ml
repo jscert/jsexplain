@@ -238,7 +238,7 @@ let descriptor_is_generic_dec desc =
 
 (** val prepost_unary_op_dec : unary_op -> coq_Decidable **)
 
-let prepost_unary_op_dec = function
+let prepost_unary_op_dec op = match op with
 | Coq_unary_op_delete -> false
 | Coq_unary_op_void -> false
 | Coq_unary_op_typeof -> false
@@ -253,7 +253,7 @@ let prepost_unary_op_dec = function
 
 (** val attributes_is_data_dec : attributes -> coq_Decidable **)
 
-let attributes_is_data_dec = function
+let attributes_is_data_dec a = match a with
 | Coq_attributes_data_of a0 -> true_decidable
 | Coq_attributes_accessor_of a0 -> false_decidable
 
@@ -373,7 +373,8 @@ let attributes_change_accessor_on_non_configurable_dec aa desc =
 
 (** val run_function_get_error_case : state -> prop_name -> value -> bool **)
 
-let run_function_get_error_case s x = function
+let run_function_get_error_case s x v =
+match v with
 | Coq_value_prim w -> false
 | Coq_value_object l ->
     (if string_comparable x ("caller")
@@ -392,7 +393,8 @@ let spec_function_get_error_case_dec s x v =
 
 (** val run_callable : state -> value -> call option option **)
 
-let run_callable s = function
+let run_callable s v = 
+match v with
 | Coq_value_prim w -> Some None
 | Coq_value_object l ->
   option_case None (fun o -> Some o.object_call_)

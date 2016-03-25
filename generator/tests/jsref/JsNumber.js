@@ -26,6 +26,18 @@ var JsNumber = {
   // this works because the >> operator first converts its first argument to int32
   to_int32 : function (x) {
     return x >> 0;
-  }
+  },
+
+
+  from_string : function (x) {
+    return Number(x);
+  },
+
+  to_string : function (x) {
+    return "" + x;
+  },
+
+
+  
 };
 

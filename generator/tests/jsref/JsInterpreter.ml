@@ -673,7 +673,7 @@ let object_default_value runs0 s c l prefo =
     match b with Coq_builtin_default_value_default ->
     let gpref = unsome_default Coq_preftype_number prefo in
     let lpref = other_preftypes gpref in
-    let_binding (fun s' x k ->
+    let sub0 = (fun s' x k -> (* this was a let_binding  *)
       if_value (run_object_get runs0 s' c l x) (fun s1 vfo ->
         if_some (run_callable s1 vfo) (fun co ->
           match co with
@@ -687,11 +687,11 @@ let object_default_value runs0 s c l prefo =
                 | Coq_value_prim w ->
                   result_out (Coq_out_ter (s3, (res_val (Coq_value_prim w))))
                 | Coq_value_object l0 -> k s3))
-          | None -> k s1))) (fun sub0 ->
+          | None -> k s1))) in
       let_binding (method_of_preftype gpref) (fun gmeth ->
         sub0 s gmeth (fun s' ->
           let lmeth = method_of_preftype lpref in
-          sub0 s' lmeth (fun s'' -> run_error s'' Coq_native_error_type)))))
+          sub0 s' lmeth (fun s'' -> run_error s'' Coq_native_error_type))))
 
 (** val to_primitive :
     runs_type -> state -> execution_ctx -> value -> preftype option -> result **)
