@@ -368,15 +368,12 @@ let generate_logged_return ctx sbody =
   let (token_start, token_stop, token_lineof) = token_fresh() in
   match !current_mode with
   | Mode_cmi -> assert false
-  | Mode_line_token ->
+  | Mode_unlogged | Mode_line_token ->
      Printf.sprintf "%sreturn %s;%s" token_start sbody token_stop
   | Mode_logged ->
     let id = id_fresh "_return_" in
     Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, [{key: \"return_value\", value: %s}]), \"return\");@,return %s; "
       id sbody token_lineof ctx id id
-  | Mode_unlogged -> 
-     Printf.sprintf "return %s; " sbody
-     (* Printf.sprintf "@[<v 0>return %s;@]" sbody *)
 (*
 ----
   [insertReturnCode(e,ctx)]
