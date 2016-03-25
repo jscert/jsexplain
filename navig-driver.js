@@ -178,17 +178,16 @@ $("#button_run").click(function() {
   var timeoutID = window.setTimeout(function() { $("#run_output").html(""); }, 1000);
 });
 
-$("#button_reset").click(function() {
- stepTo(0);
-});
+$("#button_reset").click(function() { reset(); }); 
+  // stepTo(0);
+$("#button_backward").click(function() { backward(); }); 
+  // stepTo(Math.max(0, tracer_pos-1));
+$("#button_forward").click(function() { forward() }); 
+  // stepTo(Math.min(tracer_length-1, tracer_pos+1));
 
-$("#button_prev").click(function() {
- stepTo(Math.max(0, tracer_pos-1));
-});
-
-$("#button_next").click(function() {
- stepTo(Math.min(tracer_length-1, tracer_pos+1));
-});
+$("#button_previous").click(function() { previous() }); 
+$("#button_next").click(function() { next() }); 
+$("#button_finish").click(function() { finish() }); 
 
 
 // Assumes tracer_files to be an array of objects with two field:
@@ -205,7 +204,7 @@ function shared_step(dir) {
  i += dir;
  if (! tracer_valid_pos(i))
    return; // not found, we don’t update the tracer position.
- tracer_pos = i;
+ stepTo(i);
 }
 
 // dir is -1 or +1,
@@ -222,11 +221,11 @@ function shared_next(dir, target) {
  }
  while (true) {
    if (! tracer_valid_pos(i)) {
-     tracer_pos = i - dir; // just before out of range
+     stepTo(i - dir); // just before out of range
      return; // not found
    }
    if (i !== tracer_pos && depth === target) {
-     tracer_pos = i;
+     stepTo(i);
      return;
    }
    var ty = tracer_items[i].type;
@@ -239,12 +238,14 @@ function shared_next(dir, target) {
  }
 }
 
-function restart() { tracer_pos = 0; }
-function step() { shared_step(+1); }
-function backstep() { shared_step(-1); }
-function next() { shared_next(+1, 0); }
+function reset() { tracer_pos = 0; updateSelection(); }
+function forward() { shared_step(+1); }
+function backward() { shared_step(-1); }
+
 function previous() { shared_next(-1, 0); }
+function next() { shared_next(+1, 0); }
 function finish() { shared_next(+1, -1); }
+
 
 
 // --------------- Auxiliary ----------------
@@ -477,12 +478,17 @@ interpreter = CodeMirror.fromTextArea(document.getElementById('interpreter_code'
  lineWrapping: true,
  readOnly: true,
  extraKeys: {
-   'R': function(cm) { restart(); updateSelection(); },
-   'S': function(cm) { step(); updateSelection(); },
-   'B': function(cm) { backstep(); updateSelection(); },
-   'N': function(cm) { next(); updateSelection(); },
-   'P': function(cm) { previous(); updateSelection(); },
-   'F': function(cm) { finish(); updateSelection(); }
+   'R': function(cm) { reset();  },
+   'F': function(cm) { forward();},
+   '6': function(cm) { forward();},
+   'B': function(cm) { backward(); },
+   '4': function(cm) { backward(); },
+   'P': function(cm) { previous(); },
+   '8': function(cm) { previous(); },
+   'N': function(cm) { next(); },
+   '2': function(cm) { next(); },
+   'H': function(cm) { finish(); },
+   '3': function(cm) { finish(); }
  },
 });
 interpreter.setSize(800,400);
