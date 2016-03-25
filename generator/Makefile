@@ -86,10 +86,8 @@ CC          := ocamlc -c
 OCAMLDEP    := ocamldep -one-line
 OCAMLBUILD := ocamlbuild -j 4 -classic-display -use-ocamlfind -X tests -X $(STDLIB_DIR)
 
-GENERATOR := ./main.byte
-
 LINEOF := ./lineof.byte
-
+MLTOJS := OCAMLRUNPARAM="l=100M" ./main.byte
 
 ###############################################################
 # Dependencies
@@ -129,13 +127,13 @@ tests/%.cmi: tests/%.mli stdlib
 ##### Rule for log/unlog/token
 
 tests/%.log.js: tests/%.ml main.byte stdlib tests/%.cmi
-	./main.byte -mode log -I $(<D) $<
+	$(MLTOJS) -mode log -I $(<D) $<
 
 tests/%.unlog.js: tests/%.ml main.byte stdlib tests/%.cmi
-	./main.byte -mode unlog -I $(<D) $<
+	$(MLTOJS) -mode unlog -I $(<D) $<
 
 tests/%.token.js tests/%.mlloc.js: tests/%.ml main.byte stdlib tests/%.cmi
-	./main.byte -mode token -I $(<D) $<
+	$(MLTOJS) -mode token -I $(<D) $<
 
 ##### Rule for lineof.js
 

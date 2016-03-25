@@ -185,9 +185,6 @@ let ppf_ifthen cond iftrue =
   Printf.sprintf "(function () {@[<v 2>if (%s) {@,return %s;@,}@]@,})()"
                  cond iftrue
 
-let ppf_ifthenelse cond iftrue iffalse =
-  Printf.sprintf "@[<v 0>if (%s) {@;<1 2>@[<v 0>%s@]@,} else {@;<1 2>@[<v 0>%s@]@,}@]"
-                 cond iftrue iffalse
 
 let ppf_sequence exp1 exp2 =
   Printf.sprintf "%s;@,%s"
@@ -370,22 +367,6 @@ let generate_logged_case loc spat binders ctx newctx sbody need_break =
      (if need_break then "@,break;" else ""))
 
 
-(* generate_logged_case implement using
-[insertCaseCode(caseBody,bindings,ctx,newctx,sbody)]
-£4424;caseBody;codeOf(bindings);sbody;break
-case(caseBody); codeOf(bindings); newctx=ctx_push(ctx,bindings); logEvent(LINEOF(432423), "case", newctx);sbody;break
-
-with help of
-
-  if binders = [] then L.log_line (ppf_branch spat binders se) [(L.Exit)]
-  else
-    let typ = match List.rev (Str.split (Str.regexp " ") spat) with
-      | [] -> assert false
-      | x :: xs -> String.sub x 0 (String.length x)
-    in L.log_line (ppf_branch spat binders se) [(L.Exit); (L.ReturnStrip); (L.Add (binders, typ))]
-
-*)
-
 (* LATER: optimize return when it's a value *)
 
 let generate_logged_return loc ctx sbody = 
@@ -396,19 +377,31 @@ let generate_logged_return loc ctx sbody =
      Printf.sprintf "%sreturn %s;%s" token_start sbody token_stop
   | Mode_logged ->
     let id = id_fresh "_return_" in
-    Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, [{key: \"return_value\", val: %s}]), \"return\");@,return %s; "
+    Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, [{key: \"#RETURN_VALUE\", val: %s}]), \"return\");@,return %s; "
       id sbody token_loc ctx id id
-(*
-----
-  [insertReturnCode(e,ctx)]
-
-TOKEN(432423);return e
-
-var t=e; logEvent(LINEOF(432423), ctx_push(ctx, {"return",t}), "return"); return t
-----
-*)
 
 
+
+let ppf_ifthenelse arg iftrue iffalse =
+  Printf.sprintf "@[<v 0>if (%s) {@;<1 2>@[<v 0>%s@]@,} else {@;<1 2>@[<v 0>%s@]@,}@]"
+                 arg iftrue iffalse
+
+let generate_logged_if loc ctx sintro sarg siftrue siffalse =
+  (* sintro is not empty only in the logged case,
+     it describes the binding of the value describing the argument of the if *)
+  let (token_start, token_stop, token_loc) = token_fresh loc in
+  match !current_mode with
+  | Mode_cmi -> assert false
+  | Mode_unlogged -> 
+     ppf_ifthenelse sarg siftrue siffalse
+  | Mode_line_token ->
+     let sarg_with_token = Printf.sprintf "%s%s%s" token_start sarg token_stop in
+     ppf_ifthenelse sarg_with_token siftrue siffalse
+  | Mode_logged ->
+     let sevent = Printf.sprintf "%slog_event(%s, %s, \"if\");@,"
+        sintro token_loc ctx in
+     let sbody = ppf_ifthenelse sarg siftrue siffalse in
+     sevent ^ sbody
 
 let generate_logged_let loc ids ctx newctx sdecl sbody =
   let (token_start, token_stop, token_loc) = token_fresh loc in
@@ -427,17 +420,6 @@ let generate_logged_let loc ids ctx newctx sdecl sbody =
       sdecl newctx ctx bindings token_loc newctx sbody
   | Mode_unlogged -> 
      Printf.sprintf "%s@,%s" sdecl sbody
-
-(*
-
-----
-  [insertLetCode(x,e,ctx,newctx,sbody)]
-
-TOKEN(432423);var x = e;sbody
-
-var x=e; var newctx=ctx_push(ctx,x,e); logEvent(LINEOF(432423), "let", ctx);sbody
-----
-*)
 
 (* LATER: factoriser les bindings *)
 
@@ -462,23 +444,6 @@ let generate_logged_enter loc arg_ids ctx newctx sbody =
   let args = String.concat ", " arg_ids in
   Printf.sprintf "%sfunction (%s)%s {@;<1 2>@[<v 0>%s%s@]@,}" shead1 args shead2 sintro sbody
 
-(*
-
-----
-function(x,y) {
-  [isnertEnterCode(bindings,ctx,newctx)]fdqfdsf
-  }
-
-TOKEN(432423);sbody
-
-var newctx = ctx_push(bindings);
-logEvent(LINEOF(432423), newctx, "enter");sbody
-----
-
-may reuse 
-    ppf_function args body
-
-*)
 
 
 
@@ -612,7 +577,7 @@ and js_of_expression_naming_argument_if_non_variable ctx obj name_prefix =
   | Texp_ident (path, ident,  _) -> 
       "", (js_of_path_longident path ident)
   | _ ->  (* generate  var id = sexp;  *)
-      let id = id_fresh "_switch_arg_" in
+      let id = id_fresh name_prefix in
       let sintro = js_of_expression ctx (Dest_assign id) obj in
       (sintro ^ "@,"), id
 
@@ -757,7 +722,14 @@ and js_of_expression ctx dest e =
     (* ppf_ifthen (js_of_expression e1) (js_of_expression e2) *)
   | Texp_ifthenelse (e1, e2, Some e3) ->
      reject_inline dest;
-     ppf_ifthenelse (inline_of_wrap e1) (js_of_expression ctx dest e2) (js_of_expression ctx dest e3)
+     let (sintro, se1) = 
+       match !current_mode with
+       | Mode_logged -> 
+           let (sintro, sobj) = js_of_expression_naming_argument_if_non_variable ctx e1 "_if_arg_" in 
+           (sintro, sobj)
+       | _ ->  ("", inline_of_wrap e1)
+       in
+     generate_logged_if loc ctx sintro se1 (js_of_expression ctx dest e2) (js_of_expression ctx dest e3)
   | Texp_sequence (e1, e2) -> 
      ppf_sequence (inline_of_wrap e1) (js_of_expression ctx dest e2)
   | Texp_while      (cd, body)        -> out_of_scope loc "while"

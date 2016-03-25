@@ -173,14 +173,8 @@ $("#navigation_step").change(function(e) {
 });
 
 $("#button_run").click(function() {
- // TODO: revive the try-catch
- // try {
- readSourceParseAndRun();
- //  $("#action_output").html("Run successful!");
- // } catch(e){
- //   $("#action_output").html("Error during the run.");
- //   throw(e);   
- // };
+  var message = readSourceParseAndRun();
+  $("#action_output").html(message);
   var timeoutID = window.setTimeout(function() { $("#run_output").html(""); }, 1000);
 });
 
@@ -555,15 +549,29 @@ function run() {
 }
 
 function readSourceParseAndRun() {
+   var message = "";
    var code = source.getValue();
    //console.log(code);
    // TODO handle parsing error
-   parsedTree = esprima.parse(code, {loc:true});
+   try {
+     parsedTree = esprima.parse(code, {loc:true});
+   } catch (e) {
+     return "Parse error";
+   }
    // console.log(parsedTree);
-   // TODO write the parser
+ 
+   // TODO handle out of scope errors
    program = esprimaToAST(parsedTree);
    // console.log(program);
-   run();
+
+   try {
+     run();
+   } catch (e) {
+     throw e;
+     // LATER: return "Error during the run.";
+   }
+   
+   return "Run successful!";
 }
 
 
@@ -571,10 +579,10 @@ function readSourceParseAndRun() {
 
 
 // interpreter file displayed initially
-viewFile(tracer_files[0].file);
+// -- viewFile(tracer_files[0].file);
+viewFile("JsInterpreter.ml");
 
 //$timeout(function() {codeMirror.refresh();});
-
 
 
 
