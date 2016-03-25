@@ -26,7 +26,7 @@ let report_shadowing =
 let check_shadowing ?loc env id =
   if report_shadowing then begin
      let is_shadowing =
-       try ignore (Env.lookup_value (Longident.Lident id) env); true
+       try ignore (Env.lookup_value (Lident id) env); true
        with Not_found -> false
        in
      if is_shadowing 
@@ -142,7 +142,7 @@ let ppf_let_in decl exp =
   in ppf_lambda_wrap s
 
 let ppf_function args body=
-  (L.log_line (Printf.sprintf "function (%s) {" args) [L.Enter; (L.CreateCtx args)]) ^ (Printf.sprintf "@;<1 2>@[<v 0>return %s;@]@,}" body)
+  (L.log_line (Printf.sprintf "function (%s) {" args) [L.Enter; (L.CreateCtx args)]) ^ (Printf.sprintf "@;<1 2>return@[<hov 2>@ %s;@]@,}" body)
 
 let ppf_apply f args =
   Printf.sprintf "@[<hov 2>%s(@,%s)@]"
@@ -172,8 +172,8 @@ let ppf_match_case c =
 
 let ppf_match_binders binders =
   if binders = [] then "" else
-  let binds = show_list ", " (List.map (fun (id,se) -> Printf.sprintf "%s = %s" id se) binders) in
-  Printf.sprintf "var %s;@," binds
+  let binds = show_list ",@ " (List.map (fun (id,se) -> Printf.sprintf "%s = %s" id se) binders) in
+  Printf.sprintf "@[<hov 2>var %s;@]" binds
 
 let ppf_array values =
   Printf.sprintf "[%s]"
@@ -340,8 +340,8 @@ let generate_logged_case spat binders ctx newctx sbody need_break =
       ("", sintro)
     | Mode_unlogged -> ("", "")
     in
-  let sbinders = ppf_match_binders binders in
-  (Printf.sprintf "@[<v 0>%s%s:@;<1 2>@[<v 0>%s%s%s%s@]@]"
+  let sbinders = Printf.sprintf "%s%s" (if binders = [] then "" else "@;<1 2>") (ppf_match_binders binders) in
+  (Printf.sprintf "@[<v 0>%s%s:%s%s@;<1 2>@[<v 0>%s%s@]@]"
      shead spat sbinders sintro sbody
      (if need_break then "@,break;" else ""))
 
@@ -369,7 +369,7 @@ let generate_logged_return ctx sbody =
   match !current_mode with
   | Mode_cmi -> assert false
   | Mode_line_token ->
-     Printf.sprintf "%sreturn %s; %s" token_start sbody token_stop
+     Printf.sprintf "%sreturn %s;%s" token_start sbody token_stop
   | Mode_logged ->
     let id = id_fresh "_return_" in
     Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, [{key: \"return_value\", value: %s}]), \"return\");@,return %s; "
@@ -834,7 +834,7 @@ and js_of_path_longident path ident =
   (* for string *)
   | "^"   -> "+" (* !!TODO: we want to claim ability to type our sublanguage, so we should not use this *)
   | res   -> 
-      let res = if !generate_qualified_names && (Path.head path).Ident.name <> "Stdlib" 
+      let res = if !generate_qualified_names && (Path.head path).name <> "Stdlib" 
                    then ppf_path path else res in
       ppf_ident_name res
 
