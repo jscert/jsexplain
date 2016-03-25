@@ -87,7 +87,8 @@ type tokens = (string * tokens_start * tokens_stop) list ref
 
 let tokens : tokens = ref []
 
-let gather_tokens basename input_lines =
+(* DEPRECATED
+let old_gather_tokens basename input_lines =
   let find_tokens tokens_table regexp =
     ~~ List.iteri input_lines (fun line input ->
       let r = Str.regexp regexp in 
@@ -113,8 +114,9 @@ let gather_tokens basename input_lines =
   find_tokens tokens_start "#<\\([0-9]*\\)#";
   find_tokens tokens_stop "#\\([0-9]*\\)>#";
   tokens := (basename, tokens_start, tokens_stop)::!tokens
+*)
 
-let new_gather_tokens basename input_lines =
+let gather_tokens basename input_lines =
   let tokens_start = Hashtbl.create 50 in
   let tokens_stop = Hashtbl.create 50 in
   ~~ List.iteri input_lines (fun line input ->
@@ -127,13 +129,17 @@ let new_gather_tokens basename input_lines =
       try
         while true do 
           (* Printf.printf "search from %d\n" !i; *)
-          let j1 = Str.search_forward r1 input !i in
-          let j2 = Str.search_forward r2 input !i in
+          let max_int = 1000000000 in
+          let j1 = try Str.search_forward r1 input !i with Not_found -> max_int in
+          let j2 = try Str.search_forward r2 input !i with Not_found -> max_int in
+          if j1 = max_int && j2 = max_int then raise Not_found;
           let (j,tokens_table) = 
-             if j1 < j2 then (j1,tokens_start) else (j2,tokens_stop) in
+             if j1 < j2 
+               then (Str.search_forward r1 input !i,tokens_start) 
+               else (Str.search_forward r2 input !i, tokens_stop) in
           i := j;
           let key = Str.matched_group 1 input in
-          (* Printf.printf "matched key: %s\n" key; *)
+          (* Printf.printf "matched j1=%d  j2=%d j=%d %s key: %s\n" j1 j2 j (if j1 < j2 then "start" else "stop") key; *)
           let pos = mk_pos() in
           Hashtbl.add tokens_table (int_of_string key) pos;
           i := j+1;
@@ -144,6 +150,10 @@ let new_gather_tokens basename input_lines =
       );
   tokens := (basename, tokens_start, tokens_stop)::!tokens
 
+(* FOR DEBUG
+let _ = 
+  gather_tokens "foo" [ "#<1978#case ::: var l = #1977># _switch_arg_19.head, l0 = _switch_arg_19.tail;  #1978># fdsf #<1977#return let_binding(prog_intro_strictness(p), #<1976#function (str)#1976>#ffds" ]; exit 0
+*)
 
 (* BUG WITH REGEXP
 let _ = 

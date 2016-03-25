@@ -381,6 +381,7 @@ function ctxToHtml(ctx) {
 
 function itemToHtml(item) {
   var s = '';
+  s += htmlDiv("token: " + item.loc.token + JSON.stringify(item.loc.start) + JSON.stringify(item.loc.end));
   s += htmlDiv("type: " + item.type);
   s += ctxToHtml(item.ctx);
   return s;
