@@ -74,11 +74,12 @@ let _ =
          output_string outchannel "\n" in
       put "   lineof_temp = [];";
       let filename = basename ^ ".ml" in
-      ~~ Hashtbl.iter Js_of_ast.token_locs (fun key (pos_start,pos_stop) ->
-        put (Printf.sprintf "   lineof_temp[%d] = [%d,%d,%d,%d];" 
-               key pos_start.pos_line pos_start.pos_col  
-                   pos_stop.pos_line  pos_stop.pos_col);
-      );
+      Js_of_ast.(
+         ~~ Hashtbl.iter token_locs (fun key (pos_start,pos_stop) ->
+           put (Printf.sprintf "   lineof_temp[%d] = [%d,%d,%d,%d];" 
+                  key pos_start.pos_line pos_start.pos_col  
+                      pos_stop.pos_line  pos_stop.pos_col);
+         ));
       put (Printf.sprintf "lineof_data[\"%s\"] = lineof_temp;" filename);
       close_out outchannel;
       in

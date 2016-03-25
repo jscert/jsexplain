@@ -86,8 +86,11 @@ CC          := ocamlc -c
 OCAMLDEP    := ocamldep -one-line
 OCAMLBUILD := ocamlbuild -j 4 -classic-display -use-ocamlfind -X tests -X $(STDLIB_DIR)
 
-LINEOF := ./lineof.byte
-MLTOJS := OCAMLRUNPARAM="l=100M" ./main.byte
+OCAMLPAR := OCAMLRUNPARAM="l=200M"
+
+LINEOF := $(OCAMLPAR) ./lineof.byte
+MLTOJS := $(OCAMLPAR) ./main.byte
+DISPLAYGEN := $(OCAMLPAR) ./displayed_sources.byte
 
 ###############################################################
 # Dependencies
@@ -150,7 +153,7 @@ $(JSREF_PATH)/assembly.js: assembly.byte $(ASSEMBLY_JS)
 ##### Rule for displayed_sources.js
 
 $(JSREF_PATH)/displayed_sources.js: displayed_sources.byte $(DISPLAYED:.ml=.unlog.js) $(DISPLAYED)
-	./displayed_sources.byte -o $@ $(DISPLAYED:.ml=.unlog.js) $(DISPLAYED)
+	$(DISPLAYGEN) -o $@ $(DISPLAYED:.ml=.unlog.js) $(DISPLAYED)
 
 
 #### maybe useful ??
@@ -161,13 +164,15 @@ tests/jsref/%.log.js: tests/jsref/%.ml
 #####################################################################
 # Short targets
 
-everything: gen assembly lineof display
+everything: assembly lineof display
 
 main: main.byte
 
 cmi: $(JSREF_ML:.ml=.cmi) $(JSREF_MLI:.mli=.cmi) 
 
 gen: $(JSREF_ML:.ml=.log.js) $(JSREF_ML:.ml=.unlog.js) $(JSREF_ML:.ml=.token.js)
+
+ref: $(JSREF_PATH)/JsInterpreter.log.js $(JSREF_PATH)/JsInterpreter.unlog.js $(JSREF_PATH)/JsInterpreter.token.js
 
 log: $(JSREF_ML:.ml=.log.js) $(JSREF_ML:.ml=.token.js)
 

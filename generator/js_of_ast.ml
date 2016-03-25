@@ -26,7 +26,7 @@ let report_shadowing =
 let check_shadowing ?loc env id =
   if report_shadowing then begin
      let is_shadowing =
-       try ignore (Env.lookup_value (Lident id) env); true
+       try ignore (Env.lookup_value (Longident.Lident id) env); true
        with Not_found -> false
        in
      if is_shadowing 
@@ -151,21 +151,6 @@ let ppf_apply f args =
 let ppf_apply_infix f arg1 arg2 =
   Printf.sprintf "%s %s %s"
                  arg1 f arg2
-
-let ppf_match value cases const =
-  let cons_fld = if const then "" else ".tag" in
-  let cases = 
-    match !current_mode with
-    | Mode_cmi -> assert false
-    | Mode_unlogged -> cases
-    | Mode_line_token
-    | Mode_logged -> cases 
-      (* TODO: put back if there is not already a default case:
-          ^ "@,default: throw \"No matching case for switch\";" *)
-    in
-  let s = Printf.sprintf "switch (%s%s) {@;<1 2>@[<v 0>%s@]@,}@,"
-    value cons_fld cases
-  in s
 
 let ppf_match_case c =
   Printf.sprintf "case %s" c
@@ -332,8 +317,41 @@ let ctx_initial =
   "ctx_empty"
 
 
+
+
 (****************************************************************)
 (* LOGGED CONSTRUCTORS *)
+
+
+
+
+(*--------- if ---------*)
+
+let ppf_ifthenelse arg iftrue iffalse =
+  Printf.sprintf "@[<v 0>if (%s) {@;<1 2>@[<v 0>%s@]@,} else {@;<1 2>@[<v 0>%s@]@,}@]"
+                 arg iftrue iffalse
+
+let generate_logged_if loc ctx sintro sarg siftrue siffalse =
+  (* sintro is not empty only in the logged case,
+     it describes the binding of the value describing the argument of the if *)
+  let (token_start, token_stop, token_loc) = token_fresh loc in
+  match !current_mode with
+  | Mode_cmi -> assert false
+  | Mode_unlogged -> 
+     ppf_ifthenelse sarg siftrue siffalse
+  | Mode_line_token ->
+     let sarg_with_token = Printf.sprintf "%s%s%s" token_start sarg token_stop in
+     ppf_ifthenelse sarg_with_token siftrue siffalse
+  | Mode_logged ->
+     let sevent = Printf.sprintf "%slog_event(%s, %s, \"if\");@,"
+        sintro token_loc ctx in
+     let sbody = ppf_ifthenelse sarg siftrue siffalse in
+     sevent ^ sbody
+
+
+  (* TODO: extend the ctx with if_arg *)
+
+(*--------- match ---------*)
 
 let generate_logged_case loc spat binders ctx newctx sbody need_break =
   (* Note: binders is a list of pairs of id *)
@@ -367,61 +385,74 @@ let generate_logged_case loc spat binders ctx newctx sbody need_break =
      (if need_break then "@,break;" else ""))
 
 
-(* LATER: optimize return when it's a value *)
+let ppf_match sintro sarg sbranches =
+  let sbranches = 
+    match !current_mode with
+    | Mode_cmi -> assert false
+    | Mode_unlogged -> sbranches
+    | Mode_line_token
+    | Mode_logged -> sbranches 
+      (* TODO: put back if there is not already a default case:
+          ^ "@,default: throw \"No matching case for switch\";" *)
+    in
+  Printf.sprintf "%sswitch (%s) {@;<1 2>@[<v 0>%s@]@,}@,"
+    sintro sarg sbranches
 
-let generate_logged_return loc ctx sbody = 
-  let (token_start, token_stop, token_loc) = token_fresh loc in
-  match !current_mode with
-  | Mode_cmi -> assert false
-  | Mode_unlogged | Mode_line_token ->
-     Printf.sprintf "%sreturn %s;%s" token_start sbody token_stop
-  | Mode_logged ->
-    let id = id_fresh "_return_" in
-    Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, [{key: \"#RETURN_VALUE\", val: %s}]), \"return\");@,return %s; "
-      id sbody token_loc ctx id id
-
-
-
-let ppf_ifthenelse arg iftrue iffalse =
-  Printf.sprintf "@[<v 0>if (%s) {@;<1 2>@[<v 0>%s@]@,} else {@;<1 2>@[<v 0>%s@]@,}@]"
-                 arg iftrue iffalse
-
-let generate_logged_if loc ctx sintro sarg siftrue siffalse =
-  (* sintro is not empty only in the logged case,
-     it describes the binding of the value describing the argument of the if *)
+let generate_logged_match loc ctx sintro sarg sbranches arg_is_constant =
+  (* sintro is useful not just in the logged case, but also in unlogged;
+     this is needed for the semantics *)
+  (* arg_is_constant describes whether the argument of switch is a basic JS value,
+     or whether it is an encoded object from which we need to read the tag field *)
+  let sarg = if arg_is_constant then sarg else sarg ^ ".tag" in
   let (token_start, token_stop, token_loc) = token_fresh loc in
   match !current_mode with
   | Mode_cmi -> assert false
   | Mode_unlogged -> 
-     ppf_ifthenelse sarg siftrue siffalse
+     ppf_match sintro sarg sbranches 
   | Mode_line_token ->
      let sarg_with_token = Printf.sprintf "%s%s%s" token_start sarg token_stop in
-     ppf_ifthenelse sarg_with_token siftrue siffalse
+     ppf_match sintro sarg_with_token sbranches 
   | Mode_logged ->
-     let sevent = Printf.sprintf "%slog_event(%s, %s, \"if\");@,"
-        sintro token_loc ctx in
-     let sbody = ppf_ifthenelse sarg siftrue siffalse in
-     sevent ^ sbody
+     let sbody = ppf_match "" sarg sbranches in
+     Printf.sprintf "%slog_event(%s, %s, \"switch\");@,%s"
+        sintro token_loc ctx sbody
+
+  (* TODO: extend the ctx with switch_arg *)
+
+(*--------- let ---------*)
 
 let generate_logged_let loc ids ctx newctx sdecl sbody =
   let (token_start, token_stop, token_loc) = token_fresh loc in
   match !current_mode with
   | Mode_cmi -> assert false
+  | Mode_unlogged -> 
+     Printf.sprintf "%s@,%s" sdecl sbody
   | Mode_line_token ->
      Printf.sprintf "%s%s%s@,%s" token_start sdecl token_stop sbody  
   | Mode_logged ->
     let mk_binding x =
-      Printf.sprintf "{key: \"%s\", val: %s}" x x
-    in
+      Printf.sprintf "{key: \"%s\", val: %s}" x x in
     let bindings =
-      Printf.sprintf "[%s]" (show_list ", " (List.map mk_binding ids))
-    in 
+      Printf.sprintf "[%s]" (show_list ", " (List.map mk_binding ids)) in 
     Printf.sprintf "%s@,var %s = ctx_push(%s, %s);@,log_event(%s, %s, \"let\");@,%s@,"
       sdecl newctx ctx bindings token_loc newctx sbody
-  | Mode_unlogged -> 
-     Printf.sprintf "%s@,%s" sdecl sbody
 
-(* LATER: factoriser les bindings *)
+
+(*--------- function call ---------*)
+
+let generate_logged_apply loc ctx sbody =
+  let (token_start, token_stop, token_loc) = token_fresh loc in
+  match !current_mode with
+  | Mode_cmi -> assert false
+  | Mode_unlogged -> 
+     sbody
+  | Mode_line_token ->
+     Printf.sprintf "%s%s%s" token_start sbody token_stop
+  | Mode_logged ->
+     Printf.sprintf "log_event(%s, %s, \"call\");@,%s" token_loc ctx sbody
+
+
+(*--------- enter function body ---------*)
 
 let generate_logged_enter loc arg_ids ctx newctx sbody = 
   let (token_start, token_stop, token_loc) = token_fresh loc in
@@ -444,6 +475,23 @@ let generate_logged_enter loc arg_ids ctx newctx sbody =
   let args = String.concat ", " arg_ids in
   Printf.sprintf "%sfunction (%s)%s {@;<1 2>@[<v 0>%s%s@]@,}" shead1 args shead2 sintro sbody
 
+
+(*--------- return ---------*)
+
+(* possibly: optimize return when it's a value *)
+
+let generate_logged_return loc ctx sbody = 
+  let (token_start, token_stop, token_loc) = token_fresh loc in
+  match !current_mode with
+  | Mode_cmi -> assert false
+  | Mode_unlogged ->
+     Printf.sprintf "return %s;" sbody
+  | Mode_line_token ->
+     Printf.sprintf "%sreturn %s;%s" token_start sbody token_stop
+  | Mode_logged ->
+    let id = id_fresh "_return_" in
+    Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, [{key: \"#RETURN_VALUE#\", val: %s}]), \"return\");@,return %s; "
+      id sbody token_loc ctx id id
 
 
 
@@ -471,6 +519,7 @@ exception Not_good_for_dest_inline
 
 let reject_inline dest =
   if dest = Dest_inline then raise Not_good_for_dest_inline
+
 
 
 (****************************************************************)
@@ -653,6 +702,7 @@ and js_of_expression ctx dest e =
     apply_dest' ctx dest sexp
 
   | Texp_apply (f, exp_l) ->
+
      (* first check not partial application *)
      let is_result_arrow = 
         let ty = e.exp_type in
@@ -686,15 +736,30 @@ and js_of_expression ctx dest e =
         end else begin
            ppf_apply se (String.concat ",@ " sl)
         end in
-     apply_dest' ctx dest sexp
+
+     if !current_mode = Mode_logged then begin
+        (* use this to prevent logging of the result
+           let return_exp = Printf.sprintf "return %s;" sexp in *)
+        let return_exp = apply_dest' ctx Dest_return sexp in
+        let logged_sexp = generate_logged_apply loc ctx return_exp in
+        let wrapped_exp = ppf_lambda_wrap logged_sexp in
+        apply_dest' ctx dest wrapped_exp
+     end else begin
+        (* we need a token to match the Dest_return above *)
+        let (token_start, token_stop, _token_loc) = token_fresh loc in 
+        let sexp2 = generate_logged_apply loc ctx sexp in
+        let sexp3 = Printf.sprintf "%s%s%s" token_start sexp2 token_stop in
+        apply_dest' ctx dest sexp3
+     end
+
 
   | Texp_match (obj, l, [], Total) ->
      reject_inline dest;
-     let (sintro, seobj) = js_of_expression_naming_argument_if_non_variable ctx obj "_switch_arg_" in     
-     let sb = String.concat "@," (List.map (fun b -> js_of_branch ctx dest b seobj) l) in
-     let const = exp_type_is_constant obj in
-     let sexp = sintro ^ (ppf_match seobj sb const) in
-     sexp
+     let (sintro, sarg) = js_of_expression_naming_argument_if_non_variable ctx obj "_switch_arg_" in     
+     let sbranches = String.concat "@," (List.map (fun b -> js_of_branch ctx dest b sarg) l) in
+     let arg_is_constant = exp_type_is_constant obj in
+     generate_logged_match loc ctx sintro sarg sbranches arg_is_constant
+
 
   | Texp_tuple (tl) -> 
      let sexp = ppf_tuple @@ show_list_f (fun exp -> inline_of_wrap exp) ", " tl in

@@ -276,6 +276,7 @@ function viewFile(file) {
    interpreter.swapDoc(docs[curfile]);
    interpreter.focus();
    updateFileList();
+   updateSelection();
  }
 }
 
@@ -484,7 +485,7 @@ interpreter = CodeMirror.fromTextArea(document.getElementById('interpreter_code'
    'F': function(cm) { finish(); updateSelection(); }
  },
 });
-interpreter.setSize(600,400);
+interpreter.setSize(800,400);
 
 /* ==> try in new version of codemirror*/
 try {
