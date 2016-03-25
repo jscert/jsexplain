@@ -71,6 +71,9 @@ var tracer_pos = 0;
 var source = "";
 var interpreter = null;
 
+// Initial source code
+var source_file = 'var x = 2;\n';
+
 
 // --------------- Initialization ----------------
 
@@ -564,3 +567,8 @@ function testLineof(filename, token) {
 
 // for easy debugging, launch at startup:
 readSourceParseAndRun();
+
+
+function showCurrent() {
+  console.log(tracer_items[tracer_pos]);
+};

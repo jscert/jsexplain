@@ -26,7 +26,7 @@ let report_shadowing =
 let check_shadowing ?loc env id =
   if report_shadowing then begin
      let is_shadowing =
-       try ignore (Env.lookup_value (Lident id) env); true
+       try ignore (Env.lookup_value (Longident.Lident id) env); true
        with Not_found -> false
        in
      if is_shadowing 
@@ -834,7 +834,7 @@ and js_of_path_longident path ident =
   (* for string *)
   | "^"   -> "+" (* !!TODO: we want to claim ability to type our sublanguage, so we should not use this *)
   | res   -> 
-      let res = if !generate_qualified_names && (Path.head path).name <> "Stdlib" 
+      let res = if !generate_qualified_names && (Path.head path).Ident.name <> "Stdlib" 
                    then ppf_path path else res in
       ppf_ident_name res
 

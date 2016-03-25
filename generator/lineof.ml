@@ -92,14 +92,16 @@ let gather_tokens basename input_lines =
     ~~ List.iteri input_lines (fun line input ->
       let r = Str.regexp regexp in 
       let i = ref 0 in
-      let mk_pos () = { pos_line = line; pos_col = !i } in
+      (* line+1 because lines are counted starting from 1 *)
+      let mk_pos () = { pos_line = line+1; pos_col = !i } in
       try
         while true do 
           (* Printf.printf "search from %d\n" !i; *)
           let j = Str.search_forward r input !i in
-          i := j+1;
+          i := j;
           let key = Str.matched_group 1 input in
           let pos = mk_pos() in
+          i := j+1;
           (* Printf.printf "matched key: %s\n" key; *)
           Hashtbl.add tokens_table (int_of_string key) pos
         done;
@@ -112,6 +114,61 @@ let gather_tokens basename input_lines =
   find_tokens tokens_stop "#\\([0-9]*\\)>#";
   tokens := (basename, tokens_start, tokens_stop)::!tokens
 
+let new_gather_tokens basename input_lines =
+  let tokens_start = Hashtbl.create 50 in
+  let tokens_stop = Hashtbl.create 50 in
+  ~~ List.iteri input_lines (fun line input ->
+      let r1 = Str.regexp "#<\\([0-9]*\\)#" in 
+      let r2 = Str.regexp "#\\([0-9]*\\)>#" in 
+      let i = ref 0 in
+      let toremove = ref 0 in
+      (* line+1 because lines are counted starting from 1 *)
+      let mk_pos () = { pos_line = line+1; pos_col = !i - !toremove } in
+      try
+        while true do 
+          (* Printf.printf "search from %d\n" !i; *)
+          let j1 = Str.search_forward r1 input !i in
+          let j2 = Str.search_forward r2 input !i in
+          let (j,tokens_table) = 
+             if j1 < j2 then (j1,tokens_start) else (j2,tokens_stop) in
+          i := j;
+          let key = Str.matched_group 1 input in
+          (* Printf.printf "matched key: %s\n" key; *)
+          let pos = mk_pos() in
+          Hashtbl.add tokens_table (int_of_string key) pos;
+          i := j+1;
+          (* 3 corresponds to nb chars in "#<" and "#" *)
+          toremove := !toremove + 3 + String.length key;
+        done;
+      with Not_found -> () 
+      );
+  tokens := (basename, tokens_start, tokens_stop)::!tokens
+
+
+(* BUG WITH REGEXP
+let _ = 
+  let input = "#<1978#case ::: var l = _switch_arg_19.head, l0 = _switch_arg_19.tail;  #1978>##<1977#return let_binding(prog_intro_strictness(p), #<1976#function (str)#1976># " in
+  let regexp = "\\(#<\\([0-9]*\\)#\\)\\|\\(#\\([0-9]*\\)>#\\)" in
+  let regexp = "\\(#<[0-9]*#\\)\\|\\(#[0-9]*>#\\)" in
+  let r = Str.regexp regexp in 
+  let i = ref 0 in
+  for k = 1 to 10 do
+     let j = 
+       try Str.search_forward r input !i
+       with Not_found -> exit 0 in
+     let key = Str.matched_group 1 input in
+     Printf.printf "%s\n" key;
+     i := j+1;
+  done
+
+
+  PETIT EXEMPLE
+
+     let test = Str.regexp "\\(foo\\)\\|\\(bar\\)";;
+     let s = "afoobbar";;
+     Str.search_forward test s 0;;
+     Str.search_forward test s 2;;
+*)
 
 (*#########################################################################*)
 

@@ -1,8 +1,29 @@
 open JsCommon
 (*open JsNumber*)
-open JsPreliminary
+(*open JsPreliminary*)
 open JsSyntax
 open JsSyntaxAux
+
+(**------------JS Preliminary ------------------*)
+
+(** val string_of_native_error : native_error -> string **)
+
+let string_of_native_error _foo_ = match _foo_ with
+| Coq_native_error_eval ->
+  "EvalError"
+| Coq_native_error_range ->
+  "RangeError"
+| Coq_native_error_ref ->
+  "ReferenceError"
+| Coq_native_error_syntax ->
+  "SyntaxError"
+| Coq_native_error_type ->
+  "TypeError"
+| Coq_native_error_uri ->
+  "URIError"
+
+(**------------End JS Preliminary ------------------*)
+
 
 (** Val prop_attributes_for_global_object : value -> attributes_data **)
 

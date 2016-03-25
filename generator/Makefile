@@ -16,9 +16,9 @@ STDLIB_DIR  := stdlib_ml
 TESTS_DIR   := tests
 JSREF_DIR   := jsref
 JSREF_PATH  := $(TESTS_DIR)/$(JSREF_DIR)
-TESTS_ML    := $(wildcard $(TESTS_DIR)/*.ml)
-JSREF_ML    := $(wildcard $(TESTS_DIR)/$(JSREF_DIR)/*.ml) 
-JSREF_MLI   := $(wildcard $(TESTS_DIR)/$(JSREF_DIR)/*.mli)
+JSREF_ML    := $(wildcard $(JSREF_PATH)/*.ml) 
+JSREF_MLI   := $(wildcard $(JSREF_PATH)/*.mli)
+
 
 ###############################################################
 
@@ -50,7 +50,7 @@ ASSEMBLY_JS_FILES := \
 	JsSyntaxInfos.unlog.js \
 	JsCommon.unlog.js \
 	JsCommonAux.unlog.js \
-	JsPreliminary.log.js \
+	JsPreliminary.unlog.js \
 	JsInit.unlog.js \
 	JsInterpreterMonads.unlog.js \
 	JsInterpreter.log.js
@@ -60,7 +60,6 @@ ASSEMBLY_JS := $(STDLIB_DIR)/stdlib.js $(addprefix tests/jsref/,$(ASSEMBLY_JS_FI
 ###############################################################
 
 DISPLAYED_JS_FILES := \
-	JsPreliminary.unlog.js \
 	JsInterpreter.unlog.js
 
 DISPLAYED_JS := $(addprefix tests/jsref/,$(DISPLAYED_JS_FILES));
@@ -94,7 +93,7 @@ LINEOF := ./lineof.byte
 # Dependencies
 
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
--include $(TESTS_ML:.ml=.ml.d)
+#-include $(JSREF_ML:.ml=.ml.d)
 -include $(JSREF_PATH)/.depends
 endif
 
@@ -114,7 +113,7 @@ $(STDLIB_DIR)/stdlib.cmi: $(STDLIB_DIR)/stdlib.mli
 
 ##### Rule for dependencies
 
-tests/%/.depends: tests/%/*
+$(JSREF_PATH)/.depends: $(JSREF_ML)
 	$(OCAMLDEP) -all -I $(<D) $(<D)/* > $@
 
 ##### Rule for cmi
@@ -170,7 +169,7 @@ cmi: $(JSREF_ML:.ml=.cmi) $(JSREF_MLI:.mli=.cmi)
 
 gen: $(JSREF_ML:.ml=.log.js) $(JSREF_ML:.ml=.unlog.js) $(JSREF_ML:.ml=.token.js)
 
-log: $(TESTS_ML:.ml=.log.js) $(TESTS_ML:.ml=.token.js)
+log: $(JSREF_ML:.ml=.log.js) $(JSREF_ML:.ml=.token.js)
 
 unlog: $(JSREF_ML:.ml=.unlog.js) 
 

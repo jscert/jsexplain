@@ -5,6 +5,7 @@
 function lineof(filename, token) {
    var d = lineof_data[filename][token];
    return { file: filename,
+            token: token,
             start: {line: d[0], column: d[1]}, 
             end: {line: d[2], column: d[3]} };
 };
