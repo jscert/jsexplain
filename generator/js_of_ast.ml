@@ -282,6 +282,24 @@ let id_fresh =
 
 
 (****************************************************************)
+(* TOKEN TO LOC BINDINGS FOR THE ML SOURCE FILES *)
+
+(* Keeps track of the location associated with each token,
+   maps int to (pos*pos).  *)
+
+type pos = { pos_line: int; pos_col: int }
+let token_locs = Hashtbl.create 50 
+
+let pos_of_lexing_pos lexing_pos =
+  let (file, line, char) = Location.get_pos_info lexing_pos in
+  { pos_line = line; pos_col = char } 
+
+let pos_pair_of_loc loc =
+  (pos_of_lexing_pos loc.Location.loc_start,
+   pos_of_lexing_pos loc.Location.loc_end)
+
+
+(****************************************************************)
 (* FRESH TOKEN NAMES *)
 
 let token_basename_ref = ref "no_token_basename_registered"
@@ -289,13 +307,19 @@ let token_basename_ref = ref "no_token_basename_registered"
 let token_register_basename basename =
   token_basename_ref := basename
 
+(* returns a string of the form: ["filename.js", 3425],
+   where 3425 describes the token. *)
+
 let token_fresh =
   let r = ref 0 in
-  fun () -> (incr r; 
+  fun loc -> (
+    incr r; 
+    Hashtbl.add token_locs (!r) (pos_pair_of_loc loc);
     let token_start = Printf.sprintf "@{<%d>" !r in
     let token_stop = "@}" in
-    let token_lineof = Printf.sprintf "lineof(\"%s.js\", %d)" !token_basename_ref !r in  
-    (token_start, token_stop, token_lineof))
+    let token_loc = Printf.sprintf "\"%s.js\", %d" !token_basename_ref !r in 
+    (token_start, token_stop, token_loc))
+
 
 
 (****************************************************************)
@@ -314,10 +338,10 @@ let ctx_initial =
 (****************************************************************)
 (* LOGGED CONSTRUCTORS *)
 
-let generate_logged_case spat binders ctx newctx sbody need_break =
+let generate_logged_case loc spat binders ctx newctx sbody need_break =
   (* Note: binders is a list of pairs of id *)
   (* Note: if binders = [], then newctx = ctx *)
-  let (token_start, token_stop, token_lineof) = token_fresh() in
+  let (token_start, token_stop, token_loc) = token_fresh loc in
   let (shead, sintro) =
     match !current_mode with
     | Mode_cmi -> assert false
@@ -336,7 +360,7 @@ let generate_logged_case spat binders ctx newctx sbody need_break =
         else Printf.sprintf "var %s = ctx_push(%s, %s);@," newctx ctx bindings
       in
       let sintro = Printf.sprintf "%slog_event(%s, %s, \"case\");@,"
-        spreintro token_lineof newctx in
+        spreintro token_loc newctx in
       ("", sintro)
     | Mode_unlogged -> ("", "")
     in
@@ -364,16 +388,16 @@ with help of
 
 (* LATER: optimize return when it's a value *)
 
-let generate_logged_return ctx sbody = 
-  let (token_start, token_stop, token_lineof) = token_fresh() in
+let generate_logged_return loc ctx sbody = 
+  let (token_start, token_stop, token_loc) = token_fresh loc in
   match !current_mode with
   | Mode_cmi -> assert false
   | Mode_unlogged | Mode_line_token ->
      Printf.sprintf "%sreturn %s;%s" token_start sbody token_stop
   | Mode_logged ->
     let id = id_fresh "_return_" in
-    Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, [{key: \"return_value\", value: %s}]), \"return\");@,return %s; "
-      id sbody token_lineof ctx id id
+    Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, [{key: \"return_value\", val: %s}]), \"return\");@,return %s; "
+      id sbody token_loc ctx id id
 (*
 ----
   [insertReturnCode(e,ctx)]
@@ -386,8 +410,8 @@ var t=e; logEvent(LINEOF(432423), ctx_push(ctx, {"return",t}), "return"); return
 
 
 
-let generate_logged_let ids ctx newctx sdecl sbody =
-  let (token_start, token_stop, token_lineof) = token_fresh() in
+let generate_logged_let loc ids ctx newctx sdecl sbody =
+  let (token_start, token_stop, token_loc) = token_fresh loc in
   match !current_mode with
   | Mode_cmi -> assert false
   | Mode_line_token ->
@@ -400,7 +424,7 @@ let generate_logged_let ids ctx newctx sdecl sbody =
       Printf.sprintf "[%s]" (show_list ", " (List.map mk_binding ids))
     in 
     Printf.sprintf "%s@,var %s = ctx_push(%s, %s);@,log_event(%s, %s, \"let\");@,%s@,"
-      sdecl newctx ctx bindings token_lineof newctx sbody
+      sdecl newctx ctx bindings token_loc newctx sbody
   | Mode_unlogged -> 
      Printf.sprintf "%s@,%s" sdecl sbody
 
@@ -417,8 +441,8 @@ var x=e; var newctx=ctx_push(ctx,x,e); logEvent(LINEOF(432423), "let", ctx);sbod
 
 (* LATER: factoriser les bindings *)
 
-let generate_logged_enter arg_ids ctx newctx sbody = 
-  let (token_start, token_stop, token_lineof) = token_fresh() in
+let generate_logged_enter loc arg_ids ctx newctx sbody = 
+  let (token_start, token_stop, token_loc) = token_fresh loc in
   let (shead1, shead2, sintro) =
     match !current_mode with
     | Mode_cmi -> assert false
@@ -431,7 +455,7 @@ let generate_logged_enter arg_ids ctx newctx sbody =
         Printf.sprintf "[%s]" (show_list ", " (List.map mk_binding arg_ids))
       in 
       let sintro = Printf.sprintf "var %s = ctx_push(%s, %s);@,log_event(%s, %s, \"enter\");@,"
-        newctx ctx bindings token_lineof newctx in
+        newctx ctx bindings token_loc newctx in
       ("", "", sintro)
     | Mode_unlogged -> ("", "", "")
   in
@@ -469,10 +493,10 @@ type dest =
   | Dest_assign of string
   | Dest_inline
 
-let apply_dest ctx dest sbody =
+let apply_dest loc ctx dest sbody =
   match dest with
   | Dest_ignore -> sbody
-  | Dest_return -> generate_logged_return ctx sbody
+  | Dest_return -> generate_logged_return loc ctx sbody
   | Dest_assign id -> Printf.sprintf "var %s = %s;" id sbody
   | Dest_inline -> sbody
 
@@ -572,7 +596,7 @@ and js_of_branch ctx dest b eobj =
   let newctx = if binders = [] then ctx else ctx_fresh() in
   let sbody = js_of_expression newctx dest b.c_rhs in
   let need_break = (dest <> Dest_return) in
-  generate_logged_case spat binders ctx newctx sbody need_break 
+  generate_logged_case b.c_lhs.pat_loc spat binders ctx newctx sbody need_break 
      
 and js_of_expression_inline_or_wrap ctx e = 
   try 
@@ -595,15 +619,16 @@ and js_of_expression_naming_argument_if_non_variable ctx obj name_prefix =
 and js_of_expression ctx dest e =
   let inline_of_wrap = js_of_expression_inline_or_wrap ctx in (* shorthand *)
   let loc = e.exp_loc in
+  let apply_dest' = apply_dest loc in
   match e.exp_desc with
 
   | Texp_ident (path, ident,  _) -> 
       let sexp = js_of_path_longident path ident in
-      apply_dest ctx dest sexp
+      apply_dest' ctx dest sexp
 
   | Texp_constant c -> 
       let sexp = js_of_constant c in
-      apply_dest ctx dest sexp
+      apply_dest' ctx dest sexp
 
   | Texp_let (_, vb_l, e) ->
     reject_inline dest;
@@ -645,7 +670,7 @@ and js_of_expression ctx dest e =
       end in
     let newctx = ctx_fresh() in
     let sbody = js_of_expression newctx dest e in
-    let sexp = generate_logged_let ids ctx newctx sdecl sbody in
+    let sexp = generate_logged_let loc ids ctx newctx sdecl sbody in
     sexp
 
   | Texp_function (_, c :: [], Total) ->
@@ -659,8 +684,8 @@ and js_of_expression ctx dest e =
     let arg_ids, body = explore [c.c_lhs] c.c_rhs in
     let newctx = ctx_fresh() in
     let sbody = js_of_expression newctx Dest_return body in
-    let sexp = generate_logged_enter arg_ids ctx newctx sbody in
-    apply_dest ctx dest sexp
+    let sexp = generate_logged_enter loc arg_ids ctx newctx sbody in
+    apply_dest' ctx dest sexp
 
   | Texp_apply (f, exp_l) ->
      (* first check not partial application *)
@@ -696,7 +721,7 @@ and js_of_expression ctx dest e =
         end else begin
            ppf_apply se (String.concat ",@ " sl)
         end in
-     apply_dest ctx dest sexp
+     apply_dest' ctx dest sexp
 
   | Texp_match (obj, l, [], Total) ->
      reject_inline dest;
@@ -708,7 +733,7 @@ and js_of_expression ctx dest e =
 
   | Texp_tuple (tl) -> 
      let sexp = ppf_tuple @@ show_list_f (fun exp -> inline_of_wrap exp) ", " tl in
-     apply_dest ctx dest sexp
+     apply_dest' ctx dest sexp
 
   | Texp_construct (p, cd, el) ->
     let cstr_fullname = string_of_longident p.txt in
@@ -725,7 +750,7 @@ and js_of_expression ctx dest e =
           let expr_strs = List.map (fun exp -> inline_of_wrap exp) el in
           ppf_cstrs_fct cstr_fullname expr_strs
         end in
-    apply_dest ctx dest sexp
+    apply_dest' ctx dest sexp
 
   | Texp_array      (exp_l)           -> ppf_array @@ show_list_f (fun exp -> inline_of_wrap exp) ", " exp_l
   | Texp_ifthenelse (e1, e2, None)    -> out_of_scope loc "if without else"
@@ -741,14 +766,15 @@ and js_of_expression ctx dest e =
     (* ppf_for (ppf_ident id) (js_of_expression st) (js_of_expression ed) fl (js_of_expression body) *)
   | Texp_record     (llde,_)          -> 
       let sexp = ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, inline_of_wrap exp)) llde) in
-      apply_dest ctx dest sexp
+      apply_dest' ctx dest sexp
   | Texp_field      (exp, _, lbl)     ->
       let sexp = ppf_field_access (inline_of_wrap exp) lbl.lbl_name in
-      apply_dest ctx dest sexp
+      apply_dest' ctx dest sexp
       
   | Texp_assert      e                -> 
       let sexp = inline_of_wrap e in
       Printf.sprintf "throw %s;" sexp
+      (* TODO: what about apply_dest? *)
 
   | Texp_function (label, cases, Total) when label = "" -> 
       let mk_pat pat_des =

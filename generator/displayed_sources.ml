@@ -80,8 +80,8 @@ let hashtbl_keys t =
     takes as argument a list of javascript filenames,
     and create a javascript file with a definition of
     an array called "tracer_files", storing objects with
-    two fields: a filename, and a contents, with newline
-    and quotes properly escaped.
+    two fields: a filename, and a contents, with newline, 
+    quotes and backslashes properly escaped.
 
 
    var tracer_files = [
@@ -142,17 +142,35 @@ let _ =
 
 
    (*---------------------------------------------------*)
+   (* test *)
+
+  (* DEBUG: to test how many backslashes are needed
+  let line = "foo \\n" in
+     let line = Str.global_replace (Str.regexp "\\") "\\\\\\\\" line in
+     print_string  line;
+     print_newline();
+   exit 0;
+  *)
+
+   (*---------------------------------------------------*)
    (* include of logged js files *)
+
 
    put "var tracer_files = [";
 
    ~~ List.iter !files (fun filename ->
-      let basename = Filename.chop_suffix (Filename.basename filename) ".unlog.js" in
-      let showed_filename = basename ^ ".js" in
+      let showed_filename = 
+         let short = Filename.basename filename in
+         if (Filename.check_suffix short ".unlog.js") then begin
+            let basename = Filename.chop_suffix short ".unlog.js" in
+            basename ^ ".js" 
+         end else short  (* should be .ml file *)
+         in
       put (Printf.sprintf "\n/* --------------------- %s --------------------- */" showed_filename);
       put_no_endline (Printf.sprintf "  { file: '%s', contents: '" showed_filename);
       let lines = XFile.get_lines filename in
       ~~ List.iter lines (fun line ->
+         let line = Str.global_replace (Str.regexp "\\") "\\\\\\\\" line in
          let line = Str.global_replace (Str.regexp "'") "\\'" line in
          put_no_endline line;
          put_no_endline "\\n";

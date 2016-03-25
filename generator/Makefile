@@ -1,4 +1,4 @@
-#
+	#
 # Usage:
 #    make all  # not implemented yet, will build everything
 #    make full    # build *.log.js, *.unlog.js, *.token.js
@@ -54,15 +54,17 @@ ASSEMBLY_JS_FILES := \
 	JsInit.unlog.js \
 	JsInterpreterMonads.unlog.js \
 	JsInterpreter.log.js
-ASSEMBLY_JS := $(STDLIB_DIR)/stdlib.js $(addprefix tests/jsref/,$(ASSEMBLY_JS_FILES));
+ASSEMBLY_JS := $(STDLIB_DIR)/stdlib.js $(addprefix tests/jsref/,$(ASSEMBLY_JS_FILES))
 
 
 ###############################################################
 
-DISPLAYED_JS_FILES := \
-	JsInterpreter.unlog.js
+DISPLAYED_FILES := \
+	JsInterpreter.ml
 
-DISPLAYED_JS := $(addprefix tests/jsref/,$(DISPLAYED_JS_FILES));
+DISPLAYED := $(addprefix tests/jsref/,$(DISPLAYED_FILES))
+
+
 
 
 ###############################################################
@@ -70,7 +72,7 @@ DISPLAYED_JS := $(addprefix tests/jsref/,$(DISPLAYED_JS_FILES));
 
 all: everything
 
-.PHONY: all clean .log.js .unlog.js .token.js
+.PHONY: all clean .log.js .unlog.js .token.js .mlloc.js
    # all gen log unlog 
 
 # Do not delete intermediate files.
@@ -132,13 +134,13 @@ tests/%.log.js: tests/%.ml main.byte stdlib tests/%.cmi
 tests/%.unlog.js: tests/%.ml main.byte stdlib tests/%.cmi
 	./main.byte -mode unlog -I $(<D) $<
 
-tests/%.token.js: tests/%.ml main.byte stdlib tests/%.cmi
+tests/%.token.js tests/%.mlloc.js: tests/%.ml main.byte stdlib tests/%.cmi
 	./main.byte -mode token -I $(<D) $<
 
 ##### Rule for lineof.js
 
-$(JSREF_PATH)/lineof.js: lineof.byte $(JSREF_ML:.ml=.token.js)
-	./lineof.byte -o $@ $(JSREF_ML:.ml=.token.js)
+$(JSREF_PATH)/lineof.js: lineof.byte $(DISPLAYED:.ml=.token.js) $(DISPLAYED:.ml=.mlloc.js)
+	./lineof.byte -o $@ $(DISPLAYED:.ml=.token.js) $(DISPLAYED:.ml=.mlloc.js)
 
 ##### Rule for assembly.js
 
@@ -149,8 +151,8 @@ $(JSREF_PATH)/assembly.js: assembly.byte $(ASSEMBLY_JS)
 
 ##### Rule for displayed_sources.js
 
-$(JSREF_PATH)/displayed_sources.js: displayed_sources.byte $(DISPLAYED_JS)
-	./displayed_sources.byte -o $@ $(DISPLAYED_JS)
+$(JSREF_PATH)/displayed_sources.js: displayed_sources.byte $(DISPLAYED:.ml=.unlog.js) $(DISPLAYED)
+	./displayed_sources.byte -o $@ $(DISPLAYED:.ml=.unlog.js) $(DISPLAYED)
 
 
 #### maybe useful ??
@@ -186,16 +188,17 @@ stdlib: $(STDLIB_DIR)/stdlib.cmi
 #####################################################################
 # Clean
 
-DIRTY_EXTS := cmi,token.js,log.js,unlog.js,d,ml.d,mli.d,js.pre
+DIRTY_EXTS := cmi,.mlloc.js,token.js,log.js,unlog.js,d,ml.d,mli.d,js.pre
 
 clean_genjs:
 	rm -f $(JSREF_PATH)/lineof.js
 	rm -f $(JSREF_PATH)/assembly.js
 
 clean_tests:
-	bash -c "rm -f $(TESTS_DIR)/*.{$(DIRTY_EXTS)}"
-	bash -c "rm -f $(TESTS_DIR)/$(JSREF_DIR)/*.{$(DIRTY_EXTS)}"
+	bash -c "rm -f $(JSREF_PATH)/*.{$(DIRTY_EXTS)}"
 	bash -c "rm -f $(JSREF_PATH)/.depends"
+
+#	bash -c "rm -f $(TESTS_DIR)/*.{$(DIRTY_EXTS)}"
 
 clean_stdlib:
 	rm -f $(STDLIB_DIR)/*.cmi

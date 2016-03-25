@@ -208,9 +208,7 @@ let _ =
 *)
 
 
-let generate_lineof_function put =
-   put "var lineof_data = {};";
-   put "var lineof_temp;";
+let generate_lineof_entries put =
    ~~ List.iter !tokens (fun (basename, tokens_start, tokens_stop) ->
      put "   lineof_temp = [];";
      let filename = basename ^ ".js" in
@@ -252,7 +250,7 @@ let generate_lineof_function put =
        }
      }
 
-   let generate_lineof_function output_file =
+   let generate_lineof_entries output_file =
      let aux_pos pos =
        Printf.sprintf "{ line: %d, col: %d }" pos.pos_line pos.pos_col 
        in
@@ -285,11 +283,14 @@ let generate_lineof_function put =
      let output = Format.flush_str_formatter () in
      XFile.put_contents output_file output
       
-  ==> generate_lineof_function output_filename 
+  ==> generate_lineof_entries output_filename 
 *)
 
 
 (*#########################################################################*)
+
+(** The files called *.mlloc.js are appended directly;
+    they come first in the output file.  *)
 
 
 let files = ref ([]:string list)
@@ -313,6 +314,7 @@ let _ =
      ("usage: [..other options..] -o lineof.js file1.token.js file2.token.js ..");
    if !files = [] then
      failwith "No input file provided";
+   files := List.rev !files;
    let input_filename1 = List.hd !files in
    let dirname = Filename.dirname input_filename1 in
    let output_filename = 
@@ -321,16 +323,6 @@ let _ =
      | Some f -> f
    in
 
-   (*---------------------------------------------------*)
-   (* processing source files *)
-
-   ~~ List.iter !files (fun filename ->
-     if not (Filename.check_suffix filename ".token.js") then
-       failwith "Input file must be of the form *.token.js";
-     let basename = Filename.chop_suffix (Filename.basename filename) ".token.js" in
-     let input_lines = XFile.get_lines filename in
-     gather_tokens basename input_lines
-   );
 
    (*---------------------------------------------------*)
    (* open output file for writing *)
@@ -340,11 +332,29 @@ let _ =
        output_string outchannel str;
        output_string outchannel "\n" in
 
+   put "var lineof_data = {};";
+   put "var lineof_temp;";
+
+
+   (*---------------------------------------------------*)
+   (* processing source files *)
+
+   ~~ List.iter !files (fun filename ->
+     if (Filename.check_suffix filename ".mlloc.js") then begin
+        let input_lines = XFile.get_lines filename in
+        List.iter put input_lines;
+     end else if (Filename.check_suffix filename ".token.js") then begin
+        let basename = Filename.chop_suffix (Filename.basename filename) ".token.js" in
+        let input_lines = XFile.get_lines filename in
+        gather_tokens basename input_lines
+     end else 
+        failwith "Input file must be of the form *.token.js"
+   );
 
    (*---------------------------------------------------*)
    (* generating output file *)
 
-   generate_lineof_function put;
+   generate_lineof_entries put;
    close_out outchannel;
    Printf.printf "Wrote file: %s\n" output_filename;
 

@@ -34,6 +34,7 @@ let _ =
      ]
      (fun f -> files := f :: !files)
      ("usage: [-I dir] [..other options..] file.ml");
+   files := List.rev !files;
    if List.length !files <> 1 then
       failwith "Expects one argument: the filename of the ML source file";
    let sourcefile = List.hd !files in
@@ -42,12 +43,13 @@ let _ =
    let basename = Filename.chop_suffix (Filename.basename sourcefile) ".ml" in
    let dirname = Filename.dirname sourcefile in
    let pathname = if dirname = "" then basename else (dirname ^ "/" ^ basename) in
-   let log_output, unlog_output, token_output =
+   let log_output, unlog_output, token_output, mlloc_output =
      match !outputfile with
      | None -> Filename.concat dirname (basename ^ ".log.js"),
                Filename.concat dirname (basename ^ ".unlog.js"),
-               Filename.concat dirname (basename ^ ".token.js")
-     | Some f -> f ^ ".log.js", f ^ ".unlog.js", f ^ ".token.js"
+               Filename.concat dirname (basename ^ ".token.js"),
+               Filename.concat dirname (basename ^ ".mlloc.js")
+     | Some f -> f ^ ".log.js", f ^ ".unlog.js", f ^ ".token.js", f ^ ".mlloc.js"
    in
 
    (*---------------------------------------------------*)
@@ -60,6 +62,26 @@ let _ =
    if !current_mode <> Mode_unlogged 
       then generate_qualified_names := true;
    *)
+
+
+   (*---------------------------------------------------*)
+   (* generation of the mlloc file that binds tokens to positions *)
+
+   let generate_mlloc_file () =
+      let outchannel = open_out mlloc_output in
+      let put str =
+         output_string outchannel str;
+         output_string outchannel "\n" in
+      put "   lineof_temp = [];";
+      let filename = basename ^ ".ml" in
+      ~~ Hashtbl.iter Js_of_ast.token_locs (fun key (pos_start,pos_stop) ->
+        put (Printf.sprintf "   lineof_temp[%d] = [%d,%d,%d,%d];" 
+               key pos_start.pos_line pos_start.pos_col  
+                   pos_stop.pos_line  pos_stop.pos_col);
+      );
+      put (Printf.sprintf "lineof_data[\"%s\"] = lineof_temp;" filename);
+      close_out outchannel;
+      in
 
    (*---------------------------------------------------*)
    (* "reading and typing source file" *)
@@ -82,4 +104,8 @@ let _ =
             | _ -> assert false
           in
           file_put_contents output_filename out;
-          Printf.printf "Wrote %s\n" output_filename
+          Printf.printf "Wrote %s\n" output_filename;
+          if !current_mode = Mode_line_token 
+            then generate_mlloc_file()
+
+

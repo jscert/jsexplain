@@ -3,13 +3,27 @@
 
 // see "generator/lineof.ml" and "lineof.js" 
 function lineof(filename, token) {
-   var d = lineof_data[filename][token];
+   var f = lineof_data[filename];
+   if (f == undefined) {
+     console.log("could not find lineof for " + filename);
+     return;
+   }
+   var d = f[token];
+   if (d == undefined) {
+     console.log("could not find token " + token + " for " + filename);
+     return;
+   }
    return { file: filename,
-            token: token,
             start: {line: d[0], column: d[1]}, 
             end: {line: d[2], column: d[3]} };
 };
 
+
+// ----------- Auxiliary --------------
+
+String.prototype.replaceAt=function(index, character) {
+    return this.substr(0, index) + character + this.substr(index+character.length);
+}
 
 // ----------- Datalog ----------------
 
@@ -19,11 +33,24 @@ function reset_datalog() {
   datalog = [];
 }
 
-function log_event(loc, ctx, type) {
+// filename assumed to be of js extension
+function log_event(filename, token, ctx, type) {
   // TODO populate state with object_heap, env_record_heap, fresh_locations, and populate env
-  var event = {loc : loc, ctx : ctx, type : type, state: {}, env: {}};
+
+  // compute "foo.ml" from "foo.js"
+  var len = filename.length;
+  var mlfilename = filename.replaceAt(len-2, "m");
+  mlfilename = mlfilename.replaceAt(len-1, "l");
+
+  var jsloc = lineof(filename, token);
+  var mlloc = lineof(mlfilename, token);
+
+  var event = { token: token, locByExt: { "ml": mlloc, "js": jsloc },
+                ctx : ctx, type : type, state: {}, env: {}};
   datalog.push(event);
 }
+
+
 
 // ----------- Context ----------------
 

@@ -72,7 +72,10 @@ var source = "";
 var interpreter = null;
 
 // Initial source code
-var source_file = 'var x = 2;\n';
+var source_file = 'var x = 2;\nx';
+
+var source_file = ' var t = {}; for (var i = 0; i < 3; i++) { t[i] = function() { return i; } }; t[0](); ';
+var source_file = '{}';
 
 
 // --------------- Initialization ----------------
@@ -250,14 +253,23 @@ function previous() { shared_next(-1, 0); }
 function finish() { shared_next(+1, -1); }
 
 
+// --------------- Auxiliary ----------------
+
+function get_file_extension(filename) {
+  var re = /(?:\.([^.]+))?$/;
+  return re.exec(filename)[1];
+}
+
+
 // --------------- Methods ----------------
 
 // load files in CodeMirror view
 var docs = {};
 for (var i = 0; i < tracer_files.length; i++) {
   var file = tracer_files[i].file;
+  var ext = get_file_extension(file);
   var txt = tracer_files[i].contents;
-  docs[file] = CodeMirror.Doc(txt, 'js');
+  docs[file] = CodeMirror.Doc(txt, ext);
 }
 
 function viewFile(file) {
@@ -381,7 +393,7 @@ function ctxToHtml(ctx) {
 
 function itemToHtml(item) {
   var s = '';
-  s += htmlDiv("token: " + item.loc.token + JSON.stringify(item.loc.start) + JSON.stringify(item.loc.end));
+  s += htmlDiv("token: " + item.token + JSON.stringify(item.locByExt));
   s += htmlDiv("type: " + item.type);
   s += ctxToHtml(item.ctx);
   return s;
@@ -390,12 +402,26 @@ function itemToHtml(item) {
 // --------------- Selection view ----------------
 
 function updateSelectionInCodeMirror(codeMirrorObj, loc) {
- if (loc === undefined) {
+  if (loc === undefined) {
+     return; 
+  }
+  var anchor = {line: loc.start.line-1 , ch: loc.start.column };
+  var head = {line: loc.end.line-1, ch: loc.end.column };
+  codeMirrorObj.setSelection(anchor, head);
+}
+
+function updateSelectionInCodeMirrorAccordingToExt(codeMirrorObj, locByExt) {
+  if (locByExt === undefined) {
    return; 
- }
- var anchor = {line: loc.start.line-1 , ch: loc.start.column };
- var head = {line: loc.end.line-1, ch: loc.end.column };
- codeMirrorObj.setSelection(anchor, head);
+  }
+  var ext = get_file_extension(curfile);
+  var loc = locByExt[ext];
+  if (loc === undefined) {
+    console.log("Error: missing loc for " + curfile + " in:");
+    console.log(locByExt);
+    return;
+  }
+  updateSelectionInCodeMirror(codeMirrorObj, loc);
 }
 
 function updateSelection() {
@@ -423,15 +449,15 @@ function updateSelection() {
      updateContext("#disp_ctx", item.heap, item.ctx);
 
      // interpreter code panel
-     viewFile(item.loc.file);
-     //console.log("pos: " + tracer_pos);
+     // TEMPORARILY DISABLED BECAUSE ONLY SINGLE FILE TO TRACE
+     // viewFile(item.loc.file);
 
      var color = '#F3F781';
         // possible to use different colors depending on event type
         // var color = (item.type === 'enter') ? '#F3F781' : '#CCCCCC';
      $('.CodeMirror-selected').css({ background: color });
      $('.CodeMirror-focused .CodeMirror-selected').css({ background: color });
-     updateSelectionInCodeMirror(interpreter, item.loc);
+     updateSelectionInCodeMirrorAccordingToExt(interpreter, item.locByExt);
    }
 
    // navig panel
@@ -572,4 +598,14 @@ readSourceParseAndRun();
 
 function showCurrent() {
   console.log(tracer_items[tracer_pos]);
+};
+
+
+function findToken(token) {
+  for (var i = 0; i < tracer_items.length; i++) {
+    if (tracer_items[i].token == token) {
+      return i;
+    }
+  }
+  return -1;
 };
