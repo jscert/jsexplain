@@ -82,7 +82,7 @@ var source_file = 'var x = { a : 1, b : 2 }; ';
 var source_file = 'x = 1;\nx = 2;\nx = 3';
 var source_file = 'var x = { a : 1 };\n x.b = 2;\nx';
 var source_file = 'var x = { a : { c: 1 } };\n x.a.b = 2;\nx';
-var source_file = '(function (x) {\nreturn 1;\n})()';
+var source_file = '(function (x) {\nreturn 1;\n})({a:{b:2}})';
 
 
 // --------------- Initialization ----------------
@@ -92,12 +92,7 @@ var source_file = '(function (x) {\nreturn 1;\n})()';
 $("#source_code").val(source_file);
 
 
-// --------------- Methods ----------------
-
-function stepTo(step) {
- tracer_pos = step;
- updateSelection();
-}
+// --------------- Predicate search ----------------
 
 // Take a predicate in form of a JavaScript code (string) and returns either true or an error message (string).
 function goToPred(pred) {
@@ -152,6 +147,10 @@ function goToPred(pred) {
  return "Not found";
 }
 
+
+// --------------- Trace navigation buttons ----------------
+
+
 function button_reach_handler() {
  var pred = $("#text_condition").val();
  var res = goToPred(pred);
@@ -199,6 +198,10 @@ $("#button_finish").click(function() { finish() });
 $("#button_cursor").click(function() { cursor() }); 
 
 
+
+// --------------- Trace navigation methods ----------------
+
+
 // Assumes tracer_files to be an array of objects with two field:
 // - file, containing the name of the file,
 // - contents, a string containing its source code
@@ -206,6 +209,14 @@ $("#button_cursor").click(function() { cursor() });
 function tracer_valid_pos(i) {
  return (i >= 0 && i < tracer_length);
 }
+
+function stepTo(i) {
+ if (! tracer_valid_pos(i))
+   return; 
+ tracer_pos = i;
+ updateSelection();
+}
+
 
 // dir is -1 or +1
 function shared_step(dir) {
@@ -247,6 +258,7 @@ function shared_next(dir, target) {
  }
 }
 
+
 function reset() { tracer_pos = 0; updateSelection(); }
 function forward() { shared_step(+1); }
 function backward() { shared_step(-1); }
@@ -277,15 +289,13 @@ function cursor() {
 };
 
 
-// --------------- Auxiliary ----------------
+
+// --------------- File Display ----------------
 
 function get_file_extension(filename) {
   var re = /(?:\.([^.]+))?$/;
   return re.exec(filename)[1];
 }
-
-
-// --------------- Methods ----------------
 
 // load files in CodeMirror view
 var docs = {};
@@ -469,7 +479,7 @@ function string_of_mutability(mutability) {
 
 function show_object(state, loc, target, depth) {
    var t = $("#" + target);
-   if (depth == 0) {
+   if (depth < 0) {
      t.append("&lt;hidden&gt;");
      return;
    }
@@ -553,8 +563,8 @@ function show_decl_env_record(state, env_record_decl, target) {
       var mutability = items_array[i][1][0];
       var value = items_array[i][1][1];
       var value_target = fresh_id();
-      t.append("<div id='" + value_target + "'>" + html_escape(var_name) + " (" + string_of_mutability(mutability) + "):</div>");
-      show_value(state, value, value_target, 1);
+      t.append("<div id='" + value_target + "'>	&rarr; " + html_escape(var_name) + " (" + string_of_mutability(mutability) + "):</div>");
+      show_value(state, value, value_target, 0);
    }
 }
 
@@ -572,16 +582,17 @@ function show_lexical_env(state, lexical_env, target) {
         case "Coq_env_record_decl":
           var env_record_decl = env_record.value;
           var items_target = fresh_id();
-          t.append("<div id='" + items_target + "'></div>");
+          t.append("<div><b>&bull; environment-record-declaration</b>: <div style='margin-left: 1em' id='" + items_target + "'></div></div>");
           show_decl_env_record(state, env_record_decl, items_target)
           break;
-        case "Coq_env_record_object": 
+        case "Coq_env_record_object":   
           var object_loc = env_record.value;
+          var obj_value = { tag: "Coq_value_object", value: object_loc };
           var provide_this = env_record.provide_this;
           var obj_target = fresh_id();
-          t.append("with (" + ((provide_this) ? "" : "not ") + "providing 'this'): <div id='" + obj_target + "'></div>");
-          show_object(state, object_loc, obj_target, 1);
-
+          t.append("<div id='" + obj_target + "'><b>&bull; environment-record-object</b> (" + ((provide_this) ? "" : "not ") + "providing 'this'): </div>");
+          show_value(state, obj_value, obj_target, 0);
+          // show_object(state, object_loc, obj_target, 1);
           break;
         default: 
           throw "invalid env_record.tag";
@@ -594,22 +605,22 @@ function show_execution_ctx(state, execution_ctx, target) {
   var t = $("#" + target);
 
   // strictness
-  t.append("<div>strictness: " + execution_ctx.execution_ctx_strict + " </div>");
+  t.append("<div><b>strictness</b>: " + execution_ctx.execution_ctx_strict + " </div>");
 
   // this object
   var this_target = fresh_id();
-  t.append("<div id='" + this_target + "'>this: </div>");
+  t.append("<div id='" + this_target + "'><b>this:</b> </div>");
   //TODO 
   show_value(state, execution_ctx.execution_ctx_this_binding, this_target, 0);
 
   // lexical env
   var lexical_env_target = fresh_id();
-  t.append("<div><div>lexical-env:</div> <div style='margin-left:0.5em' id='" + lexical_env_target + "'></div></div>");
+  t.append("<div><b>lexical-env:</b> <div style='margin-left: 1em' id='" + lexical_env_target + "'></div></div>");
   show_lexical_env(state, execution_ctx.execution_ctx_lexical_env, lexical_env_target);
   
   // variable env -- TODO, like above
   var variable_env_target = fresh_id();
-  t.append("<div><div>variable-env:</div> <div style='margin-left:0.5em' id='" + variable_env_target + "'></div></div>");
+  t.append("<div><b>variable-env:</b> <div style='margin-left: 1em' id='" + variable_env_target + "'></div></div>");
   show_lexical_env(state, execution_ctx.execution_ctx_variable_env, variable_env_target);
 }
 
@@ -748,8 +759,6 @@ function show_interp_ctx(state, ctx, target) {
   for (var i = 0; i < a.length; i++) {
     var key = a[i].key;
     var val = a[i].val;
-    if (val.runs_type_expr !== undefined) // runs0
-      continue;
     var targetsub = fresh_id();
     t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
     $("#" + targetsub).html(html_escape(key) + ": ");
@@ -1005,14 +1014,14 @@ function assignExtraInfosInTrace() {
 
 function runDebug() {
   reset_datalog();
-  JsInterpreter.run_javascript(JsInterpreter.runs, program);
+  JsInterpreter.run_javascript(program);
 }
 
 function run() {
  reset_datalog();
  var success = true;
  try {
-    JsInterpreter.run_javascript(JsInterpreter.runs, program);
+    JsInterpreter.run_javascript(program);
  } catch (e) {
    success = false;
    // alert("Error during the run");
@@ -1076,7 +1085,7 @@ function testLineof(filename, token) {
 
 // for easy debugging, launch at startup:
 readSourceParseAndRun();
-stepTo(3772);
+stepTo(1700);
 
 
 function showCurrent() {

@@ -1,45 +1,126 @@
 
-javascript >>> op
-
-prevent use of "tag" or "type" as object field name 
-
-
-NEW NEW TODO
-
-- remove _runs0 from arguments
-- rename the p' variables
-
-- restore button step into / next
-
-- if switch,return,call,var generate events, 
-
-
-NEW TODO
-
-
-- utiliser "=" comme comparison primitive? ou supprimer les occurences?
-
-- parse pickage in JsCommon needed for eval
-
-- optimize ML code for 
-      type_compare mutability_compare prim_compare 
-  and test for prim_compare if we can match on pairs of arguments, with a catchall
-
-- move prim_compare and value_compare to a higher file because it is interesting and should be logged
-- move same_value_dec from jscommonaux to a higher file
-
-- generate the escaped source code
-
-- LATER: inline the "%able" functions
-
-- LATER: remove useless files such as LibReflect LibString etc...
-
-
-- BONUS  -- generate "type: " in smart constructors [optional until display is needed]
 
 
 =========================================================
-HERE IS HOW TO PRINT BROWSER STACK SIZE LIMIT:
+CURRENT TODO
+
+
+*) Alan: proof read JSNumber
+
+*) Thomas: factorize branches such as:
+
+
+       | Coq_prim_bool b0 ->
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+           s
+           ("[run_object_method] returned a primitive in [object_proto_is_prototype_of_body].")
+       | Coq_prim_number n ->
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+           s
+           ("[run_object_method] returned a primitive in [object_proto_is_prototype_of_body].")
+
+
+
+*) Arthur: inline let_binding
+
+*) Alan/Thomas: test "eval", might need pieces of JsCommon for it (parsePickable)
+
+
+*) ? 
+  update the ML code for: type_compare mutability_compare prim_compare 
+  (for prim_compare, we should be able to match on pairs of arguments, with a catch-all)
+
+*) 
+   - move prim_compare and value_compare to JsInterpreter because it is interesting and should be logged
+   - move same_value_dec from jscommonaux 
+
+*) See if we can inline the "%able" functions, e.g. string_comparable
+
+
+
+*) [thomas]
+- bigger test262 testing.
+- Flat to force esprima to parse in strict mode
+
+*) LATER: remove useless files such as LibReflect LibString etc...
+
+
+*) [thomas]
+- put online the tool on the jscert website
+	  - make sure to describe the supported features 
+	    (ecma5 minus for-in and a few other things)
+     - explain that currently JS files are generated
+	    from ML files and thus should not be edited,
+		 although this might change in the future.
+    - assembly.js should have a header
+       to tell people not to use this file
+
+
+*) Arthur: full display	of heap information
+	  add a "+details" button 
+	  to show additional information about an object, like the
+	  getter and setter methods, and also for each field we need
+	  to see additional information like enumerable/configurable...
+
+
+*) Arthur: search by predicate in the trace
+	- remove the "with (obj)" hack that is currently there
+	- introduce functions
+	   - INTERP_RAW("x") : returns the value bound to "x" in the
+		  current context, by looking up the linked list of arrays
+		- PROG_RAW("x") : returns the value bound to "x" in the
+		  environment, using the prototype chain resolution function
+		- JSOF(v) : lift the encoding of a JS value to the corresponding JS value
+		- INTERP_VAL("x") = JSOF(INTERP_RAW("x"))
+		- PROG_VAL("x") = JSOF(PROG_RAW("x"))
+
+
+*) Alan:
+  There is one place where we compute a "substring" in the code;
+  need to check whether the argument is always nonnegative.
+
+
+*) Coq extraction has generated cases in the order of the definition
+  of the constructors in the inductive definition; this is not the
+  same order as in the original coq files; we should put back in
+  the right order, i'm afraid we need to do this by hand.
+
+
+
+
+
+=========================================================
+LATER-- OPTIMIZATIONS
+
+- The representation of the heap could be optimized by
+  having "remove" nodes in the list describing a heap,
+  this would avoid filtering through the heap in O(n).
+
+- Optimize heap representations using trees, to improve
+  lookups from O(n) to O(log n).
+
+- Only introduce logging instructions in files for which
+  they are going to be used.
+
+
+
+=========================================================
+LATER-- FOR A BETTER ML TO JS TRANSLATION
+
+- Js_of_ast prevent use of "tag" or "type" as object field name 
+
+- generate "type: " in smart constructors [optional until display is needed]
+
+- Reactivate the generation of the lines of the form:
+	  default: throw "No matching case for switch";
+  by having js_of_pattern return an additional boolean 
+  indicating whether there was a default case or not.
+  This is needed to detect bugs in the spec where the
+  switch are missing useful cases.
+
+
+=========================================================
+TRICK-- HERE IS HOW TO PRINT BROWSER STACK SIZE LIMIT:
 
 	in the console, execute:
 
@@ -53,119 +134,3 @@ HERE IS HOW TO PRINT BROWSER STACK SIZE LIMIT:
 	then print value of "i".
 
 =========================================================
-
-
-- Introduce testing functions called:
-	- test_exec("code") -> parse, convert, build trace, log trace
-- Test first "var x = 3".
-- Test a compound example, e.g.:
-    var x = 3;
-    x = 4;
-    if (x === 4) {
-      while (false) {}
-    }
-- Test langage features one by one, using minimal input programs;
-  these programs should be stored in an "examples/" folder;
-  for each example, check the AST, check step-by-step the execution.
-  => to see if the right things get highlighted
-
-- display JS values/env/heap/ctx in html 
-	- contexts: essentially as before
-	- environments: need to follow the list of environment records
-	- heap: same as before, and do not attempt at first to show
-	  additional information in the heap appart from key/value bindings.
-
-- BONUS in JsInterpreter let append = strappend (* hack for compatibility, to do cleanup *)
-
-
-
-
-=========================================================
-LATER
-
-[thomas]
-- bigger test262 testing.
-- Flat to force esprima to parse in strict mode
-
-[thomas and alan]
-- add a combo box above the source textbox for loading in one click
-  a particular example. The source code for the examples is obtained
-  by including a JS file that contains an array of source code,
-  this file being generated from the contents of the "examples" folder.
-
-- put online the tool on the jscert website
-	  - make sure to describe the supported features 
-	    (ecma5 minus for-in and a few other things)
-     - explain that currently JS files are generated
-	    from ML files and thus should not be edited,
-		 although this might change in the future.
-    - assembly.js should have a header
-
-- full display	of heap information
-	  add a "+details" button 
-	  to show additional information about an object, like the
-	  getter and setter methods, and also for each field we need
-	  to see additional information like enumerable/configurable...
-
-- search by predicate in the trace
-	- remove the "with (obj)" hack that is currently there
-	- introduce functions
-	   - INTERP_RAW("x") : returns the value bound to "x" in the
-		  current context, by looking up the linked list of arrays
-		- PROG_RAW("x") : returns the value bound to "x" in the
-		  environment, using the prototype chain resolution function
-		- JSOF(v) : lift the encoding of a JS value to the corresponding JS value
-		- INTERP_VAL("x") = JSOF(INTERP_RAW("x"))
-		- PROG_VAL("x") = JSOF(PROG_RAW("x"))
-
-
-
-=========================================================
-LATER LATER
-
-- Reactivate the generation of the lines of the form:
-	  default: throw "No matching case for switch";
-  by having js_of_pattern return an additional boolean 
-  indicating whether there was a default case or not.
-  This is needed to detect bugs in the spec where the
-  switch are missing useful cases.
-
-- There is one place where we compute a "substring" in the code;
-  need to check whether the argument is always nonnegative.
-
-- Coq extraction has generated cases in the order of the definition
-  of the constructors in the inductive definition; this is not the
-  same order as in the original coq files; we should put back in
-  the right order, i'm afraid we need to do this by hand.
-
-- Investigate generation of english sentences from esprima AST
-  of the code of the interpreter, with live visualization of
-  the sentences being executed.
-
-
-=========================================================
-OPTIMIZATIONS
-
-- The representation of the heap could be optimized by
-  having "remove" nodes in the list describing a heap,
-  this would avoid filtering through the heap in O(n).
-
-- Optimize heap representations using trees, to improve
-  lookups from O(n) to O(log n).
-
-- Only introduce logging instructions in files for which
-  they are going to be used.
-
-
-=========================================================
-NEVER
-
-- There is an extra tab when closing bracket for fun def
-
-
-
-
-=========================================================
-
-
-
