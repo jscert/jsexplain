@@ -131,16 +131,6 @@ let map_cstr_fields ?loc bind (cstr : constructor_description) elements =
 let ppf_lambda_wrap s =
   Printf.sprintf "(function () {@;<1 2>@[<v 0>%s@]@,}())@," s
 
-let ppf_branch case binders expr =
-  Printf.sprintf "%s: @[<v 0>%s@,return %s;@]"
-                 case binders expr
-
-let ppf_let_in decl exp =
-  let s =
-    Printf.sprintf "%s@,return %s;"
-                   decl exp
-  in ppf_lambda_wrap s
-
 let ppf_function args body=
   (L.log_line (Printf.sprintf "function (%s) {" args) [L.Enter; (L.CreateCtx args)]) ^ (Printf.sprintf "@;<1 2>return@[<hov 2>@ %s;@]@,}" body)
 
@@ -165,11 +155,6 @@ let ppf_array values =
                  values
 
 let ppf_tuple = ppf_array
-
-let ppf_ifthen cond iftrue =
-  Printf.sprintf "(function () {@[<v 2>if (%s) {@,return %s;@,}@]@,})()"
-                 cond iftrue
-
 
 let ppf_sequence exp1 exp2 =
   Printf.sprintf "%s;@,%s"
@@ -331,7 +316,7 @@ let ctx_initial =
 (*--------- if ---------*)
 
 let ppf_ifthenelse arg iftrue iffalse =
-  Printf.sprintf "@[<v 0>if (%s) {@;<1 2>@[<v 0>%s@]@,} else {@;<1 2>@[<v 0>%s@]@,}@]"
+  Printf.sprintf "@[<v 0>if (%s) {@;<1 2>@[<v 0>%s@]@,} else {@;<1 2>@[<hv 0>%s@]@,}@]"
                  arg iftrue iffalse
 
 let generate_logged_if loc ctx sintro sarg siftrue siffalse =
@@ -488,9 +473,9 @@ let generate_logged_return loc ctx sbody =
   match !current_mode with
   | Mode_cmi -> assert false
   | Mode_unlogged ->
-     Printf.sprintf "return %s;" sbody
+     Printf.sprintf "@[<hv 2>return@ %s;@]" sbody
   | Mode_line_token ->
-     Printf.sprintf "%sreturn %s;%s" token_start sbody token_stop
+     Printf.sprintf "@[<hv 2>%sreturn@ %s;%s@]" token_start sbody token_stop
   | Mode_logged ->
     let id = id_fresh "_return_" in
     Printf.sprintf "var %s = %s;@,log_event(%s, ctx_push(%s, [{key: \"#RETURN_VALUE#\", val: %s}]), \"return\");@,return %s; "
