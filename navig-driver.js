@@ -647,6 +647,21 @@ function ctxToHtml(ctx) {
   for (var i = 0; i < a.length; i++) {
     var b = a[i];
     s += "<div style='white-space: nowrap;'><b>" + b.key + "</b>: " + JSON.stringify(b.val) + "</div>";
+    if (b.key == "#RETURN_VALUE#" && 
+        b.val.value !== undefined &&
+        b.val.value.out !== undefined &&
+        b.val.value.out.res !== undefined) {
+      var res = b.val.value.out.res;
+      // Coq_result_some  [@f value] of 't 
+      // Coq_specret_out  [@f value] of out
+      // Coq_out_ter  [@f state, res] of state * res
+      s += "<div style='white-space: nowrap;'><b>#RES#</b>: " + JSON.stringify(res) + "</div>";
+      if (res.res_value !== undefined && 
+          res.res_value.value !== undefined) {
+        var value = res.res_value.value;
+        s += "<div style='white-space: nowrap;'><b>#RESVALUE#: " + JSON.stringify(value) + "</b></div>";
+      }
+    } 
   }
   return s;
 }
@@ -690,13 +705,19 @@ function updateSelectionInCodeMirrorAccordingToExt(codeMirrorObj, locByExt) {
   updateSelectionInCodeMirror(codeMirrorObj, loc);
 }
 
+function clearFeedback() {
+   $("#disp_infos").html("");
+   $("#disp_env").html("");
+   $("#disp_ctx").html("");
+}
+
 function updateSelection() {
- var item = tracer_items[tracer_pos];
- source.setSelection({line: 0, ch:0}, {line: 0, ch:0}); // TODO: introduce a fct reset
+  clearFeedback();
+  var item = tracer_items[tracer_pos];
+  source.setSelection({line: 0, ch:0}, {line: 0, ch:0}); // TODO: introduce a fct reset
 
  if (item !== undefined) {
    // console.log(item);
-   $("#disp_infos").html("");
    $("#disp_infos").html(itemToHtml(item));
    if (item.source_loc === undefined) {
      console.log("Error: missing line in log event");
@@ -712,7 +733,6 @@ function updateSelection() {
      if (item.state === undefined || item.execution_ctx === undefined) {
        $("#disp_env").html("<undefined state or context>");
      } else {
-       $("#disp_env").html("");
        show_execution_ctx(item.state, item.execution_ctx, "disp_env");
      }
 

@@ -237,8 +237,11 @@ let ppf_field_access expr field =
   Printf.sprintf "%s.%s" expr field
 
 (* ' is not permitted in JS identifier names, and $ is not permitted in OCaml ones *)
-let ppf_ident_name =
-  String.map (function '\'' -> '$' | c -> c)
+let ppf_ident_name x =
+  if List.mem x ["arguments"]
+    then unsupported ("use of reserved keyword: " ^ x);
+      (* TODO: complete the list *)
+  String.map (function '\'' -> '$' | c -> c) x
 
 let ppf_ident i =
   i |> Ident.name |> ppf_ident_name

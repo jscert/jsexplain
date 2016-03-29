@@ -2517,8 +2517,8 @@ let run_construct runs0 s c co l args =
           | Some co0 ->
             if_some (run_object_method object_bound_args_ s l) (fun oarg ->
               if_some oarg (fun boundArgs ->
-                let_binding (LibList.append boundArgs args) (fun arguments ->
-                  runs0.runs_type_construct s c co0 target arguments)))
+                let_binding (LibList.append boundArgs args) (fun arguments_ ->
+                  runs0.runs_type_construct s c co0 target arguments_)))
           | None -> run_error s Coq_native_error_type)))
   | Coq_construct_prealloc b -> run_construct_prealloc runs0 s c b args
 
@@ -2857,7 +2857,7 @@ let create_arguments_object runs0 s c lf xs args x str =
     list -> value list -> env_loc -> result_void **)
 
 let binding_inst_arg_obj runs0 s c lf p xs args l =
-  let arguments =
+  let arguments_ =
     "arguments"
   in
   let_binding (prog_intro_strictness p) (fun str ->
@@ -2865,11 +2865,11 @@ let binding_inst_arg_obj runs0 s c lf p xs args l =
       (create_arguments_object runs0 s c lf xs args
         c.execution_ctx_variable_env str) (fun s1 largs ->
       if str
-      then if_void (env_record_create_immutable_binding s1 l arguments)
+      then if_void (env_record_create_immutable_binding s1 l arguments_)
              (fun s2 ->
-             env_record_initialize_immutable_binding s2 l arguments
+             env_record_initialize_immutable_binding s2 l arguments_
                (Coq_value_object largs))
-      else env_record_create_set_mutable_binding runs0 s1 c l arguments None
+      else env_record_create_set_mutable_binding runs0 s1 c l arguments_ None
              (Coq_value_object largs) false))
 
 (** val binding_inst_var_decls :
@@ -5317,8 +5317,8 @@ let run_call_prealloc runs0 s c b vthis args =
                      if_spec (to_uint32 runs0 s0 c v) (fun s1 ilen ->
                        if_spec
                          (run_get_args_for_apply runs0 s1 c array 0. ilen)
-                         (fun s2 arguments ->
-                         runs0.runs_type_call s2 c thisobj thisArg arguments)))))
+                         (fun s2 arguments_ ->
+                         runs0.runs_type_call s2 c thisobj thisArg arguments_)))))
         else run_error s Coq_native_error_type))
   | Coq_prealloc_function_proto_call ->
     if is_callable_dec s vthis
@@ -5787,8 +5787,8 @@ let run_call runs0 s c l vthis args =
                   (fun otrg ->
                   if_some otrg (fun target ->
                     let_binding (LibList.append boundArgs args)
-                      (fun arguments ->
-                      runs0.runs_type_call s c target boundThis arguments)))))))
+                      (fun arguments_ ->
+                      runs0.runs_type_call s c target boundThis arguments_)))))))
       | Coq_call_prealloc b -> run_call_prealloc runs0 s c b vthis args))
 
 (** val run_javascript : runs_type -> prog -> result **)

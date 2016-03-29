@@ -39,17 +39,18 @@ NEW TODO
 
 
 =========================================================
-BROWSER LIMIT WITH STACK SIZE:
+HERE IS HOW TO PRINT BROWSER STACK SIZE LIMIT:
 
-execute:
-	var i=0;
-	function inc() {
-		 i++;
-		 inc();
-	}
-	inc();
+	in the console, execute:
 
-then print value of "i".
+		var i=0;
+		function inc() {
+			 i++;
+			 inc();
+		}
+		inc();
+
+	then print value of "i".
 
 =========================================================
 

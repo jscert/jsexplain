@@ -592,7 +592,7 @@ type restype =
 type resvalue =
 | Coq_resvalue_empty [@f]
 | Coq_resvalue_value  [@f value] of value
-| Coq_resvalue_ref  [@f value] of ref
+| Coq_resvalue_ref  [@f ref] of ref
 
 type res = { res_type : restype; res_value : resvalue; res_label : label }
 

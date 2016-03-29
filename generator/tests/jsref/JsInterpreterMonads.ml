@@ -9,10 +9,10 @@ open Shared
 type __ = unit
 
 type 't resultof =
-| Coq_result_some  [@f label0] of 't (** Auto Generated Attributes **)
+| Coq_result_some  [@f value] of 't (** Auto Generated Attributes **)
 | Coq_result_not_yet_implemented [@f]  (** Auto Generated Attributes **)
 | Coq_result_impossible [@f]  (** Auto Generated Attributes **)
-| Coq_result_bottom  [@f label0] of state (** Auto Generated Attributes **)
+| Coq_result_bottom  [@f state] of state (** Auto Generated Attributes **)
 
 type 't specres = 't specret resultof
 
