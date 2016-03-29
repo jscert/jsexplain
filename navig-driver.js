@@ -90,6 +90,7 @@ var source_files = [
 source_files.reduce((select, file_content) => {
   let option = document.createElement('option');
   option.textContent = file_content;
+  option.value = file_content;
   select.append(option);
   return select;
 }, $('#select_source_code'));
