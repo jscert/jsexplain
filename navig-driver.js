@@ -99,6 +99,7 @@ function setSourceCode(text) {
   $("#source_code").val(text);
   if (source !== null) {
     source.setValue(text);
+    buttonRunHandler();
   }
 }
 
@@ -203,11 +204,13 @@ $("#navigation_step").change(function(e) {
  stepTo(n);
 });
 
-$("#button_run").click(function() {
+function buttonRunHandler() {
   var message = readSourceParseAndRun();
   $("#action_output").html(message);
   var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 1000);
-});
+};
+
+$("#button_run").click(buttonRunHandler);
 
 $("#button_reset").click(function() { reset(); }); 
   // stepTo(0);
