@@ -124,7 +124,7 @@ let gather_tokens basename input_lines =
       let r2 = Str.regexp "#\\([0-9]*\\)>#" in 
       let i = ref 0 in
       let toremove = ref 0 in
-      (* line+1 because lines are counted starting from 1 *)
+      (* line+1 because lines are counted starting from 1 in esprima *)
       let mk_pos () = { pos_line = line+1; pos_col = !i - !toremove } in
       try
         while true do 

@@ -37,7 +37,41 @@ var JsNumber = {
     return "" + x;
   },
 
-
   
+  
+  int32_left_shift : function (x, y) { return x << y; },
+  int32_right_shift : function (x, y) { return x >> y; },
+  uint32_right_shift : function (x, y) { return x >>> y; },
+
+  int32_bitwise_and : function (x, y) { return x & y; },
+  int32_bitwise_or : function (x, y) { return x | y; },
+  int32_bitwise_xor : function (x, y) { return x ^ y; },
+  int32_bitwise_not : function (x) { return ~ x; },
+
+  floor : function (x) { return Math.floor(x); },
+  neg : function (x) { return - x; },
+  sign : function (x) { return Math.sign(x); },
+  absolute : function (x) { return Math.abs(x); },
+  fmod : function (x, y) { return x % y; },
+
+
+  modulo_32 : function (x) { return x % (1 << 32); }, // TODO check !
+
+
+  zero : 0.0,
+  neg_zero : -0.0,
+  one : 1.0,
+  infinity : Number.POSITIVE_INFINITY,
+  neg_infinity : Number.NEGATIVE_INFINITY,
+  max_value : Number.MAX_VALUE,
+  min_value : Number.MIN_VALUE,
+  nan : Number.NaN,
+  pi : Math.PI,
+  e : Math.E,
+  ln2 : Math.LN2,
+  
+  /* TODO: what about other functions from Math? */
+
+
 };
 

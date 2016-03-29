@@ -409,6 +409,6 @@ let is_callable_dec s v =
     state -> object_loc -> prop_name list coq_Pickable_option **)
 
 let object_properties_keys_as_list_pickable_option s l =
-  map (fun props -> LibList.map fst (Heap.to_list props))
+  map (fun props -> LibList.map fst (Heap.to_list string_comparable props))
     (map object_properties_ (object_binds_pickable_option s l))
 

@@ -16,14 +16,15 @@
 //   more recent binding at the tail of the array.
 
 // type event_item = { type: event_type, loc: loc, ctx: ctx,
-//                     state: JsSyntax.state, env: JsSyntax.env,
+//                     state: JsSyntax.state, 
+//                     execution_ctx: JsSyntax.execution_ctx,
 //                     source_loc: loc }
 //   Event items are created on every call to the "log_event" function.
 //   Such calls are located in the *.log.js files.
-//   Fields "state" and "env" are snapshots of the state at the time of the event.
 //   Field "ctx" describes the state of the variables from the interpreter,
 //   and this description is constructed by the instrumented code in "*.log.js".
-//   The "source_loc" fields are filled in by function "assignSourceLocInTrace".
+//   Fields "state" and "execution_ctx" and "source_loc" fields are filled in 
+//   by the function "assignExtraInfosInTrace".
 
 // type trace = [event_item]
 //   In this file, "datalog" and "tracer_items" have type trace.
@@ -77,6 +78,8 @@ var source_file = 'var x = 2;\nx';
 var source_file = ' var t = {}; for (var i = 0; i < 3; i++) { t[i] = function() { return i; } }; t[0](); ';
 var source_file = '{}';
 var source_file = '{} + {}';
+var source_file = 'var x = { a : 1, b : 2 }; ';
+var source_file = 'x = 1;\nx = 2;\nx = 3';
 
 
 // --------------- Initialization ----------------
@@ -190,6 +193,8 @@ $("#button_previous").click(function() { previous() });
 $("#button_next").click(function() { next() }); 
 $("#button_finish").click(function() { finish() }); 
 
+$("#button_cursor").click(function() { cursor() }); 
+
 
 // Assumes tracer_files to be an array of objects with two field:
 // - file, containing the name of the file,
@@ -247,6 +252,26 @@ function previous() { shared_next(-1, 0); }
 function next() { shared_next(+1, 0); }
 function finish() { shared_next(+1, -1); }
 
+function cursor() {
+  // jump to the last event that contains the source location
+  var pos = source.getCursor();
+  var line = pos.line + 1; // adding 1 because Codemirror counts from 0
+  var column = pos.ch;
+  // for (var i = 0; i < tracer_length; i++) {
+  for (var i = tracer_length-1; i >= 0; i--) {
+    var loc = tracer_items[i].source_loc;
+    if (loc === undefined) continue;
+    if (loc.start.line <= line && 
+        loc.start.column <= column &&
+        loc.end.line >= line &&
+        loc.end.column >= column) {
+      stepTo(i);
+      return;
+    }
+  }
+  $("#action_output").html("Event covering cursor not found");
+  var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 1000);
+};
 
 
 // --------------- Auxiliary ----------------
@@ -291,17 +316,9 @@ function updateFileList() {
  $('#file_list').html(s);
 }
 
-// TODO adapt to values from JsSyntax
-function text_of_cst(c) {
- switch (c.tag) {
- case "cst_bool":
-   return c.bool + "";
- case "cst_number":
-   return c.number + "";
- default:
-   return "unrecognized cst";
- }
-}
+
+
+// --------------- Tools for Views ----------------
 
 // fresh name generated used for handlers of interactively-explorable values
 var next_fresh_id = 0;
@@ -309,69 +326,288 @@ function fresh_id() {
  return "fresh_id_" + (next_fresh_id++);
 }
 
-// TODO deal with the heap here
-function show_value(heap, v, target, depth) {
- var contents_init = $("#" + target).html();
- var s = "";
- switch (v.tag) {
- case "val_cst":
-   s = text_of_cst(v.cst);
-   break;
- case "val_loc":
-   var contents_rest = "<span class='heap_link'><a onclick=\"handlers['" + target + "']()\">&lt;Object&gt;(" + v.loc + ")</a></span>";
-   var contents_default = contents_init + contents_rest;
-   function handler_close() {
-     handlers[target] = handler_open;
-     $("#" + target).html(contents_default);
-     interpreter.focus();
-   }
-   function handler_open() {
-     handlers[target] = handler_close;
-     var obj = heap.get(v.loc).asReadOnlyArray(); // type object
-     var count = 0;
-     for (var x in obj) {
-       if (obj[x] === undefined) continue; // LATER remove!
-       count++;
-       var targetsub = fresh_id();
-       $("#" + target).append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
-       $("#" + targetsub).html(x + ": ");
-       show_value(heap, obj[x], targetsub, depth-1);
-     }
-     if (count === 0)
-       $("#" + target).append("<div style='margin-left:1em'>(empty object)</div>");
-     interpreter.focus();
-   };
-   handlers[target] = handler_open;
-   $("#" + target).html(contents_default);
-   if (depth > 0)
-     handler_open();
-   return;
- case "val_abs":
-   s = "&lt;Closure&gt;";
-   break;
- default:
-   s = "<pre style='margin:0; padding: 0; margin-left:1em'>" + JSON.stringify(v, null, 2) + "</pre>";
-   break;
- }
- $("#" + target).append(s);
+function encoded_list_to_array(list) {
+  var r = [];
+  while (list.tag == "::") {
+    r.push(list.head);
+    list = list.tail;
+  }
+  return r;
 }
 
-function updateContext(targetid, heap, env) {
+  /* for reversed lists
+  var i = LibList.length(list) - 1;
+  while (i >= 0) {
+    if (list.tag != "::") throw "encoded_list_to_array: bug";
+    r[i] = list.head;
+    list = list.tail;
+    i--;
+  }
+  */
+
+function html_escape(stringToEncode) {
+   var entityMap = {
+      "&": "&amp;", 
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': '&quot;',
+      "'": '&#39;',
+      "/": '&#x2F;' };
+   return String(stringToEncode).replace(/[&<>"'\/]/g, function (s) {
+      return entityMap[s]; });
+}
+
+
+// --------------- Views for JS state/context ----------------
+
+function string_of_default(v) {
+  return "<pre style='margin:0; padding: 0; margin-left:1em'>" + JSON.stringify(v, null, 2) + "</pre>";
+}
+
+function string_of_prim(v) {
+  switch (v.tag) {
+  case "Coq_prim_undef":
+    return "undefined";
+  case "Coq_prim_null":
+    return "null";
+  case "Coq_prim_bool":
+    return (v.value) ? "true" : "false";
+  case "Coq_prim_number":
+    return "" + v.value;
+  case "Coq_prim_string":
+    return "\"" + v.value + "\"";
+  default:
+    throw "unrecognized tag in string_of_prim";
+  }
+}
+
+function string_of_option(string_of_elem, opt_elem) {
+  switch (opt_elem.tag) {
+  case "None":
+    return "None";
+  case "Some":
+    return "Some (" + string_of_elem(opt_elem.value) + ")";
+  default:
+    throw "unrecognized tag in string_of_option";
+  }
+}
+
+function string_of_mutability(mutability) {
+  return (mutability.tag).slice("Coq_mutability_".length);
+}
+
+
+  /*
+  type coq_object = { object_proto_ : value;
+                    object_class_ : class_name;
+                    object_extensible_ : bool;
+                    object_prim_value_ : value option;
+                    object_properties_ : object_properties_type;
+                    object_get_ : builtin_get;
+                    object_get_own_prop_ : builtin_get_own_prop;
+                    object_get_prop_ : builtin_get_prop;
+                    object_put_ : builtin_put;
+                    object_can_put_ : builtin_can_put;
+                    object_has_prop_ : builtin_has_prop;
+                    object_delete_ : builtin_delete;
+                    object_default_value_ : builtin_default_value;
+                    object_define_own_prop_ : builtin_define_own_prop;
+                    object_construct_ : construct option;
+                    object_call_ : call option;
+                    object_has_instance_ : builtin_has_instance option;
+                    object_scope_ : lexical_env option;
+                    object_formal_parameters_ : string list option;
+                    object_code_ : funcbody option;
+                    object_target_function_ : object_loc option;
+                    object_bound_this_ : value option;
+                    object_bound_args_ : value list option;
+                    object_parameter_map_ : object_loc option }
+                    */
+   // TODO  for object_prim_value_, use string_of_option(show_elem, opt_elem)
+/*
+    type attributes =
+    | Coq_attributes_data_of [@f value] of attributes_data
+    | Coq_attributes_accessor_of [@f value] of attributes_accessor
+
+
+    type attributes_data = { attributes_data_value : value;
+                             attributes_data_writable : bool;
+                             attributes_data_enumerable : bool;
+                             attributes_data_configurable : bool }
+
+    type attributes_accessor = { attributes_accessor_get : value;
+                                 attributes_accessor_set : value;
+                                 attributes_accessor_enumerable : bool;
+                                 attributes_accessor_configurable : bool }
+*/
+
+
+function show_object(state, loc, target, depth) {
+   var t = $("#" + target);
+   var obj_opt = JsCommonAux.object_binds_pickable_option(state, loc);
+   if (obj_opt.tag != "Some") throw "show_object: unbound object";
+   var obj = obj_opt.value;
+   var props = obj.object_properties_;
+   var key_value_pair_list = Heap.to_list(string_comparable, props);
+   var key_value_pair_array = encoded_list_to_array(key_value_pair_list);
+   for (var i = 0; i < key_value_pair_array.length; i++) {
+      var prop_name = key_value_pair_array[i][0];
+      var attribute = key_value_pair_array[i][1];
+
+      var targetsub = fresh_id();
+      t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
+      $("#" + targetsub).html(html_escape(prop_name) + ": ");
+
+      switch (attribute.tag) {
+        case "Coq_attributes_data_of":
+          var attr = attribute.value;
+          var prop_value = attribute.attributes_data_value;
+          show_value(state, prop_value, targetsub, depth-1);
+
+          break;
+        case "Coq_attributes_accessor_of": 
+          var attr = attribute.value;
+          $("#" + targetsub).append(" <accessor> ");
+          // TODO: complete
+
+          break;
+        default: 
+          throw "invalid attribute.tag";
+      }
+   }
+
+   // special display for empty objects
+   if (key_value_pair_array.length === 0) {
+     t.append("<div style='margin-left:1em'>(empty object)</div>");
+   }
+}
+
+
+function show_value(state, v, target, depth) {
+  var t = $("#" + target);
+  switch (v.tag) {
+  case "Coq_value_prim":
+    var s = string_of_prim(v.value);
+    t.append(s);
+    return;
+  case "Coq_value_object":
+     var loc = v.value;
+     var contents_init = $("#" + target).html();
+     var contents_rest = "<span class='heap_link'><a onclick=\"handlers['" + target + "']()\">&lt;Object&gt;(" + loc + ")</a></span>";
+     var contents_default = contents_init + contents_rest;
+     function handler_close() {
+       handlers[target] = handler_open;
+       t.html(contents_default);
+       interpreter.focus();
+     }
+     function handler_open() {
+       handlers[target] = handler_close;
+       show_object(state, loc, target, depth);
+       interpreter.focus();
+     };
+     handlers[target] = handler_open;
+     // initial opening of the object
+     t.append(contents_default); 
+     if (depth > 0) {
+       handler_open();
+     }
+     return;
+  default:
+    throw "unrecognized tag in show_value";
+  }
+}
+
+function show_lexical_env(state, env_record_decl, items_target) {
+   // env_record_decl : (string, mutability * value) Heap.heap
+   var t = $("#" + target);
+   var items_list = Heap.to_list(string_comparable, env_record_decl);
+   var items_array = encoded_list_to_array(items_list);
+   for (var i = 0; i < items_array.length; i++) {
+      var var_name = items_array[i][0];
+      var mutability = items_array[i][1][0];
+      var value = items_array[i][1][1];
+      var value_target = fresh_id();
+      t.append("<div id='" + value_target + "'>" + html_escape(varname) + " (" + string_of_mutability(mutability) + "):</div>");
+      show_value(state, value, value_target, 1);
+   }
+}
+
+function show_lexical_env(state, lexical_env, target) {
+   var t = $("#" + target);
+   var env_record_heap = state.state_env_record_heap;
+   var env_loc_array = encoded_list_to_array(lexical_env);
+   for (var i = 0; i < env_loc_array.length; i++) {
+      var env_loc = env_loc_array[i];
+      var env_record_opt = JsCommonAux.object_binds_pickable_option(env_record_heap, env_loc);
+      if (env_record_opt.tag != "Some") throw "show_object: unbound object";
+      var env_record = env_record_opt.value;
+
+      switch (env_record.tag) {
+        case "Coq_env_record_decl":
+          var env_record_decl = env_record.value;
+          var items_target = fresh_id();
+          t.append("<div id='" + items_target + "'></div>");
+          show_decl_env_record(state, env_record_decl, items_target)
+          break;
+        case "Coq_env_record_object": 
+          var env_record_object = env_record.value;
+          var object_loc = env_record_object.value;
+          var provide_this = env_record_object.provide_this;
+          var obj_target = fresh_id();
+          t.append("with (" + ((provide_this) ? "" : "not ") + "providing 'this'): <div id='" + obj_target + "'></div>");
+          show_value(state, object_loc, obj_target, 0);
+
+          break;
+        default: 
+          throw "invalid env_record.tag";
+      }
+   }
+}
+
+
+function show_execution_ctx(state, execution_ctx, target) {
+  var t = $("#" + target);
+
+  // strictness
+  t.append("<div>strictness: " + execution_ctx.execution_ctx_strict + " </div>");
+
+  // this object
+  var this_target = fresh_id();
+  t.append("<div id='" + this_target + "'>this: </div>");
+  show_value(state, execution_ctx.execution_ctx_this_binding, this_target, 0);
+
+  // lexical env
+  var lexical_env_target = fresh_id();
+  t.append("<div><div>lexical-env:</div> <div style='margin-left:0.5em' id='" + lexical_env_target + "'></div></div>");
+  show_lexical_env(state, execution_ctx.execution_ctx_lexical_env, lexical_env_target);
+
+  // variable env -- TODO, like above
+  // execution_ctx.execution_ctx_variable_env
+}
+
+
+
+
+// --------------- Views for interpreter context ----------------
+
+/*
+function updateContext(targetid, state, env) {
  $(targetid).html("");
  if (env === undefined)
    return;
- if (heap === undefined)
+ if (state === undefined)
    return;
  array_of_env(env).map(function(env){
    var target = fresh_id();
    $(targetid).append("<div id='" + target + "'></div>");
    $("#" + target).html(env.name + ": ");
    var depth = 1;
-   show_value(heap, env.val, target, depth);
+   show_value(state, env.val, target, depth);
  });
 }
+*/
 
-// --------------- Debuggin view ----------------
+// --------------- Debugging view ----------------
 
 function htmlDiv(s) {
   return "<div>" + s + "</div>";
@@ -402,6 +638,7 @@ function updateSelectionInCodeMirror(codeMirrorObj, loc) {
   if (loc === undefined) {
      return; 
   }
+  // Substracting 1 because Esprima counts from 1, and Codemirror from 0
   var anchor = {line: loc.start.line-1 , ch: loc.start.column };
   var head = {line: loc.end.line-1, ch: loc.end.column };
   codeMirrorObj.setSelection(anchor, head);
@@ -440,10 +677,15 @@ function updateSelection() {
      // console.log(source_loc_selected);
 
      // source heap/env panel
-     updateContext("#disp_env", item.heap, item.env);
+     if (item.state === undefined || item.execution_ctx === undefined) {
+       $("#disp_env").html("<undefined state or context>");
+     } else {
+       $("#disp_env").html("");
+       // show_execution_ctx(item.state, item.execution_ctx, "disp_env");
+     }
 
      // interpreter ctx panel
-     updateContext("#disp_ctx", item.heap, item.ctx);
+     // updateContext("#disp_ctx", item.heap, item.ctx);
 
      // interpreter code panel
      // TEMPORARILY DISABLED BECAUSE ONLY SINGLE FILE TO TRACE
@@ -527,24 +769,38 @@ interpreter.focus();
 // to the binding of this argument in the context, so as to extract
 // the corresponding location from the piece of AST that corresponds.
 // These locations are used for source highlighting.
-function assignSourceLocInTrace() {
- var last = parsedTree.loc;
+function assignExtraInfosInTrace() {
+ var last_loc = parsedTree.loc;
+ var last_state = undefined;
+ var last_execution_ctx = undefined;
    // { start: { line: 1, column: 0}, end: { line: 1, column: 1 } };
  for (var k = 0; k < tracer_items.length; k++) {
    var item = tracer_items[k];
    if (item.ctx !== undefined && item.ctx.bindings !== undefined) {
      var bindings = item.ctx.bindings;
-     var binding = bindings[bindings.length-1];
-     if (binding !== undefined && binding.key === "_term_") {
-       var t = binding.val;
-       if (t.loc != undefined) {
-         last = t.loc;
+     for (var i = 0; i < bindings.length; i++) {
+       var binding = bindings[i];
+       if (binding.key === "_term_") {
+         var t = binding.val;
+         if (t.loc != undefined) {
+           last_loc = t.loc;
+         }
+       } else if (binding.val.state_object_heap != undefined) {
+         // assuming: 'is an state object' iff 'has a state_object_heap field'
+         last_state = binding.val;
+       } else if (binding.val.execution_ctx_lexical_env != undefined) {
+         // assuming: 'is an execution_ctx' iff 'has a execution_ctx_lexical_env field'
+         last_execution_ctx = binding.val;
        }
      }
    }
-   item.source_loc = last;
+   item.source_loc = last_loc;
+   item.state = last_state;
+   item.execution_ctx = last_execution_ctx;
  }
 }
+
+
 
 function runDebug() {
   reset_datalog();
@@ -567,7 +823,7 @@ function run() {
 
  tracer_items = datalog;
  tracer_length = tracer_items.length;
- assignSourceLocInTrace();
+ assignExtraInfosInTrace();
  $("#navigation_total").html(tracer_length - 1);
  stepTo(tracer_length-1);
  return (success) ? "Run successful!" : "Error during the run!";

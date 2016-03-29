@@ -1,4 +1,9 @@
 
+javascript >>> op
+
+prevent use of "tag" or "type" as object field name 
+
+
 NEW NEW TODO
 
 - remove _runs0 from arguments

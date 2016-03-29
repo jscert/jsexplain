@@ -11,10 +11,6 @@ type ('k, 'v) heap = ('k * 'v) list
 let empty =
  []
 
-(** val to_list : ('a1, 'a2) heap -> ('a1, 'a2) heap **)
-
-let to_list l =
- l
 
 (** val assoc : 'a1 coq_Comparable -> 'a1 -> ('a1 * 'a2) list -> 'a2 **)
 
@@ -67,4 +63,15 @@ let indom_dec h1 h k =
 
 let indom_decidable h h0 k =
  indom_dec h h0 k
+
+
+(** val to_list : ('a1, 'a2) heap -> ('a1, 'a2) heap **)
+
+(* MODIFIED TO REMOVE DUPLICATE KEYS  --- warning: quadratic complexity *)
+let rec to_list eq l =
+  match l with
+  | [] -> []
+  | p :: l' ->  p :: (to_list eq (rem eq l' (fst p)))
+
+
 

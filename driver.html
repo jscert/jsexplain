@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>JavaScript Reference Tracer</title>
+<title>Interactive Debugger for the JavaScript Specification</title>
 
 <script src="../interp/tracer/jquery-2.1.1.min.js"></script>
 
@@ -86,7 +86,7 @@
 </head>
 <body>
 
-<h2>Mini-ML Interpreter</h2>
+<h2>Interactive Debugger for the JavaScript Specification</h2>
 
 
 <div class='source_div'>
@@ -117,8 +117,10 @@ Navigation:
 <input type="button" id='button_previous' value="Prev" />(8)
 <input type="button" id='button_next' value="Next" />(2)
 <input type="button" id='button_finish' value="Finish" />(3)
+<span style="width:3em">&nbsp;</span>
+<input type="button" id='button_cursor' value="Cursor" />(7)
 
-Reach condition:
+<br/>Reach condition:
 <input type="textbox" id='text_condition' style="width:15em" />
 <input type="button" id='button_reach' value="Reach" />
 <span id="reach_output"></span>
