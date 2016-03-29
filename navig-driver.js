@@ -80,9 +80,9 @@ var source_file = '{}';
 var source_file = '{} + {}';
 var source_file = 'var x = { a : 1, b : 2 }; ';
 var source_file = 'x = 1;\nx = 2;\nx = 3';
-var source_file = '(function (x) {return 1;})()';
 var source_file = 'var x = { a : 1 };\n x.b = 2;\nx';
 var source_file = 'var x = { a : { c: 1 } };\n x.a.b = 2;\nx';
+var source_file = '(function (x) {\nreturn 1;\n})()';
 
 
 // --------------- Initialization ----------------
@@ -580,7 +580,7 @@ function show_lexical_env(state, lexical_env, target) {
           var provide_this = env_record.provide_this;
           var obj_target = fresh_id();
           t.append("with (" + ((provide_this) ? "" : "not ") + "providing 'this'): <div id='" + obj_target + "'></div>");
-          show_object(state, object_loc, obj_target, 0);
+          show_object(state, object_loc, obj_target, 1);
 
           break;
         default: 
@@ -891,7 +891,7 @@ source = CodeMirror.fromTextArea(document.getElementById('source_code'), {
  lineNumbers: true,
  lineWrapping: true
 });
-source.setSize(300, 150);
+source.setSize(500, 150);
 
 interpreter = CodeMirror.fromTextArea(document.getElementById('interpreter_code'), {
  mode: 'js',
@@ -914,6 +914,7 @@ interpreter = CodeMirror.fromTextArea(document.getElementById('interpreter_code'
 });
 interpreter.setSize(800,400);
 
+
 /* ==> try in new version of codemirror*/
 try {
  $(interpreter.getWrapperElement()).resizable({
@@ -922,6 +923,25 @@ try {
    }
  });
 } catch(e) { }
+// TODO: factorize code below with the above
+try {
+ $(source.getWrapperElement()).resizable({
+   resize: function() {
+     source.setSize($(this).width(), $(this).height());
+   }
+ });
+} catch(e) { }
+try {
+ $("disp_env_pane").resizable({
+   resize: function() {
+     disp_env_pane.setSize($(this).width(), $(this).height());
+   }
+ });
+} catch(e) { }
+
+
+
+
 
 interpreter.on('dblclick', function() {
  var line = interpreter.getCursor().line;
