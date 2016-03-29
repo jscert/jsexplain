@@ -69,27 +69,49 @@ var tracer_length = 0;
 var tracer_pos = 0;
 
 // Core Mirror objects
-var source = "";
+var source = null;
 var interpreter = null;
 
 // Initial source code
-var source_file = 'var x = 2;\nx';
+var source_files = [
+  'var x = 2;\nx',
+  ' var t = {}; for (var i = 0; i < 3; i++) { t[i] = function() { return i; } }; t[0](); ',
+  '{}',
+  '{} + {}',
+  'var x = { a : 1, b : 2 }; ',
+  'x = 1;\nx = 2;\nx = 3',
+  'var x = { a : 1 };\n x.b = 2;\nx',
+  'var x = { a : { c: 1 } };\n x.a.b = 2;\nx',
+  '(function (x) {return 1;})()',
+];
 
-var source_file = ' var t = {}; for (var i = 0; i < 3; i++) { t[i] = function() { return i; } }; t[0](); ';
-var source_file = '{}';
-var source_file = '{} + {}';
-var source_file = 'var x = { a : 1, b : 2 }; ';
-var source_file = 'x = 1;\nx = 2;\nx = 3';
-var source_file = 'var x = { a : 1 };\n x.b = 2;\nx';
-var source_file = 'var x = { a : { c: 1 } };\n x.a.b = 2;\nx';
-var source_file = '(function (x) {\nreturn 1;\n})()';
+source_files.reduce((select, file_content) => {
+  let option = document.createElement('option');
+  option.textContent = file_content;
+  select.append(option);
+  return select;
+}, $('#select_source_code'));
 
+function setSourceCode(text) {
+  $("#source_code").val(text);
+  if (source !== null) {
+    source.setValue(text);
+  }
+}
+
+$('#select_source_code').change(e => { setSourceCode(e.target.value)});
+$('#select_file').change(e => {
+  let fr = new FileReader();
+  fr.onload = function (e) { setSourceCode(e.target.result) };
+  fr.readAsText(e.target.files[0]);
+});
 
 // --------------- Initialization ----------------
 
 // WARNING: do not move this initialization further down in the file
 // source code displayed initially
-$("#source_code").val(source_file);
+
+setSourceCode(source_files[source_files.length - 1]);
 
 
 // --------------- Methods ----------------
