@@ -393,20 +393,8 @@ and run_object_get_prop s c l x =
              match proto with
              | Coq_value_prim p ->
                (match p with
-                | Coq_prim_undef ->
-                  (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                    s1
-                    ("Found a non-null primitive value as a prototype in [run_object_get_prop].")
                 | Coq_prim_null -> res_spec s1 Coq_full_descriptor_undef
-                | Coq_prim_bool b0 ->
-                  (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                    s1
-                    ("Found a non-null primitive value as a prototype in [run_object_get_prop].")
-                | Coq_prim_number n ->
-                  (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                    s1
-                    ("Found a non-null primitive value as a prototype in [run_object_get_prop].")
-                | Coq_prim_string s0 ->
+                | _ ->
                   (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                     s1
                     ("Found a non-null primitive value as a prototype in [run_object_get_prop]."))
@@ -422,22 +410,10 @@ and object_proto_is_prototype_of s l0 l =
     match b with
     | Coq_value_prim p ->
       (match p with
-       | Coq_prim_undef ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[run_object_method] returned a primitive in [object_proto_is_prototype_of_body].")
        | Coq_prim_null ->
          result_out (Coq_out_ter (s,
            (res_val (Coq_value_prim (Coq_prim_bool false)))))
-       | Coq_prim_bool b0 ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[run_object_method] returned a primitive in [object_proto_is_prototype_of_body].")
-       | Coq_prim_number n ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[run_object_method] returned a primitive in [object_proto_is_prototype_of_body].")
-       | Coq_prim_string s0 ->
+       | _ ->
          (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[run_object_method] returned a primitive in [object_proto_is_prototype_of_body]."))
@@ -549,22 +525,10 @@ and object_can_put s c l x =
           match vproto with
           | Coq_value_prim p ->
             (match p with
-             | Coq_prim_undef ->
-               (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                 s1
-                 ("Non-null primitive get as a prototype value in [object_can_put].")
              | Coq_prim_null ->
                if_some (run_object_method object_extensible_ s1 l) (fun b0 ->
                  res_ter s1 (res_val (Coq_value_prim (Coq_prim_bool b0))))
-             | Coq_prim_bool b0 ->
-               (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                 s1
-                 ("Non-null primitive get as a prototype value in [object_can_put].")
-             | Coq_prim_number n ->
-               (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                 s1
-                 ("Non-null primitive get as a prototype value in [object_can_put].")
-             | Coq_prim_string s0 ->
+             | _ ->
                (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                  s1
                  ("Non-null primitive get as a prototype value in [object_can_put]."))
@@ -1025,14 +989,6 @@ and run_to_descriptor s c _foo_ = match _foo_ with
 (** val prim_new_object : state -> prim -> result **)
 
 and prim_new_object s _foo_ = match _foo_ with
-| Coq_prim_undef ->
-  (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-    s
-    ("[prim_new_object] received an null or undef.")
-| Coq_prim_null ->
-  (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-    s
-    ("[prim_new_object] received an null or undef.")
 | Coq_prim_bool b ->
   result_out
     (let_binding
@@ -1074,6 +1030,10 @@ and prim_new_object s _foo_ = match _foo_ with
               (attributes_data_intro_constant (Coq_value_prim
                 (Coq_prim_number (number_of_int (strlength s0))))))))
           (fun s_2 -> res_ter s_2 (res_val (Coq_value_object l))))))
+| _ ->
+  (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+    s
+    ("[prim_new_object] received an null or undef.")
 
 (** val to_object : state -> value -> result **)
 
@@ -1720,224 +1680,8 @@ and string_of_prealloc _foo_ = match _foo_ with
 
 and run_construct_prealloc s c b args =
   match b with
-  | Coq_prealloc_global ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_global_eval ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_global_parse_int ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_global_parse_float ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_global_is_finite ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_global_is_nan ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_global_decode_uri ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_global_decode_uri_component ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_global_encode_uri ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_global_encode_uri_component ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
   | Coq_prealloc_object ->
     let_binding (get_arg 0 args) (fun v -> call_object_new s v)
-  | Coq_prealloc_object_get_proto_of ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_get_own_prop_descriptor ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_get_own_prop_name ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_create ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_define_prop ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_define_props ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_seal ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_freeze ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_prevent_extensions ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_is_sealed ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_is_frozen ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_is_extensible ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_keys ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_keys_call ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_proto ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_proto_to_string ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_proto_value_of ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_proto_has_own_prop ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_proto_is_prototype_of ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_object_proto_prop_is_enumerable ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_function ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_function_proto ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_function_proto_to_string ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_function_proto_apply ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_function_proto_call ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_function_proto_bind ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
   | Coq_prealloc_bool ->
     result_out
       (let_binding (get_arg 0 args) (fun v ->
@@ -1952,24 +1696,6 @@ and run_construct_prealloc s c b args =
               let_binding (object_alloc s o) (fun p ->
                 let (l, s_2) = p in
                 Coq_out_ter (s_2, (res_val (Coq_value_object l)))))))))
-  | Coq_prealloc_bool_proto ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_bool_proto_to_string ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_bool_proto_value_of ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
   | Coq_prealloc_number ->
     let_binding (fun s_2 v ->
       let_binding
@@ -1985,42 +1711,6 @@ and run_construct_prealloc s c b args =
       else let_binding (get_arg 0 args) (fun v ->
              if_number (to_number s c v) (fun x x0 ->
                follow x (Coq_value_prim (Coq_prim_number x0)))))
-  | Coq_prealloc_number_proto ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_number_proto_to_string ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_number_proto_value_of ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_number_proto_to_fixed ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_number_proto_to_exponential ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_number_proto_to_precision ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
   | Coq_prealloc_array ->
     let_binding
       (object_new (Coq_value_object (Coq_object_loc_prealloc
@@ -2105,42 +1795,6 @@ and run_construct_prealloc s c b args =
                          attributes_data_configurable = false }))) (fun s0 ->
                      if_void (array_args_map_loop s0 c l args 0.)
                        (fun s1 -> res_ter s1 (res_val (Coq_value_object l)))))))))
-  | Coq_prealloc_array_is_array ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_array_proto ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_array_proto_to_string ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_array_proto_join ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_array_proto_pop ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_array_proto_push ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
   | Coq_prealloc_string ->
     let_binding
       (object_new (Coq_value_object (Coq_object_loc_prealloc
@@ -2169,93 +1823,15 @@ and run_construct_prealloc s c b args =
             else let_binding (get_arg 0 args) (fun arg ->
                    if_string (to_string s c arg) (fun s0 s1 ->
                      follow s0 s1))))))
-  | Coq_prealloc_string_proto ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_string_proto_to_string ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_string_proto_value_of ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_string_proto_char_at ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_string_proto_char_code_at ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_math ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_mathop m ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_date ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_regexp ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
   | Coq_prealloc_error ->
     let_binding (get_arg 0 args) (fun v ->
       build_error s (Coq_value_object (Coq_object_loc_prealloc
         Coq_prealloc_error_proto)) v)
-  | Coq_prealloc_error_proto ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
   | Coq_prealloc_native_error ne ->
     let_binding (get_arg 0 args) (fun v ->
       build_error s (Coq_value_object (Coq_object_loc_prealloc
         (Coq_prealloc_native_error_proto ne))) v)
-  | Coq_prealloc_native_error_proto n ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_error_proto_to_string ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_throw_type_error ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Construct prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented.")))
-  | Coq_prealloc_json ->
+  | _ ->
     (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (strappend
         ("Construct prealloc_")
@@ -2869,21 +2445,9 @@ and run_function_has_instance s lv _foo_ = match _foo_ with
     match vproto with
     | Coq_value_prim p ->
       (match p with
-       | Coq_prim_undef ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("Primitive found in the prototype chain in [run_object_has_instance_loop].")
        | Coq_prim_null ->
          res_ter s (res_val (Coq_value_prim (Coq_prim_bool false)))
-       | Coq_prim_bool b ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("Primitive found in the prototype chain in [run_object_has_instance_loop].")
-       | Coq_prim_number n ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("Primitive found in the prototype chain in [run_object_has_instance_loop].")
-       | Coq_prim_string s0 ->
+       | _ ->
          (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("Primitive found in the prototype chain in [run_object_has_instance_loop]."))
@@ -4148,19 +3712,11 @@ and run_eval s c is_direct_call vs =
                      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                        s2
                        ("Reference found in the result of an `eval\' in [run_eval]."))
-               | Coq_restype_break ->
+               | Coq_restype_throw -> res_ter s2 (res_throw r.res_value)
+               | _ ->
                  (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                    s2
-                   ("Forbidden result type returned by an `eval\' in [run_eval].")
-               | Coq_restype_continue ->
-                 (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                   s2
-                   ("Forbidden result type returned by an `eval\' in [run_eval].")
-               | Coq_restype_return ->
-                 (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                   s2
-                   ("Forbidden result type returned by an `eval\' in [run_eval].")
-               | Coq_restype_throw -> res_ter s2 (res_throw r.res_value)))
+                   ("Forbidden result type returned by an `eval\' in [run_eval].")))
          | None -> run_error s Coq_native_error_syntax))
   | Coq_value_object o ->
     result_out (Coq_out_ter (s, (res_val (Coq_value_object o))))
@@ -4808,30 +4364,6 @@ and run_array_join_elements s c l k length0 sep sR =
 
 and run_call_prealloc s c b vthis args =
   match b with
-  | Coq_prealloc_global ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_global_eval ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_global_parse_int ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_global_parse_float ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
   | Coq_prealloc_global_is_finite ->
     let_binding (get_arg 0 args) (fun v ->
       if_number (to_number s c v) (fun s0 n ->
@@ -4847,30 +4379,6 @@ and run_call_prealloc s c b vthis args =
         res_ter s0
           (res_val (Coq_value_prim (Coq_prim_bool
             (number_comparable n JsNumber.nan))))))
-  | Coq_prealloc_global_decode_uri ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_global_decode_uri_component ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_global_encode_uri ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_global_encode_uri_component ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
   | Coq_prealloc_object ->
     let_binding (get_arg 0 args) (fun value0 ->
       match value0 with
@@ -4898,18 +4406,6 @@ and run_call_prealloc s c b vthis args =
           (fun s1 x ->
           if_spec (run_object_get_own_prop s1 c l x) (fun s2 d ->
             from_prop_descriptor s2 c d)))
-  | Coq_prealloc_object_get_own_prop_name ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_object_create ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
   | Coq_prealloc_object_define_prop ->
     let_binding (get_arg 0 args) (fun o ->
       let_binding (get_arg 1 args) (fun p ->
@@ -4922,12 +4418,6 @@ and run_call_prealloc s c b vthis args =
               if_spec (run_to_descriptor s1 c attr) (fun s2 desc ->
                 if_bool (object_define_own_prop s2 c l name desc true)
                   (fun s3 x -> res_ter s3 (res_val (Coq_value_object l))))))))
-  | Coq_prealloc_object_define_props ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
   | Coq_prealloc_object_seal ->
     let_binding (get_arg 0 args) (fun v ->
       match v with
@@ -4972,24 +4462,6 @@ and run_call_prealloc s c b vthis args =
       | Coq_value_object l ->
         if_some (run_object_method object_extensible_ s l) (fun r ->
           res_ter s (res_val (Coq_value_prim (Coq_prim_bool r)))))
-  | Coq_prealloc_object_keys ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_object_keys_call ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_object_proto ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
   | Coq_prealloc_object_proto_to_string ->
     (match vthis with
      | Coq_value_prim p ->
@@ -5066,12 +4538,6 @@ and run_call_prealloc s c b vthis args =
               res_ter s3
                 (res_val (Coq_value_prim (Coq_prim_bool
                   (attributes_enumerable a))))))))
-  | Coq_prealloc_function ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
   | Coq_prealloc_function_proto ->
     result_out (Coq_out_ter (s, (res_val (Coq_value_prim Coq_prim_undef))))
   | Coq_prealloc_function_proto_to_string ->
@@ -5222,12 +4688,6 @@ and run_call_prealloc s c b vthis args =
       (let_binding (get_arg 0 args) (fun v -> Coq_out_ter (s,
         (res_val (Coq_value_prim (Coq_prim_bool
           (convert_value_to_boolean v)))))))
-  | Coq_prealloc_bool_proto ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
   | Coq_prealloc_bool_proto_to_string ->
     (match vthis with
      | Coq_value_prim p ->
@@ -5304,18 +4764,6 @@ and run_call_prealloc s c b vthis args =
     then result_out (Coq_out_ter (s,
            (res_val (Coq_value_prim (Coq_prim_number JsNumber.zero)))))
     else let v = get_arg 0 args in to_number s c v
-  | Coq_prealloc_number_proto ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_number_proto_to_string ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
   | Coq_prealloc_number_proto_value_of ->
     (match vthis with
      | Coq_value_prim p ->
@@ -5348,24 +4796,6 @@ and run_call_prealloc s c b vthis args =
                    | Coq_value_object o -> run_error s Coq_native_error_type)
                 | None -> run_error s Coq_native_error_type)
          else run_error s Coq_native_error_type))
-  | Coq_prealloc_number_proto_to_fixed ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_number_proto_to_exponential ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_number_proto_to_precision ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
   | Coq_prealloc_array ->
     run_construct_prealloc s c Coq_prealloc_array args
   | Coq_prealloc_array_is_array ->
@@ -5378,12 +4808,6 @@ and run_call_prealloc s c b vthis args =
           if string_comparable class0 ("Array")
           then res_ter s (res_val (Coq_value_prim (Coq_prim_bool true)))
           else res_ter s (res_val (Coq_value_prim (Coq_prim_bool false)))))
-  | Coq_prealloc_array_proto ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
   | Coq_prealloc_array_proto_to_string ->
     if_object (to_object s vthis) (fun s0 array ->
       if_value
@@ -5461,12 +4885,6 @@ and run_call_prealloc s c b vthis args =
     else let_binding (get_arg 0 args) (fun value0 ->
            if_string (to_string s c value0) (fun s0 s1 ->
              res_ter s0 (res_val (Coq_value_prim (Coq_prim_string s1)))))
-  | Coq_prealloc_string_proto ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
   | Coq_prealloc_string_proto_to_string ->
     (match vthis with
      | Coq_value_prim p ->
@@ -5489,70 +4907,16 @@ and run_call_prealloc s c b vthis args =
          if string_comparable s0 ("String")
          then run_object_prim_value s l
          else run_error s Coq_native_error_type))
-  | Coq_prealloc_string_proto_char_at ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_string_proto_char_code_at ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_math ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_mathop m ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_date ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_regexp ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
   | Coq_prealloc_error ->
     let_binding (get_arg 0 args) (fun v ->
       build_error s (Coq_value_object (Coq_object_loc_prealloc
         Coq_prealloc_error_proto)) v)
-  | Coq_prealloc_error_proto ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
   | Coq_prealloc_native_error ne ->
     let_binding (get_arg 0 args) (fun v ->
       build_error s (Coq_value_object (Coq_object_loc_prealloc
         (Coq_prealloc_native_error_proto ne))) v)
-  | Coq_prealloc_native_error_proto n ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
-  | Coq_prealloc_error_proto_to_string ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-        ("Call prealloc_")
-        (strappend (string_of_prealloc b)
-          (" not yet implemented")))
   | Coq_prealloc_throw_type_error -> run_error s Coq_native_error_type
-  | Coq_prealloc_json ->
+  | _ ->
     (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
       (strappend
         ("Call prealloc_")
