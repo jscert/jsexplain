@@ -660,7 +660,7 @@ and js_of_expression ctx dest e =
           let binders = List.mapi bind el in
           let ids = List.map fst binders in
           let sdecl = ppf_match_binders binders in
-          (ids, sdecl)
+          (ids, sintro ^ sdecl)
       | [ { vb_pat = { pat_desc = Tpat_record (args, closed_flag) }; vb_expr = obj } ] -> (* binding records *)
           (* args : (Longident.t loc * label_description * pattern) list *)
          let (sintro, seobj) = js_of_expression_naming_argument_if_non_variable ctx obj "_record_arg_" in     
@@ -676,7 +676,7 @@ and js_of_expression ctx dest e =
           let binders = List.map bind args in
           let ids = List.map fst binders in
           let sdecl = ppf_match_binders binders in
-          (ids, sdecl)
+          (ids, sintro ^ sdecl)
       | _ -> (* other cases *)
         let (ids,sdecls) = List.split (List.map (fun vb -> show_value_binding ctx vb) @@ vb_l) in
         let sdecl = String.concat lin1 @@ sdecls in
@@ -993,92 +993,3 @@ let to_javascript basename module_name typedtree =
   Format.flush_str_formatter ()
 
 
-(****************************************************************)
-(* COMMENTS *)
-
-(*
-ctx_empty
-ctx_push(ctx, bindings)   where bindings = [ { key: "ls", val: ls}, { key:"xs", val:xs } ]
-
-push("ls", ls, push("v", v, push("y", y, ctx314)); 
-
-example:  
-  ctx321 = ctx_push(ctx320, bindings); log(|line|, ctx321, "ctx_push")
-
-
-  enter  (or call)   => arguments of the call + name of new ctx
-  return (was exit)  => return value
-  let (on the "in")  => new binding + name of new ctx
-  case               => bound variables + name of new ctx
-
-
-
-
-
-
-
-  type token_info = ctx_operation * current ctx
-
-  
-  if  ==> viewed as match with case true/false.
-
-
-ctx_empty is passed on each structure_item
-on each ctx extension, we need a fresh name (enter, let, match_branch)
-(for return values, do the extension on the fly)
-
-   
-   return f(x);
-translates as
-   var v213 = f(x);
-   log(|line|, ctx_push(ctx320, {key: "return", val: v213}), "return")
-
-
-
-  match v with | None -> x | Some y -> y
-translates as
-  function() { 
-
-
-  
-----------------------
-  let f ... =
-    match ...
-
-=> 
-  switch
-    case:
-      return;
-
-----------------------
-  let f ... =
-    match .. -> 
-      match ...
-
-=>
-  return
-
-----------------------
-  let x = match ... in ...
-=> 
-  switch ...
-    case:
-      x = ..; break;
-    case:
-      x = ..; break;
-
-
-----------------------
-  let x = 
-    match .. ->
-      match .. ->
-=> 
-  would not work without wrapping
-
-----------------------
-
-  f (match ...)
-=> 
-  requires A-normalization
-
-*)

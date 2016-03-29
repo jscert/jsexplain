@@ -80,7 +80,7 @@ var source_file = '{}';
 var source_file = '{} + {}';
 var source_file = 'var x = { a : 1, b : 2 }; ';
 var source_file = 'x = 1;\nx = 2;\nx = 3';
-
+var source_file = '(function (x) {return 1;})()';
 
 // --------------- Initialization ----------------
 
@@ -360,6 +360,32 @@ function html_escape(stringToEncode) {
 
 // --------------- Views for JS state/context ----------------
 
+function array_of_heap(heap) {
+  var items_list = Heap.to_list(LibString.string_comparable, heap);
+  return encoded_list_to_array(items_list);
+} 
+
+
+function string_of_prealloc(prealloc) {
+    return (prealloc.tag).slice("Coq_prealloc_".length);
+  //TODO:
+  // Coq_prealloc_mathop  [@f mathop] of mathop
+  // Coq_prealloc_native_error  [@f error] of native_error
+  // Coq_prealloc_native_error_proto  [@f error] of native_error
+}
+
+function string_of_loc(loc) {
+  switch (loc.tag) {
+  case "Coq_object_loc_normal":
+    return loc.address;
+  case "Coq_object_loc_prealloc":
+    return string_of_prealloc(loc.prealloc);
+  default:
+    throw "unrecognized tag in string_of_loc";
+  }
+}
+
+
 function string_of_default(v) {
   return "<pre style='margin:0; padding: 0; margin-left:1em'>" + JSON.stringify(v, null, 2) + "</pre>";
 }
@@ -441,15 +467,17 @@ function string_of_mutability(mutability) {
                                  attributes_accessor_configurable : bool }
 */
 
-
 function show_object(state, loc, target, depth) {
    var t = $("#" + target);
+   if (depth == 0) {
+     t.append("&lt;hidden&gt;");
+     return;
+   }
    var obj_opt = JsCommonAux.object_binds_pickable_option(state, loc);
    if (obj_opt.tag != "Some") throw "show_object: unbound object";
    var obj = obj_opt.value;
    var props = obj.object_properties_;
-   var key_value_pair_list = Heap.to_list(string_comparable, props);
-   var key_value_pair_array = encoded_list_to_array(key_value_pair_list);
+   var key_value_pair_array = array_of_heap(props);
    for (var i = 0; i < key_value_pair_array.length; i++) {
       var prop_name = key_value_pair_array[i][0];
       var attribute = key_value_pair_array[i][1];
@@ -461,13 +489,13 @@ function show_object(state, loc, target, depth) {
       switch (attribute.tag) {
         case "Coq_attributes_data_of":
           var attr = attribute.value;
-          var prop_value = attribute.attributes_data_value;
+          var prop_value = attr.attributes_data_value;
           show_value(state, prop_value, targetsub, depth-1);
 
           break;
         case "Coq_attributes_accessor_of": 
           var attr = attribute.value;
-          $("#" + targetsub).append(" <accessor> ");
+          $("#" + targetsub).append(" &lt;accessor&gt; ");
           // TODO: complete
 
           break;
@@ -482,7 +510,6 @@ function show_object(state, loc, target, depth) {
    }
 }
 
-
 function show_value(state, v, target, depth) {
   var t = $("#" + target);
   switch (v.tag) {
@@ -493,7 +520,7 @@ function show_value(state, v, target, depth) {
   case "Coq_value_object":
      var loc = v.value;
      var contents_init = $("#" + target).html();
-     var contents_rest = "<span class='heap_link'><a onclick=\"handlers['" + target + "']()\">&lt;Object&gt;(" + loc + ")</a></span>";
+     var contents_rest = "<span class='heap_link'><a onclick=\"handlers['" + target + "']()\">&lt;Object&gt;(" + string_of_loc(loc) + ")</a></span>";
      var contents_default = contents_init + contents_rest;
      function handler_close() {
        handlers[target] = handler_open;
@@ -517,28 +544,27 @@ function show_value(state, v, target, depth) {
   }
 }
 
-function show_lexical_env(state, env_record_decl, items_target) {
+function show_decl_env_record(state, env_record_decl, target) {
    // env_record_decl : (string, mutability * value) Heap.heap
    var t = $("#" + target);
-   var items_list = Heap.to_list(string_comparable, env_record_decl);
-   var items_array = encoded_list_to_array(items_list);
+   var items_array = array_of_heap(env_record_decl);
    for (var i = 0; i < items_array.length; i++) {
       var var_name = items_array[i][0];
       var mutability = items_array[i][1][0];
       var value = items_array[i][1][1];
       var value_target = fresh_id();
-      t.append("<div id='" + value_target + "'>" + html_escape(varname) + " (" + string_of_mutability(mutability) + "):</div>");
+      t.append("<div id='" + value_target + "'>" + html_escape(var_name) + " (" + string_of_mutability(mutability) + "):</div>");
       show_value(state, value, value_target, 1);
    }
 }
 
 function show_lexical_env(state, lexical_env, target) {
    var t = $("#" + target);
-   var env_record_heap = state.state_env_record_heap;
+   // var env_record_heap = state.state_env_record_heap;
    var env_loc_array = encoded_list_to_array(lexical_env);
    for (var i = 0; i < env_loc_array.length; i++) {
       var env_loc = env_loc_array[i];
-      var env_record_opt = JsCommonAux.object_binds_pickable_option(env_record_heap, env_loc);
+      var env_record_opt = JsCommonAux.env_record_binds_pickable_option(state, env_loc);
       if (env_record_opt.tag != "Some") throw "show_object: unbound object";
       var env_record = env_record_opt.value;
 
@@ -550,12 +576,11 @@ function show_lexical_env(state, lexical_env, target) {
           show_decl_env_record(state, env_record_decl, items_target)
           break;
         case "Coq_env_record_object": 
-          var env_record_object = env_record.value;
-          var object_loc = env_record_object.value;
-          var provide_this = env_record_object.provide_this;
+          var object_loc = env_record.value;
+          var provide_this = env_record.provide_this;
           var obj_target = fresh_id();
           t.append("with (" + ((provide_this) ? "" : "not ") + "providing 'this'): <div id='" + obj_target + "'></div>");
-          show_value(state, object_loc, obj_target, 0);
+          show_object(state, object_loc, obj_target, 0);
 
           break;
         default: 
@@ -574,15 +599,18 @@ function show_execution_ctx(state, execution_ctx, target) {
   // this object
   var this_target = fresh_id();
   t.append("<div id='" + this_target + "'>this: </div>");
+  //TODO 
   show_value(state, execution_ctx.execution_ctx_this_binding, this_target, 0);
 
   // lexical env
   var lexical_env_target = fresh_id();
   t.append("<div><div>lexical-env:</div> <div style='margin-left:0.5em' id='" + lexical_env_target + "'></div></div>");
   show_lexical_env(state, execution_ctx.execution_ctx_lexical_env, lexical_env_target);
-
+  
   // variable env -- TODO, like above
-  // execution_ctx.execution_ctx_variable_env
+  var variable_env_target = fresh_id();
+  t.append("<div><div>variable-env:</div> <div style='margin-left:0.5em' id='" + variable_env_target + "'></div></div>");
+  show_lexical_env(state, execution_ctx.execution_ctx_variable_env, variable_env_target);
 }
 
 
@@ -629,6 +657,10 @@ function itemToHtml(item) {
   s += htmlDiv("token: " + item.token + JSON.stringify(item.locByExt));
   s += htmlDiv("type: " + item.type);
   s += ctxToHtml(item.ctx);
+  s += htmlDiv("execution_ctx: " + item.type);
+  s += JSON.stringify(item.execution_ctx);
+  // s += htmlDiv("state: " + item.type);
+  // s += JSON.stringify(item.state);
   return s;
 }
 
@@ -681,7 +713,7 @@ function updateSelection() {
        $("#disp_env").html("<undefined state or context>");
      } else {
        $("#disp_env").html("");
-       // show_execution_ctx(item.state, item.execution_ctx, "disp_env");
+       show_execution_ctx(item.state, item.execution_ctx, "disp_env");
      }
 
      // interpreter ctx panel
@@ -780,6 +812,9 @@ function assignExtraInfosInTrace() {
      var bindings = item.ctx.bindings;
      for (var i = 0; i < bindings.length; i++) {
        var binding = bindings[i];
+       if (binding.val === undefined) {
+         continue; // might happen on run with errors
+       }
        if (binding.key === "_term_") {
          var t = binding.val;
          if (t.loc != undefined) {

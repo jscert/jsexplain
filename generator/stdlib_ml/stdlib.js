@@ -60,7 +60,12 @@ var of_int = function(x) { return x; };
 
 //----------------------------------------------------------------------------
 
-var number_comparable = function(x, y) { return x === y; };
+var number_comparable = function(x, y) {
+  if (typeof(x) != "number" || typeof(y) != "number")
+    throw "string_eq invalid arguments";
+  return x === y; 
+};
+
 
 //----------------------------------------------------------------------------
 
@@ -71,13 +76,29 @@ var not = function(x) { return !x; };
 
 //----------------------------------------------------------------------------
 
-var string_eq = function(x, y) { return x === y; };
+var string_eq = function(x, y)  { 
+  if (typeof(x) != "string" || typeof(y) != "string")
+    throw "string_eq invalid arguments";
+  return x === y; 
+};
 
-var strappend = function(x, y) { return x + y; };
+var strappend = function(x, y) { 
+  if (typeof(x) != "string" || typeof(y) != "string")
+    throw "strappend invalid arguments";
+  return x + y; 
+};
 
-var strlength = function(x) { return x.length; };
+var strlength = function(x) { 
+  if (typeof(x) != "string")
+    throw "strlength invalid arguments";
+  return x.length;
+};
 
-var substring = function(n, m, s) { return s.slice(n, n+m); };
+var substring = function(n, m, s) { 
+  if (typeof(s) != "string")
+    throw "strlength invalid arguments";
+  return s.slice(n, n+m); 
+};
 
 
 //----------------------------------------------------------------------------
