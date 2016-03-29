@@ -2,6 +2,7 @@
 *.log.js
 *.unlog.js
 *.token.js
+*.mlloc.js
 *.pre
 tests/jsref/assembly.js
 tests/jsref/lineof.js
