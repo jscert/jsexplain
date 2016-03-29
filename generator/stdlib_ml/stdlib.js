@@ -2,21 +2,21 @@
 //----------------------------------------------------------------------------
 
 var None = function() {
-   return { type: "option", tag: "None" };
+   return { /*type: "option",*/ tag: "None" };
 };
 
 var Some = function(value) {
-   return { type: "option", tag: "Some", value: value };
+   return { /*type: "option",*/ tag: "Some", value: value };
 };
 
 //----------------------------------------------------------------------------
 
 var mk_nil = function() {
-   return { type: "list", tag: "[]" };
+   return { /*type: "list",*/ tag: "[]" };
 };
 
 var mk_cons = function(head, tail) {
-   return { type: "list", tag: "::", head: head, tail: tail };
+   return { /*type: "list",*/ tag: "::", head: head, tail: tail };
 };
 
 //----------------------------------------------------------------------------

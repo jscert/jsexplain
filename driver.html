@@ -70,6 +70,10 @@
    color: red;
 }
 
+#disp_env {
+   margin-top: 0.5em;
+}
+
 .CodeMirror-selected { background: #F3F781; }
 .CodeMirror-focused .CodeMirror-selected { background: #F3F781; }
 
@@ -136,11 +140,13 @@ Navigation:
    <div id='file_list'></div>
    <textarea id='interpreter_code' class='source' rows='30' cols='60'></textarea>
 </td>
-<td width='600'>
-   <div id='disp_ctx'>ctx here</div>
-</td>
+<!--<td width='600'>
+   <div id='disp_ctx'></div>
+</td>-->
 </tr></table>
 </div>
+<div id='disp_ctx'></div>
+<hr>
 <div id='disp_infos'></div>
 
 <script src="tools.js"></script> 

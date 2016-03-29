@@ -81,6 +81,9 @@ var source_file = '{} + {}';
 var source_file = 'var x = { a : 1, b : 2 }; ';
 var source_file = 'x = 1;\nx = 2;\nx = 3';
 var source_file = '(function (x) {return 1;})()';
+var source_file = 'var x = { a : 1 };\n x.b = 2;\nx';
+var source_file = 'var x = { a : { c: 1 } };\n x.a.b = 2;\nx';
+
 
 // --------------- Initialization ----------------
 
@@ -357,6 +360,9 @@ function html_escape(stringToEncode) {
       return entityMap[s]; });
 }
 
+function string_of_any(v) {
+  return "<pre style='margin:0; padding: 0; margin-left:1em'>" + JSON.stringify(v, null, 2) + "</pre>";
+}
 
 // --------------- Views for JS state/context ----------------
 
@@ -364,7 +370,6 @@ function array_of_heap(heap) {
   var items_list = Heap.to_list(LibString.string_comparable, heap);
   return encoded_list_to_array(items_list);
 } 
-
 
 function string_of_prealloc(prealloc) {
     return (prealloc.tag).slice("Coq_prealloc_".length);
@@ -385,11 +390,6 @@ function string_of_loc(loc) {
   }
 }
 
-
-function string_of_default(v) {
-  return "<pre style='margin:0; padding: 0; margin-left:1em'>" + JSON.stringify(v, null, 2) + "</pre>";
-}
-
 function string_of_prim(v) {
   switch (v.tag) {
   case "Coq_prim_undef":
@@ -401,7 +401,7 @@ function string_of_prim(v) {
   case "Coq_prim_number":
     return "" + v.value;
   case "Coq_prim_string":
-    return "\"" + v.value + "\"";
+    return "\"" + html_escape(v.value) + "\"";
   default:
     throw "unrecognized tag in string_of_prim";
   }
@@ -484,7 +484,7 @@ function show_object(state, loc, target, depth) {
 
       var targetsub = fresh_id();
       t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
-      $("#" + targetsub).html(html_escape(prop_name) + ": ");
+      $("#" + targetsub).html("&ndash; " + html_escape(prop_name) + ": ");
 
       switch (attribute.tag) {
         case "Coq_attributes_data_of":
@@ -506,7 +506,7 @@ function show_object(state, loc, target, depth) {
 
    // special display for empty objects
    if (key_value_pair_array.length === 0) {
-     t.append("<div style='margin-left:1em'>(empty object)</div>");
+     t.append("(empty object)");
    }
 }
 
@@ -519,24 +519,24 @@ function show_value(state, v, target, depth) {
     return;
   case "Coq_value_object":
      var loc = v.value;
-     var contents_init = $("#" + target).html();
-     var contents_rest = "<span class='heap_link'><a onclick=\"handlers['" + target + "']()\">&lt;Object&gt;(" + string_of_loc(loc) + ")</a></span>";
-     var contents_default = contents_init + contents_rest;
+     var obj_target = fresh_id();
+     t.append("<span class='heap_link'><a onclick=\"handlers['" + obj_target + "']()\" >&lt;Object&gt;(" + string_of_loc(loc) + ")</a><span id='" + obj_target + "'></span></span>"); 
      function handler_close() {
-       handlers[target] = handler_open;
-       t.html(contents_default);
+       handlers[obj_target] = handler_open;
+       $("#" + obj_target).html("");
        interpreter.focus();
      }
      function handler_open() {
-       handlers[target] = handler_close;
-       show_object(state, loc, target, depth);
+       handlers[obj_target] = handler_close;
+       show_object(state, loc, obj_target, 1);
        interpreter.focus();
      };
-     handlers[target] = handler_open;
      // initial opening of the object
-     t.append(contents_default); 
      if (depth > 0) {
-       handler_open();
+       handlers[obj_target] = handler_close;
+       show_object(state, loc, obj_target, depth);
+     } else {
+       handler_close();
      }
      return;
   default:
@@ -635,6 +635,129 @@ function updateContext(targetid, state, env) {
 }
 */
 
+function has_tag_in_set(value, array_tags) {
+  return (value.tag !== undefined &&
+          array_tags.indexOf(value.tag) != -1);
+}
+
+function interp_val_is_base_value(val) {
+  var t = typeof(val);
+  return t == "string" || 
+         t == "number" ||
+         t == "boolean" ||
+         t == "undefined" ||
+         t == "null";
+}
+
+function interp_val_is_js_prim(v) {
+  return has_tag_in_set(v, [ "Coq_prim_undef", "Coq_prim_null", "Coq_prim_bool", "Coq_prim_number", "Coq_prim_string" ]);
+}
+
+function interp_val_is_js_value(v) {
+  return has_tag_in_set(v, [ "Coq_value_prim", "Coq_value_object" ]);
+}
+
+function interp_val_is_loc(v) {
+  return has_tag_in_set(v, [ "Coq_object_loc_normal", "Coq_object_loc_prealloc" ]);
+}
+
+function interp_val_is_list(v) {
+  return has_tag_in_set(v, [ "::", "[]" ]);
+}
+  
+function interp_val_is_syntax(v) {
+  return has_tag_in_set(v, [ "Coq_expr_this", "Coq_expr_identifier", "Coq_expr_literal", "Coq_expr_object", "Coq_expr_array", "Coq_expr_function", "Coq_expr_access", "Coq_expr_member", "Coq_expr_new", "Coq_expr_call", "Coq_expr_unary_op", "Coq_expr_binary_op", "Coq_expr_conditional", "Coq_expr_assign", "Coq_propbody_val", "Coq_propbody_get", "Coq_propbody_set", "Coq_funcbody_intro", "Coq_stat_expr", "Coq_stat_label", "Coq_stat_block", "Coq_stat_var_decl", "Coq_stat_if", "Coq_stat_do_while", "Coq_stat_while", "Coq_stat_with", "Coq_stat_throw", "Coq_stat_return", "Coq_stat_break", "Coq_stat_continue", "Coq_stat_try", "Coq_stat_for", "Coq_stat_for_var", "Coq_stat_for_in", "Coq_stat_for_in_var", "Coq_stat_debugger", "Coq_stat_switch", "Coq_switchbody_nodefault", "Coq_switchbody_withdefault", "Coq_switchclause_intro", "Coq_prog_intro", "Coq_element_stat", "Coq_element_func_decl" ]);
+}
+
+function interp_val_is_state(v) {
+  // Assume "has a state_object_heap" field iff "is a state"
+  return v.state_object_heap !== undefined;
+}
+
+function interp_val_is_execution_ctx(v) {
+  // Assume "has a execution_ctx_lexical_env" field iff "is a state"
+  return v.execution_ctx_lexical_env !== undefined;
+}
+
+
+function show_interp_val(state, v, target, depth) {
+  if (depth == 0) {
+    t.append("&lt; ... &gt;"); 
+  }
+  var t = $("#" + target);
+  if (interp_val_is_base_value(v)) {
+    t.append(html_escape("" + v));
+  } else if (interp_val_is_js_value(v)) {
+    show_value(state, v, target, 1);
+  } else if (interp_val_is_loc(v)) {
+    show_object(state, v, target, 1);
+  } else if (interp_val_is_js_prim(v)) {
+    t.append(string_of_prim(v));
+  } else if (interp_val_is_state(v)) {
+    t.append("&lt; state-object &gt;"); 
+  } else if (interp_val_is_execution_ctx(v)) {
+    t.append("&lt; execution-ctx-object &gt;"); 
+  } else if (interp_val_is_syntax(v)) {
+    t.append("&lt; syntax-object &gt;"); 
+  } else if (interp_val_is_list(v)) {
+      var items = encoded_list_to_array(v)
+      t.append("List:");
+      for (var i = 0; i < items.length; i++) {
+        var vi = items[i];
+        var targetsub = fresh_id();
+        t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
+        $("#" + targetsub).html("&bull; "); 
+        show_interp_val(state, vi, targetsub, depth-1);
+      }
+  } else if (v.tag !== undefined) { // data constructor
+      var constr = html_escape(v.tag); // TODO: rename constructor prefix
+      var hasArgs = (function() {
+                        for (var key in v) {
+                          if (key !== "tag") {
+                            return true;
+                          }
+                        }
+                        return false;
+                      })();
+      t.append(constr + ((hasArgs) ? " with:" : ""));
+      for (var key in v) {
+        if (key !== "tag") {
+          var targetsub = fresh_id();
+          t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
+          $("#" + targetsub).html(html_escape(key) + ": ");
+          show_interp_val(state, v[key], targetsub, depth-1);
+        }
+      }
+  } else { // record
+      var items_target = fresh_id();
+      t.append("Struct with:");
+      for (var key in v) {
+         var targetsub = fresh_id();
+         t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
+         $("#" + targetsub).html(html_escape(key) + ": ");
+         show_interp_val(state, v[key], targetsub, depth-1);
+      }
+  }
+  // t.append(string_of_any(v));
+}
+
+function show_interp_ctx(state, ctx, target) {
+  var depth = 1000;
+  var t = $("#" + target);
+  var a = ctx_to_array(ctx);
+  for (var i = 0; i < a.length; i++) {
+    var key = a[i].key;
+    var val = a[i].val;
+    if (val.runs_type_expr !== undefined) // runs0
+      continue;
+    var targetsub = fresh_id();
+    t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
+    $("#" + targetsub).html(html_escape(key) + ": ");
+    show_interp_val(state, val, targetsub, depth);
+  }
+}
+
+
 // --------------- Debugging view ----------------
 
 function htmlDiv(s) {
@@ -645,13 +768,15 @@ function ctxToHtml(ctx) {
   var s = '';
   var a = ctx_to_array(ctx);
   for (var i = 0; i < a.length; i++) {
-    var b = a[i];
-    s += "<div style='white-space: nowrap;'><b>" + b.key + "</b>: " + JSON.stringify(b.val) + "</div>";
-    if (b.key == "#RETURN_VALUE#" && 
-        b.val.value !== undefined &&
-        b.val.value.out !== undefined &&
-        b.val.value.out.res !== undefined) {
-      var res = b.val.value.out.res;
+    var key = a[i].key;
+    var val = a[i].val;
+    // Uncomment next line for debug:
+    // s += "<div style='white-space: nowrap;'><b>" + b.key + "</b>: " + JSON.stringify(b.val) + "</div>";
+    if (key == "#RETURN_VALUE#" && 
+        val.value !== undefined &&
+        val.value.out !== undefined &&
+        val.value.out.res !== undefined) {
+      var res = val.value.out.res;
       // Coq_result_some  [@f value] of 't 
       // Coq_specret_out  [@f value] of out
       // Coq_out_ter  [@f state, res] of state * res
@@ -666,14 +791,15 @@ function ctxToHtml(ctx) {
   return s;
 }
 
-
 function itemToHtml(item) {
   var s = '';
   s += htmlDiv("token: " + item.token + JSON.stringify(item.locByExt));
   s += htmlDiv("type: " + item.type);
   s += ctxToHtml(item.ctx);
   s += htmlDiv("execution_ctx: " + item.type);
-  s += JSON.stringify(item.execution_ctx);
+  // For debug, use:
+  //    s += JSON.stringify(item.execution_ctx);
+
   // s += htmlDiv("state: " + item.type);
   // s += JSON.stringify(item.state);
   return s;
@@ -737,7 +863,7 @@ function updateSelection() {
      }
 
      // interpreter ctx panel
-     // updateContext("#disp_ctx", item.heap, item.ctx);
+     show_interp_ctx(item.state, item.ctx, "disp_ctx");
 
      // interpreter code panel
      // TEMPORARILY DISABLED BECAUSE ONLY SINGLE FILE TO TRACE
@@ -840,10 +966,10 @@ function assignExtraInfosInTrace() {
          if (t.loc != undefined) {
            last_loc = t.loc;
          }
-       } else if (binding.val.state_object_heap != undefined) {
+       } else if (interp_val_is_state(binding.val)) {
          // assuming: 'is an state object' iff 'has a state_object_heap field'
          last_state = binding.val;
-       } else if (binding.val.execution_ctx_lexical_env != undefined) {
+       } else if (interp_val_is_execution_ctx(binding.val)) {
          // assuming: 'is an execution_ctx' iff 'has a execution_ctx_lexical_env field'
          last_execution_ctx = binding.val;
        }
@@ -930,6 +1056,7 @@ function testLineof(filename, token) {
 
 // for easy debugging, launch at startup:
 readSourceParseAndRun();
+stepTo(3772);
 
 
 function showCurrent() {
