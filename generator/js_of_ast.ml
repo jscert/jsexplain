@@ -236,12 +236,11 @@ let ppf_pat_array id_list array_expr =
 let ppf_field_access expr field =
   Printf.sprintf "%s.%s" expr field
 
-(* ' is not permitted in JS identifier names, we assume _2 is not used in OCaml names *)
 let ppf_ident_name x =
   if List.mem x ["arguments"; "eval"; "caller"]
     then unsupported ("use of reserved keyword: " ^ x);
-      (* TODO: complete the list *)
-  Str.global_replace (Str.regexp "'") "_2" x
+    (* TODO: complete the list *)
+  Str.global_replace (Str.regexp "'") "$" x
 
 let ppf_ident i =
   i |> Ident.name |> ppf_ident_name

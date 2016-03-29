@@ -88,7 +88,7 @@ var source_files = [
 ];
 
 source_files.reduce((select, file_content) => {
-  let option = document.createElement('option');
+  var option = document.createElement('option');
   option.textContent = file_content;
   select.append(option);
   return select;
@@ -103,7 +103,7 @@ function setSourceCode(text) {
 
 $('#select_source_code').change(e => { setSourceCode(e.target.value)});
 $('#select_file').change(e => {
-  let fr = new FileReader();
+  var fr = new FileReader();
   fr.onload = function (e) { setSourceCode(e.target.result) };
   fr.readAsText(e.target.files[0]);
 });
@@ -387,11 +387,11 @@ function html_escape(stringToEncode) {
       "&": "&amp;", 
       "<": "&lt;",
       ">": "&gt;",
-      '"': '&quot;',
+/*      '"': '&quot;',
       "'": '&#39;',
-      "/": '&#x2F;' };
-   return String(stringToEncode).replace(/[&<>"'\/]/g, function (s) {
-      return entityMap[s]; });
+      "/": '&#x2F;' */ };
+   return String(stringToEncode).replace(/[&<>]/g, function (s) {
+      return entityMap[s]; });  // "'\/
 }
 
 function string_of_any(v) {
@@ -785,7 +785,7 @@ function show_interp_ctx(state, ctx, target) {
     var val = a[i].val;
     var targetsub = fresh_id();
     t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
-    $("#" + targetsub).html(html_escape(key) + ": ");
+    $("#" + targetsub).html("<b>" + html_escape(key) + "</b>: ");
     show_interp_val(state, val, targetsub, depth);
   }
 }
