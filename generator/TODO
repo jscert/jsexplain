@@ -16,20 +16,6 @@ CURRENT TODO
 
 *) Alan: proof read JSNumber
 
-*) Thomas: factorize branches such as:
-
-
-       | Coq_prim_bool b0 ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[run_object_method] returned a primitive in [object_proto_is_prototype_of_body].")
-       | Coq_prim_number n ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[run_object_method] returned a primitive in [object_proto_is_prototype_of_body].")
-
-
-
 *) Arthur: inline let_binding
 
 *) Alan/Thomas: test "eval", might need pieces of JsCommon for it (parsePickable)
