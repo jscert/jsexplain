@@ -47,7 +47,6 @@ ASSEMBLY_JS_FILES := \
 	JsSyntax.unlog.js \
 	JsSyntaxAux.unlog.js \
 	Translate_syntax.js \
-	JsSyntaxInfos.unlog.js \
 	JsCommon.unlog.js \
 	JsCommonAux.unlog.js \
 	JsPreliminary.unlog.js \

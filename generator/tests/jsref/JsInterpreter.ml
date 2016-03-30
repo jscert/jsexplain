@@ -7,7 +7,6 @@ open JsInterpreterMonads
 open JsPreliminary
 open JsSyntax
 open JsSyntaxAux
-open JsSyntaxInfos
 open LibBool
 open LibFunc
 open LibList
@@ -4576,8 +4575,7 @@ and run_call s c l vthis args =
 (** val run_javascript : prog -> result **)
 
 and run_javascript p =
-  let p_2 = add_infos_prog strictness_false p in
-  let c = execution_ctx_initial (prog_intro_strictness p_2) in
+  let c = execution_ctx_initial (prog_intro_strictness p) in
   if_void
     (execution_ctx_binding_inst state_initial c Coq_codetype_global
-      None p_2 []) (fun s_2 -> run_prog s_2 c p_2)
+      None p []) (fun s_2 -> run_prog s_2 c p)

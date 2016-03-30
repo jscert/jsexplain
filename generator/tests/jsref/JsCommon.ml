@@ -582,11 +582,8 @@ let elision_tail_remove ol =
 (** val parse_pickable : string -> bool -> prog coq_Pickable_option **)
 
 let parse_pickable = (fun s strict ->
-    let str = s in
-    (* try  ARTHUR HACK *)
-      let parserExp = Translate_syntax.Parser_main.exp_from_string ~force_strict:strict str in
-      Some (JsSyntaxInfos.add_infos_prog strict
-        (Translate_syntax.exp_to_prog parserExp))
+  Translate_syntax.parse_esprima strict s
+    (*Translate_syntax.parse_esprima strict s*)
     (* with
       (* | Translate_syntax.CoqSyntaxDoesNotSupport _ -> assert false (* Temporary *) *)
       | Parser.ParserFailure _ [@f]  (** Auto Generated Attributes **)

@@ -18,8 +18,8 @@ CURRENT TODO
 
 *) Arthur: inline let_binding
 
-*) Alan/Thomas: test "eval", might need pieces of JsCommon for it (parsePickable)
-
+*) Alan/Thomas: test "eval"
+    Still need to implement parsing with a given strictness
 
 *) ? 
   update the ML code for: type_compare mutability_compare prim_compare 
@@ -35,7 +35,7 @@ CURRENT TODO
 
 *) [thomas]
 - bigger test262 testing.
-- Flat to force esprima to parse in strict mode
+- Flag to force esprima to parse in strict mode
 
 *) LATER: remove useless files such as LibReflect LibString etc...
 

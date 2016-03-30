@@ -85,6 +85,7 @@ var source_files = [
   'var x = { a : { c: 1 } };\n x.a.b = 2;\nx',
   '(function (x) {return 1;})()',
   '(function (x) {\nreturn 1;\n})({a:{b:2}})',
+  'eval("var x = { a : 1 }; x.b = 2; x");',
 ];
 
 source_files.reduce((select, file_content) => {
@@ -1073,14 +1074,14 @@ function readSourceParseAndRun() {
    //console.log(code);
    // TODO handle parsing error
    try {
-     parsedTree = esprima.parse(code, {loc:true});
+     parsedTree = esprima.parse(code, {loc: true, range: true});
    } catch (e) {
      return "Parse error";
    }
    // console.log(parsedTree);
  
    // TODO handle out of scope errors
-   program = esprimaToAST(parsedTree);
+   program = esprimaToAST(parsedTree, code);
    // console.log(program);
    return run();
 }
