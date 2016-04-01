@@ -28,7 +28,6 @@ var JsNumber = {
     return x >> 0;
   },
 
-
   from_string : function (x) {
     return Number(x);
   },
@@ -37,8 +36,6 @@ var JsNumber = {
     return "" + x;
   },
 
-  
-  
   int32_left_shift : function (x, y) { return x << y; },
   int32_right_shift : function (x, y) { return x >> y; },
   uint32_right_shift : function (x, y) { return x >>> y; },
@@ -54,9 +51,7 @@ var JsNumber = {
   absolute : function (x) { return Math.abs(x); },
   fmod : function (x, y) { return x % y; },
 
-
   modulo_32 : function (x) { return x % (1 << 32); }, // TODO check !
-
 
   zero : 0.0,
   neg_zero : -0.0,
@@ -69,9 +64,6 @@ var JsNumber = {
   pi : Math.PI,
   e : Math.E,
   ln2 : Math.LN2,
-  
+
   /* TODO: what about other functions from Math? */
-
-
 };
-
