@@ -51,7 +51,7 @@ var JsNumber = {
   absolute : function (x) { return Math.abs(x); },
   fmod : function (x, y) { return x % y; },
 
-  modulo_32 : function (x) { return x % (1 << 32); }, // TODO check !
+  modulo_32 : function (x) { return x & 0x1F; },
 
   zero : 0.0,
   neg_zero : -0.0,
