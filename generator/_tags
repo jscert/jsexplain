@@ -6,6 +6,7 @@ true: bin_annot
 <parsing>: include
 <typing>: include
 <utils>: include
+<driver>: include
 
 # <tests>: precious
 # <stdlib_ml>: precious

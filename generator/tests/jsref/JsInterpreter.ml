@@ -2791,7 +2791,8 @@ match _foo_ with
 
 and run_binary_op s c op v1 v2 =
   if binary_op_comparable op Coq_binary_op_add
-  then if_spec (convert_twice_primitive s c v1 v2) (fun s1 ww ->
+  then (* if_spec (convert_twice_primitive s c v1 v2) (fun s1 ww ->*)
+        (let%spec (s1,ww) = convert_twice_primitive s c v1 v2 in 
          let (w1, w2) = ww in
          if or_decidable
               (type_comparable (type_of (Coq_value_prim w1)) Coq_type_string)

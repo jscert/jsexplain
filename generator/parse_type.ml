@@ -88,7 +88,9 @@ let parse_file inputfile parse_fun ast_magic =
     with x -> close_in ic; raise x
   in
   close_in ic;
-  ast
+  (* was: ast *)
+  Pparse.apply_rewriters ~restore:false ~tool_name:"ok" ast_magic ast
+
 
 
 (** Analysis of an implementation file. Returns (Some typedtree) if
@@ -103,6 +105,8 @@ let process_implementation_file ppf sourcefile =
   try
     let env = initial_env () in
     let parsetree = parse_file inputfile Parse.implementation ast_impl_magic_number in
+
+
     let typedtree = Typemod.type_implementation sourcefile prefixname modulename env parsetree in
     (Some (parsetree, typedtree), inputfile, modulename)
   with

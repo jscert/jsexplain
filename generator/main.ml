@@ -20,6 +20,10 @@ let outputfile = ref None
 
 (*#########################################################################*)
 
+let add_to_list li s =
+  li := s :: !li
+
+
 let _ =
    (*---------------------------------------------------*)
    (* parsing of command line *)
@@ -30,10 +34,16 @@ let _ =
                       "includes a directory where to look for interface files");
        ("-o", Arg.String (fun s -> outputfile := Some s), "set the output file name");
        ("-debug", Arg.Set debug, "trace the various steps");
+       ("-ppx", Arg.String (add_to_list Clflags.all_ppx (* TODO Compenv.first_ppx *) ), "load ppx");
        ("-mode", Arg.String (fun s -> set_current_mode s), "current mode: unlog, log, or token")
      ]
      (fun f -> files := f :: !files)
      ("usage: [-I dir] [..other options..] file.ml");
+
+   (* force: -dsource *)
+   Clflags.dump_source := true;
+
+
    files := List.rev !files;
    if List.length !files <> 1 then
       failwith "Expects one argument: the filename of the ML source file";

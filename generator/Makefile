@@ -88,7 +88,10 @@ OCAMLBUILD := ocamlbuild -j 4 -classic-display -use-ocamlfind -X tests -X $(STDL
 OCAMLPAR := OCAMLRUNPARAM="l=200M"
 
 LINEOF := $(OCAMLPAR) ./lineof.byte
-MLTOJS := $(OCAMLPAR) ./main.byte
+MLTOJS := $(OCAMLPAR) ./main.byte -ppx ./monad_ppx.native
+# -dsource is automatically considered by main.byte
+
+
 DISPLAYGEN := $(OCAMLPAR) ./displayed_sources.byte
 
 ###############################################################
@@ -103,14 +106,24 @@ endif
 ###############################################################
 # Rules
 
+
+
 ##### Compilation of STDLIB
 
 $(STDLIB_DIR)/stdlib.cmi: $(STDLIB_DIR)/stdlib.mli
 	$(CC) $<
 
+##### Rule for parser extension
+
+monad_ppx.native: monad_ppx.ml
+	$(OCAMLBUILD) $@
+	
+#ocamlfind ocamlc -linkpkg -o $@ $<
+# -package compiler-libs.common
+
 ##### Rule for binaries
 
-%.byte: *.ml _tags
+%.byte: *.ml _tags monad_ppx.native
 	$(OCAMLBUILD) $@
 
 ##### Rule for dependencies
@@ -121,7 +134,7 @@ $(JSREF_PATH)/.depends: $(JSREF_ML)
 ##### Rule for cmi
 
 tests/%.cmi: tests/%.ml main.byte stdlib
-	./main.byte -mode cmi -I $(<D) $<
+	$(MLTOJS) -mode cmi -I $(<D) $<
 
 tests/%.cmi: tests/%.mli stdlib
 	ocamlc -I $(JSREF_PATH) -I stdlib_ml -open Stdlib $<
