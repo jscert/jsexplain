@@ -70,6 +70,7 @@ var source = null;
 var interpreter = null;
 
 var source_docs = {};
+var initialSourceName = "";
 
 // Initial source code
 
@@ -134,6 +135,7 @@ function selectSourceDoc(name) {
 function setInitialSourceCode(name, text) {
   initSourceDocs();
   var doc = newSourceDoc(name, text);
+  initialSourceName = name;
 
   $("#source_code").val(text);
 
@@ -143,7 +145,9 @@ function setInitialSourceCode(name, text) {
   }
 }
 
-$('#select_source_code').change(e => { setInitialSourceCode("_toplevel_", e.target.value)});
+$('#select_source_code').change(e => {
+  setInitialSourceCode("example" + e.target.selectedOptions[0].index + ".js", e.target.value)
+});
 $('#select_file').change(e => {
   var f = e.target.files[0];
   var fr = new FileReader();
@@ -151,12 +155,11 @@ $('#select_file').change(e => {
   fr.readAsText(f);
 });
 
-// --------------- Initialization ----------------
+function setExample(idx) {
+  $('#select_source_code option')[idx].selected = true;
+  $('#select_source_code').change();
+}
 
-// WARNING: do not move this initialization further down in the file
-// source code displayed initially
-
-setInitialSourceCode("_toplevel_", source_files[0]);
 
 
 // --------------- Predicate search ----------------
@@ -1333,7 +1336,7 @@ function readSourceParseAndRun() {
    // TODO handle parsing error
    // TODO handle out of scope errors
    try {
-     program = parseSource(code, "_toplevel_");
+     program = parseSource(code, initialSourceName);
    } catch (e) {
      return "Parse error";
    }
@@ -1380,7 +1383,7 @@ readSourceParseAndRun();
 //  $("#reach_condition").val("I_line()");
 //  button_test_handler();
 
-setSourceCode(source_files[3]);
+setExample(3);
 stepTo(5873);
 
 function showCurrent() {
