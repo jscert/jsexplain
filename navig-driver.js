@@ -75,11 +75,16 @@ var interpreter = null;
 // Initial source code
 
 var source_files = [
+  // '',
   'var x = 1;\nx++;\nx',
-  'var x = 2;\nx',
-  'var t = {};\nfor (var i = 0; i < 3; i++) {\n  t[i] = function() { return i; } \n};\nt[0](); ',
-  '{} + {}',
+  'var x = { a : { c: 1 } };\n x.a.b = 2;\nx.a.x = x;\nx',
   '(+{}+[])[+!![]]',
+  'var t = {};\nfor (var i = 0; i < 3; i++) {\n  t[i] = function() { return i; } \n};\nt[0](); ',
+  'var t = {};\nfor (var i = 0; i < 3; i++) {\n  t[i] = (function(j) { return function() { return j; }; })(i) \n};\nt[0](); ',
+  '(function (x) {return arguments;})(3)',
+  'var x = 2;\nx',
+  '{} + {}',
+  'throw 3',
   'var x = { a : 1, b : 2 }; ',
   'var x = { a : 1 };\n x.b = 2;\nx',
   'var x = { a : { c: 1 } };\n x.a.b = 2;\nx',
@@ -353,7 +358,8 @@ function buttonRunHandler() {
 
 $("#button_run").click(buttonRunHandler);
 
-$("#button_reset").click(function() { reset(); }); 
+$("#button_goto_begin").click(function() { goto_begin(); }); 
+$("#button_goto_end").click(function() { goto_end(); }); 
   // stepTo(0);
 $("#button_backward").click(function() { backward(); }); 
   // stepTo(Math.max(0, tracer_pos-1));
@@ -451,7 +457,8 @@ function src_shared_next(dir) {
 }
 
 
-function reset() { tracer_pos = 0; updateSelection(); }
+function goto_begin() { stepTo(0); }
+function goto_end() { stepTo(tracer_length - 1); }
 function forward() { shared_step(+1); }
 function backward() { shared_step(-1); }
 
@@ -738,6 +745,19 @@ function show_object(state, loc, target, depth) {
    if (key_value_pair_array.length === 0) {
      t.append("(empty object)");
    }
+
+   // custom fields
+   var props = obj.object_code_;
+   if (obj.object_code_.tag == "Some") {
+      var targetfunc = fresh_id();
+      t.append("<div style='margin-left:1em' id='" + targetfunc + "'>&ndash; &lt;Function&gt;</div>");
+      if (obj.object_scope_.tag == "Some") {
+         var func_lexical_env = obj.object_scope_.value;
+         var targetscope = fresh_id();
+         $("#" + targetfunc).append("<div style='margin-left:1em'>&ndash; scope:<div style='margin-left:1em' id='" + targetscope + "'></div></div>");
+         show_lexical_env(state, func_lexical_env, targetscope);
+      }
+   }
 }
 
 function show_value(state, v, target, depth) {
@@ -929,7 +949,7 @@ function show_interp_val(state, v, target, depth) {
   } else if (interp_val_is_execution_ctx(v)) {
     t.append("&lt; execution-ctx-object &gt;"); 
   } else if (interp_val_is_syntax(v)) {
-    t.append("&lt; syntax-object &gt;"); 
+    t.append("&lt; syntax-object &gt;");  // + JSON.stringify(v)
   } else if (interp_val_is_list(v)) {
       var items = encoded_list_to_array(v)
       t.append("List:");
@@ -1129,7 +1149,7 @@ interpreter = CodeMirror.fromTextArea(document.getElementById('interpreter_code'
  lineWrapping: true,
  readOnly: true,
  extraKeys: {
-   'R': function(cm) { reset();  },
+   'R': function(cm) { goto_begin();  },
    'F': function(cm) { forward();},
    '6': function(cm) { forward();},
    'B': function(cm) { backward(); },
@@ -1308,7 +1328,7 @@ function testLineof(filename, token) {
 // for easy debugging, launch at startup:
 readSourceParseAndRun();
 
-stepTo(2466);
+// stepTo(2466);
 
 // $("#reach_condition").val("S('x') == 2");
 // button_reach_handler();
@@ -1318,6 +1338,8 @@ stepTo(2466);
 //  $("#reach_condition").val("I_line()");
 //  button_test_handler();
 
+setSourceCode(source_files[3]);
+stepTo(5873);
 
 function showCurrent() {
   console.log(tracer_items[tracer_pos]);
