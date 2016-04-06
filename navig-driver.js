@@ -78,10 +78,12 @@ var source_files = [
   'var x = 1;\nx++;\nx',
   'var x = { a : { c: 1 } };\n x.a.b = 2;\nx.a.x = x;\nx',
   '(+{}+[])[+!![]]',
-  'var t = {};\nfor (var i = 0; i < 3; i++) {\n  t[i] = function() { return i; } \n};\nt[0](); ',
-  'var t = {};\nfor (var i = 0; i < 3; i++) {\n  t[i] = (function(j) { return function() { return j; }; })(i) \n};\nt[0](); ',
+  'var t = [];\nfor (var i = 0; i < 3; i++) {\n  t[i] = function() { return i; } \n};\nt[0](); ',
+  'var t = [];\nfor (var i = 0; i < 3; i++) {\n  t[i] = (function(j) {\n      return function() { return j; }; \n    })(i); \n};\nt[0](); ',
   '(function (x) {return arguments;})(3)',
+  'var s = "val(\\"++x\\")";\neval("x=0; e" + s)',
   'var x = 2;\nx',
+  '"use strict";\nvar x = 1;\nx++;\nx',
   '{} + {}',
   'throw 3',
   'var x = { a : 1, b : 2 }; ',
@@ -750,7 +752,10 @@ function show_object(state, loc, target, depth) {
    var obj = obj_opt.value;
    var props = obj.object_properties_;
    var key_value_pair_array = array_of_heap(props);
-   for (var i = 0; i < key_value_pair_array.length; i++) {
+   // 
+   var is_global = (string_of_loc(loc) == "global");
+   for (var j = 0; j < key_value_pair_array.length; j++) {
+      var i = (is_global) ? j : (key_value_pair_array.length-1-j);
       var prop_name = key_value_pair_array[i][0];
       var attribute = key_value_pair_array[i][1];
 
@@ -838,7 +843,8 @@ function show_decl_env_record(state, env_record_decl, target) {
       var mutability = items_array[i][1][0];
       var value = items_array[i][1][1];
       var value_target = fresh_id();
-      t.append("<div id='" + value_target + "'>	&rarr; " + html_escape(var_name) + " (" + string_of_mutability(mutability) + "):</div>");
+      t.append("<div id='" + value_target + "'>	&rarr; " + html_escape(var_name) + ":</div>");
+      // + " (" + string_of_mutability(mutability) + ")" +
       show_value(state, value, value_target, 0);
    }
 }
@@ -865,7 +871,8 @@ function show_lexical_env(state, lexical_env, target) {
           var obj_value = { tag: "Coq_value_object", value: object_loc };
           var provide_this = env_record.provide_this;
           var obj_target = fresh_id();
-          t.append("<div id='" + obj_target + "'><b>&bull; environment-record-object</b> (" + ((provide_this) ? "" : "not ") + "providing 'this'): </div>");
+          t.append("<div id='" + obj_target + "'><b>&bull; environment-record-object</b>:</div>");
+          // (" + ((provide_this) ? "" : "not ") + "providing 'this'):
           show_value(state, obj_value, obj_target, 0);
           // show_object(state, object_loc, obj_target, 1);
           break;
@@ -973,18 +980,18 @@ function show_interp_val(state, v, target, depth) {
   var t = $("#" + target);
   if (interp_val_is_base_value(v)) {
     t.append(html_escape("" + v));
-  } else if (interp_val_is_js_value(v)) {
-    show_value(state, v, target, 1);
   } else if (interp_val_is_loc(v)) {
-    show_object(state, v, target, 1);
+    show_object(state, v, target, 0);
+  } else if (interp_val_is_js_value(v)) {
+    show_value(state, v, target, 0);
   } else if (interp_val_is_js_prim(v)) {
     t.append(string_of_prim(v));
   } else if (interp_val_is_state(v)) {
-    t.append("&lt; state-object &gt;"); 
+    t.append("&lt;state-object&gt;"); 
   } else if (interp_val_is_execution_ctx(v)) {
-    t.append("&lt; execution-ctx-object &gt;"); 
+    t.append("&lt;execution-ctx-object&gt;"); 
   } else if (interp_val_is_syntax(v)) {
-    t.append("&lt; syntax-object &gt;");  // + JSON.stringify(v)
+    t.append("&lt;syntax-object&gt;");  // + JSON.stringify(v)
   } else if (interp_val_is_list(v)) {
       var items = encoded_list_to_array(v)
       t.append("List:");
@@ -1380,8 +1387,8 @@ readSourceParseAndRun();
 //  $("#reach_condition").val("I_line()");
 //  button_test_handler();
 
-setSourceCode(source_files[3]);
-stepTo(5873);
+// setSourceCode(source_files[3]);
+// stepTo(5873);
 
 function showCurrent() {
   console.log(tracer_items[tracer_pos]);
@@ -1396,3 +1403,5 @@ function findToken(token) {
   }
   return -1;
 };
+
+//S_line() == 4 && S("j") == 2
