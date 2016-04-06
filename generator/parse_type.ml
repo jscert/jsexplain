@@ -59,6 +59,8 @@ exception Outdated_version
 
 (** Parse a file or get a dumped syntax tree in it *)
 let parse_file inputfile parse_fun ast_magic =
+(* TODO new version is:
+   let (ic, is_ast_file) = open_and_check_magic inputfile ast_magic in *)
   let ic = open_in_bin inputfile in
   let is_ast_file =
     try

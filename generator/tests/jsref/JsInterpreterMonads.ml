@@ -381,3 +381,10 @@ let if_spec w k =
     | Coq_specret_val (s0, a) -> k s0 a
     | Coq_specret_out o -> if_abort o (fun x -> res_out o))
 
+
+
+
+let ifx_prim w k = if_prim w k
+let ifx_number w k = ifx_number w k
+let ifx_string w k = ifx_string w k
+let ifx_success_state a b c = if_success_state a b c
