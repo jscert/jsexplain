@@ -117,10 +117,24 @@ function newSourceDoc(name, text, readOnly) {
                 .text(name)
                 .click(e => selectSourceDoc(e.target.textContent))
                 .appendTo('#source_tabs');
+    if (name === '_eval_') { tab.hide(); }
+    source_docs[name].doc_name = name;
     source_docs[name].tab = tab;
     source_docs[name].readOnly = Boolean(readOnly);
   }
   return source_docs[name];
+}
+
+function selectSourceDocFromLoc(loc) {
+  var name = loc.file;
+  if (name === '_eval_') {
+    source_docs['_eval_'].tab.show();
+    source_docs['_eval_'].setValue(loc.sourceText);
+  }
+  var old_doc = selectSourceDoc(loc.file);
+  if (old_doc.doc_name === "_eval_" && name !== "_eval_") {
+    source_docs['_eval_'].tab.hide();
+  }
 }
 
 // Switches current source doc
@@ -129,6 +143,7 @@ function selectSourceDoc(name) {
   if (old_doc.tab) old_doc.tab.removeClass('file_item_current');
   source_docs[name].tab.addClass('file_item_current');
   source.setOption('readOnly', source_docs[name].readOnly);
+  return old_doc;
 }
 
 // Sets the initial source doc
@@ -1141,9 +1156,7 @@ function updateSelection() {
      // source panel
      source_loc_selected = item.source_loc;
 
-     newSourceDoc(item.source_loc.file, item.source_loc.sourceText);
-     selectSourceDoc(item.source_loc.file);
-
+     selectSourceDocFromLoc(source_loc_selected);
      updateSelectionInCodeMirror(source, source_loc_selected);
      // console.log(source_loc_selected);
 
