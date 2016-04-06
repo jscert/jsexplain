@@ -2,7 +2,10 @@
 
 //https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API$revision/707671
 
-function esprimaToAST(prog, sourceText) {
+function esprimaToAST(prog, sourceText, filename) {
+
+  filename = filename || "_toplevel_";
+  var returnSourceText = filename.startsWith("_eval_");
 
   var contextStrictMode = false;
 
@@ -16,10 +19,13 @@ function esprimaToAST(prog, sourceText) {
 
   var toLoc = function (pos) {
     if (pos === null) {throw "null position in esprima AST";};
-    return {file: "input.js",
-            start: {line: pos.start.line, column: pos.start.column},
-            end:  {line: pos.end.line, column: pos.end.column}};
     // TODO : could reuse the start and end object
+    var loc = {file: filename,
+               start: {line: pos.start.line, column: pos.start.column},
+               end:  {line: pos.end.line, column: pos.end.column},
+               sourceText: ""};
+    if (returnSourceText) loc.sourceText = sourceText;
+    return loc;
   };
 
   var toOption = function (funcTr, node) {

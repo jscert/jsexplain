@@ -51,9 +51,6 @@ function ctx_to_jsobject(env) {
 // view
 var handlers = [];
 
-var parsedTree;
-
-
 // --------------- Variables ----------------
 
 // file currently displayed
@@ -72,6 +69,8 @@ var tracer_pos = 0;
 var source = null;
 var interpreter = null;
 
+var source_docs = {};
+
 // Initial source code
 
 var source_files = [
@@ -85,7 +84,9 @@ var source_files = [
   'var x = { a : { c: 1 } };\n x.a.b = 2;\nx',
   '(function (x) {return 1;})()',
   '(function (x) {\nreturn 1;\n})({a:{b:2}})',
-//  'eval("var x = { a : 1 }; x.b = 2; x");',
+  'eval("var x = { a : 1 };\\nx.b = 2;\\nx");',
+  'var f = function() {return "f"}; eval("var g = function() {return \\"g\\"}; eval(\\"var h = function() {return \\\\\\"h\\\\\\"}; f(); g(); h()\\"); h();"); g(); h(); f();',
+  'var t = {};\nfor (var i = 0; i < 3; i++) {\n  t[i] = eval("i + " + i); \n};\nt; ',
 ];
 
 source_files.reduce((select, file_content) => {
@@ -96,19 +97,53 @@ source_files.reduce((select, file_content) => {
   return select;
 }, $('#select_source_code'));
 
-function setSourceCode(text) {
+function initSourceDocs() {
+  source_docs = {};
+  Translate_syntax.eval_counter = 0;
+  $('#source_tabs').empty();
+}
+
+// Registers a new source doc
+function newSourceDoc(name, text, readOnly) {
+  if (!source_docs.hasOwnProperty(name)) {
+    source_docs[name] = CodeMirror.Doc(text, 'js');
+    var tab = $('<span>').addClass('file_item')
+                .text(name)
+                .click(e => selectSourceDoc(e.target.textContent))
+                .appendTo('#source_tabs');
+    source_docs[name].tab = tab;
+    source_docs[name].readOnly = Boolean(readOnly);
+  }
+  return source_docs[name];
+}
+
+// Switches current source doc
+function selectSourceDoc(name) {
+  var old_doc = source.swapDoc(source_docs[name]);
+  if (old_doc.tab) old_doc.tab.removeClass('file_item_current');
+  source_docs[name].tab.addClass('file_item_current');
+  source.setOption('readOnly', source_docs[name].readOnly);
+}
+
+// Sets the initial source doc
+function setInitialSourceCode(name, text) {
+  initSourceDocs();
+  var doc = newSourceDoc(name, text);
+
   $("#source_code").val(text);
+
   if (source !== null) {
-    source.setValue(text);
+    selectSourceDoc(name);
     buttonRunHandler();
   }
 }
 
-$('#select_source_code').change(e => { setSourceCode(e.target.value)});
+$('#select_source_code').change(e => { setInitialSourceCode("_toplevel_", e.target.value)});
 $('#select_file').change(e => {
+  var f = e.target.files[0];
   var fr = new FileReader();
-  fr.onload = function (e) { setSourceCode(e.target.result) };
-  fr.readAsText(e.target.files[0]);
+  fr.onload = function (e) { setInitialSourceCode(f.name, e.target.result) };
+  fr.readAsText(f);
 });
 
 // --------------- Initialization ----------------
@@ -116,8 +151,7 @@ $('#select_file').change(e => {
 // WARNING: do not move this initialization further down in the file
 // source code displayed initially
 
-//source_files.length - 1
-setSourceCode(source_files[0]);
+setInitialSourceCode("_toplevel_", source_files[0]);
 
 
 // --------------- Predicate search ----------------
@@ -346,6 +380,7 @@ $("#navigation_step").change(function(e) {
 });
 
 function buttonRunHandler() {
+  initSourceDocs();
   var message = readSourceParseAndRun();
   $("#action_output").html(message);
   var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 1000);
@@ -1082,6 +1117,10 @@ function updateSelection() {
 
      // source panel
      source_loc_selected = item.source_loc;
+
+     newSourceDoc(item.source_loc.file, item.source_loc.sourceText);
+     selectSourceDoc(item.source_loc.file);
+
      updateSelectionInCodeMirror(source, source_loc_selected);
      // console.log(source_loc_selected);
 
@@ -1198,7 +1237,7 @@ interpreter.focus();
 // the corresponding location from the piece of AST that corresponds.
 // These locations are used for source highlighting.
 function assignExtraInfosInTrace() {
- var last_loc = parsedTree.loc;
+ var last_loc = program.loc;
  var last_state = undefined;
  var last_execution_ctx = undefined;
    // { start: { line: 1, column: 0}, end: { line: 1, column: 1 } };
@@ -1261,21 +1300,24 @@ function run() {
  return (success) ? "Run successful!" : "Error during the run!";
 }
 
+function parseSource(source, name, readOnly) {
+  var tree = esprimaToAST(esprima.parse(source, {loc: true, range: true}), source, name);
+  newSourceDoc(name, source, readOnly);
+  return tree;
+}
+
 function readSourceParseAndRun() {
    var message = "";
    var code = source.getValue();
    //console.log(code);
    // TODO handle parsing error
+   // TODO handle out of scope errors
    try {
-     parsedTree = esprima.parse(code, {loc: true, range: true});
+     program = parseSource(code, "_toplevel_");
    } catch (e) {
      return "Parse error";
    }
-   // console.log(parsedTree);
- 
-   // TODO handle out of scope errors
-   program = esprimaToAST(parsedTree, code);
-   // console.log(program);
+
    return run();
 }
 
