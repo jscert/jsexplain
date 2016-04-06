@@ -75,17 +75,17 @@ var interpreter = null;
 // Initial source code
 
 var source_files = [
+  'var x = 1;\nx++;\nx',
   'var x = 2;\nx',
-  ' var t = {}; for (var i = 0; i < 3; i++) { t[i] = function() { return i; } }; t[0](); ',
-  '{}',
+  'var t = {};\nfor (var i = 0; i < 3; i++) {\n  t[i] = function() { return i; } \n};\nt[0](); ',
   '{} + {}',
+  '(+{}+[])[+!![]]',
   'var x = { a : 1, b : 2 }; ',
-  'x = 1;\nx = 2;\nx = 3',
   'var x = { a : 1 };\n x.b = 2;\nx',
   'var x = { a : { c: 1 } };\n x.a.b = 2;\nx',
   '(function (x) {return 1;})()',
   '(function (x) {\nreturn 1;\n})({a:{b:2}})',
-  'eval("var x = { a : 1 }; x.b = 2; x");',
+//  'eval("var x = { a : 1 }; x.b = 2; x");',
 ];
 
 source_files.reduce((select, file_content) => {
@@ -116,70 +116,209 @@ $('#select_file').change(e => {
 // WARNING: do not move this initialization further down in the file
 // source code displayed initially
 
-setSourceCode(source_files[source_files.length - 1]);
+//source_files.length - 1
+setSourceCode(source_files[0]);
 
 
 // --------------- Predicate search ----------------
 
-// Take a predicate in form of a JavaScript code (string) and returns either true or an error message (string).
+function jsvalue_of_prim(v) {
+  switch (v.tag) {
+  case "Coq_prim_undef":
+    return undefined;
+  case "Coq_prim_null":
+    return null;
+  case "Coq_prim_bool":
+    return (v.value) ? true : false;
+  case "Coq_prim_number":
+    return v.value;
+  case "Coq_prim_string":
+    return v.value;
+  default:
+    throw "unrecognized tag in jsvalue_of_prim";
+  }
+}
+
+function jsvalue_of_value(v) {
+  switch (v.tag) {
+     case "Coq_value_prim":
+       return jsvalue_of_prim(v.value);
+     case "Coq_value_object":
+       return v.value; // TODO: reflect
+     default:
+       throw "unrecognized tag in jsvalue_of_value";
+  }
+}
+
+function lookup_var_in_record_decl(name, env_record_decl) {
+   var items_array = array_of_heap(env_record_decl);
+   for (var i = 0; i < items_array.length; i++) {
+      var var_name = items_array[i][0];
+      // var mutability = items_array[i][1][0];
+      var value = items_array[i][1][1];
+      if (var_name === name) {
+         return value;
+      }
+   }
+   return undefined;
+}
+
+function lookup_var_in_object(state, name, loc) {
+   var obj_opt = JsCommonAux.object_binds_pickable_option(state, loc);
+   if (obj_opt.tag != "Some") throw "show_object: unbound object";
+   var obj = obj_opt.value;
+   var props = obj.object_properties_;
+   var key_value_pair_array = array_of_heap(props);
+   for (var i = 0; i < key_value_pair_array.length; i++) {
+      var prop_name = key_value_pair_array[i][0];
+      if (prop_name !== name) {
+         continue;
+      }
+      var attribute = key_value_pair_array[i][1];
+      switch (attribute.tag) {
+        case "Coq_attributes_data_of":
+          var attr = attribute.value;
+          var prop_value = attr.attributes_data_value;
+          return prop_value;
+          break;
+        case "Coq_attributes_accessor_of": 
+          // raise error
+          break;
+        default: 
+          throw "invalid attribute.tag";
+      }
+   }
+   return undefined;
+}
+
+
+// todo : handle objects
+function lookup_var_in_lexical_env(state, name, lexical_env) {
+   // var env_record_heap = state.state_env_record_heap;
+   var env_loc_array = encoded_list_to_array(lexical_env);
+   for (var i = 0; i < env_loc_array.length; i++) {
+      var env_loc = env_loc_array[i];
+      var env_record_opt = JsCommonAux.env_record_binds_pickable_option(state, env_loc);
+      if (env_record_opt.tag != "Some") throw "show_object: unbound object";
+      var env_record = env_record_opt.value;
+
+      switch (env_record.tag) {
+        case "Coq_env_record_decl":
+          var env_record_decl = env_record.value;
+          var r = lookup_var_in_record_decl(name, env_record_decl);
+          if (r !== undefined) {
+             return r;
+          }
+          break;
+        case "Coq_env_record_object":   
+          var object_loc = env_record.value;
+          var r = lookup_var_in_object(state, name, object_loc);
+          if (r !== undefined) {
+             return r;
+          }
+          /*
+          var obj_value = { tag: "Coq_value_object", value: object_loc };
+          var provide_this = env_record.provide_this;
+          */
+          break;
+        default: 
+          throw "invalid env_record.tag";
+      }
+   }
+   return undefined;
+}
+
+function evalPred(item, pred) {
+   var I = function(name) {
+      var a = ctx_to_array(item.ctx);
+      for (var i = 0; i < a.length; i++) {
+        var key = a[i].key;
+        if (key !== name) {
+           continue;
+        }
+        var val = a[i].val;
+        return val;
+      }
+      return undefined;
+   }
+   /*var interp_val = function(name) {
+      return interp_raw(name);
+   }*/
+   var I_line = function () {
+      var locByExt = item.locByExt;
+      if (locByExt === undefined) {
+         return -1;
+      }
+      var ext = get_file_extension(curfile);
+      var loc = locByExt[ext];
+      if (loc === undefined) {
+         return -1;
+      }
+      return loc.start.line;
+   };
+   var S_line = function () {
+      var loc = item.source_loc;
+      if (loc === undefined) {
+         return -1;
+      } 
+      return loc.start.line;
+   };
+   var S_core = function(name) {
+      var execution_ctx = item.execution_ctx;
+      var state = item.state;
+      if (execution_ctx === undefined || state === undefined) {
+         return undefined;
+      }
+      return lookup_var_in_lexical_env(state, name, execution_ctx.execution_ctx_lexical_env);      
+   };
+   var S_raw = function(name) {
+      var v = S_core(name);
+      return JSON.stringify(v);
+   };
+   var S = function(name) {
+      var v = S_core(name);
+      if (v === undefined) {
+         return undefined;
+      }
+      return jsvalue_of_value(v);
+   };
+   return eval(pred);
+}
+
+function itemSatisfiesPred(item, pred) {
+   var ok = evalPred(item, pred);
+   return (ok === true) ? true : false;
+    // forces to return a boolean even if "pred" does not
+}
+
 function goToPred(pred) {
-
- function check(i){
-   var item = tracer_items[i];
-   var state = item.state;
-   // the goal here is to take the environment and make it available to the
-   // user
-   var obj = env_to_jsobject(state, item.env);
-   // the goal here is to take the local variable of the interpreter and make
-   // them available to the user
-   var objX = {};
-   if (item.ctx !== undefined){
-     objX = ctx_to_jsobject(state, item.ctx);
-   }
-   // TODO bind loc
-   objX.line = item.loc.start.line;
-   objX.type = item.type;
-   // TODO bind other fields of the state
-   objX.heap = state.object_heap;
-   obj.X = objX; // If we want to change the “X” identifier, just change this line.
-   try {
-     if (check_pred(pred, obj)){
-       stepTo(i);
-       return true;
+  for (var k = 1; k < tracer_length+1; k++) {
+     var i = (tracer_pos + k) % tracer_length;
+     if (itemSatisfiesPred(tracer_items[i], pred)) {
+        stepTo(i);
+        return;
      }
-   } catch(e){
-     error++;
-   }
-
-   return false;
- }
-
- var error = 0;
-
- if (tracer_items.length === 0)
-   return false;
-
- for (var i = (tracer_pos + 1) % tracer_items.length, current = tracer_pos;
-      i !== current;
-      i++, i %= tracer_items.length)
-   if (check(i))
-     return true;
-
- if (check(tracer_pos))
-   return true;
-
- if (error === tracer_items.length)
-   return "There was an execution error at every execution of your condition: are you sure that this is a valid JavaScript code?";
-
- return "Not found";
+  }
+  $("#action_output").html("Could not find an event matching the reach condition.");
+  var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 1000);
 }
 
 
 // --------------- Trace navigation buttons ----------------
 
+function button_test_handler() {
+  var pred = $("#reach_condition").val();
+  var r = evalPred(tracer_items[tracer_pos], pred);
+  // $("#disp_infos").html(r);
+  if (r === undefined) {
+     r = "undefined";
+  }
+  $("#action_output").html(r);
+  var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 3000); 
+}
 
 function button_reach_handler() {
- var pred = $("#text_condition").val();
+ var pred = $("#reach_condition").val();
  var res = goToPred(pred);
  if (res !== true){
    $("#action_output").html(res);
@@ -196,7 +335,8 @@ $('#text_condition').keypress(function(e){
   }
 });
 
-$("#button_reach").click(button_reach_handler);
+$("#button_reach_condition").click(button_reach_handler);
+$("#button_test_condition").click(button_test_handler);
 
 
 $("#navigation_step").change(function(e) {
@@ -220,11 +360,15 @@ $("#button_backward").click(function() { backward(); });
 $("#button_forward").click(function() { forward() }); 
   // stepTo(Math.min(tracer_length-1, tracer_pos+1));
 
+$("#button_srcprevious").click(function() { src_previous() }); 
+$("#button_srcnext").click(function() { src_next() }); 
+
 $("#button_previous").click(function() { previous() }); 
 $("#button_next").click(function() { next() }); 
 $("#button_finish").click(function() { finish() }); 
 
 $("#button_cursor").click(function() { cursor() }); 
+$("#button_selection").click(function() { selection() }); 
 
 
 
@@ -287,6 +431,25 @@ function shared_next(dir, target) {
  }
 }
 
+function src_shared_next(dir) {
+   var cur_item = tracer_items[tracer_pos];
+   var cur_loc = cur_item.source_loc;
+   var i = tracer_pos += dir;
+   // for (var k = 1; k < tracer_length; k++) {
+   //    var i = (tracer_pos + tracer_length + dir * k) % tracer_length;
+   while (i >= 0 && i < tracer_length) {
+      var next_item = tracer_items[i];
+      var next_loc = next_item.source_loc;
+      if (next_loc !== cur_loc) {
+         stepTo(i);
+         return;
+      }
+      i += dir;
+   }
+  // $("#action_output").html("Distinct loc event not found");
+  // var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 1000);
+}
+
 
 function reset() { tracer_pos = 0; updateSelection(); }
 function forward() { shared_step(+1); }
@@ -295,6 +458,34 @@ function backward() { shared_step(-1); }
 function previous() { shared_next(-1, 0); }
 function next() { shared_next(+1, 0); }
 function finish() { shared_next(+1, -1); }
+
+function src_previous() { src_shared_next(-1); }
+function src_next() { src_shared_next(+1); }
+
+
+/*
+function selection() {
+  // jump to the last event that contains the source location
+  var pos = source.getSelection();
+  console.log(source);
+  var line = pos.line + 1; // adding 1 because Codemirror counts from 0
+  var column = pos.ch;
+  // for (var i = 0; i < tracer_length; i++) {
+  for (var i = tracer_length-1; i >= 0; i--) {
+    var loc = tracer_items[i].source_loc;
+    if (loc === undefined) continue;
+    if (loc.start.line <= line && 
+        loc.start.column <= column &&
+        loc.end.line >= line &&
+        loc.end.column >= column) {
+      stepTo(i);
+      return;
+    }
+  }
+  $("#action_output").html("Event covering cursor not found");
+  var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 1000);
+};
+*/
 
 function cursor() {
   // jump to the last event that contains the source location
@@ -785,7 +976,8 @@ function show_interp_ctx(state, ctx, target) {
   var depth = 1000;
   var t = $("#" + target);
   var a = ctx_to_array(ctx);
-  for (var i = 0; i < a.length; i++) {
+  // for (var i = 0; i < a.length; i++) {
+  for (var i = a.length-1; i >= 0; i--) {
     var key = a[i].key;
     var val = a[i].val;
     var targetsub = fresh_id();
@@ -882,7 +1074,7 @@ function updateSelection() {
 
  if (item !== undefined) {
    // console.log(item);
-   $("#disp_infos").html(itemToHtml(item));
+   // $("#disp_infos").html(itemToHtml(item));
    if (item.source_loc === undefined) {
      console.log("Error: missing line in log event");
 
@@ -950,7 +1142,7 @@ interpreter = CodeMirror.fromTextArea(document.getElementById('interpreter_code'
    '3': function(cm) { finish(); }
  },
 });
-interpreter.setSize(800,400);
+interpreter.setSize(800,250);
 
 
 /* ==> try in new version of codemirror*/
@@ -1064,7 +1256,8 @@ function run() {
  tracer_length = tracer_items.length;
  assignExtraInfosInTrace();
  $("#navigation_total").html(tracer_length - 1);
- stepTo(tracer_length-1);
+ // stepTo(tracer_length-1);
+ stepTo(0);
  return (success) ? "Run successful!" : "Error during the run!";
 }
 
@@ -1114,7 +1307,16 @@ function testLineof(filename, token) {
 
 // for easy debugging, launch at startup:
 readSourceParseAndRun();
-stepTo(1700);
+
+stepTo(2466);
+
+// $("#reach_condition").val("S('x') == 2");
+// button_reach_handler();
+// $("#reach_condition").val("S_raw('x')");
+// button_test_handler();
+
+//  $("#reach_condition").val("I_line()");
+//  button_test_handler();
 
 
 function showCurrent() {

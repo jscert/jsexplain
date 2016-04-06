@@ -16,7 +16,7 @@ STDLIB_DIR  := stdlib_ml
 TESTS_DIR   := tests
 JSREF_DIR   := jsref
 JSREF_PATH  := $(TESTS_DIR)/$(JSREF_DIR)
-JSREF_ML    := $(wildcard $(JSREF_PATH)/*.ml) 
+JSREF_ML    := $(filter-out JsOutput.ml,$(wildcard $(JSREF_PATH)/*.ml))
 JSREF_MLI   := $(wildcard $(JSREF_PATH)/*.mli)
 
 

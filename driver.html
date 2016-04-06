@@ -74,6 +74,10 @@
    margin-top: 0.5em;
 }
 
+#disp_env_pane {
+   height: 150px;
+}
+
 .CodeMirror-selected { background: #F3F781; }
 .CodeMirror-focused .CodeMirror-selected { background: #F3F781; }
 
@@ -84,63 +88,69 @@
 	height: 300px;
 	overflow: auto;
 }
+.hint {
+   display: none;
+}
 </style>
 
 
 </head>
 <body>
 
-<h2>Interactive Debugger for the JavaScript Specification</h2>
+<h2 class="hint">Interactive Debugger for the JavaScript Specification</h2>
 
 
-<div class='source_div'>
-  JavaScript code to run: 
-  <select id='select_source_code'><option disabled selected>Examples</option></select><br />
-  Or load: <input type='file' accept='.js' id='select_file' />
-<table id='main_table'><tr>
-<td>
-   <textarea id='source_code' class='source' rows='6' cols='60'>source code here</textarea>
-</td>
-<td width='600'>
-   <div id='disp_env_pane' class="scroll-pane" style="height: 15em">
-   <div id='disp_env'>ctx here</div>
-   </div>
-</td>
-</tr></table>
+<div class='source_div' style="">
+     Load example: 
+     <select id='select_source_code'><option disabled selected>Examples</option></select> 
+     Load file: <input type='file' accept='.js' id='select_file' />
+   <table id='main_table'><tr>
+   <td>
+      <textarea id='source_code' class='source' rows='6' cols='60'>source code here</textarea>
+   </td>
+   <td width='600'>
+      <div id='disp_env_pane' class="scroll-pane">
+      <div id='disp_env'>ctx here</div>
+      </div>
+   </td>
+   </tr></table>
 </div>
 
 
-<br/>
-<div>
+<div style="margin-top:0.2em">
 <input type="button" id="button_run" value="RUN" />
 Navigation:
 <input type="textbox" id='navigation_step' style="width:3em" value="0"/>
 / <span id="navigation_total"></span>
-<input type="button" id='button_reset' value="Reset" />
-<input type="button" id='button_backward' value="Backward" />(4)
-<input type="button" id='button_forward' value="Forward" />(6)
+<input type="button" id='button_reset' value="Restart" />
+<input type="button" id='button_backward' value="Backward" /><div class="hint">(4)</div>
+<input type="button" id='button_forward' value="Forward" /><div class="hint">(6)</div>
 <span style="width:3em">&nbsp;</span>
-<input type="button" id='button_previous' value="Prev" />(8)
-<input type="button" id='button_next' value="Next" />(2)
-<input type="button" id='button_finish' value="Finish" />(3)
+<input type="button" id='button_previous' value="Prev" /><div class="hint">(8)</div>
+<input type="button" id='button_next' value="Next" /><div class="hint">(2)</div>
+<input type="button" id='button_finish' value="Finish" /><div class="hint">(3)</div>
 <span style="width:3em">&nbsp;</span>
-<input type="button" id='button_cursor' value="Cursor" />(7)
+<input type="button" id='button_srcprevious' value="Source Prev" /><div class="hint">(7)</div>
+<input type="button" id='button_srcnext' value="Source Next" /><div class="hint">(7)</div>
+<input type="button" id='button_cursor' value="Source Cursor" /><div class="hint">(7)</div>
+<!--<input type="button" id='button_selection' value="ReachSelection" /><div class="hint">(7)</div>-->
 
-<br/>Reach condition:
-<input type="textbox" id='text_condition' style="width:15em" />
-<input type="button" id='button_reach' value="Reach" />
+<div style="margin-top: 0.2em">Condition:
+<input type="textbox" id='reach_condition' style="width:20em" />
+<input type="button" id='button_reach_condition' value="Reach" />
+<input type="button" id='button_test_condition' value="Test" />
 <span id="reach_output"></span>
+</div>
 </div>
 
 <div id="action_output"></div>
-<br/>
 
 <div class='source_div'>
 
 <table id='main_table'><tr>
 <td>
    <div id='file_list'></div>
-   <textarea id='interpreter_code' class='source' rows='30' cols='60'></textarea>
+   <textarea id='interpreter_code' class='source' rows='15' cols='60'></textarea>
 </td>
 <!--<td width='600'>
    <div id='disp_ctx'></div>
@@ -211,3 +221,4 @@ t[0]();
 3
 
 -->
+

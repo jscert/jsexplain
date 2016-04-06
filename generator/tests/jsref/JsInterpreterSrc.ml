@@ -3397,7 +3397,7 @@ and run_expr_call s c e1 e2s =
                                s3
                                ("[run_expr_call] unable to call a non-property function.")
                       | Coq_ref_base_type_env_loc l0 ->
-                        if_some (env_record_implicit_this_value s3 l0) (fun v -> follow v)))
+                        if_some (env_record_implicit_this_value s3 l0) (fun s4 v -> follow s4 v)))
             else run_error s3 Coq_native_error_type))))
 
 (** val run_expr_conditionnal :

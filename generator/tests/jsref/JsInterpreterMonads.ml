@@ -385,6 +385,6 @@ let if_spec w k =
 
 
 let ifx_prim w k = if_prim w k
-let ifx_number w k = ifx_number w k
-let ifx_string w k = ifx_string w k
+let ifx_number w k = if_number w k
+let ifx_string w k = if_string w k
 let ifx_success_state a b c = if_success_state a b c

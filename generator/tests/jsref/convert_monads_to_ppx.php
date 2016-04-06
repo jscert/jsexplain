@@ -12,8 +12,8 @@ printf("%s %s\n", $x, $y);
 */
 
 
-$input = "JsInterpreter.ml";
-$output = "JsOutput.ml";
+$input = "JsInterpreterSrc.ml";
+$output = "JsInterpreterOut.ml";
 
 $sinput = file_get_contents($input);
 /*
