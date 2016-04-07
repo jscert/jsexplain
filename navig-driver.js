@@ -156,27 +156,27 @@ function setInitialSourceCode(name, text) {
 
   $("#source_code").val(text);
 
-  if (source !== null) {
-    selectSourceDoc(name);
-    buttonRunHandler();
-  }
+  selectSourceDoc(name);
 }
 
 $('#select_source_code').change(e => {
-  setInitialSourceCode("example" + e.target.selectedOptions[0].index + ".js", e.target.value)
+  setInitialSourceCode("example" + (e.target.selectedOptions[0].index - 1) + ".js", e.target.value);
+  buttonRunHandler();
 });
 $('#select_file').change(e => {
   var f = e.target.files[0];
   var fr = new FileReader();
-  fr.onload = function (e) { setInitialSourceCode(f.name, e.target.result) };
+  fr.onload = function (e) {
+    setInitialSourceCode(f.name, e.target.result);
+    buttonRunHandler();
+  };
   fr.readAsText(f);
 });
 
 function setExample(idx) {
-  $('#select_source_code option')[idx].selected = true;
+  $('#select_source_code option')[idx+1].selected = true;
   $('#select_source_code').change();
 }
-
 
 
 // --------------- Predicate search ----------------
@@ -1204,6 +1204,8 @@ source = CodeMirror.fromTextArea(document.getElementById('source_code'), {
  lineWrapping: true
 });
 source.setSize(500, 150);
+
+setInitialSourceCode("source.js", "source code here");
 
 interpreter = CodeMirror.fromTextArea(document.getElementById('interpreter_code'), {
  mode: 'js',

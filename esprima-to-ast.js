@@ -4,7 +4,6 @@
 
 function esprimaToAST(prog, sourceText, filename) {
 
-  filename = filename || "_toplevel_";
   var returnSourceText = filename.startsWith("_eval_");
 
   var contextStrictMode = false;
