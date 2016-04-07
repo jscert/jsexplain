@@ -86,6 +86,7 @@ var source_files = [
   'var x = 2;\nx',
   '"use strict";\nvar x = 1;\nx++;\nx',
   '{} + {}',
+  'x = [1]',
   'throw 3',
   'var x = { a : 1, b : 2 }; ',
   'var x = { a : 1 };\n x.b = 2;\nx',
@@ -1405,8 +1406,9 @@ readSourceParseAndRun();
 //  $("#reach_condition").val("I_line()");
 //  button_test_handler();
 
-//setExample(3);
+//
 //stepTo(5873);
+setExample(3);
 
 function showCurrent() {
   console.log(tracer_items[tracer_pos]);

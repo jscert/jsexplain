@@ -864,6 +864,7 @@ and js_of_path_longident path ident =
   | "&&"  -> "&&"
   | "||"  -> "||"
   (* for float: *)
+  | "="  -> "=="
   | "+."  -> "+"
   | "*."  -> "*"
   | "-."  -> "-"
@@ -880,8 +881,6 @@ and js_of_path_longident path ident =
   | "/"  -> "/"
   (* for string *)
   | "^"   -> "+" (* !!TODO: we want to claim ability to type our sublanguage, so we should not use this *)
-  (* for equality *)
-  | "="   -> "=="
   | res   -> 
       let res = if !generate_qualified_names && (Path.head path).Ident.name <> "Stdlib" 
                    then ppf_path path else res in
