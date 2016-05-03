@@ -1343,7 +1343,8 @@ let dummy_fresh_locations = 0
 (** val state_initial : state **)
 
 let state_initial =
-  { state_object_heap = object_heap_initial; state_env_record_heap =
-    env_record_heap_initial; state_fresh_locations = dummy_fresh_locations;
-    state_event_list = [] }
+  { state_object_heap = object_heap_initial; 
+    state_env_record_heap = env_record_heap_initial; 
+    state_fresh_locations = dummy_fresh_locations;
+     }
 

@@ -23,7 +23,7 @@ let bool_decidable b =
 (** val not_decidable : coq_Decidable -> coq_Decidable **)
 
 let not_decidable h =
-  neg h
+  not h
 
 (** val or_decidable : coq_Decidable -> coq_Decidable -> coq_Decidable **)
 
@@ -47,7 +47,7 @@ let comparable_of_dec h x y =
 (** val bool_comparable : bool coq_Comparable **)
 
 let bool_comparable x y =
-  eqb x y
+  bool_eq x y
 
 (** val prop_eq_decidable :
     coq_Decidable -> coq_Decidable -> coq_Decidable **)

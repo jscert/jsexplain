@@ -116,6 +116,7 @@ val float_le : float -> float -> bool*)
 val bool_eq : bool -> bool -> bool (* should be "===" in  JS *)
 val ( && ) : bool -> bool -> bool  (* beware of strict vs lazy semantics: todo discuss --> just map to  *)
 val not : bool -> bool
+val ( || ) : bool -> bool -> bool  (* beware of strict vs lazy semantics: todo discuss --> just map to  *)
 
 
 (*--------------------*)

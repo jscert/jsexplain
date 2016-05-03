@@ -1,4 +1,66 @@
+(** val object_write : state -> object_loc -> coq_object -> state **)
+=> on pourrait faire
+(** val object_write : state -> object_loc -> coq_object -> unit*state **)
 
+
+ -----------
+
+    let_binding (fun s0 ->
+      if_value (def s0 l) (fun s_2 v ->
+        if spec_function_get_error_case_dec s_2 x v
+        then run_error s_2 Coq_native_error_type
+        else res_ter s_2 (res_val v))) (fun function0 -> ...)
+  
+ -----------
+   spec_function_get_error_case_dec (@pure)
+
+	let function0 = fun () -> (* implicity bind s0 *)
+		 let%value v = (def l) in     (* implicitly from s0 to s_2 *)
+		 let%ter_ro b = spec_function_get_error_case_dec x v in	 (* implicy pass s_2 en read-only *)
+       if b
+         then run_error Coq_native_error_type  (* on s2 implicitly *)
+         else return_val v)) (* res on s2 implicitly *) (* where  return_val v = res_ter (res_val v) *)
+   in ...
+
+
+ -----------
+
+state as last arg
+
+ -----------
+TODO inliner:
+	let if_any_or_throw w k1 k2 =
+	let if_success_or_return w k1 k2 =
+
+ -----------
+TODO 
+
+	let if_success_state rv w k =
+	=> inliner if_ter 
+	  et nommer la fonction à l'intérieur, qui est stateless
+
+ -----------
+
+inline or_decidable
+ and all of libreflect
+
+
+ ----
+ rename decl_env_record_pickable_option into
+ decl_env_record_option
+----------
+
+remove Coq_value_prim
+----
+
+(* TODO: one day
+    let%spec v1 = run_expr_get_value e1 in
+    let%spec v2 = run_expr_get_value e2 in
+    run_binary_op op v1 v2
+*)
+
+
+=========================================================
 
 list.rev on ctx
 

@@ -107,7 +107,7 @@ let process_implementation_file ppf sourcefile =
   try
     let env = initial_env () in
     let parsetree = parse_file inputfile Parse.implementation ast_impl_magic_number in
-
+    if !Clflags.dump_source then fprintf ppf "%a@." Pprintast.structure parsetree;
 
     let typedtree = Typemod.type_implementation sourcefile prefixname modulename env parsetree in
     (Some (parsetree, typedtree), inputfile, modulename)

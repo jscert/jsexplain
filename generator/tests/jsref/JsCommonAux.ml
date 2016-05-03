@@ -199,12 +199,14 @@ let ref_kind_comparable x y =
 (** val object_binds_pickable_option :
     state -> object_loc -> coq_object coq_Pickable_option **)
 
+(* STATEFUL-RO *)
 let object_binds_pickable_option s l =
   Heap.read_option object_loc_comparable s.state_object_heap l
 
 (** val env_record_binds_pickable_option :
     state -> env_loc -> env_record coq_Pickable_option **)
 
+(* STATEFUL-RO *)
 let env_record_binds_pickable_option s l =
   Heap.read_option nat_eq s.state_env_record_heap l
 
@@ -261,6 +263,7 @@ let attributes_is_data_dec a = match a with
     state -> object_loc -> (object_properties_type -> object_properties_type)
     -> state option **)
 
+(* STATEFUL -- idea is to have this one imperative *)
 let run_object_heap_map_properties s l f =
   map (fun o -> object_write s l (object_map_properties o f))
     (object_binds_pickable_option s l)
@@ -269,6 +272,7 @@ let run_object_heap_map_properties s l f =
     state -> object_loc -> (object_properties_type -> object_properties_type)
     -> state coq_Pickable_option **)
 
+(* STATEFUL -- eliminate by inlining *)
 let object_heap_map_properties_pickable_option s l f =
   run_object_heap_map_properties s l f
 
@@ -373,10 +377,12 @@ let attributes_change_accessor_on_non_configurable_dec aa desc =
 
 (** val run_function_get_error_case : state -> prop_name -> value -> bool **)
 
+(* STATEFUL-RO *)
 let run_function_get_error_case s x v =
 match v with
 | Coq_value_prim w -> false
 | Coq_value_object l ->
+    (* In strict mode, cannot call "caller" *)
     (if string_comparable x ("caller")
      then true
      else false)
@@ -388,11 +394,13 @@ match v with
 (** val spec_function_get_error_case_dec :
     state -> prop_name -> value -> coq_Decidable **)
 
+(* STATEFUL-RO *)
 let spec_function_get_error_case_dec s x v =
   run_function_get_error_case s x v
 
 (** val run_callable : state -> value -> call option option **)
 
+(* STATEFUL-RO *)
 let run_callable s v = 
 match v with
 | Coq_value_prim w -> Some None
@@ -402,12 +410,14 @@ match v with
 
 (** val is_callable_dec : state -> value -> coq_Decidable **)
 
+(* STATEFUL-RO *)
 let is_callable_dec s v =
   option_case false (fun o -> option_case false (fun x -> true) o) (run_callable s v)
 
 (** val object_properties_keys_as_list_pickable_option :
     state -> object_loc -> prop_name list coq_Pickable_option **)
 
+(* STATEFUL-RO *)
 let object_properties_keys_as_list_pickable_option s l =
   map (fun props -> LibList.map fst (Heap.to_list string_comparable props))
     (map object_properties_ (object_binds_pickable_option s l))

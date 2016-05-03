@@ -1,3 +1,11 @@
+function record_with(einit, lbl, exp) {
+  var res = {};
+  for (var i in einit) {
+    res[i] = einit[i];
+  }
+  res[lbl] = exp;
+  return res;
+}
 
 //----------------------------------------------------------------------------
 

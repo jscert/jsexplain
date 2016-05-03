@@ -3170,6 +3170,7 @@ and run_block s c _foo_ = match _foo_ with
     state -> execution_ctx -> binary_op -> expr -> expr ->
     result **)
 
+(* TODO: DEPRECATED 
 and run_expr_binary_op s c op e1 e2 =
   match is_lazy_op op with
   | Some b_ret ->
@@ -3184,9 +3185,26 @@ and run_expr_binary_op s c op e1 e2 =
       if_spec (run_expr_get_value s1 c e2) (fun s2 v2 ->
         run_binary_op s2 c op v1 v2))
 
+*)
+
+and run_expr_binary_op s c op e1 e2 =
+  match is_lazy_op op with
+  | Some b_ret ->
+    if_spec (run_expr_get_value s c e1) (fun s1 v1 ->
+      let_binding (convert_value_to_boolean v1) (fun b1 ->
+        if bool_comparable b1 b_ret
+        then res_ter s1 (res_val v1)
+        else if_spec (run_expr_get_value s1 c e2) (fun s2 v ->
+               res_ter s2 (res_val v))))
+  | None ->
+    let%run (s1,v1) = run_expr_get_value s c e1 in
+    let%run (s2,v2) = run_expr_get_value s1 c e2 in
+    run_binary_op s2 c op v1 v2
+
 (** val run_expr_access :
     state -> execution_ctx -> expr -> expr -> result **)
 
+(* TODO DEPRECATEd
 and run_expr_access s c e1 e2 =
   if_spec (run_expr_get_value s c e1) (fun s1 v1 ->
     if_spec (run_expr_get_value s1 c e2) (fun s2 v2 ->
@@ -3196,6 +3214,16 @@ and run_expr_access s c e1 e2 =
       else if_string (to_string s2 c v2) (fun s3 x ->
              res_ter s3
                (res_ref (ref_create_value v1 x c.execution_ctx_strict)))))
+*)
+
+and run_expr_access s c e1 e2 =
+  let%run (s1,v1) = run_expr_get_value s c e1 in
+  let%run (s2,v2) = run_expr_get_value s1 c e2 in
+   if    (value_comparable v1 (Coq_value_prim Coq_prim_undef))
+      || (value_comparable v1 (Coq_value_prim Coq_prim_null))
+   then run_error s2 Coq_native_error_type
+   else let%string (s3,x) = to_string s2 c v2 in
+        res_ter s3 (res_ref (ref_create_value v1 x c.execution_ctx_strict))
 
 (** val run_expr_assign :
     state -> execution_ctx -> binary_op option -> expr -> expr
@@ -3542,7 +3570,7 @@ and run_stat_switch s c labs e sb =
   if_spec (run_expr_get_value s c e) (fun s1 vi ->
     let_binding (fun w ->
       if_success
-        (if_break w (fun s2 r ->
+        (if_break (w) (fun s2 r ->
           if res_label_in r labs
           then result_out (Coq_out_ter (s2, (res_normal r.res_value)))
           else result_out (Coq_out_ter (s2, r)))) (fun s0 r ->

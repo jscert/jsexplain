@@ -137,10 +137,9 @@ let if_success_state rv w k =
           (if resvalue_comparable r.res_value Coq_resvalue_empty
            then rv
            else r.res_value))
-    | Coq_restype_break -> res_ter s0 (res_overwrite_value_if_empty rv r)
-    | Coq_restype_continue -> res_ter s0 (res_overwrite_value_if_empty rv r)
-    | Coq_restype_return -> res_ter s0 (res_overwrite_value_if_empty rv r)
-    | Coq_restype_throw -> res_ter s0 r)
+    | Coq_restype_throw -> res_ter s0 r
+    | _ -> res_ter s0 (res_overwrite_value_if_empty rv r)
+    )
 
 (** val if_success :
     result -> (state -> resvalue -> 'a1 specres) -> 'a1 specres **)
@@ -193,12 +192,8 @@ let if_any_or_throw w k1 k2 =
     | Coq_restype_return -> k1 s r
     | Coq_restype_throw ->
       (match r.res_value with
-       | Coq_resvalue_empty ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[if_any_or_throw] called with a non-value result.")
        | Coq_resvalue_value v -> if_empty_label s r (fun x -> k2 s v)
-       | Coq_resvalue_ref r0 ->
+       | _ ->
          (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
            ("[if_any_or_throw] called with a non-value result.")))
@@ -291,23 +286,12 @@ let if_string w k =
     match v with
     | Coq_value_prim p ->
       (match p with
-       | Coq_prim_undef ->
+       | Coq_prim_string s0 -> k s s0
+       | _ ->
          (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
-           ("[if_string] called on a non-string value.")
-       | Coq_prim_null ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[if_string] called on a non-string value.")
-       | Coq_prim_bool b ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[if_string] called on a non-string value.")
-       | Coq_prim_number n ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[if_string] called on a non-string value.")
-       | Coq_prim_string s0 -> k s s0)
+           ("[if_string] called on a non-string value.")       
+       )
     | Coq_value_object o ->
       (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
@@ -321,23 +305,12 @@ let if_number w k =
     match v with
     | Coq_value_prim p ->
       (match p with
-       | Coq_prim_undef ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[if_number] called with non-number value.")
-       | Coq_prim_null ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[if_number] called with non-number value.")
-       | Coq_prim_bool b ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[if_number] called with non-number value.")
        | Coq_prim_number n -> k s n
-       | Coq_prim_string s0 ->
+       | _ ->
          (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s
-           ("[if_number] called with non-number value."))
+           ("[if_number] called with non-number value.")
+       )
     | Coq_value_object o ->
       (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
@@ -382,6 +355,7 @@ let if_spec w k =
     | Coq_specret_out o -> if_abort o (fun x -> res_out o))
 
 
+let if_run w k = if_spec w k
 
 
 let ifx_prim w k = if_prim w k

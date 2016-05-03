@@ -159,39 +159,37 @@ let attributes_enumerable _foo_ = match _foo_ with
 (** val state_with_object_heap :
     state -> (object_loc, coq_object) Heap.heap -> state **)
 
+(* STATEFUL *)
 let state_with_object_heap s new_object_heap =
-  let { state_object_heap = old_object_heap; state_env_record_heap =
-    env_heap; state_fresh_locations = fresh_locs; state_event_list =
-    ev_list } = s
-  in
-  { state_object_heap = new_object_heap; state_env_record_heap = env_heap;
-  state_fresh_locations = fresh_locs; state_event_list = ev_list }
+  { s with state_object_heap = new_object_heap } 
 
 (** val state_map_object_heap :
     state -> ((object_loc, coq_object) Heap.heap -> (object_loc, coq_object)
     Heap.heap) -> state **)
 
+(* STATEFUL *)
 let state_map_object_heap s f =
   state_with_object_heap s (f s.state_object_heap)
 
 (** val object_write : state -> object_loc -> coq_object -> state **)
 
+(* STATEFUL *)
 let object_write s l o =
   state_map_object_heap s (fun h -> Heap.write h l o)
 
 (** val object_alloc : state -> coq_object -> object_loc * state **)
 
+(* STATEFUL *)
 let object_alloc s o =
   let { state_object_heap = cells; state_env_record_heap = bindings;
-    state_fresh_locations = state_fresh_locations0; state_event_list =
-    ev_list } = s
+    state_fresh_locations = state_fresh_locations0; } = s
   in
   let n = state_fresh_locations0 in
   let alloc = state_fresh_locations0 + 1 in
   let l = Coq_object_loc_normal n in
   (l,
   (object_write { state_object_heap = cells; state_env_record_heap =
-    bindings; state_fresh_locations = alloc; state_event_list = ev_list } l
+    bindings; state_fresh_locations = alloc } l
     o))
 
 (** val object_map_properties :
@@ -284,38 +282,40 @@ let mutability_of_bool _foo_ = match _foo_ with
 (** val state_with_env_record_heap :
     state -> (env_loc, env_record) Heap.heap -> state **)
 
+(* STATEFUL *)
 let state_with_env_record_heap s new_env_heap =
   let { state_object_heap = object_heap; state_env_record_heap =
-    old_env_heap; state_fresh_locations = fresh_locs; state_event_list =
-    ev_list } = s
+    old_env_heap; state_fresh_locations = fresh_locs; } = s
   in
   { state_object_heap = object_heap; state_env_record_heap = new_env_heap;
-  state_fresh_locations = fresh_locs; state_event_list = ev_list }
+  state_fresh_locations = fresh_locs }
 
 (** val state_map_env_record_heap :
     state -> ((env_loc, env_record) Heap.heap -> (env_loc, env_record)
     Heap.heap) -> state **)
 
+(* STATEFUL *)
 let state_map_env_record_heap s f =
   state_with_env_record_heap s (f s.state_env_record_heap)
 
 (** val env_record_write : state -> env_loc -> env_record -> state **)
 
+(* STATEFUL *)
 let env_record_write s l e =
   state_map_env_record_heap s (fun h -> Heap.write h l e)
 
 (** val env_record_alloc : state -> env_record -> int * state **)
 
+(* STATEFUL *)
 let env_record_alloc s e =
   let { state_object_heap = cells; state_env_record_heap = bindings;
-    state_fresh_locations = state_fresh_locations0; state_event_list =
-    ev_list } = s
+    state_fresh_locations = state_fresh_locations0;  } = s
   in
   let l =  state_fresh_locations0 in
   let alloc = state_fresh_locations0 + 1 in
   let bindings' = Heap.write bindings l e in
   (l, { state_object_heap = cells; state_env_record_heap = bindings';
-  state_fresh_locations = alloc; state_event_list = ev_list })
+  state_fresh_locations = alloc })
 
 (** val provide_this_true : provide_this_flag **)
 
@@ -352,6 +352,7 @@ let decl_env_record_rem ed x =
 (** val env_record_write_decl_env :
     state -> env_loc -> prop_name -> mutability -> value -> state **)
 
+(* STATEFUL *)
 let env_record_write_decl_env s l x mu v =
   match Heap.read nat_eq s.state_env_record_heap l with
   | Coq_env_record_decl ed ->
@@ -362,17 +363,20 @@ let env_record_write_decl_env s l x mu v =
 (** val lexical_env_alloc :
     state -> int list -> env_record -> int list * state **)
 
+(* STATEFUL *)
 let lexical_env_alloc s lex e =
   let (l, s') = env_record_alloc s e in let lex' = l :: lex in (lex', s')
 
 (** val lexical_env_alloc_decl : state -> int list -> int list * state **)
 
+(* STATEFUL *)
 let lexical_env_alloc_decl s lex =
   lexical_env_alloc s lex (Coq_env_record_decl decl_env_record_empty)
 
 (** val lexical_env_alloc_object :
     state -> int list -> object_loc -> provide_this_flag -> int list * state **)
 
+(* STATEFUL *)
 let lexical_env_alloc_object s lex l pt =
   lexical_env_alloc s lex (Coq_env_record_object (l, pt))
 

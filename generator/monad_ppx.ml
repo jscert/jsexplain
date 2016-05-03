@@ -5,7 +5,9 @@ open Parsetree
 open Longident
 
 let monad_mapping =
-   [("spec", "if_spec");
+   [("run", "if_run");
+    (*("spec", "if_spec");  *)
+    ("string", "if_string");
     (*("success", "ifsuccess")*)
    ]
 
@@ -26,6 +28,7 @@ becomes
 let generate_mapper namesid = function argv ->
   { default_mapper with
     expr = fun mapper expr ->
+      let aux e = mapper.expr mapper e in
       match expr with
       (* Is this an extension node? *)
       | { pexp_desc =
@@ -48,8 +51,8 @@ let generate_mapper namesid = function argv ->
             Exp.apply ~loc (Exp.ident
                               (Location.mkloc
                                  (Longident.Lident ident) Location.none))
-              [("", e);
-               ("", Exp.fun_ "" None p1 (Exp.fun_ "" None p2 cont))]
+              [("", aux e);
+               ("", Exp.fun_ "" None p1 (Exp.fun_ "" None p2 (aux cont)))]
           | _ ->
             raise (Location.Error (
                 Location.error ~loc ("error with let%"^name)))
