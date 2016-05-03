@@ -477,22 +477,22 @@ and to_number s c _foo_ = match _foo_ with
     state -> execution_ctx -> value -> result **)
 
 and to_integer s c v =
-  if_number (to_number s c v) (fun s1 n ->
+  let%number (s1, n) = to_number s c v in
       res_ter s1
         (res_val (Coq_value_prim (Coq_prim_number
-                                    (convert_number_to_integer n)))))
+                                    (convert_number_to_integer n))))
 
 (** val to_int32 :
     state -> execution_ctx -> value -> float specres **)
 
 and to_int32 s c v =
-  if_number (to_number s c v) (fun s_2 n -> res_spec s_2 (JsNumber.to_int32 n))
+  let%number (s_2, n) = to_number s c v in res_spec s_2 (JsNumber.to_int32 n)
 
 (** val to_uint32 :
     state -> execution_ctx -> value -> float specres **)
 
 and to_uint32 s c v =
-  if_number (to_number s c v) (fun s_2 n -> res_spec s_2 (JsNumber.to_uint32 n))
+  let%number (s_2, n) = to_number s c v in res_spec s_2 (JsNumber.to_uint32 n)
 
 (** val to_string :
     state -> execution_ctx -> value -> result **)
@@ -726,8 +726,7 @@ and object_define_own_prop s c l x desc throwcont =
                                                | Some descValue ->
                                                  let%run 
                                                    (s1, newLen) = (to_uint32 s0 c descValue) in 
-                                                      if_number (to_number s1 c descValue)
-                                                        (fun s2 newLenN ->
+                                                      let%number (s2, newLenN) = to_number s1 c descValue in
                                                            if not_decidable
                                                                (number_comparable (of_int newLen)
                                                                   newLenN)
@@ -785,7 +784,7 @@ and object_define_own_prop s c l x desc throwcont =
                                                                                        newLenDesc0
                                                                                        newWritable
                                                                                        throwcont
-                                                                                       def)))))
+                                                                                       def))))
                                                | None ->
                                                  def s0
                                                    ("length")
@@ -1679,8 +1678,8 @@ and run_construct_prealloc s c b args =
          if list_eq_nil_decidable args
          then follow s (Coq_value_prim (Coq_prim_number JsNumber.zero))
          else let_binding (get_arg 0 args) (fun v ->
-             if_number (to_number s c v) (fun x x0 ->
-                 follow x (Coq_value_prim (Coq_prim_number x0)))))
+             let%number (x, x0) = (to_number s c v) in
+                 follow x (Coq_value_prim (Coq_prim_number x0))))
   | Coq_prealloc_array ->
     let_binding
       (object_new (Coq_value_object (Coq_object_loc_prealloc
@@ -2934,7 +2933,7 @@ and run_unary_op s c op e =
   if prepost_unary_op_dec op
   then if_success (run_expr s c e) (fun s1 rv1 ->
       let%run  (s2, v2) = (ref_get_value s1 c rv1) in 
-          if_number (to_number s2 c v2) (fun s3 n1 ->
+          let%number  (s3, n1) = (to_number s2 c v2) in 
               if_some (run_prepost_op op) (fun po ->
                   let (number_op, is_pre) = po in
                   let_binding (number_op n1) (fun n2 ->
@@ -2944,7 +2943,7 @@ and run_unary_op s c op e =
                              (ref_put_value s3 c rv1 (Coq_value_prim
                                                         (Coq_prim_number n2))) (fun s4 ->
                                  result_out (Coq_out_ter (s4,
-                                                          (res_val (Coq_value_prim v))))))))))
+                                                          (res_val (Coq_value_prim v)))))))))
   else (match op with
       | Coq_unary_op_delete ->
         if_success (run_expr s c e) (fun s0 rv ->
@@ -2996,10 +2995,10 @@ and run_unary_op s c op e =
               res_ter s1 (res_val (Coq_value_prim Coq_prim_undef))
             | Coq_unary_op_add -> to_number s1 c v
             | Coq_unary_op_neg ->
-              if_number (to_number s1 c v) (fun s2 n ->
+              let%number  (s2, n) = (to_number s1 c v) in 
                   res_ter s2
                     (res_val (Coq_value_prim (Coq_prim_number
-                                                (JsNumber.neg n)))))
+                                                (JsNumber.neg n))))
             | Coq_unary_op_bitwise_not ->
               let%run  (s2, k) = (to_int32 s1 c v) in 
                   res_ter s2
@@ -3996,19 +3995,19 @@ and run_call_prealloc s c b vthis args =
   match b with
   | Coq_prealloc_global_is_finite ->
     let_binding (get_arg 0 args) (fun v ->
-        if_number (to_number s c v) (fun s0 n ->
+        let%number  (s0, n) = (to_number s c v) in 
             res_ter s0
               (res_val (Coq_value_prim (Coq_prim_bool
                                           (neg
                                              (or_decidable (number_comparable n JsNumber.nan)
                                                 (or_decidable (number_comparable n JsNumber.infinity)
-                                                   (number_comparable n JsNumber.neg_infinity)))))))))
+                                                   (number_comparable n JsNumber.neg_infinity))))))))
   | Coq_prealloc_global_is_nan ->
     let_binding (get_arg 0 args) (fun v ->
-        if_number (to_number s c v) (fun s0 n ->
+        let%number  (s0, n) = (to_number s c v) in 
             res_ter s0
               (res_val (Coq_value_prim (Coq_prim_bool
-                                          (number_comparable n JsNumber.nan))))))
+                                          (number_comparable n JsNumber.nan)))))
   | Coq_prealloc_object ->
     let_binding (get_arg 0 args) (fun value0 ->
         match value0 with
@@ -4257,10 +4256,10 @@ and run_call_prealloc s c b vthis args =
                                                       (fun class0 ->
                                                          if string_comparable class0
                                                              ("Function")
-                                                         then if_number
-                                                             (run_object_get s_2 c thisobj
-                                                                ("length"))
-                                                             (fun s10 n ->
+                                                         then let%number
+                                                             
+                                                             (s10, n) = (run_object_get s_2 c thisobj
+                                                                ("length")) in 
                                                                 let%run
                                                                   
                                                                   (s11, ilen) = (to_int32 s10 c (Coq_value_prim
@@ -4270,7 +4269,7 @@ and run_call_prealloc s c b vthis args =
                                                                      then res_spec s11 0.
                                                                      else res_spec s11
                                                                          (ilen -.
-                                                                          (number_of_int (LibList.length a))))
+                                                                          (number_of_int (LibList.length a)))
                                                          else res_spec s_2 0.)) (fun vlength ->
                                                        let%run  (s10, length0) = (vlength) in 
                                                            let_binding { attributes_data_value =
