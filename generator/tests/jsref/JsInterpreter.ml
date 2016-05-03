@@ -321,11 +321,11 @@ let run_object_heap_set_extensible b s l =
 let rec object_has_prop s c l x =
   if_some (run_object_method object_has_prop_ s l) (fun b ->
       match b with Coq_builtin_has_prop_default ->
-        if_spec (run_object_get_prop s c l x) (fun s1 d ->
+        let%run  (s1, d) = (run_object_get_prop s c l x) in 
             res_ter s1
               (res_val (Coq_value_prim (Coq_prim_bool
                                           (not_decidable
-                                             (full_descriptor_comparable d Coq_full_descriptor_undef)))))))
+                                             (full_descriptor_comparable d Coq_full_descriptor_undef))))))
 
 (** val object_get_builtin :
     state -> execution_ctx -> builtin_get -> value -> object_loc
@@ -333,7 +333,7 @@ let rec object_has_prop s c l x =
 
 and object_get_builtin s c b vthis l x =
   let_binding (fun s0 l0 ->
-      if_spec (run_object_get_prop s0 c l0 x) (fun s1 d ->
+      let%run  (s1, d) = (run_object_get_prop s0 c l0 x) in 
           match d with
           | Coq_full_descriptor_undef ->
             res_ter s1 (res_val (Coq_value_prim Coq_prim_undef))
@@ -351,7 +351,7 @@ and object_get_builtin s c b vthis l x =
                    | Coq_prim_bool b0 -> Coq_result_impossible
                    | Coq_prim_number n -> Coq_result_impossible
                    | Coq_prim_string s2 -> Coq_result_impossible)
-                | Coq_value_object lf -> run_call s1 c lf vthis []))))
+                | Coq_value_object lf -> run_call s1 c lf vthis [])))
     (fun def ->
        let_binding (fun s0 ->
            if_value (def s0 l) (fun s_2 v ->
@@ -364,12 +364,12 @@ and object_get_builtin s c b vthis l x =
            | Coq_builtin_get_args_obj ->
              if_some (run_object_method object_parameter_map_ s l) (fun lmapo ->
                  if_some (lmapo) (fun lmap ->
-                     if_spec (run_object_get_own_prop s c lmap x)
-                       (fun s0 d ->
+                     let%run 
+                       (s0, d) = (run_object_get_own_prop s c lmap x) in 
                           match d with
                           | Coq_full_descriptor_undef -> function0 s0
                           | Coq_full_descriptor_some a ->
-                            run_object_get s0 c lmap x)))))
+                            run_object_get s0 c lmap x))))
 
 (** val run_object_get :
     state -> execution_ctx -> object_loc -> prop_name -> result **)
@@ -385,7 +385,7 @@ and run_object_get s c l x =
 and run_object_get_prop s c l x =
   if_some (run_object_method object_get_prop_ s l) (fun b ->
       match b with Coq_builtin_get_prop_default ->
-        if_spec (run_object_get_own_prop s c l x) (fun s1 d ->
+        let%run  (s1, d) = (run_object_get_own_prop s c l x) in 
             if full_descriptor_comparable d Coq_full_descriptor_undef
             then if_some (run_object_method object_proto_ s1 l) (fun proto ->
                 match proto with
@@ -398,7 +398,7 @@ and run_object_get_prop s c l x =
                        ("Found a non-null primitive value as a prototype in [run_object_get_prop]."))
                 | Coq_value_object lproto ->
                   run_object_get_prop s1 c lproto x)
-            else res_spec s1 d))
+            else res_spec s1 d)
 
 (** val object_proto_is_prototype_of :
     state -> object_loc -> object_loc -> result **)
@@ -515,7 +515,7 @@ and to_string s c _foo_ = match _foo_ with
 and object_can_put s c l x =
   if_some (run_object_method object_can_put_ s l) (fun b ->
       match b with Coq_builtin_can_put_default ->
-        if_spec (run_object_get_own_prop s c l x) (fun s1 d ->
+        let%run  (s1, d) = (run_object_get_own_prop s c l x) in 
             match d with
             | Coq_full_descriptor_undef ->
               if_some (run_object_method object_proto_ s1 l) (fun vproto ->
@@ -530,7 +530,7 @@ and object_can_put s c l x =
                          s1
                          ("Non-null primitive get as a prototype value in [object_can_put]."))
                   | Coq_value_object lproto ->
-                    if_spec (run_object_get_prop s1 c lproto x) (fun s2 d_2 ->
+                    let%run  (s2, d_2) = (run_object_get_prop s1 c lproto x) in 
                         match d_2 with
                         | Coq_full_descriptor_undef ->
                           if_some (run_object_method object_extensible_ s2 l)
@@ -551,7 +551,7 @@ and object_can_put s c l x =
                                (res_val (Coq_value_prim (Coq_prim_bool
                                                            (not_decidable
                                                               (value_comparable aa.attributes_accessor_set
-                                                                 (Coq_value_prim Coq_prim_undef)))))))))
+                                                                 (Coq_value_prim Coq_prim_undef))))))))
             | Coq_full_descriptor_some a ->
               (match a with
                | Coq_attributes_data_of ad ->
@@ -563,7 +563,7 @@ and object_can_put s c l x =
                    (res_val (Coq_value_prim (Coq_prim_bool
                                                (not_decidable
                                                   (value_comparable aa.attributes_accessor_set (Coq_value_prim
-                                                                                                  Coq_prim_undef)))))))))
+                                                                                                  Coq_prim_undef))))))))
 
 (** val run_object_define_own_prop_array_loop :
     state -> execution_ctx -> object_loc -> float -> float ->
@@ -611,7 +611,7 @@ and object_define_own_prop s c l x desc throwcont =
       out_error_or_cst s0 throwcont0 Coq_native_error_type (Coq_value_prim
                                                               (Coq_prim_bool false))) (fun reject ->
       let_binding (fun s0 x0 desc0 throwcont0 ->
-          if_spec (run_object_get_own_prop s0 c l x0) (fun s1 d ->
+          let%run  (s1, d) = (run_object_get_own_prop s0 c l x0) in 
               if_some (run_object_method object_extensible_ s1 l) (fun ext ->
                   match d with
                   | Coq_full_descriptor_undef ->
@@ -697,15 +697,15 @@ and object_define_own_prop s c l x desc throwcont =
                                    s1 a)
                          else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                              s0
-                             ("cases are mutually exclusives in [defineOwnProperty]")))))
+                             ("cases are mutually exclusives in [defineOwnProperty]"))))
         (fun def ->
            if_some (run_object_method object_define_own_prop_ s l) (fun b ->
                match b with
                | Coq_builtin_define_own_prop_default -> def s x desc throwcont
                | Coq_builtin_define_own_prop_array ->
-                 if_spec
-                   (run_object_get_own_prop s c l
-                      ("length")) (fun s0 d ->
+                 let%run
+                    (s0, d) = (run_object_get_own_prop s c l
+                      ("length")) in begin
                        match d with
                        | Coq_full_descriptor_undef ->
                          (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
@@ -725,8 +725,8 @@ and object_define_own_prop s c l x desc throwcont =
                                                ("length")
                                            then (match descValueOpt with
                                                | Some descValue ->
-                                                 if_spec (to_uint32 s0 c descValue)
-                                                   (fun s1 newLen ->
+                                                 let%run 
+                                                   (s1, newLen) = (to_uint32 s0 c descValue) in 
                                                       if_number (to_number s1 c descValue)
                                                         (fun s2 newLenN ->
                                                            if not_decidable
@@ -786,24 +786,24 @@ and object_define_own_prop s c l x desc throwcont =
                                                                                        newLenDesc0
                                                                                        newWritable
                                                                                        throwcont
-                                                                                       def))))))
+                                                                                       def)))))
                                                | None ->
                                                  def s0
                                                    ("length")
                                                    desc throwcont)
-                                           else if_spec
-                                               (to_uint32 s0 c (Coq_value_prim
-                                                                  (Coq_prim_string x))) (fun s1 ilen ->
+                                           else let%run
+                                                (s1, ilen) = (to_uint32 s0 c (Coq_value_prim
+                                                                  (Coq_prim_string x))) in 
                                                    if_string
                                                      (to_string s1 c (Coq_value_prim
                                                                         (Coq_prim_number (of_int ilen))))
                                                      (fun s2 slen ->
                                                         if and_decidable (string_comparable x slen)
                                                             (not_decidable ( ilen = 4294967295.))
-                                                        then if_spec
-                                                            (to_uint32 s2 c
+                                                        then let%run
+                                                             (s3, index) = (to_uint32 s2 c
                                                                (Coq_value_prim (Coq_prim_string
-                                                                                  x))) (fun s3 index ->
+                                                                                  x))) in 
                                                                 if and_decidable
                                                                     (le_int_decidable oldLen0
                                                                        index)
@@ -836,8 +836,8 @@ and object_define_own_prop s c l x desc throwcont =
                                                                            (res_val
                                                                               (Coq_value_prim
                                                                                  (Coq_prim_bool
-                                                                                    true)))))
-                                                        else def s2 x desc throwcont))))
+                                                                                    true))))
+                                                        else def s2 x desc throwcont)))
                                 | Coq_value_object l0 ->
                                   (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                                     s0
@@ -845,12 +845,13 @@ and object_define_own_prop s c l x desc throwcont =
                           | Coq_attributes_accessor_of a ->
                             (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                               s0
-                              ("Array length property descriptor cannot be accessor.")))
+                              ("Array length property descriptor cannot be accessor."))
+                         end
                | Coq_builtin_define_own_prop_args_obj ->
                  if_some (run_object_method object_parameter_map_ s l) (fun lmapo ->
                      if_some (lmapo) (fun lmap ->
-                         if_spec (run_object_get_own_prop s c lmap x)
-                           (fun s0 d ->
+                         let%run 
+                           (s0, d) = (run_object_get_own_prop s c lmap x) in 
                               if_bool (def s0 x desc false) (fun s1 b0 ->
                                   if b0
                                   then let_binding (fun s2 ->
@@ -878,7 +879,7 @@ and object_define_own_prop s c l x desc throwcont =
                                                    (object_put s1 c lmap x
                                                       v throwcont) (fun s2 -> follow0 s2)
                                                | None -> follow0 s1))
-                                  else reject s1 throwcont)))))))
+                                  else reject s1 throwcont))))))
 
 (** val run_to_descriptor :
     state -> execution_ctx -> value -> descriptor specres **)
@@ -891,12 +892,12 @@ and run_to_descriptor s c _foo_ = match _foo_ with
           if neg has
           then k s1 desc
           else if_value (run_object_get s1 c l name) (fun s2 v0 ->
-              if_spec (conv s2 v0 desc) (fun s3 r -> k s3 r)))
+              let%run  (s3, r)  = (conv s2 v0 desc) in k s3 r))
       (*let%bool (s1,has) = object_has_prop s0 c l name in
         if neg has
         then k s1 desc
         else let%value (s2,v0) = run_object_get s1 c l name in
-               let%spec (s3,r) = conv s2 v0 desc in
+               let%run (s3,r) = conv s2 v0 desc in
                k s3 r))*)
     in
     sub0 s descriptor_intro_empty
@@ -1062,7 +1063,7 @@ and lexical_env_get_identifier_ref s c x x0 str =
     strictness_flag -> result **)
 
 and object_delete_default s c l x str =
-  if_spec (run_object_get_own_prop s c l x) (fun s1 d ->
+  let%run  (s1, d) = (run_object_get_own_prop s c l x) in 
       match d with
       | Coq_full_descriptor_undef ->
         res_ter s1 (res_val (Coq_value_prim (Coq_prim_bool true)))
@@ -1073,7 +1074,7 @@ and object_delete_default s c l x str =
                  Heap.rem string_comparable p x)) (fun s_2 ->
                 res_ter s_2 (res_val (Coq_value_prim (Coq_prim_bool true))))
         else out_error_or_cst s1 str Coq_native_error_type (Coq_value_prim
-                                                              (Coq_prim_bool false)))
+                                                              (Coq_prim_bool false))
 
 (** val object_delete :
     state -> execution_ctx -> object_loc -> prop_name ->
@@ -1086,7 +1087,7 @@ and object_delete s c l x str =
       | Coq_builtin_delete_args_obj ->
         if_some (run_object_method object_parameter_map_ s l) (fun mo ->
             if_some (mo) (fun m ->
-                if_spec (run_object_get_own_prop s c m x) (fun s1 d ->
+                let%run  (s1, d) = (run_object_get_own_prop s c m x) in 
                     if_bool (object_delete_default s1 c l x str) (fun s2 b0 ->
                         if b0
                         then (match d with
@@ -1098,7 +1099,7 @@ and object_delete s c l x str =
                                 (fun s3 b_2 ->
                                    res_ter s3
                                      (res_val (Coq_value_prim (Coq_prim_bool b0)))))
-                        else res_ter s2 (res_val (Coq_value_prim (Coq_prim_bool b0))))))))
+                        else res_ter s2 (res_val (Coq_value_prim (Coq_prim_bool b0)))))))
 
 (** val env_record_delete_binding :
     state -> execution_ctx -> env_loc -> prop_name -> result **)
@@ -1255,9 +1256,9 @@ and object_put_complete b s c vthis l x v str =
   match b with Coq_builtin_put_default ->
     if_bool (object_can_put s c l x) (fun s1 b0 ->
         if b0
-        then if_spec (run_object_get_own_prop s1 c l x) (fun s2 d ->
+        then let%run  (s2, d) = (run_object_get_own_prop s1 c l x) in 
             let_binding (fun x0 ->
-                if_spec (run_object_get_prop s2 c l x) (fun s3 d_2 ->
+                let%run  (s3, d_2) = (run_object_get_prop s2 c l x) in 
                     let_binding (fun x1 ->
                         match vthis with
                         | Coq_value_prim wthis ->
@@ -1282,7 +1283,7 @@ and object_put_complete b s c vthis l x v str =
                               | Coq_value_object lfsetter ->
                                 if_success
                                   (run_call s3 c lfsetter vthis
-                                     (v :: [])) (fun s4 rv -> res_void s4))))))
+                                     (v :: [])) (fun s4 rv -> res_void s4)))))
               (fun follow ->
                  match d with
                  | Coq_full_descriptor_undef -> follow ()
@@ -1300,7 +1301,7 @@ and object_put_complete b s c vthis l x v str =
                              if_success
                                (object_define_own_prop s2 c l x desc str)
                                (fun s3 rv -> res_void s3)))
-                    | Coq_attributes_accessor_of a0 -> follow ())))
+                    | Coq_attributes_accessor_of a0 -> follow ()))
         else out_error_or_void s1 str Coq_native_error_type)
 
 (** val object_put :
@@ -1731,12 +1732,12 @@ and run_construct_prealloc s c b args =
                                      (fun s0 ->
                                         follow s0 1.0)
                                  | Coq_prim_number vlen ->
-                                   if_spec
-                                     (to_uint32 s_2 c (Coq_value_prim
-                                                         (Coq_prim_number vlen))) (fun s0 ilen ->
+                                   let%run
+                                      (s0, ilen) = (to_uint32 s_2 c (Coq_value_prim
+                                                         (Coq_prim_number vlen))) in 
                                          if number_comparable (of_int ilen) vlen
                                          then follow s0 ilen
-                                         else run_error s0 Coq_native_error_range)
+                                         else run_error s0 Coq_native_error_range
                                  | Coq_prim_string s0 ->
                                    if_some
                                      (object_heap_map_properties_pickable_option s_2 l
@@ -1997,10 +1998,10 @@ and binding_inst_function_decls s c l fds str bconfig =
                                  (fun s2 has ->
                                     if has
                                     then if nat_eq l env_loc_global_env_record
-                                      then if_spec
-                                          (run_object_get_prop s2 c
+                                      then let%run
+                                           (s3, d) = (run_object_get_prop s2 c
                                              (Coq_object_loc_prealloc Coq_prealloc_global)
-                                             fname) (fun s3 d ->
+                                             fname) in 
                                               match d with
                                               | Coq_full_descriptor_undef ->
                                                 (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
@@ -2031,7 +2032,7 @@ and binding_inst_function_decls s c l fds str bconfig =
                                                           (attributes_enumerable a)
                                                           false))
                                                 then run_error s3 Coq_native_error_type
-                                                else follow s3)
+                                                else follow s3
                                       else follow s2
                                     else if_void
                                         (env_record_create_mutable_binding s2 c l
@@ -2347,7 +2348,7 @@ and run_object_get_own_prop s c l x =
           match b with
           | Coq_builtin_get_own_prop_default -> def s
           | Coq_builtin_get_own_prop_args_obj ->
-            if_spec (def s) (fun s1 d ->
+            let%run  (s1, d) = (def s) in begin
                 match d with
                 | Coq_full_descriptor_undef ->
                   res_spec s1 Coq_full_descriptor_undef
@@ -2355,8 +2356,8 @@ and run_object_get_own_prop s c l x =
                   if_some (run_object_method object_parameter_map_ s1 l)
                     (fun lmapo ->
                        if_some (lmapo) (fun lmap ->
-                           if_spec (run_object_get_own_prop s1 c lmap x)
-                             (fun s2 d0 ->
+                           let%run 
+                             (s2, d0) = (run_object_get_own_prop s1 c lmap x) in 
                                 let_binding (fun s_2 a0 ->
                                     res_spec s_2 (Coq_full_descriptor_some a0)) (fun follow ->
                                     match d0 with
@@ -2371,14 +2372,15 @@ and run_object_get_own_prop s c l x =
                                            | Coq_attributes_accessor_of aa ->
                                              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                                                s3
-                                               ("[run_object_get_own_prop]:  received an accessor property descriptor in a point where the specification suppose it never happens.")))))))
+                                               ("[run_object_get_own_prop]:  received an accessor property descriptor in a point where the specification suppose it never happens.")))))
+            end
           | Coq_builtin_get_own_prop_string ->
-            if_spec (def s) (fun s0 d ->
+            let%run  (s0, d) = (def s) in 
                 match d with
                 | Coq_full_descriptor_undef ->
-                  if_spec
-                    (to_int32 s0 c (Coq_value_prim (Coq_prim_string x)))
-                    (fun s1 k ->
+                  let%run
+                    
+                    (s1, k) = (to_int32 s0 c (Coq_value_prim (Coq_prim_string x))) in 
                        if_string
                          (to_string s1 c (Coq_value_prim
                                             (Coq_prim_number (JsNumber.absolute k))))
@@ -2386,9 +2388,9 @@ and run_object_get_own_prop s c l x =
                             if not_decidable (string_comparable x s3)
                             then res_spec s2 Coq_full_descriptor_undef
                             else if_string (run_object_prim_value s2 l) (fun s4 str ->
-                                if_spec
-                                  (to_int32 s4 c (Coq_value_prim
-                                                    (Coq_prim_string x))) (fun s5 k0 ->
+                                let%run
+                                   (s5, k0) = (to_int32 s4 c (Coq_value_prim
+                                                    (Coq_prim_string x))) in 
                                       let_binding (number_of_int (strlength str)) (fun len ->
                                           if le_int_decidable len k0
                                           then res_spec s5 Coq_full_descriptor_undef
@@ -2403,8 +2405,8 @@ and run_object_get_own_prop s c l x =
                                                       attributes_data_configurable = false }
                                             in
                                             res_spec s5 (Coq_full_descriptor_some
-                                                           (Coq_attributes_data_of a)))))))
-                | Coq_full_descriptor_some a -> res_spec s0 d)))
+                                                           (Coq_attributes_data_of a)))))
+                | Coq_full_descriptor_some a -> res_spec s0 d))
 
 (** val run_function_has_instance :
     state -> object_loc -> value -> result **)
@@ -2764,54 +2766,54 @@ and issome : 'a1 . 'a1 option -> bool = fun _foo_ ->
 
 and run_binary_op s c op v1 v2 =
   if binary_op_comparable op Coq_binary_op_add
-  then  if_spec (convert_twice_primitive s c v1 v2) (fun s1 ww ->
-      (* let%spec (s1,ww) = convert_twice_primitive s c v1 v2 in *)
+  then  let%run  (s1, ww) = (convert_twice_primitive s c v1 v2) in 
+      (* let%run (s1,ww) = convert_twice_primitive s c v1 v2 in *)
       let (w1, w2) = ww in
       if or_decidable
           (type_comparable (type_of (Coq_value_prim w1)) Coq_type_string)
           (type_comparable (type_of (Coq_value_prim w2)) Coq_type_string)
-      then if_spec
-          (convert_twice_string s1 c (Coq_value_prim w1)
-             (Coq_value_prim w2)) (fun s2 ss ->
+      then let%run
+           (s2, ss) = (convert_twice_string s1 c (Coq_value_prim w1)
+             (Coq_value_prim w2)) in 
               let (s3, s4) = ss in
               res_out (Coq_out_ter (s2,
-                                    (res_val (Coq_value_prim (Coq_prim_string (strappend s3 s4)))))))
-      else if_spec
-          (convert_twice_number s1 c (Coq_value_prim w1)
-             (Coq_value_prim w2)) (fun s2 nn ->
+                                    (res_val (Coq_value_prim (Coq_prim_string (strappend s3 s4))))))
+      else let%run
+           (s2, nn) = (convert_twice_number s1 c (Coq_value_prim w1)
+             (Coq_value_prim w2)) in 
               let (n1, n2) = nn in
               res_out (Coq_out_ter (s2,
-                                    (res_val (Coq_value_prim (Coq_prim_number (n1 +. n2))))))))
+                                    (res_val (Coq_value_prim (Coq_prim_number (n1 +. n2))))))
   else if issome (get_puremath_op op)
   then if_some (get_puremath_op op) (fun mop ->
-      if_spec (convert_twice_number s c v1 v2) (fun s1 nn ->
+      let%run  (s1, nn) = (convert_twice_number s c v1 v2) in 
           let (n1, n2) = nn in
           res_out (Coq_out_ter (s1,
-                                (res_val (Coq_value_prim (Coq_prim_number (mop n1 n2))))))))
+                                (res_val (Coq_value_prim (Coq_prim_number (mop n1 n2)))))))
   else if issome (get_shift_op op)
   then if_some (get_shift_op op) (fun so ->
       let (b_unsigned, f) = so in
-      if_spec
-        ((if b_unsigned then to_uint32 else to_int32) s c
-           v1) (fun s1 k1 ->
-            if_spec (to_uint32 s1 c v2) (fun s2 k2 ->
+      let%run
+         (s1, k1) = ((if b_unsigned then to_uint32 else to_int32) s c
+           v1) in 
+            let%run  (s2, k2) = (to_uint32 s1 c v2) in 
                 let k2_2 = JsNumber.modulo_32 k2 in
                 res_ter s2
                   (res_val (Coq_value_prim (Coq_prim_number
-                                              (of_int (f k1 k2_2))))))))
+                                              (of_int (f k1 k2_2))))))
   else if issome (get_bitwise_op op)
   then if_some (get_bitwise_op op) (fun bo ->
-      if_spec (to_int32 s c v1) (fun s1 k1 ->
-          if_spec (to_int32 s1 c v2) (fun s2 k2 ->
+      let%run  (s1, k1) = (to_int32 s c v1) in 
+          let%run  (s2, k2) = (to_int32 s1 c v2) in 
               res_ter s2
                 (res_val (Coq_value_prim (Coq_prim_number
-                                            (of_int (bo k1 k2))))))))
+                                            (of_int (bo k1 k2))))))
   else if issome (get_inequality_op op)
   then if_some (get_inequality_op op) (fun io ->
       let (b_swap, b_neg) = io in
-      if_spec
-        (convert_twice_primitive s c v1 v2)
-        (fun s1 ww ->
+      let%run
+        
+        (s1, ww) = (convert_twice_primitive s c v1 v2) in 
            let (w1, w2) = ww in
            let_binding
              (if b_swap then (w2, w1) else (w1, w2))
@@ -2836,7 +2838,7 @@ and run_binary_op s c op v1 v2 =
                                        then res_val (Coq_value_prim
                                                        (Coq_prim_bool true))
                                        else res_val (Coq_value_prim
-                                                       wr)))))))
+                                                       wr))))))
   else if binary_op_comparable op
       Coq_binary_op_instanceof
   then (match v2 with
@@ -2932,7 +2934,7 @@ and run_typeof_value s _foo_ = match _foo_ with
 and run_unary_op s c op e =
   if prepost_unary_op_dec op
   then if_success (run_expr s c e) (fun s1 rv1 ->
-      if_spec (ref_get_value s1 c rv1) (fun s2 v2 ->
+      let%run  (s2, v2) = (ref_get_value s1 c rv1) in 
           if_number (to_number s2 c v2) (fun s3 n1 ->
               if_some (run_prepost_op op) (fun po ->
                   let (number_op, is_pre) = po in
@@ -2943,7 +2945,7 @@ and run_unary_op s c op e =
                              (ref_put_value s3 c rv1 (Coq_value_prim
                                                         (Coq_prim_number n2))) (fun s4 ->
                                  result_out (Coq_out_ter (s4,
-                                                          (res_val (Coq_value_prim v)))))))))))
+                                                          (res_val (Coq_value_prim v))))))))))
   else (match op with
       | Coq_unary_op_delete ->
         if_success (run_expr s c e) (fun s0 rv ->
@@ -2983,13 +2985,13 @@ and run_unary_op s c op e =
               then res_ter s1
                   (res_val (Coq_value_prim (Coq_prim_string
                                               ("undefined"))))
-              else if_spec (ref_get_value s1 c (Coq_resvalue_ref r))
-                  (fun s2 v ->
+              else let%run 
+                  (s2, v) = (ref_get_value s1 c (Coq_resvalue_ref r)) in 
                      res_ter s2
                        (res_val (Coq_value_prim (Coq_prim_string
-                                                   (run_typeof_value s2 v))))))
+                                                   (run_typeof_value s2 v)))))
       | _ ->
-        if_spec (run_expr_get_value s c e) (fun s1 v ->
+        let%run  (s1, v) = (run_expr_get_value s c e) in 
             match op with
             | Coq_unary_op_void ->
               res_ter s1 (res_val (Coq_value_prim Coq_prim_undef))
@@ -3000,10 +3002,10 @@ and run_unary_op s c op e =
                     (res_val (Coq_value_prim (Coq_prim_number
                                                 (JsNumber.neg n)))))
             | Coq_unary_op_bitwise_not ->
-              if_spec (to_int32 s1 c v) (fun s2 k ->
+              let%run  (s2, k) = (to_int32 s1 c v) in 
                   res_ter s2
                     (res_val (Coq_value_prim (Coq_prim_number
-                                                (of_int (JsNumber.int32_bitwise_not k))))))
+                                                (of_int (JsNumber.int32_bitwise_not k)))))
             | Coq_unary_op_not ->
               res_ter s1
                 (res_val (Coq_value_prim (Coq_prim_bool
@@ -3011,7 +3013,7 @@ and run_unary_op s c op e =
             | _ ->
               (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
-                ("Undealt regular operator in [run_unary_op].")))
+                ("Undealt regular operator in [run_unary_op]."))
 
 (** val create_new_function_in :
     state -> execution_ctx -> string list -> funcbody ->
@@ -3034,13 +3036,13 @@ and init_object s c l _foo_ = match _foo_ with
               (fun s2 rv -> init_object s2 c l pds_2)) (fun follows ->
             match pb with
             | Coq_propbody_val e0 ->
-              if_spec (run_expr_get_value s c e0) (fun s1 v0 ->
+              let%run  (s1, v0) = (run_expr_get_value s c e0) in 
                   let desc = { descriptor_value = (Some v0); descriptor_writable =
                                                                (Some true); descriptor_get = None; descriptor_set = None;
                                descriptor_enumerable = (Some true); descriptor_configurable =
                                                                       (Some true) }
                   in
-                  follows s1 desc)
+                  follows s1 desc
             | Coq_propbody_get bd ->
               if_value (create_new_function_in s c [] bd) (fun s1 v0 ->
                   let desc = { descriptor_value = None; descriptor_writable = None;
@@ -3071,11 +3073,11 @@ and run_array_element_list s c l oes n =
        let_binding (fun s0 ->
            run_array_element_list s0 c l oes_2 0.)
          (fun loop_result ->
-            if_spec (run_expr_get_value s c e) (fun s0 v ->
+            let%run  (s0, v) = (run_expr_get_value s c e) in 
                 if_value
                   (run_object_get s0 c l
                      ("length")) (fun s1 vlen ->
-                      if_spec (to_uint32 s1 c vlen) (fun s2 ilen ->
+                      let%run  (s2, ilen) = (to_uint32 s1 c vlen) in 
                           if_string
                             (to_string s2 c (Coq_value_prim (Coq_prim_number
                                                                (ilen +. n)))) (fun s3 slen ->
@@ -3088,7 +3090,7 @@ and run_array_element_list s c l oes n =
                                          (descriptor_of_attributes (Coq_attributes_data_of
                                                                       desc)) false) (fun s4 x ->
                                           let%object  (s5, l0) = (loop_result s4) in
-                                              res_ter s5 (res_val (Coq_value_object l0)))))))))
+                                              res_ter s5 (res_val (Coq_value_object l0)))))))
      | None ->
        let_binding (elision_head_count (None :: oes_2)) (fun firstIndex ->
            run_array_element_list s c l
@@ -3106,29 +3108,29 @@ and init_array s c l oes =
                if_value
                  (run_object_get s0 c l0
                     ("length")) (fun s1 vlen ->
-                     if_spec (to_uint32 s1 c vlen) (fun s2 ilen ->
-                         if_spec
-                           (to_uint32 s2 c (Coq_value_prim (Coq_prim_number
-                                                              (ilen +. number_of_int elisionLength))))
-                           (fun s3 len ->
+                     let%run  (s2, ilen) = (to_uint32 s1 c vlen) in 
+                         let%run
+                           
+                           (s3, len) = (to_uint32 s2 c (Coq_value_prim (Coq_prim_number
+                                                              (ilen +. number_of_int elisionLength)))) in 
                               if_not_throw
                                 (object_put s3 c l0
                                    ("length")
                                    (Coq_value_prim (Coq_prim_number (of_int len)))
                                    throw_false) (fun s4 x ->
                                     result_out (Coq_out_ter (s4,
-                                                             (res_val (Coq_value_object l0))))))))))
+                                                             (res_val (Coq_value_object l0))))))))
 
 (** val run_var_decl_item :
     state -> execution_ctx -> prop_name -> expr option -> result **)
 
 and run_var_decl_item s c x _foo_ = match _foo_ with
   | Some e ->
-    if_spec (identifier_resolution s c x) (fun s1 ir ->
-        if_spec (run_expr_get_value s1 c e) (fun s2 v ->
+    let%run  (s1, ir) = (identifier_resolution s c x) in 
+        let%run  (s2, v) = (run_expr_get_value s1 c e) in 
             if_void (ref_put_value s2 c (Coq_resvalue_ref ir) v) (fun s3 ->
                 result_out (Coq_out_ter (s3,
-                                         (res_val (Coq_value_prim (Coq_prim_string x))))))))
+                                         (res_val (Coq_value_prim (Coq_prim_string x))))))
   | None ->
     result_out (Coq_out_ter (s,
                              (res_val (Coq_value_prim (Coq_prim_string x)))))
@@ -3151,8 +3153,8 @@ and run_var_decl s c _foo_ = match _foo_ with
 and run_list_expr s1 c vs _foo_ = match _foo_ with
   | [] -> res_spec s1 (rev vs)
   | e :: es_2 ->
-    if_spec (run_expr_get_value s1 c e) (fun s2 v ->
-        run_list_expr s2 c (v :: vs) es_2)
+    let%run  (s2, v) = (run_expr_get_value s1 c e) in 
+        run_list_expr s2 c (v :: vs) es_2
 
 (** val run_block :
     state -> execution_ctx -> stat list -> result **)
@@ -3172,28 +3174,28 @@ and run_block s c _foo_ = match _foo_ with
    and run_expr_binary_op s c op e1 e2 =
    match is_lazy_op op with
    | Some b_ret ->
-    if_spec (run_expr_get_value s c e1) (fun s1 v1 ->
+    let%run  (s1, v1) = (run_expr_get_value s c e1) in 
       let_binding (convert_value_to_boolean v1) (fun b1 ->
         if bool_comparable b1 b_ret
         then res_ter s1 (res_val v1)
-        else if_spec (run_expr_get_value s1 c e2) (fun s2 v ->
-               res_ter s2 (res_val v))))
+        else let%run  (s2, v) = (run_expr_get_value s1 c e2) in 
+               res_ter s2 (res_val v))
    | None ->
-    if_spec (run_expr_get_value s c e1) (fun s1 v1 ->
-      if_spec (run_expr_get_value s1 c e2) (fun s2 v2 ->
-        run_binary_op s2 c op v1 v2))
+    let%run  (s1, v1) = (run_expr_get_value s c e1) in 
+      let%run  (s2, v2) = (run_expr_get_value s1 c e2) in 
+        run_binary_op s2 c op v1 v2
 
 *)
 
 and run_expr_binary_op s c op e1 e2 =
   match is_lazy_op op with
   | Some b_ret ->
-    if_spec (run_expr_get_value s c e1) (fun s1 v1 ->
+    let%run  (s1, v1) = (run_expr_get_value s c e1) in 
         let_binding (convert_value_to_boolean v1) (fun b1 ->
             if bool_comparable b1 b_ret
             then res_ter s1 (res_val v1)
-            else if_spec (run_expr_get_value s1 c e2) (fun s2 v ->
-                res_ter s2 (res_val v))))
+            else let%run  (s2, v) = (run_expr_get_value s1 c e2) in 
+                res_ter s2 (res_val v))
   | None ->
     let%run (s1,v1) = run_expr_get_value s c e1 in
     let%run (s2,v2) = run_expr_get_value s1 c e2 in
@@ -3204,14 +3206,14 @@ and run_expr_binary_op s c op e1 e2 =
 
 (* TODO DEPRECATEd
    and run_expr_access s c e1 e2 =
-   if_spec (run_expr_get_value s c e1) (fun s1 v1 ->
-    if_spec (run_expr_get_value s1 c e2) (fun s2 v2 ->
+   let%run  (s1, v1) = (run_expr_get_value s c e1) in 
+    let%run  (s2, v2) = (run_expr_get_value s1 c e2) in 
       if or_decidable (value_comparable v1 (Coq_value_prim Coq_prim_undef))
            (value_comparable v1 (Coq_value_prim Coq_prim_null))
       then run_error s2 Coq_native_error_type
       else if_string (to_string s2 c v2) (fun s3 x ->
              res_ter s3
-               (res_ref (ref_create_value v1 x c.execution_ctx_strict)))))
+               (res_ref (ref_create_value v1 x c.execution_ctx_strict)))
 *)
 
 and run_expr_access s c e1 e2 =
@@ -3245,12 +3247,12 @@ and run_expr_assign s c opo e1 e2 =
         (fun follow ->
            match opo with
            | Some op ->
-             if_spec (ref_get_value s1 c rv1) (fun s2 v1 ->
-                 if_spec (run_expr_get_value s2 c e2) (fun s3 v2 ->
-                     if_success (run_binary_op s3 c op v1 v2) (fun s4 v -> follow s4 v)))
+             let%run  (s2, v1) = (ref_get_value s1 c rv1) in 
+                 let%run  (s3, v2) = (run_expr_get_value s2 c e2) in 
+                     if_success (run_binary_op s3 c op v1 v2) (fun s4 v -> follow s4 v)
            | None ->
-             if_spec (run_expr_get_value s1 c e2) (fun x x0 ->
-                 follow x (Coq_resvalue_value x0))))
+             let%run  (x, x0 )= (run_expr_get_value s1 c e2) in 
+                 follow x (Coq_resvalue_value x0)))
 
 (** val run_expr_function :
     state -> execution_ctx -> prop_name option -> string list
@@ -3356,8 +3358,8 @@ and run_eval s c is_direct_call vs =
 and run_expr_call s c e1 e2s =
   let_binding (is_syntactic_eval e1) (fun is_eval_direct ->
       if_success (run_expr s c e1) (fun s1 rv ->
-          if_spec (ref_get_value s1 c rv) (fun s2 f ->
-              if_spec (run_list_expr s2 c [] e2s) (fun s3 vs ->
+          let%run  (s2, f) = (ref_get_value s1 c rv) in 
+              let%run  (s3, vs) = (run_list_expr s2 c [] e2s) in 
                   match f with
                   | Coq_value_prim p -> run_error s3 Coq_native_error_type
                   | Coq_value_object l ->
@@ -3391,31 +3393,31 @@ and run_expr_call s c e1 e2s =
                                  ("[run_expr_call] unable to call a non-property function.")
                            | Coq_ref_base_type_env_loc l0 ->
                              if_some (env_record_implicit_this_value s3 l0) (fun v -> follow v)))
-                    else run_error s3 Coq_native_error_type))))
+                    else run_error s3 Coq_native_error_type))
 
 (** val run_expr_conditionnal :
     state -> execution_ctx -> expr -> expr -> expr -> result **)
 
 and run_expr_conditionnal s c e1 e2 e3 =
-  if_spec (run_expr_get_value s c e1) (fun s1 v1 ->
+  let%run  (s1, v1) = (run_expr_get_value s c e1) in 
       let_binding (convert_value_to_boolean v1) (fun b ->
           let_binding (if b then e2 else e3) (fun e ->
-              if_spec (run_expr_get_value s1 c e) (fun s0 r ->
-                  res_ter s0 (res_val r)))))
+              let%run  (s0, r) = (run_expr_get_value s1 c e) in 
+                  res_ter s0 (res_val r)))
 
 (** val run_expr_new :
     state -> execution_ctx -> expr -> expr list -> result **)
 
 and run_expr_new s c e1 e2s =
-  if_spec (run_expr_get_value s c e1) (fun s1 v ->
-      if_spec (run_list_expr s1 c [] e2s) (fun s2 args ->
+  let%run  (s1, v) = (run_expr_get_value s c e1) in 
+      let%run  (s2, args) = (run_list_expr s1 c [] e2s) in 
           match v with
           | Coq_value_prim p -> run_error s2 Coq_native_error_type
           | Coq_value_object l ->
             if_some (run_object_method object_construct_ s2 l) (fun coo ->
                 match coo with
                 | Some co -> run_construct s2 c co l args
-                | None -> run_error s2 Coq_native_error_type)))
+                | None -> run_error s2 Coq_native_error_type)
 
 (** val run_stat_label :
     state -> execution_ctx -> label -> stat -> result **)
@@ -3431,35 +3433,35 @@ and run_stat_label s c lab t =
     state -> execution_ctx -> expr -> stat -> result **)
 
 and run_stat_with s c e1 t2 =
-  if_spec (run_expr_get_value s c e1) (fun s1 v1 ->
+  let%run  (s1, v1) = (run_expr_get_value s c e1) in 
       let%object  (s2, l) = (to_object s1 v1) in
           let_binding c.execution_ctx_lexical_env (fun lex ->
               let_binding (lexical_env_alloc_object s2 lex l provide_this_true)
                 (fun p ->
                    let (lex_2, s3) = p in
                    let_binding (execution_ctx_with_lex c lex_2) (fun c_2 ->
-                       run_stat s3 c_2 t2))))
+                       run_stat s3 c_2 t2)))
 
 (** val run_stat_if :
     state -> execution_ctx -> expr -> stat -> stat option ->
     result **)
 
 and run_stat_if s c e1 t2 to0 =
-  if_spec (run_expr_get_value s c e1) (fun s1 v1 ->
+  let%run  (s1, v1) = (run_expr_get_value s c e1) in 
       let_binding (convert_value_to_boolean v1) (fun b ->
           if b
           then run_stat s1 c t2
           else (match to0 with
               | Some t3 -> run_stat s1 c t3
               | None ->
-                result_out (Coq_out_ter (s1, (res_normal Coq_resvalue_empty))))))
+                result_out (Coq_out_ter (s1, (res_normal Coq_resvalue_empty)))))
 
 (** val run_stat_while :
     state -> execution_ctx -> resvalue -> label_set -> expr ->
     stat -> result **)
 
 and run_stat_while s c rv labs e1 t2 =
-  if_spec (run_expr_get_value s c e1) (fun s1 v1 ->
+  let%run  (s1, v1) = (run_expr_get_value s c e1) in 
       let_binding (convert_value_to_boolean v1) (fun b ->
           if b
           then if_ter (run_stat s1 c t2) (fun s2 r ->
@@ -3484,7 +3486,7 @@ and run_stat_while s c rv labs e1 t2 =
                           then res_ter s2 r
                           else loop ()
                         else loop ())))
-          else res_ter s1 (res_normal rv)))
+          else res_ter s1 (res_normal rv))
 
 (** val run_stat_switch_end :
     state -> execution_ctx -> resvalue -> switchclause list ->
@@ -3505,12 +3507,12 @@ and run_stat_switch_no_default s c vi rv _foo_ = match _foo_ with
   | [] -> result_out (Coq_out_ter (s, (res_normal rv)))
   | y :: scs_2 ->
     match y with Coq_switchclause_intro (e, ts) ->
-      if_spec (run_expr_get_value s c e) (fun s1 v1 ->
+      let%run  (s1, v1) = (run_expr_get_value s c e) in 
           let_binding (strict_equality_test v1 vi) (fun b ->
               if b
               then if_success (run_block s1 c (rev ts)) (fun s2 rv2 ->
                   run_stat_switch_end s2 c rv2 scs_2)
-              else run_stat_switch_no_default s1 c vi rv scs_2))
+              else run_stat_switch_no_default s1 c vi rv scs_2)
 
 (** val run_stat_switch_with_default_default :
     state -> execution_ctx -> stat list -> switchclause list ->
@@ -3528,12 +3530,12 @@ and run_stat_switch_with_default_B s c vi rv ts0 scs = match scs with
   | [] -> run_stat_switch_with_default_default s c ts0 scs
   | y :: scs_2 ->
     match y with Coq_switchclause_intro (e, ts) ->
-      if_spec (run_expr_get_value s c e) (fun s1 v1 ->
+      let%run  (s1, v1) = (run_expr_get_value s c e) in 
           let_binding (strict_equality_test v1 vi) (fun b ->
               if b
               then if_success (run_block s1 c (rev ts)) (fun s2 rv2 ->
                   run_stat_switch_end s2 c rv2 scs_2)
-              else run_stat_switch_with_default_B s1 c vi rv ts0 scs_2))
+              else run_stat_switch_with_default_B s1 c vi rv ts0 scs_2)
 
 (** val run_stat_switch_with_default_A :
     state -> execution_ctx -> bool -> value -> resvalue ->
@@ -3553,19 +3555,19 @@ and run_stat_switch_with_default_A s c found vi rv scs1 ts0 scs2 =
         (fun follow ->
            if found
            then follow s
-           else if_spec (run_expr_get_value s c e) (fun s1 v1 ->
+           else let%run  (s1, v1) = (run_expr_get_value s c e) in 
                let_binding (strict_equality_test v1 vi) (fun b ->
                    if b
                    then follow s1
                    else run_stat_switch_with_default_A s1 c false vi rv
-                       scs_2 ts0 scs2)))
+                       scs_2 ts0 scs2))
 
 (** val run_stat_switch :
     state -> execution_ctx -> label_set -> expr -> switchbody ->
     result **)
 
 and run_stat_switch s c labs e sb =
-  if_spec (run_expr_get_value s c e) (fun s1 vi ->
+  let%run  (s1, vi) = (run_expr_get_value s c e) in 
       let_binding (fun w ->
           if_success
             (if_break (w) (fun s2 r ->
@@ -3580,7 +3582,7 @@ and run_stat_switch s c labs e sb =
           | Coq_switchbody_withdefault (scs1, ts, scs2) ->
             follow
               (run_stat_switch_with_default_A s1 c false vi
-                 Coq_resvalue_empty scs1 ts scs2)))
+                 Coq_resvalue_empty scs1 ts scs2))
 
 (** val run_stat_do_while :
     state -> execution_ctx -> resvalue -> label_set -> expr ->
@@ -3593,11 +3595,11 @@ and run_stat_do_while s c rv labs e1 t2 =
          then rv
          else r.res_value) (fun rv_2 ->
             let_binding (fun x ->
-                if_spec (run_expr_get_value s1 c e1) (fun s2 v1 ->
+                let%run  (s2, v1) = (run_expr_get_value s1 c e1) in 
                     let_binding (convert_value_to_boolean v1) (fun b ->
                         if b
                         then run_stat_do_while s2 c rv_2 labs e1 t2
-                        else res_ter s2 (res_normal rv_2)))) (fun loop ->
+                        else res_ter s2 (res_normal rv_2))) (fun loop ->
                 if and_decidable (restype_comparable r.res_type Coq_restype_continue)
                     (bool_decidable (res_label_in r labs))
                 then loop ()
@@ -3644,16 +3646,16 @@ and run_stat_try s c t1 t2o t3o =
     state -> execution_ctx -> expr -> result **)
 
 and run_stat_throw s c e =
-  if_spec (run_expr_get_value s c e) (fun s1 v1 ->
-      res_ter s1 (res_throw (Coq_resvalue_value v1)))
+  let%run  (s1, v1) = (run_expr_get_value s c e) in 
+      res_ter s1 (res_throw (Coq_resvalue_value v1))
 
 (** val run_stat_return :
     state -> execution_ctx -> expr option -> result **)
 
 and run_stat_return s c _foo_ = match _foo_ with
   | Some e ->
-    if_spec (run_expr_get_value s c e) (fun s1 v1 ->
-        res_ter s1 (res_return (Coq_resvalue_value v1)))
+    let%run  (s1, v1) = (run_expr_get_value s c e) in 
+        res_ter s1 (res_return (Coq_resvalue_value v1))
   | None ->
     result_out (Coq_out_ter (s,
                              (res_return (Coq_resvalue_value (Coq_value_prim Coq_prim_undef)))))
@@ -3682,15 +3684,15 @@ and run_stat_for_loop s c labs rv eo2 eo3 t =
                            (bool_decidable (res_label_in r labs)))
                     then (match eo3 with
                         | Some e3 ->
-                          if_spec (run_expr_get_value s1 c e3)
-                            (fun s2 v3 -> loop s2)
+                          let%run 
+                            (s2, v3)  = (run_expr_get_value s1 c e3) in loop s2
                         | None -> loop s1)
                     else res_ter s1 r)))) (fun follows ->
       match eo2 with
       | Some e2 ->
-        if_spec (run_expr_get_value s c e2) (fun s0 v2 ->
+        let%run  (s0, v2) = (run_expr_get_value s c e2) in 
             let_binding (convert_value_to_boolean v2) (fun b ->
-                if b then follows s0 else res_ter s0 (res_normal rv)))
+                if b then follows s0 else res_ter s0 (res_normal rv))
       | None -> follows s)
 
 (** val run_stat_for :
@@ -3703,7 +3705,7 @@ and run_stat_for s c labs eo1 eo2 eo3 t =
   in
   (match eo1 with
    | Some e1 ->
-     if_spec (run_expr_get_value s c e1) (fun s0 v1 -> follows s0)
+     let%run  (s0, v1)  = (run_expr_get_value s c e1) in follows s0
    | None -> follows s)
 
 (** val run_stat_for_var :
@@ -3720,8 +3722,8 @@ and run_expr s c _term_ = match _term_ with
   | Coq_expr_this ->
     result_out (Coq_out_ter (s, (res_val c.execution_ctx_this_binding)))
   | Coq_expr_identifier x ->
-    if_spec (identifier_resolution s c x) (fun s0 r ->
-        res_ter s0 (res_ref r))
+    let%run  (s0, r) = (identifier_resolution s c x) in 
+        res_ter s0 (res_ref r)
   | Coq_expr_literal i ->
     result_out (Coq_out_ter (s,
                              (res_val (Coq_value_prim (convert_literal_to_prim i)))))
@@ -3748,8 +3750,8 @@ and run_expr s c _term_ = match _term_ with
 
 and run_stat s c _term_ = match _term_ with
   | Coq_stat_expr e ->
-    if_spec (run_expr_get_value s c e) (fun s0 r ->
-        res_ter s0 (res_val r))
+    let%run  (s0, r) = (run_expr_get_value s c e) in 
+        res_ter s0 (res_val r)
   | Coq_stat_label (lab, t0) ->
     run_stat_label s c (Coq_label_string lab) t0
   | Coq_stat_block ts -> run_block s c (rev ts)
@@ -3825,7 +3827,7 @@ and run_object_is_sealed s c l _foo_ = match _foo_ with
     if_some (run_object_method object_extensible_ s l) (fun ext ->
         res_ter s (res_val (Coq_value_prim (Coq_prim_bool (neg ext)))))
   | x :: xs_2 ->
-    if_spec (run_object_get_own_prop s c l x) (fun s0 d ->
+    let%run  (s0, d) = (run_object_get_own_prop s c l x) in 
         match d with
         | Coq_full_descriptor_undef ->
           (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
@@ -3834,7 +3836,7 @@ and run_object_is_sealed s c l _foo_ = match _foo_ with
         | Coq_full_descriptor_some a ->
           if attributes_configurable a
           then res_ter s0 (res_val (Coq_value_prim (Coq_prim_bool false)))
-          else run_object_is_sealed s0 c l xs_2)
+          else run_object_is_sealed s0 c l xs_2
 
 (** val run_object_seal :
     state -> execution_ctx -> object_loc -> prop_name list ->
@@ -3845,7 +3847,7 @@ and run_object_seal s c l _foo_ = match _foo_ with
     if_some (run_object_heap_set_extensible false s l) (fun s0 ->
         res_ter s0 (res_val (Coq_value_object l)))
   | x :: xs_2 ->
-    if_spec (run_object_get_own_prop s c l x) (fun s0 d ->
+    let%run  (s0, d) = (run_object_get_own_prop s c l x) in 
         match d with
         | Coq_full_descriptor_undef ->
           (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
@@ -3864,7 +3866,7 @@ and run_object_seal s c l _foo_ = match _foo_ with
           in
           if_bool
             (object_define_own_prop s0 c l x (descriptor_of_attributes a_2)
-               true) (fun s1 x0 -> run_object_seal s1 c l xs_2))
+               true) (fun s1 x0 -> run_object_seal s1 c l xs_2)
 
 (** val run_object_freeze :
     state -> execution_ctx -> object_loc -> prop_name list ->
@@ -3875,7 +3877,7 @@ and run_object_freeze s c l _foo_ = match _foo_ with
     if_some (run_object_heap_set_extensible false s l) (fun s0 ->
         res_ter s0 (res_val (Coq_value_object l)))
   | x :: xs_2 ->
-    if_spec (run_object_get_own_prop s c l x) (fun s0 d ->
+    let%run  (s0, d) = (run_object_get_own_prop s c l x) in 
         match d with
         | Coq_full_descriptor_undef ->
           (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
@@ -3904,7 +3906,7 @@ and run_object_freeze s c l _foo_ = match _foo_ with
           in
           if_bool
             (object_define_own_prop s0 c l x (descriptor_of_attributes a_3)
-               true) (fun s1 x0 -> run_object_freeze s1 c l xs_2))
+               true) (fun s1 x0 -> run_object_freeze s1 c l xs_2)
 
 (** val run_object_is_frozen :
     state -> execution_ctx -> object_loc -> prop_name list ->
@@ -3915,7 +3917,7 @@ and run_object_is_frozen s c l _foo_ = match _foo_ with
     if_some (run_object_method object_extensible_ s l) (fun ext ->
         res_ter s (res_val (Coq_value_prim (Coq_prim_bool (neg ext)))))
   | x :: xs_2 ->
-    if_spec (run_object_get_own_prop s c l x) (fun s0 d ->
+    let%run  (s0, d) = (run_object_get_own_prop s c l x) in 
         let_binding (fun a ->
             if attributes_configurable a
             then res_ter s0 (res_val (Coq_value_prim (Coq_prim_bool false)))
@@ -3932,7 +3934,7 @@ and run_object_is_frozen s c l _foo_ = match _foo_ with
                  then res_ter s0 (res_val (Coq_value_prim (Coq_prim_bool false)))
                  else check_configurable (Coq_attributes_data_of ad)
                | Coq_attributes_accessor_of aa ->
-                 check_configurable (Coq_attributes_accessor_of aa))))
+                 check_configurable (Coq_attributes_accessor_of aa)))
 
 (** val run_get_args_for_apply :
     state -> execution_ctx -> object_loc -> float -> float ->
@@ -3947,7 +3949,7 @@ and run_get_args_for_apply s c l index n =
               let_binding
                 (run_get_args_for_apply s1 c l (index +. 1.) n)
                 (fun tail_args ->
-                   if_spec (tail_args) (fun s2 tail -> res_spec s2 (v :: tail)))))
+                   let%run  (s2, tail)  = (tail_args) in res_spec s2 (v :: tail))))
   else res_spec s []
 
 (** val valueToStringForJoin :
@@ -3981,10 +3983,10 @@ and run_array_join_elements s c l k length0 sep sR =
   if  k < length0
   then let_binding (strappend sR sep) (fun ss ->
       let_binding (valueToStringForJoin s c l k) (fun sE ->
-          if_spec (sE) (fun s0 element ->
+          let%run  (s0, element) = (sE) in 
               let_binding (strappend ss element) (fun sR0 ->
                   run_array_join_elements s0 c l (k +. 1.)
-                    length0 sep sR0))))
+                    length0 sep sR0)))
   else res_ter s (res_val (Coq_value_prim (Coq_prim_string sR)))
 
 (** val run_call_prealloc :
@@ -4033,8 +4035,8 @@ and run_call_prealloc s c b vthis args =
         | Coq_value_object l ->
           if_string (to_string s c (get_arg 1 args))
             (fun s1 x ->
-               if_spec (run_object_get_own_prop s1 c l x) (fun s2 d ->
-                   from_prop_descriptor s2 c d)))
+               let%run  (s2, d) = (run_object_get_own_prop s1 c l x) in 
+                   from_prop_descriptor s2 c d))
   | Coq_prealloc_object_define_prop ->
     let_binding (get_arg 0 args) (fun o ->
         let_binding (get_arg 1 args) (fun p ->
@@ -4044,9 +4046,9 @@ and run_call_prealloc s c b vthis args =
                  | Coq_value_prim p0 -> run_error s Coq_native_error_type
                  | Coq_value_object l ->
                    if_string (to_string s c p) (fun s1 name ->
-                       if_spec (run_to_descriptor s1 c attr) (fun s2 desc ->
+                       let%run  (s2, desc) = (run_to_descriptor s1 c attr) in 
                            if_bool (object_define_own_prop s2 c l name desc true)
-                             (fun s3 x -> res_ter s3 (res_val (Coq_value_object l))))))))
+                             (fun s3 x -> res_ter s3 (res_val (Coq_value_object l)))))))
   | Coq_prealloc_object_seal ->
     let_binding (get_arg 0 args) (fun v ->
         match v with
@@ -4140,12 +4142,12 @@ and run_call_prealloc s c b vthis args =
     let_binding (get_arg 0 args) (fun v ->
         if_string (to_string s c v) (fun s1 x ->
             let%object  (s2, l) = (to_object s1 vthis) in 
-                if_spec (run_object_get_own_prop s2 c l x) (fun s3 d ->
+                let%run  (s3, d) = (run_object_get_own_prop s2 c l x) in 
                     match d with
                     | Coq_full_descriptor_undef ->
                       res_ter s3 (res_val (Coq_value_prim (Coq_prim_bool false)))
                     | Coq_full_descriptor_some a ->
-                      res_ter s3 (res_val (Coq_value_prim (Coq_prim_bool true))))))
+                      res_ter s3 (res_val (Coq_value_prim (Coq_prim_bool true)))))
   | Coq_prealloc_object_proto_is_prototype_of ->
     let_binding (get_arg 0 args) (fun v ->
         match v with
@@ -4159,14 +4161,14 @@ and run_call_prealloc s c b vthis args =
     let_binding (get_arg 0 args) (fun v ->
         if_string (to_string s c v) (fun s1 x ->
             let%object  (s2, l) = (to_object s1 vthis) in 
-                if_spec (run_object_get_own_prop s2 c l x) (fun s3 d ->
+                let%run  (s3, d) = (run_object_get_own_prop s2 c l x) in 
                     match d with
                     | Coq_full_descriptor_undef ->
                       res_ter s3 (res_val (Coq_value_prim (Coq_prim_bool false)))
                     | Coq_full_descriptor_some a ->
                       res_ter s3
                         (res_val (Coq_value_prim (Coq_prim_bool
-                                                    (attributes_enumerable a)))))))
+                                                    (attributes_enumerable a))))))
   | Coq_prealloc_function_proto ->
     result_out (Coq_out_ter (s, (res_val (Coq_value_prim Coq_prim_undef))))
   | Coq_prealloc_function_proto_to_string ->
@@ -4199,11 +4201,11 @@ and run_call_prealloc s c b vthis args =
                        (run_object_get s c array
                           ("length"))
                        (fun s0 v ->
-                          if_spec (to_uint32 s0 c v) (fun s1 ilen ->
-                              if_spec
-                                (run_get_args_for_apply s1 c array 0. ilen)
-                                (fun s2 arguments_ ->
-                                   run_call s2 c thisobj thisArg arguments_)))))
+                          let%run  (s1, ilen) = (to_uint32 s0 c v) in 
+                              let%run
+                                
+                                (s2, arguments_) = (run_get_args_for_apply s1 c array 0. ilen) in 
+                                   run_call s2 c thisobj thisArg arguments_)))
             else run_error s Coq_native_error_type))
   | Coq_prealloc_function_proto_call ->
     if is_callable_dec s vthis
@@ -4260,18 +4262,18 @@ and run_call_prealloc s c b vthis args =
                                                              (run_object_get s_2 c thisobj
                                                                 ("length"))
                                                              (fun s10 n ->
-                                                                if_spec
-                                                                  (to_int32 s10 c (Coq_value_prim
-                                                                                     (Coq_prim_number n)))
-                                                                  (fun s11 ilen ->
+                                                                let%run
+                                                                  
+                                                                  (s11, ilen) = (to_int32 s10 c (Coq_value_prim
+                                                                                     (Coq_prim_number n))) in 
                                                                      if  ilen <
                                                                          (number_of_int (LibList.length a))
                                                                      then res_spec s11 0.
                                                                      else res_spec s11
                                                                          (ilen -.
-                                                                          (number_of_int (LibList.length a)))))
+                                                                          (number_of_int (LibList.length a))))
                                                          else res_spec s_2 0.)) (fun vlength ->
-                                                       if_spec (vlength) (fun s10 length0 ->
+                                                       let%run  (s10, length0) = (vlength) in 
                                                            let_binding { attributes_data_value =
                                                                            (Coq_value_prim (Coq_prim_number
                                                                                               (of_int length0)));
@@ -4310,7 +4312,7 @@ and run_call_prealloc s c b vthis args =
                                                                                             (Coq_attributes_accessor_of
                                                                                                a1)) false) (fun s13 x0 ->
                                                                                           res_ter s13
-                                                                                            (res_val (Coq_value_object l))))))))))))))))))
+                                                                                            (res_val (Coq_value_object l)))))))))))))))))
     else run_error s Coq_native_error_type
   | Coq_prealloc_bool ->
     result_out
@@ -4459,7 +4461,7 @@ and run_call_prealloc s c b vthis args =
             if_value
               (run_object_get s0 c l
                  ("length")) (fun s1 vlen ->
-                  if_spec (to_uint32 s1 c vlen) (fun s2 ilen ->
+                  let%run  (s2, ilen) = (to_uint32 s1 c vlen) in 
                       let_binding
                         (if not_decidable
                             (value_comparable vsep (Coq_value_prim Coq_prim_undef))
@@ -4471,14 +4473,14 @@ and run_call_prealloc s c b vthis args =
                                     (res_val (Coq_value_prim (Coq_prim_string "")))
                                 else let_binding (valueToStringForJoin s3 c l 0.)
                                     (fun sR ->
-                                       if_spec (sR) (fun s4 sR0 ->
-                                           run_array_join_elements s4 c l 1. ilen sep sR0)))))))
+                                       let%run  (s4, sR0) = (sR) in 
+                                           run_array_join_elements s4 c l 1. ilen sep sR0)))))
   | Coq_prealloc_array_proto_pop ->
     let%object  (s0, l) = (to_object s vthis) in 
         if_value
           (run_object_get s0 c l
              ("length")) (fun s1 vlen ->
-              if_spec (to_uint32 s1 c vlen) (fun s2 ilen ->
+              let%run  (s2, ilen) = (to_uint32 s1 c vlen) in 
                   if ilen = 0.0
                   then if_not_throw
                       (object_put s2 c l
@@ -4500,14 +4502,14 @@ and run_call_prealloc s c b vthis args =
                                          ("length")
                                          (Coq_value_prim (Coq_prim_string sindx)) throw_true)
                                       (fun s6 x0 ->
-                                         result_out (Coq_out_ter (s6, (res_val velem)))))))))
+                                         result_out (Coq_out_ter (s6, (res_val velem))))))))
   | Coq_prealloc_array_proto_push ->
     let%object  (s0, l) = (to_object s vthis) in 
         if_value
           (run_object_get s0 c l
              ("length")) (fun s1 vlen ->
-              if_spec (to_uint32 s1 c vlen) (fun s2 ilen ->
-                  push s2 c l args ilen))
+              let%run  (s2, ilen) = (to_uint32 s1 c vlen) in 
+                  push s2 c l args ilen)
   | Coq_prealloc_string ->
     if list_eq_nil_decidable args
     then res_ter s (res_val (Coq_value_prim (Coq_prim_string "")))
