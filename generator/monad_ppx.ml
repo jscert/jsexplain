@@ -10,6 +10,7 @@ let monad_mapping =
     ("string", "if_string");
     ("object", "if_object");
     ("value", "if_value");
+    ("prim", "if_prim");
     (*("success", "ifsuccess")*)
    ]
 

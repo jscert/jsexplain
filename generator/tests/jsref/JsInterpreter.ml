@@ -456,8 +456,8 @@ and to_primitive s c v prefo =
   | Coq_value_prim w ->
     result_out (Coq_out_ter (s, (res_val (Coq_value_prim w))))
   | Coq_value_object l ->
-    if_prim (object_default_value s c l prefo) (fun s0 r ->
-        res_ter s0 (res_val (Coq_value_prim r)))
+    let%prim  (s0, r) = (object_default_value s c l prefo) in 
+        res_ter s0 (res_val (Coq_value_prim r))
 
 (** val to_number :
     state -> execution_ctx -> value -> result **)
@@ -467,11 +467,11 @@ and to_number s c _foo_ = match _foo_ with
     result_out (Coq_out_ter (s,
                              (res_val (Coq_value_prim (Coq_prim_number (convert_prim_to_number w))))))
   | Coq_value_object l ->
-    if_prim
-      (to_primitive s c (Coq_value_object l) (Some Coq_preftype_number))
-      (fun s1 w ->
+    let%prim
+      
+      (s1, w) = (to_primitive s c (Coq_value_object l) (Some Coq_preftype_number)) in 
          res_ter s1
-           (res_val (Coq_value_prim (Coq_prim_number (convert_prim_to_number w)))))
+           (res_val (Coq_value_prim (Coq_prim_number (convert_prim_to_number w))))
 
 (** val to_integer :
     state -> execution_ctx -> value -> result **)
@@ -502,11 +502,11 @@ and to_string s c _foo_ = match _foo_ with
     result_out (Coq_out_ter (s,
                              (res_val (Coq_value_prim (Coq_prim_string (convert_prim_to_string w))))))
   | Coq_value_object l ->
-    if_prim
-      (to_primitive s c (Coq_value_object l) (Some Coq_preftype_string))
-      (fun s1 w ->
+    let%prim
+      
+      (s1, w) = (to_primitive s c (Coq_value_object l) (Some Coq_preftype_string)) in 
          res_ter s1
-           (res_val (Coq_value_prim (Coq_prim_string (convert_prim_to_string w)))))
+           (res_val (Coq_value_prim (Coq_prim_string (convert_prim_to_string w))))
 
 (** val object_can_put :
     state -> execution_ctx -> object_loc -> prop_name -> result **)
