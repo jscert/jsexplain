@@ -6,12 +6,12 @@ open Longident
 
 let monad_mapping =
    [("run", "if_run");
-    (*("spec", "if_spec");  *)
     ("string", "if_string");
     ("object", "if_object");
     ("value", "if_value");
     ("prim", "if_prim");
     ("number", "if_number");
+    ("some", "if_some");
     (*("success", "ifsuccess")*)
    ]
 
@@ -28,7 +28,6 @@ becomes
  *)
 
 
-
 let generate_mapper namesid = function argv ->
   { default_mapper with
     expr = fun mapper expr ->
@@ -36,37 +35,49 @@ let generate_mapper namesid = function argv ->
       match expr with
       (* Is this an extension node? *)
       | { pexp_desc =
-            (* Should have name "getenv". *)
             Pexp_extension ({ txt = name; loc }, pstr)} ->
         begin
-        try
-          let ident = List.assoc name namesid in
-          match pstr with
-          | PStr [{ pstr_desc =
-                      Pstr_eval ({ pexp_loc  = loc;
-                                   pexp_desc = Pexp_let
-                                       (rf,
-                                        [{pvb_pat =
-                                            {ppat_desc =
-                                               Ppat_tuple [p1;p2]};
-                                          pvb_expr = e}],
-                                        cont)
-                                 }, _)}] ->
-            Exp.apply ~loc (Exp.ident
-                              (Location.mkloc
-                                 (Longident.Lident ident) Location.none))
-              [("", aux e);
-               ("", Exp.fun_ "" None p1 (Exp.fun_ "" None p2 (aux cont)))]
-          | _ ->
+          try
+            let ident = List.assoc name namesid in
+            match pstr with
+            | PStr [{ pstr_desc =
+                        Pstr_eval ({ pexp_loc  = loc;
+                                     pexp_desc = Pexp_let
+                                         (rf,
+                                          [{pvb_pat = {ppat_desc = Ppat_var _} as p;
+                                            pvb_expr = e}],
+                                          cont)
+                                   }, _)}] ->
+              Exp.apply ~loc (Exp.ident
+                                (Location.mkloc
+                                   (Longident.Lident ident) Location.none))
+                [("", aux e);
+                 ("", Exp.fun_ "" None p (aux cont))]
+            | PStr [{ pstr_desc =
+                        Pstr_eval ({ pexp_loc  = loc;
+                                     pexp_desc = Pexp_let
+                                         (rf,
+                                          [{pvb_pat =
+                                              {ppat_desc =
+                                                 Ppat_tuple [p1;p2]};
+                                            pvb_expr = e}],
+                                          cont)
+                                   }, _)}] ->
+              Exp.apply ~loc (Exp.ident
+                                (Location.mkloc
+                                   (Longident.Lident ident) Location.none))
+                [("", aux e);
+                 ("", Exp.fun_ "" None p1 (Exp.fun_ "" None p2 (aux cont)))]
+            | _ ->
+              raise (Location.Error (
+                  Location.error ~loc ("error with let%"^name)))
+          with
+          | Not_found ->
             raise (Location.Error (
-                Location.error ~loc ("error with let%"^name)))
-        with
-        | Not_found ->
-          raise (Location.Error (
-              Location.error ~loc ("no let%"^name)))
+                Location.error ~loc ("no let%"^name)))
         end
-        (* Delegate to the default mapper. *)
-        | x -> default_mapper.expr mapper x;
+      (* Delegate to the default mapper. *)
+      | x -> default_mapper.expr mapper x;
   }
 
 let () = register "my_monads" (generate_mapper monad_mapping)
