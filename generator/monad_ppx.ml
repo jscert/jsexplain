@@ -8,6 +8,7 @@ let monad_mapping =
    [("run", "if_run");
     (*("spec", "if_spec");  *)
     ("string", "if_string");
+    ("object", "if_object");
     (*("success", "ifsuccess")*)
    ]
 
