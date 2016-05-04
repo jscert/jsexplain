@@ -3625,7 +3625,7 @@ and run_stat_try s c t1 t2o t3o =
       | Some t3 ->
         let%success  (s2, rv_2) = (run_stat s1 c t3) in  res_ter s2 r
       | None -> res_ter s1 r) (fun finallycont ->
-      if_any_or_throw (run_stat s c t1) finallycont (fun s1 v ->
+      ifx_any_or_throw (run_stat s c t1) finallycont (fun s1 v ->
           match t2o with
           | Some y ->
             let (x, t2) = y in
