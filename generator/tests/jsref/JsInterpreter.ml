@@ -3334,7 +3334,7 @@ and run_eval s c is_direct_call vs =
             | Some p0 ->
               entering_eval_code s c is_direct_call (Coq_funcbody_intro
                                                        (p0, s0)) (fun s1 c_2 ->
-                  if_ter (run_prog s1 c_2 p0) (fun s2 r ->
+                  let%ter  (s2, r) = (run_prog s1 c_2 p0) in
                       match r.res_type with
                       | Coq_restype_normal ->
                         if_empty_label s2 r (fun x ->
@@ -3350,7 +3350,7 @@ and run_eval s c is_direct_call vs =
                       | _ ->
                         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                           s2
-                          ("Forbidden result type returned by an `eval\' in [run_eval].")))
+                          ("Forbidden result type returned by an `eval\' in [run_eval]."))
             | None -> run_error s Coq_native_error_syntax))
   | Coq_value_object o ->
     result_out (Coq_out_ter (s, (res_val (Coq_value_object o))))
@@ -3467,7 +3467,7 @@ and run_stat_while s c rv labs e1 t2 =
   let%run  (s1, v1) = (run_expr_get_value s c e1) in 
       let_binding (convert_value_to_boolean v1) (fun b ->
           if b
-          then if_ter (run_stat s1 c t2) (fun s2 r ->
+          then let%ter  (s2, r) = (run_stat s1 c t2) in
               let_binding
                 (if not_decidable
                     (resvalue_comparable r.res_value Coq_resvalue_empty)
@@ -3488,7 +3488,7 @@ and run_stat_while s c rv labs e1 t2 =
                                  Coq_restype_normal)
                           then res_ter s2 r
                           else loop ()
-                        else loop ())))
+                        else loop ()))
           else res_ter s1 (res_normal rv))
 
 (** val run_stat_switch_end :
@@ -3592,7 +3592,7 @@ and run_stat_switch s c labs e sb =
     stat -> result **)
 
 and run_stat_do_while s c rv labs e1 t2 =
-  if_ter (run_stat s c t2) (fun s1 r ->
+  let%ter  (s1, r) = (run_stat s c t2) in
       let_binding
         (if resvalue_comparable r.res_value Coq_resvalue_empty
          then rv
@@ -3613,7 +3613,7 @@ and run_stat_do_while s c rv labs e1 t2 =
                 else if not_decidable
                     (restype_comparable r.res_type Coq_restype_normal)
                 then res_ter s1 r
-                else loop ())))
+                else loop ()))
 
 (** val run_stat_try :
     state -> execution_ctx -> stat -> (prop_name * stat) option
@@ -3642,7 +3642,7 @@ and run_stat_try s c t1 t2o t3o =
                           s2= (env_record_create_set_mutable_binding s_2 c l x None v
                             throw_irrelevant) in  
                              let c_2 = execution_ctx_with_lex c lex_2 in
-                             if_ter (run_stat s2 c_2 t2) (fun s3 r -> finallycont s3 r))))
+                             let%ter  (s3, r)  = (run_stat s2 c_2 t2) in finallycont s3 r)))
           | None -> finallycont s1 (res_throw (Coq_resvalue_value v))))
 
 (** val run_stat_throw :
@@ -3669,7 +3669,7 @@ and run_stat_return s c _foo_ = match _foo_ with
 
 and run_stat_for_loop s c labs rv eo2 eo3 t =
   let_binding (fun s0 ->
-      if_ter (run_stat s0 c t) (fun s1 r ->
+      let%ter  (s1, r) = (run_stat s0 c t) in
           let_binding
             (if not_decidable
                 (resvalue_comparable r.res_value Coq_resvalue_empty)
@@ -3690,7 +3690,7 @@ and run_stat_for_loop s c labs rv eo2 eo3 t =
                           let%run 
                             (s2, v3)  = (run_expr_get_value s1 c e3) in loop s2
                         | None -> loop s1)
-                    else res_ter s1 r)))) (fun follows ->
+                    else res_ter s1 r))) (fun follows ->
       match eo2 with
       | Some e2 ->
         let%run  (s0, v2) = (run_expr_get_value s c e2) in 
@@ -3716,8 +3716,8 @@ and run_stat_for s c labs eo1 eo2 eo3 t =
     option) list -> expr option -> expr option -> stat -> result **)
 
 and run_stat_for_var s c labs ds eo2 eo3 t =
-  if_ter (run_stat s c (Coq_stat_var_decl ds)) (fun s0 r ->
-      run_stat_for_loop s0 c labs Coq_resvalue_empty eo2 eo3 t)
+  let%ter  (s0, r) = (run_stat s c (Coq_stat_var_decl ds)) in
+      run_stat_for_loop s0 c labs Coq_resvalue_empty eo2 eo3 t
 
 (** val run_expr : state -> execution_ctx -> expr -> result **)
 
@@ -3792,9 +3792,9 @@ and run_elements s c _foo_ = match _foo_ with
     let%success  (s0, rv0)= (run_elements s c els_rev_2) in  
         match el with
         | Coq_element_stat t ->
-          if_ter (run_stat s0 c t) (fun s1 r1 ->
+          let%ter  (s1, r1) = (run_stat s0 c t) in
               let r2 = res_overwrite_value_if_empty rv0 r1 in
-              res_out (Coq_out_ter (s1, r2)))
+              res_out (Coq_out_ter (s1, r2))
         | Coq_element_func_decl (name, args, bd) -> res_ter s0 (res_normal rv0)
 
 (** val run_prog : state -> execution_ctx -> prog -> result **)
