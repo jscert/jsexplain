@@ -3116,13 +3116,13 @@ and init_array s c l oes =
                            
                            (s3, len) = (to_uint32 s2 c (Coq_value_prim (Coq_prim_number
                                                               (ilen +. number_of_int elisionLength)))) in 
-                              if_not_throw
-                                (object_put s3 c l0
+                              let%not_throw
+                                 (s4, x) = (object_put s3 c l0
                                    ("length")
                                    (Coq_value_prim (Coq_prim_number (of_int len)))
-                                   throw_false) (fun s4 x ->
+                                   throw_false) in 
                                     result_out (Coq_out_ter (s4,
-                                                             (res_val (Coq_value_object l0)))))))
+                                                             (res_val (Coq_value_object l0))))))
 
 (** val run_var_decl_item :
     state -> execution_ctx -> prop_name -> expr option -> result **)
@@ -3810,16 +3810,16 @@ and push s c l args ilen =
   let_binding (of_int ilen) (fun vlen ->
       match args with
       | [] ->
-        if_not_throw
-          (object_put s c l ("length")
-             (Coq_value_prim (Coq_prim_number vlen)) throw_true) (fun s0 x ->
+        let%not_throw
+           (s0, x) = (object_put s c l ("length")
+             (Coq_value_prim (Coq_prim_number vlen)) throw_true) in 
               result_out (Coq_out_ter (s0,
-                                       (res_val (Coq_value_prim (Coq_prim_number vlen))))))
+                                       (res_val (Coq_value_prim (Coq_prim_number vlen)))))
       | v :: vs ->
         let%string 
           (s0, slen) = (to_string s c (Coq_value_prim (Coq_prim_number vlen))) in 
-             if_not_throw (object_put s0 c l slen v throw_true) (fun s1 x ->
-                 push s1 c l vs (ilen +. 1.)))
+             let%not_throw  (s1, x) = (object_put s0 c l slen v throw_true) in 
+                 push s1 c l vs (ilen +. 1.))
 
 (** val run_object_is_sealed :
     state -> execution_ctx -> object_loc -> prop_name list ->
@@ -4485,27 +4485,27 @@ and run_call_prealloc s c b vthis args =
              ("length")) in 
               let%run  (s2, ilen) = (to_uint32 s1 c vlen) in 
                   if ilen = 0.0
-                  then if_not_throw
-                      (object_put s2 c l
+                  then let%not_throw
+                      
+                      (s3, x) = (object_put s2 c l
                          ("length")
-                         (Coq_value_prim (Coq_prim_number JsNumber.zero)) throw_true)
-                      (fun s3 x ->
+                         (Coq_value_prim (Coq_prim_number JsNumber.zero)) throw_true) in 
                          result_out (Coq_out_ter (s3,
-                                                  (res_val (Coq_value_prim Coq_prim_undef)))))
+                                                  (res_val (Coq_value_prim Coq_prim_undef))))
                   else let%string
                        (s3, sindx) = (to_string s2 c (Coq_value_prim (Coq_prim_number
                                                          (of_int (ilen -. 1.))))) in 
                           let%value 
                             (s4, velem) = (run_object_get s3 c l sindx) in 
-                               if_not_throw
-                                 (object_delete_default s4 c l sindx throw_true)
-                                 (fun s5 x ->
-                                    if_not_throw
-                                      (object_put s5 c l
+                               let%not_throw
+                                 
+                                 (s5, x) = (object_delete_default s4 c l sindx throw_true) in 
+                                    let%not_throw
+                                      
+                                      (s6, x0) = (object_put s5 c l
                                          ("length")
-                                         (Coq_value_prim (Coq_prim_string sindx)) throw_true)
-                                      (fun s6 x0 ->
-                                         result_out (Coq_out_ter (s6, (res_val velem)))))
+                                         (Coq_value_prim (Coq_prim_string sindx)) throw_true) in 
+                                         result_out (Coq_out_ter (s6, (res_val velem)))
   | Coq_prealloc_array_proto_push ->
     let%object  (s0, l) = (to_object s vthis) in 
         let%value
