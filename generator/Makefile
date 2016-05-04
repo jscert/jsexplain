@@ -36,7 +36,6 @@ ASSEMBLY_JS_FILES := \
 	LibList.unlog.js \
 	LibString.unlog.js \
 	LibOption.unlog.js \
-	LibTactics.unlog.js \
 	LibProd.unlog.js \
 	LibFunc.unlog.js \
 	Heap.unlog.js \
@@ -117,7 +116,7 @@ $(STDLIB_DIR)/stdlib.cmi: $(STDLIB_DIR)/stdlib.mli
 
 monad_ppx.native: monad_ppx.ml
 	$(OCAMLBUILD) $@
-	
+
 #ocamlfind ocamlc -linkpkg -o $@ $<
 # -package compiler-libs.common
 
