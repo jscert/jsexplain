@@ -363,3 +363,4 @@ let ifx_number w k = if_number w k
 let ifx_string w k = if_string w k
 let ifx_success_state a b c = if_success_state a b c
 let ifx_some_or_default v d f = if_some_or_default v d f
+let ifx_success_or_return a b c = if_success_or_return a b c

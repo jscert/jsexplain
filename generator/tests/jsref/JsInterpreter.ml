@@ -1868,7 +1868,7 @@ and run_call_default s c lf =
            | Some bd ->
              if list_eq_nil_decidable (prog_elements (funcbody_prog bd))
              then def
-             else if_success_or_return
+             else ifx_success_or_return
                  (run_prog s c (funcbody_prog bd)) (fun s_2 ->
                      result_out (Coq_out_ter (s_2,
                                               (res_val (Coq_value_prim Coq_prim_undef))))) (fun s_2 rv ->
