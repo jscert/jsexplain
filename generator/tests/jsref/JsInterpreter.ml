@@ -1245,8 +1245,8 @@ and ref_get_value s c _foo_ = match _foo_ with
     state -> execution_ctx -> expr -> value specres **)
 
 and run_expr_get_value s c e =
-  if_success (run_expr s c e) (fun s0 rv ->
-      ref_get_value s0 c rv)
+  let%success  (s0, rv) = (run_expr s c e) in
+      ref_get_value s0 c rv
 
 (** val object_put_complete :
     builtin_put -> state -> execution_ctx -> value -> object_loc
@@ -1266,9 +1266,9 @@ and object_put_complete b s c vthis l x v str =
                         | Coq_value_object lthis ->
                           let_binding (descriptor_intro_data v true true true)
                             (fun desc ->
-                               if_success
-                                 (object_define_own_prop s3 c l x desc str)
-                                 (fun s4 rv -> res_void s4))) (fun follow_2 ->
+                               let%success
+                                 
+                                 (s4, rv) = (object_define_own_prop s3 c l x desc str) in  res_void s4)) (fun follow_2 ->
                         match d_2 with
                         | Coq_full_descriptor_undef -> follow_2 ()
                         | Coq_full_descriptor_some a ->
@@ -1281,9 +1281,9 @@ and object_put_complete b s c vthis l x v str =
                                   s3
                                   ("[object_put_complete] found a primitive in an `set\' accessor.")
                               | Coq_value_object lfsetter ->
-                                if_success
-                                  (run_call s3 c lfsetter vthis
-                                     (v :: [])) (fun s4 rv -> res_void s4)))))
+                                let%success
+                                   (s4, rv) = (run_call s3 c lfsetter vthis
+                                     (v :: [])) in  res_void s4))))
               (fun follow ->
                  match d with
                  | Coq_full_descriptor_undef -> follow ()
@@ -1298,9 +1298,9 @@ and object_put_complete b s c vthis l x v str =
                                        descriptor_writable = None; descriptor_get = None;
                                        descriptor_set = None; descriptor_enumerable = None;
                                        descriptor_configurable = None } (fun desc ->
-                             if_success
-                               (object_define_own_prop s2 c l x desc str)
-                               (fun s3 rv -> res_void s3)))
+                             let%success
+                               
+                               (s3, rv) = (object_define_own_prop s2 c l x desc str) in  res_void s3))
                     | Coq_attributes_accessor_of a0 -> follow ()))
         else out_error_or_void s1 str Coq_native_error_type
 
@@ -1416,10 +1416,10 @@ and env_record_create_mutable_binding s c l x deletable_opt =
                                                               Coq_prim_undef); attributes_data_writable = true;
                                    attributes_data_enumerable = true;
                                    attributes_data_configurable = deletable } (fun a ->
-                    if_success
-                      (object_define_own_prop s1 c l0 x
+                    let%success
+                       (s2, rv) = (object_define_own_prop s1 c l0 x
                          (descriptor_of_attributes (Coq_attributes_data_of a))
-                         throw_true) (fun s2 rv -> res_void s2)))
+                         throw_true) in  res_void s2))
 
 (** val env_record_create_set_mutable_binding :
     state -> execution_ctx -> env_loc -> prop_name -> bool
@@ -2934,7 +2934,7 @@ and run_typeof_value s _foo_ = match _foo_ with
 
 and run_unary_op s c op e =
   if prepost_unary_op_dec op
-  then if_success (run_expr s c e) (fun s1 rv1 ->
+  then let%success  (s1, rv1)= (run_expr s c e) in  
       let%run  (s2, v2) = (ref_get_value s1 c rv1) in 
           let%number  (s3, n1) = (to_number s2 c v2) in 
               let%some po= (run_prepost_op op) in  
@@ -2946,10 +2946,10 @@ and run_unary_op s c op e =
                               s4= (ref_put_value s3 c rv1 (Coq_value_prim
                                                         (Coq_prim_number n2))) in  
                                  result_out (Coq_out_ter (s4,
-                                                          (res_val (Coq_value_prim v)))))))
+                                                          (res_val (Coq_value_prim v))))))
   else (match op with
       | Coq_unary_op_delete ->
-        if_success (run_expr s c e) (fun s0 rv ->
+        let%success  (s0, rv)= (run_expr s c e) in begin
             match rv with
             | Coq_resvalue_empty ->
               res_ter s0 (res_val (Coq_value_prim (Coq_prim_bool true)))
@@ -2969,9 +2969,10 @@ and run_unary_op s c op e =
                   | Coq_ref_base_type_env_loc l ->
                     if r.ref_strict
                     then run_error s0 Coq_native_error_syntax
-                    else env_record_delete_binding s0 c l r.ref_name))
+                    else env_record_delete_binding s0 c l r.ref_name)
+        end
       | Coq_unary_op_typeof ->
-        if_success (run_expr s c e) (fun s1 rv ->
+        let%success  (s1, rv)= (run_expr s c e) in begin
             match rv with
             | Coq_resvalue_empty ->
               (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
@@ -2990,7 +2991,8 @@ and run_unary_op s c op e =
                   (s2, v) = (ref_get_value s1 c (Coq_resvalue_ref r)) in 
                      res_ter s2
                        (res_val (Coq_value_prim (Coq_prim_string
-                                                   (run_typeof_value s2 v)))))
+                                                   (run_typeof_value s2 v))))
+        end
       | _ ->
         let%run  (s1, v) = (run_expr_get_value s c e) in 
             match op with
@@ -3033,8 +3035,8 @@ and init_object s c l _foo_ = match _foo_ with
     let (pn, pb) = p in
     let_binding (string_of_propname pn) (fun x ->
         let_binding (fun s1 desc ->
-            if_success (object_define_own_prop s1 c l x desc false)
-              (fun s2 rv -> init_object s2 c l pds_2)) (fun follows ->
+            let%success 
+              (s2, rv) = (object_define_own_prop s1 c l x desc false) in  init_object s2 c l pds_2) (fun follows ->
             match pb with
             | Coq_propbody_val e0 ->
               let%run  (s1, v0) = (run_expr_get_value s c e0) in 
@@ -3163,9 +3165,9 @@ and run_list_expr s1 c vs _foo_ = match _foo_ with
 and run_block s c _foo_ = match _foo_ with
   | [] -> res_ter s (res_normal Coq_resvalue_empty)
   | t :: ts_rev_2 ->
-    if_success (run_block s c ts_rev_2) (fun s0 rv0 ->
+    let%success  (s0, rv0)= (run_block s c ts_rev_2) in  
         ifx_success_state rv0 (run_stat s0 c t) (fun x x0 ->
-            result_out (Coq_out_ter (x, (res_normal x0)))))
+            result_out (Coq_out_ter (x, (res_normal x0))))
 
 (** val run_expr_binary_op :
     state -> execution_ctx -> binary_op -> expr -> expr ->
@@ -3231,7 +3233,7 @@ and run_expr_access s c e1 e2 =
     -> result **)
 
 and run_expr_assign s c opo e1 e2 =
-  if_success (run_expr s c e1) (fun s1 rv1 ->
+  let%success  (s1, rv1)= (run_expr s c e1) in  
       let_binding (fun s0 rv_2 ->
           match rv_2 with
           | Coq_resvalue_empty ->
@@ -3250,10 +3252,10 @@ and run_expr_assign s c opo e1 e2 =
            | Some op ->
              let%run  (s2, v1) = (ref_get_value s1 c rv1) in 
                  let%run  (s3, v2) = (run_expr_get_value s2 c e2) in 
-                     if_success (run_binary_op s3 c op v1 v2) (fun s4 v -> follow s4 v)
+                     let%success  (s4, v) = (run_binary_op s3 c op v1 v2) in  follow s4 v
            | None ->
              let%run  (x, x0 )= (run_expr_get_value s1 c e2) in 
-                 follow x (Coq_resvalue_value x0)))
+                 follow x (Coq_resvalue_value x0))
 
 (** val run_expr_function :
     state -> execution_ctx -> prop_name option -> string list
@@ -3358,7 +3360,7 @@ and run_eval s c is_direct_call vs =
 
 and run_expr_call s c e1 e2s =
   let_binding (is_syntactic_eval e1) (fun is_eval_direct ->
-      if_success (run_expr s c e1) (fun s1 rv ->
+      let%success  (s1, rv)= (run_expr s c e1) in  
           let%run  (s2, f) = (ref_get_value s1 c rv) in 
               let%run  (s3, vs) = (run_list_expr s2 c [] e2s) in 
                   match f with
@@ -3394,7 +3396,7 @@ and run_expr_call s c e1 e2s =
                                  ("[run_expr_call] unable to call a non-property function.")
                            | Coq_ref_base_type_env_loc l0 ->
                              let%some v = (env_record_implicit_this_value s3 l0) in  follow v))
-                    else run_error s3 Coq_native_error_type))
+                    else run_error s3 Coq_native_error_type)
 
 (** val run_expr_conditionnal :
     state -> execution_ctx -> expr -> expr -> expr -> result **)
@@ -3511,8 +3513,8 @@ and run_stat_switch_no_default s c vi rv _foo_ = match _foo_ with
       let%run  (s1, v1) = (run_expr_get_value s c e) in 
           let_binding (strict_equality_test v1 vi) (fun b ->
               if b
-              then if_success (run_block s1 c (rev ts)) (fun s2 rv2 ->
-                  run_stat_switch_end s2 c rv2 scs_2)
+              then let%success  (s2, rv2)= (run_block s1 c (rev ts)) in  
+                  run_stat_switch_end s2 c rv2 scs_2
               else run_stat_switch_no_default s1 c vi rv scs_2)
 
 (** val run_stat_switch_with_default_default :
@@ -3520,8 +3522,8 @@ and run_stat_switch_no_default s c vi rv _foo_ = match _foo_ with
     result **)
 
 and run_stat_switch_with_default_default s c ts scs =
-  if_success (run_block s c (rev ts)) (fun s1 rv ->
-      run_stat_switch_end s1 c rv scs)
+  let%success  (s1, rv)= (run_block s c (rev ts)) in  
+      run_stat_switch_end s1 c rv scs
 
 (** val run_stat_switch_with_default_B :
     state -> execution_ctx -> value -> resvalue -> stat list ->
@@ -3534,8 +3536,8 @@ and run_stat_switch_with_default_B s c vi rv ts0 scs = match scs with
       let%run  (s1, v1) = (run_expr_get_value s c e) in 
           let_binding (strict_equality_test v1 vi) (fun b ->
               if b
-              then if_success (run_block s1 c (rev ts)) (fun s2 rv2 ->
-                  run_stat_switch_end s2 c rv2 scs_2)
+              then let%success  (s2, rv2)= (run_block s1 c (rev ts)) in  
+                  run_stat_switch_end s2 c rv2 scs_2
               else run_stat_switch_with_default_B s1 c vi rv ts0 scs_2)
 
 (** val run_stat_switch_with_default_A :
@@ -3570,12 +3572,12 @@ and run_stat_switch_with_default_A s c found vi rv scs1 ts0 scs2 =
 and run_stat_switch s c labs e sb =
   let%run  (s1, vi) = (run_expr_get_value s c e) in 
       let_binding (fun w ->
-          if_success
-            (if_break (w) (fun s2 r ->
+          let%success
+             (s0, r)= (if_break (w) (fun s2 r ->
                  if res_label_in r labs
                  then result_out (Coq_out_ter (s2, (res_normal r.res_value)))
-                 else result_out (Coq_out_ter (s2, r)))) (fun s0 r ->
-                res_ter s0 (res_normal r))) (fun follow ->
+                 else result_out (Coq_out_ter (s2, r)))) in  
+                res_ter s0 (res_normal r)) (fun follow ->
           match sb with
           | Coq_switchbody_nodefault scs ->
             follow
@@ -3621,7 +3623,7 @@ and run_stat_try s c t1 t2o t3o =
   let_binding (fun s1 r ->
       match t3o with
       | Some t3 ->
-        if_success (run_stat s1 c t3) (fun s2 rv_2 -> res_ter s2 r)
+        let%success  (s2, rv_2) = (run_stat s1 c t3) in  res_ter s2 r
       | None -> res_ter s1 r) (fun finallycont ->
       if_any_or_throw (run_stat s c t1) finallycont (fun s1 v ->
           match t2o with
@@ -3787,13 +3789,13 @@ and run_stat s c _term_ = match _term_ with
 and run_elements s c _foo_ = match _foo_ with
   | [] -> result_out (Coq_out_ter (s, (res_normal Coq_resvalue_empty)))
   | el :: els_rev_2 ->
-    if_success (run_elements s c els_rev_2) (fun s0 rv0 ->
+    let%success  (s0, rv0)= (run_elements s c els_rev_2) in  
         match el with
         | Coq_element_stat t ->
           if_ter (run_stat s0 c t) (fun s1 r1 ->
               let r2 = res_overwrite_value_if_empty rv0 r1 in
               res_out (Coq_out_ter (s1, r2)))
-        | Coq_element_func_decl (name, args, bd) -> res_ter s0 (res_normal rv0))
+        | Coq_element_func_decl (name, args, bd) -> res_ter s0 (res_normal rv0)
 
 (** val run_prog : state -> execution_ctx -> prog -> result **)
 
