@@ -3337,7 +3337,7 @@ and run_eval s c is_direct_call vs =
                   let%ter  (s2, r) = (run_prog s1 c_2 p0) in
                       match r.res_type with
                       | Coq_restype_normal ->
-                        if_empty_label s2 r (fun x ->
+                        ifx_empty_label s2 r (fun x ->
                             match r.res_value with
                             | Coq_resvalue_empty ->
                               res_ter s2 (res_val (Coq_value_prim Coq_prim_undef))
@@ -3426,11 +3426,11 @@ and run_expr_new s c e1 e2s =
     state -> execution_ctx -> label -> stat -> result **)
 
 and run_stat_label s c lab t =
-  if_break (run_stat s c t) (fun s1 r1 ->
+  let%break (s1, r1) = run_stat s c t in
       result_out (Coq_out_ter (s1,
                                (if label_comparable r1.res_label lab
                                 then res_normal r1.res_value
-                                else r1))))
+                                else r1)))
 
 (** val run_stat_with :
     state -> execution_ctx -> expr -> stat -> result **)
@@ -3570,22 +3570,22 @@ and run_stat_switch_with_default_A s c found vi rv scs1 ts0 scs2 =
     result **)
 
 and run_stat_switch s c labs e sb =
-  let%run  (s1, vi) = (run_expr_get_value s c e) in 
+  let%run (s1, vi) = run_expr_get_value s c e in
       let_binding (fun w ->
-          let%success
-             (s0, r)= (if_break (w) (fun s2 r ->
-                 if res_label_in r labs
-                 then result_out (Coq_out_ter (s2, (res_normal r.res_value)))
-                 else result_out (Coq_out_ter (s2, r)))) in  
-                res_ter s0 (res_normal r)) (fun follow ->
-          match sb with
-          | Coq_switchbody_nodefault scs ->
-            follow
-              (run_stat_switch_no_default s1 c vi Coq_resvalue_empty scs)
-          | Coq_switchbody_withdefault (scs1, ts, scs2) ->
-            follow
-              (run_stat_switch_with_default_A s1 c false vi
-                 Coq_resvalue_empty scs1 ts scs2))
+      let%success (s0, r) =
+        let%break (s2, r) = w in
+        if res_label_in r labs
+        then result_out (Coq_out_ter (s2, (res_normal r.res_value)))
+        else result_out (Coq_out_ter (s2, r)) in
+      res_ter s0 (res_normal r)) (fun follow ->
+      match sb with
+      | Coq_switchbody_nodefault scs ->
+        follow
+          (run_stat_switch_no_default s1 c vi Coq_resvalue_empty scs)
+      | Coq_switchbody_withdefault (scs1, ts, scs2) ->
+        follow
+          (run_stat_switch_with_default_A s1 c false vi
+             Coq_resvalue_empty scs1 ts scs2))
 
 (** val run_stat_do_while :
     state -> execution_ctx -> resvalue -> label_set -> expr ->

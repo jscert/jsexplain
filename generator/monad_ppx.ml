@@ -17,6 +17,7 @@ let monad_mapping =
     ("success", "if_success");
     ("not_throw", "if_not_throw");
     ("ter", "if_ter");
+    ("break", "if_break");
    ]
 
 (* e.g. 
