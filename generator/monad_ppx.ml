@@ -12,7 +12,8 @@ let monad_mapping =
     ("prim", "if_prim");
     ("number", "if_number");
     ("some", "if_some");
-    (*("success", "ifsuccess")*)
+    ("bool", "if_bool");
+    ("success", "if_success");
    ]
 
 (* e.g. 
