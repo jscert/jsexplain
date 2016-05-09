@@ -90,6 +90,10 @@ var string_eq = function(x, y)  {
   return x === y; 
 };
 
+var string_compare = function(x, y) {
+  return x.localeCompare(y);
+};
+
 var strappend = function(x, y) { 
   if (typeof(x) != "string" || typeof(y) != "string")
     throw "strappend invalid arguments";

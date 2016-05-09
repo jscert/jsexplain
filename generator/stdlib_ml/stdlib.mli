@@ -125,6 +125,7 @@ val ( || ) : bool -> bool -> bool  (* beware of strict vs lazy semantics: todo d
 (* todo : factorize and clean up *)
 
 val string_eq : string -> string -> bool (* === *)
+val string_compare : string -> string -> float (* actually returns an int *)
 
 (*
    val string_concat : string -> string -> string (* + *)

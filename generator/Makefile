@@ -34,6 +34,7 @@ ASSEMBLY_JS_FILES := \
 	LibList.unlog.js \
 	LibOption.unlog.js \
 	LibProd.unlog.js \
+	StdMap.unlog.js \
 	Heap.unlog.js \
 	Shared.unlog.js \
 	Compare.js \
