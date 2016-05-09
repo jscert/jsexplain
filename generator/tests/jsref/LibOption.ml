@@ -14,12 +14,6 @@ let option_compare h o1 o2 =
      | Some a -> false
      | None -> true)
 
-(** val option_comparable :
-    'a1 coq_Comparable -> 'a1 option coq_Comparable **)
-
-let option_comparable h x y =
-  option_compare h x y
-
 (** val unsome_default : 'a1 -> 'a1 option -> 'a1 **)
 
 let unsome_default d o = match o with

@@ -5,7 +5,6 @@ open JsSyntax
 open JsSyntaxAux
 open LibList
 open LibOption
-open LibString
 open List0
 open Shared
 
@@ -347,7 +346,7 @@ let decl_env_record_write ed x mu v =
     decl_env_record -> prop_name -> decl_env_record **)
 
 let decl_env_record_rem ed x =
-  Heap.rem string_comparable ed x
+  Heap.rem string_eq ed x
 
 (** val env_record_write_decl_env :
     state -> env_loc -> prop_name -> mutability -> value -> state **)
@@ -535,14 +534,14 @@ let sub_one n =
 
 let is_syntactic_eval _foo_ = match _foo_ with
 | Coq_expr_this -> false
-| Coq_expr_identifier s -> string_comparable s ("eval")
+| Coq_expr_identifier s -> string_eq s ("eval")
 | Coq_expr_literal l ->
   (match l with
    | Coq_literal_null -> false
    | Coq_literal_bool b -> false
    | Coq_literal_number n -> false
    | Coq_literal_string s ->
-     string_comparable s ("eval"))
+     string_eq s ("eval"))
 | Coq_expr_object l -> false
 | Coq_expr_array l -> false
 | Coq_expr_function (o, l, f) -> false

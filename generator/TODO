@@ -53,6 +53,10 @@ inline or_decidable
 remove Coq_value_prim
 ----
 
+TODO: regexp pour cacher les %s et %c
+----
+
+
 (* TODO: one day
     let%spec v1 = run_expr_get_value e1 in
     let%spec v2 = run_expr_get_value e2 in

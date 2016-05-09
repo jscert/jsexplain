@@ -1,5 +1,4 @@
 open Datatypes
-open LibBool
 open LibList
 open LibReflect
 
@@ -50,7 +49,7 @@ let read_option h l k =
 
 let rec mem_assoc h1 k l = match l with
 | [] -> false
-| p :: l' -> let (x, y) = p in coq_or (h1 x k) (mem_assoc h1 k l')
+| p :: l' -> let (x, y) = p in (h1 x k) || (mem_assoc h1 k l')
 
 (** val indom_dec :
    'a1 coq_Comparable -> ('a1, 'a2) heap -> 'a1 -> bool **)

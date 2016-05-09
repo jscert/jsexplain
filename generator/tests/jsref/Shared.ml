@@ -21,15 +21,15 @@ let option_case d f o = match o with
 let string_sub s n l =
   substring n l s
 
-(** val lt_int_decidable : float -> float -> coq_Decidable **)
+(** val lt_int_decidable : float -> float -> bool **)
 
 let lt_int_decidable x y =  x < y
 
-(** val le_int_decidable : float -> float -> coq_Decidable **)
+(** val le_int_decidable : float -> float -> bool **)
 
 let le_int_decidable x y =  x <= y
 
-(** val ge_nat_decidable : int -> int -> coq_Decidable **)
+(** val ge_nat_decidable : int -> int -> bool **)
 
 let ge_nat_decidable x y = int_ge x y
 

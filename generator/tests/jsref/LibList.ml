@@ -1,7 +1,6 @@
-open LibOperation
 open LibReflect
 
-(** val list_eq_nil_decidable : 'a1 list -> coq_Decidable **)
+(** val list_eq_nil_decidable : 'a1 list -> bool **)
 
 let list_eq_nil_decidable l = match l with
 | [] -> true
@@ -24,7 +23,7 @@ let rec fold_left f acc l = match l with
 let map f l =
   fold_right (fun x acc -> (f x) :: acc) [] l
 
-(** val filter : 'a1 predb -> 'a1 list -> 'a1 list **)
+(** val filter : ('a1 -> bool) -> 'a1 list -> 'a1 list **)
 
 let filter f l =
   fold_right (fun x acc -> if f x then x :: acc else acc) [] l
@@ -69,10 +68,4 @@ let rec nth_def d n l = match l with
 let rec mem_decide h x l = match l with
 | [] -> false
 | y :: l' -> if h x y then true else mem_decide h x l'
-
-(** val coq_Mem_decidable :
-    'a1 coq_Comparable -> 'a1 -> 'a1 list -> coq_Decidable **)
-
-let coq_Mem_decidable h x l =
-  mem_decide h x l
 

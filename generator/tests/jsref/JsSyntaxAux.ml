@@ -2,7 +2,6 @@
 open JsSyntax
 open LibList
 open LibReflect
-open LibString
 
 (** val object_create :
     value -> class_name -> bool -> object_properties_type -> coq_object **)
@@ -428,7 +427,7 @@ let prim_compare w1 w2 =
     (match w2 with
      | Coq_prim_undef -> false
      | Coq_prim_null -> false
-     | Coq_prim_bool b2 -> bool_comparable b1 b2
+     | Coq_prim_bool b2 -> bool_eq b1 b2
      | Coq_prim_number n -> false
      | Coq_prim_string s -> false)
   | Coq_prim_number n1 ->
@@ -444,7 +443,7 @@ let prim_compare w1 w2 =
      | Coq_prim_null -> false
      | Coq_prim_bool b -> false
      | Coq_prim_number n -> false
-     | Coq_prim_string s2 -> string_comparable s1 s2)
+     | Coq_prim_string s2 -> string_eq s1 s2)
 
 (** val prim_comparable : prim coq_Comparable **)
 
@@ -524,9 +523,9 @@ let ref_base_type_comparable x y =
 (** val ref_compare : ref -> ref -> bool **)
 
 let ref_compare r1 r2 =
-  and_decidable (ref_base_type_comparable r1.ref_base r2.ref_base)
-    (and_decidable (string_comparable r1.ref_name r2.ref_name)
-      (bool_comparable r1.ref_strict r2.ref_strict))
+    (ref_base_type_comparable r1.ref_base r2.ref_base)
+ && (string_eq r1.ref_name r2.ref_name)
+ && (bool_eq r1.ref_strict r2.ref_strict)
 
 (** val ref_comparable : ref coq_Comparable **)
 
@@ -535,7 +534,8 @@ let ref_comparable x y =
 
 (** val type_compare : coq_type -> coq_type -> bool **)
 
-let type_compare t1 t2 =
+let type_compare t1 t2 = 
+  (* TODO: implement as t1 = t2, extract in JS as tag comparison *)
   match t1 with
   | Coq_type_undef ->
     (match t2 with
@@ -1334,7 +1334,7 @@ let label_compare lab1 lab2 =
   | Coq_label_string s1 ->
     (match lab2 with
      | Coq_label_empty -> false
-     | Coq_label_string s2 -> string_comparable s1 s2)
+     | Coq_label_string s2 -> string_eq s1 s2)
 
 (** val label_comparable : label coq_Comparable **)
 
@@ -1359,7 +1359,7 @@ let label_set_add_empty labs =
 (** val label_set_mem : label -> label list -> bool **)
 
 let label_set_mem lab labs =
-  coq_Mem_decidable label_comparable lab labs
+  mem_decide label_comparable lab labs
 
 (** val attributes_data_with_value :
     attributes_data -> value -> attributes_data **)

@@ -6,69 +6,62 @@ open JsSyntaxAux
 open LibList
 open LibOption
 open LibReflect
-open LibString
 open Shared
 
 let __ = ()
 
 (** val if_some_then_same_dec :
-    'a1 option -> 'a1 option -> ('a1 -> 'a1 -> coq_Decidable) ->
-    coq_Decidable **)
+    'a1 option -> 'a1 option -> ('a1 -> 'a1 -> bool) ->
+    bool **)
 
 let if_some_then_same_dec x y d =
   match x with
   | Some a ->
     (match y with
      | Some a0 -> d a0 a
-     | None -> true_decidable)
+     | None -> true)
   | None ->
     (match y with
-     | Some a -> false_decidable
-     | None -> true_decidable)
+     | Some a -> false
+     | None -> true)
 
-(** val same_value_dec : value -> value -> coq_Decidable **)
+(** val same_value_dec : value -> value -> bool **)
 
 let same_value_dec v1 v2 =
-  let h0 = not_decidable (type_comparable (type_of v1) (type_of v2)) in
+  let h0 = not (type_comparable (type_of v1) (type_of v2)) in
   (if h0
-   then (fun _ -> false_decidable)
+   then (fun _ -> false)
    else (fun _ ->
           let t = type_of v1 in
           (match t with
-           | Coq_type_undef -> (fun _ _ -> true_decidable)
-           | Coq_type_null -> (fun _ _ -> true_decidable)
+           | Coq_type_undef -> (fun _ _ -> true)
+           | Coq_type_null -> (fun _ _ -> true)
            | Coq_type_bool -> (fun _ _ -> value_comparable v1 v2)
            | Coq_type_number ->
              (fun _ _ ->
                let h2 =
-                 and_decidable
-                   (value_comparable v1 (Coq_value_prim (Coq_prim_number
-                     JsNumber.nan)))
-                   (value_comparable v2 (Coq_value_prim (Coq_prim_number
-                     JsNumber.nan)))
+                     (value_comparable v1 (Coq_value_prim (Coq_prim_number JsNumber.nan)))
+                  && (value_comparable v2 (Coq_value_prim (Coq_prim_number JsNumber.nan)))
                in
                (if h2
-                then (fun _ -> true_decidable)
+                then (fun _ -> true)
                 else (fun _ ->
                        let h3 =
-                         and_decidable
-                           (value_comparable v1 (Coq_value_prim
-                             (Coq_prim_number JsNumber.zero)))
-                           (value_comparable v2 (Coq_value_prim
-                             (Coq_prim_number JsNumber.neg_zero)))
+                           (value_comparable v1 (Coq_value_prim (Coq_prim_number JsNumber.zero)))
+                        && (value_comparable v2 (Coq_value_prim (Coq_prim_number JsNumber.neg_zero)))
                        in
                        (if h3
-                        then (fun _ -> false_decidable)
+                        then (fun _ -> false)
                         else (fun _ ->
                                let h4 =
-                                 and_decidable
                                    (value_comparable v1 (Coq_value_prim
                                      (Coq_prim_number JsNumber.neg_zero)))
+                                 &&
                                    (value_comparable v2 (Coq_value_prim
                                      (Coq_prim_number JsNumber.zero)))
                                in
                                (if h4
-                                then (fun _ -> false_decidable)
+                                then (fun _ -> false)
                                 else (fun _ -> value_comparable v1 v2)) __))
                          __)) __)
            | Coq_type_string -> (fun _ _ -> value_comparable v1 v2)
@@ -87,9 +80,10 @@ let attributes_data_compare ad1 ad2 =
     attributes_data_enumerable = e2; attributes_data_configurable = c2 } =
     ad2
   in
-  and_decidable (value_comparable v1 v2)
-    (and_decidable (bool_comparable w1 w2)
-      (and_decidable (bool_comparable e1 e2) (bool_comparable c1 c2)))
+     (value_comparable v1 v2)
+  && (bool_eq w1 w2)
+  && (bool_eq e1 e2)
+  && (bool_eq c1 c2)
 
 (** val attributes_data_comparable : attributes_data coq_Comparable **)
 
@@ -108,9 +102,10 @@ let attributes_accessor_compare aa1 aa2 =
     attributes_accessor_enumerable = e2; attributes_accessor_configurable =
     c2 } = aa2
   in
-  and_decidable (value_comparable v1 v2)
-    (and_decidable (value_comparable w1 w2)
-      (and_decidable (bool_comparable e1 e2) (bool_comparable c1 c2)))
+     (value_comparable v1 v2)
+  && (value_comparable w1 w2)
+  && (bool_eq e1 e2)
+  && (bool_eq c1 c2)
 
 (** val attributes_accessor_comparable :
     attributes_accessor coq_Comparable **)
@@ -162,39 +157,39 @@ let ref_kind_comparable x y =
   match x with
   | Coq_ref_kind_null ->
     (match y with
-     | Coq_ref_kind_null -> true_decidable
-     | Coq_ref_kind_undef -> false_decidable
-     | Coq_ref_kind_primitive_base -> false_decidable
-     | Coq_ref_kind_object -> false_decidable
-     | Coq_ref_kind_env_record -> false_decidable)
+     | Coq_ref_kind_null -> true
+     | Coq_ref_kind_undef -> false
+     | Coq_ref_kind_primitive_base -> false
+     | Coq_ref_kind_object -> false
+     | Coq_ref_kind_env_record -> false)
   | Coq_ref_kind_undef ->
     (match y with
-     | Coq_ref_kind_null -> false_decidable
-     | Coq_ref_kind_undef -> true_decidable
-     | Coq_ref_kind_primitive_base -> false_decidable
-     | Coq_ref_kind_object -> false_decidable
-     | Coq_ref_kind_env_record -> false_decidable)
+     | Coq_ref_kind_null -> false
+     | Coq_ref_kind_undef -> true
+     | Coq_ref_kind_primitive_base -> false
+     | Coq_ref_kind_object -> false
+     | Coq_ref_kind_env_record -> false)
   | Coq_ref_kind_primitive_base ->
     (match y with
-     | Coq_ref_kind_null -> false_decidable
-     | Coq_ref_kind_undef -> false_decidable
-     | Coq_ref_kind_primitive_base -> true_decidable
-     | Coq_ref_kind_object -> false_decidable
-     | Coq_ref_kind_env_record -> false_decidable)
+     | Coq_ref_kind_null -> false
+     | Coq_ref_kind_undef -> false
+     | Coq_ref_kind_primitive_base -> true
+     | Coq_ref_kind_object -> false
+     | Coq_ref_kind_env_record -> false)
   | Coq_ref_kind_object ->
     (match y with
-     | Coq_ref_kind_null -> false_decidable
-     | Coq_ref_kind_undef -> false_decidable
-     | Coq_ref_kind_primitive_base -> false_decidable
-     | Coq_ref_kind_object -> true_decidable
-     | Coq_ref_kind_env_record -> false_decidable)
+     | Coq_ref_kind_null -> false
+     | Coq_ref_kind_undef -> false
+     | Coq_ref_kind_primitive_base -> false
+     | Coq_ref_kind_object -> true
+     | Coq_ref_kind_env_record -> false)
   | Coq_ref_kind_env_record ->
     (match y with
-     | Coq_ref_kind_null -> false_decidable
-     | Coq_ref_kind_undef -> false_decidable
-     | Coq_ref_kind_primitive_base -> false_decidable
-     | Coq_ref_kind_object -> false_decidable
-     | Coq_ref_kind_env_record -> true_decidable)
+     | Coq_ref_kind_null -> false
+     | Coq_ref_kind_undef -> false
+     | Coq_ref_kind_primitive_base -> false
+     | Coq_ref_kind_object -> false
+     | Coq_ref_kind_env_record -> true)
 
 (** val object_binds_pickable_option :
     state -> object_loc -> coq_object coq_Pickable_option **)
@@ -214,31 +209,29 @@ let env_record_binds_pickable_option s l =
     decl_env_record -> prop_name -> (mutability * value) coq_Pickable_option **)
 
 let decl_env_record_pickable_option ed x =
-  Heap.read_option string_comparable ed x
+  Heap.read_option string_eq ed x
 
-(** val descriptor_is_data_dec : descriptor -> coq_Decidable **)
+(** val descriptor_is_data_dec : descriptor -> bool **)
 
 let descriptor_is_data_dec desc =
-  not_decidable
-    (and_decidable
-      (option_comparable value_comparable desc.descriptor_value None)
-      (option_comparable bool_comparable desc.descriptor_writable None))
+  not
+    (  (option_compare value_comparable desc.descriptor_value None)
+    && (option_compare bool_eq desc.descriptor_writable None))
 
-(** val descriptor_is_accessor_dec : descriptor -> coq_Decidable **)
+(** val descriptor_is_accessor_dec : descriptor -> bool **)
 
 let descriptor_is_accessor_dec desc =
-  not_decidable
-    (and_decidable
-      (option_comparable value_comparable desc.descriptor_get None)
-      (option_comparable value_comparable desc.descriptor_set None))
+  not
+    (   (option_compare value_comparable desc.descriptor_get None)
+     && (option_compare value_comparable desc.descriptor_set None))
 
-(** val descriptor_is_generic_dec : descriptor -> coq_Decidable **)
+(** val descriptor_is_generic_dec : descriptor -> bool **)
 
 let descriptor_is_generic_dec desc =
-  and_decidable (not_decidable (descriptor_is_data_dec desc))
-    (not_decidable (descriptor_is_accessor_dec desc))
+     (not (descriptor_is_data_dec desc))
+  && (not (descriptor_is_accessor_dec desc))
 
-(** val prepost_unary_op_dec : unary_op -> coq_Decidable **)
+(** val prepost_unary_op_dec : unary_op -> bool **)
 
 let prepost_unary_op_dec op = match op with
 | Coq_unary_op_delete -> false
@@ -253,11 +246,11 @@ let prepost_unary_op_dec op = match op with
 | Coq_unary_op_bitwise_not -> false
 | Coq_unary_op_not -> false
 
-(** val attributes_is_data_dec : attributes -> coq_Decidable **)
+(** val attributes_is_data_dec : attributes -> bool **)
 
 let attributes_is_data_dec a = match a with
-| Coq_attributes_data_of a0 -> true_decidable
-| Coq_attributes_accessor_of a0 -> false_decidable
+| Coq_attributes_data_of a0 -> true
+| Coq_attributes_accessor_of a0 -> false
 
 (** val run_object_heap_map_properties :
     state -> object_loc -> (object_properties_type -> object_properties_type)
@@ -277,7 +270,7 @@ let object_heap_map_properties_pickable_option s l f =
   run_object_heap_map_properties s l f
 
 (** val descriptor_contains_dec :
-    descriptor -> descriptor -> coq_Decidable **)
+    descriptor -> descriptor -> bool **)
 
 let descriptor_contains_dec desc1 desc2 =
   let { descriptor_value = descriptor_value0; descriptor_writable =
@@ -290,90 +283,76 @@ let descriptor_contains_dec desc1 desc2 =
     descriptor_set1; descriptor_enumerable = descriptor_enumerable1;
     descriptor_configurable = descriptor_configurable1 } = desc2
   in
-  and_decidable
-    (if_some_then_same_dec descriptor_value0 descriptor_value1 (fun u v ->
-      same_value_dec u v))
-    (and_decidable
-      (if_some_then_same_dec descriptor_writable0 descriptor_writable1
-        (fun u v -> bool_comparable u v))
-      (and_decidable
-        (if_some_then_same_dec descriptor_get0 descriptor_get1 (fun u v ->
-          same_value_dec u v))
-        (and_decidable
-          (if_some_then_same_dec descriptor_set0 descriptor_set1 (fun u v ->
-            same_value_dec u v))
-          (and_decidable
-            (if_some_then_same_dec descriptor_enumerable0
-              descriptor_enumerable1 (fun u v -> bool_comparable u v))
-            (if_some_then_same_dec descriptor_configurable0
-              descriptor_configurable1 (fun u v -> bool_comparable u v))))))
+     (if_some_then_same_dec descriptor_value0 descriptor_value1 (fun u v -> same_value_dec u v))
+  && (if_some_then_same_dec descriptor_writable0 descriptor_writable1 (fun u v -> bool_eq u v))
+  && (if_some_then_same_dec descriptor_get0 descriptor_get1 (fun u v -> same_value_dec u v))
+  && (if_some_then_same_dec descriptor_set0 descriptor_set1 (fun u v -> same_value_dec u v))
+  && (if_some_then_same_dec descriptor_enumerable0 descriptor_enumerable1 (fun u v -> bool_eq u v))
+  && (if_some_then_same_dec descriptor_configurable0 descriptor_configurable1 (fun u v -> bool_eq u v))
 
 (** val descriptor_enumerable_not_same_dec :
-    attributes -> descriptor -> coq_Decidable **)
+    attributes -> descriptor -> bool **)
 
 let descriptor_enumerable_not_same_dec a desc =
   let o = desc.descriptor_enumerable in
   (match o with
-   | Some b -> not_decidable (bool_comparable b (attributes_enumerable a))
-   | None -> false_decidable)
+   | Some b -> not (bool_eq b (attributes_enumerable a))
+   | None -> false)
 
 (** val descriptor_value_not_same_dec :
-    attributes_data -> descriptor -> coq_Decidable **)
+    attributes_data -> descriptor -> bool **)
 
 let descriptor_value_not_same_dec ad desc =
   let o = desc.descriptor_value in
   (match o with
-   | Some v -> not_decidable (same_value_dec v ad.attributes_data_value)
-   | None -> false_decidable)
+   | Some v -> not (same_value_dec v ad.attributes_data_value)
+   | None -> false)
 
 (** val descriptor_get_not_same_dec :
-    attributes_accessor -> descriptor -> coq_Decidable **)
+    attributes_accessor -> descriptor -> bool **)
 
 let descriptor_get_not_same_dec aa desc =
   let o = desc.descriptor_get in
   (match o with
-   | Some v -> not_decidable (same_value_dec v aa.attributes_accessor_get)
-   | None -> false_decidable)
+   | Some v -> not (same_value_dec v aa.attributes_accessor_get)
+   | None -> false)
 
 (** val descriptor_set_not_same_dec :
-    attributes_accessor -> descriptor -> coq_Decidable **)
+    attributes_accessor -> descriptor -> bool **)
 
 let descriptor_set_not_same_dec aa desc =
   let o = desc.descriptor_set in
   (match o with
-   | Some v -> not_decidable (same_value_dec v aa.attributes_accessor_set)
-   | None -> false_decidable)
+   | Some v -> not (same_value_dec v aa.attributes_accessor_set)
+   | None -> false)
 
 (** val attributes_change_enumerable_on_non_configurable_dec :
-    attributes -> descriptor -> coq_Decidable **)
+    attributes -> descriptor -> bool **)
 
 let attributes_change_enumerable_on_non_configurable_dec a desc =
-  and_decidable (bool_comparable (attributes_configurable a) false)
-    (or_decidable
-      (option_comparable bool_comparable desc.descriptor_configurable (Some
-        true)) (descriptor_enumerable_not_same_dec a desc))
+    (bool_eq (attributes_configurable a) false)
+  &&
+    ((option_compare bool_eq desc.descriptor_configurable (Some
+        true)) 
+     || (descriptor_enumerable_not_same_dec a desc))
 
 (** val attributes_change_data_on_non_configurable_dec :
-    attributes_data -> descriptor -> coq_Decidable **)
+    attributes_data -> descriptor -> bool **)
 
 let attributes_change_data_on_non_configurable_dec ad desc =
-  and_decidable
-    (bool_comparable (attributes_configurable (Coq_attributes_data_of ad))
-      false)
-    (and_decidable (bool_comparable ad.attributes_data_writable false)
-      (or_decidable
-        (option_comparable bool_comparable desc.descriptor_writable (Some
-          true)) (descriptor_value_not_same_dec ad desc)))
+    (bool_eq (attributes_configurable (Coq_attributes_data_of ad)) false)
+  &&
+    (bool_eq ad.attributes_data_writable false)
+  &&  (   (option_compare bool_eq desc.descriptor_writable (Some true)) 
+       || (descriptor_value_not_same_dec ad desc))
 
 (** val attributes_change_accessor_on_non_configurable_dec :
-    attributes_accessor -> descriptor -> coq_Decidable **)
+    attributes_accessor -> descriptor -> bool **)
 
 let attributes_change_accessor_on_non_configurable_dec aa desc =
-  and_decidable
-    (bool_comparable
-      (attributes_configurable (Coq_attributes_accessor_of aa)) false)
-    (or_decidable (descriptor_get_not_same_dec aa desc)
-      (descriptor_set_not_same_dec aa desc))
+     (bool_eq (attributes_configurable (Coq_attributes_accessor_of aa)) false)
+  && (    (descriptor_get_not_same_dec aa desc)
+       || (descriptor_set_not_same_dec aa desc))
 
 (** val run_function_get_error_case : state -> prop_name -> value -> bool **)
 
@@ -383,7 +362,7 @@ match v with
 | Coq_value_prim w -> false
 | Coq_value_object l ->
     (* In strict mode, cannot call "caller" *)
-    (if string_comparable x ("caller")
+    (if string_eq x ("caller")
      then true
      else false)
   &&
@@ -392,7 +371,7 @@ match v with
       (object_binds_pickable_option s l))
 
 (** val spec_function_get_error_case_dec :
-    state -> prop_name -> value -> coq_Decidable **)
+    state -> prop_name -> value -> bool **)
 
 (* STATEFUL-RO *)
 let spec_function_get_error_case_dec s x v =
@@ -408,7 +387,7 @@ match v with
   option_case None (fun o -> Some o.object_call_)
     (object_binds_pickable_option s l)
 
-(** val is_callable_dec : state -> value -> coq_Decidable **)
+(** val is_callable_dec : state -> value -> bool **)
 
 (* STATEFUL-RO *)
 let is_callable_dec s v =
@@ -419,6 +398,6 @@ let is_callable_dec s v =
 
 (* STATEFUL-RO *)
 let object_properties_keys_as_list_pickable_option s l =
-  map (fun props -> LibList.map fst (Heap.to_list string_comparable props))
+  map (fun props -> LibList.map fst (Heap.to_list string_eq props))
     (map object_properties_ (object_binds_pickable_option s l))
 

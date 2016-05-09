@@ -30,14 +30,10 @@ ASSEMBLY_JS_FILES := \
 	Datatypes.unlog.js \
 	Fappli_IEEE_bits.unlog.js \
 	Fappli_IEEE.unlog.js \
-	LibBool.unlog.js \
 	LibReflect.unlog.js \
-	LibOperation.unlog.js \
 	LibList.unlog.js \
-	LibString.unlog.js \
 	LibOption.unlog.js \
 	LibProd.unlog.js \
-	LibFunc.unlog.js \
 	Heap.unlog.js \
 	Shared.unlog.js \
 	Compare.js \
