@@ -107,14 +107,14 @@ let _ =
         | _ ->
           let out = Js_of_ast.to_javascript basename module_name typedtree1 in
           let output_filename = match !current_mode with
-            | Mode_unlogged -> unlog_output
+            | Mode_unlogged TokenTrue -> token_output
+            | Mode_unlogged TokenFalse -> unlog_output
             | Mode_logged -> log_output
-            | Mode_line_token -> token_output
             | _ -> assert false
           in
           file_put_contents output_filename out;
           Printf.printf "Wrote %s\n" output_filename;
-          if !current_mode = Mode_line_token 
+          if !current_mode = (Mode_unlogged TokenTrue) 
             then generate_mlloc_file()
 
 

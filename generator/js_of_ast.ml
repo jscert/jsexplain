@@ -195,8 +195,7 @@ let ppf_cstrs styp cstr_name rest =
   let styp_full =
     match !current_mode with
     | Mode_cmi -> assert false
-    | Mode_unlogged
-    | Mode_line_token -> ""
+    | Mode_unlogged _ -> ""
     | Mode_logged -> Printf.sprintf "type: \"%s\", " styp
     in
   Printf.sprintf "{@[<v 2>%stag: \"%s\"%s %s@]}" (* TODO: cleanup *)
@@ -285,13 +284,15 @@ let token_register_basename basename =
 
 let token_fresh =
   let r = ref 0 in
-  fun loc -> (
+  fun mode loc -> (
     incr r; 
     Hashtbl.add token_locs (!r) (pos_pair_of_loc loc);
+    (* if mode = Mode_unlogged TokenFalse then ("", "", "") else begin end*)
     let token_start = Printf.sprintf "@{<%d>" !r in
     let token_stop = "@}" in
     let token_loc = Printf.sprintf "\"%s.js\", %d" !token_basename_ref !r in 
-    (token_start, token_stop, token_loc))
+    (token_start, token_stop, token_loc)
+    )
 
 
 
@@ -325,12 +326,10 @@ let ppf_ifthenelse arg iftrue iffalse =
 let generate_logged_if loc ctx sintro sarg siftrue siffalse =
   (* sintro is not empty only in the logged case,
      it describes the binding of the value describing the argument of the if *)
-  let (token_start, token_stop, token_loc) = token_fresh loc in
+  let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
   match !current_mode with
   | Mode_cmi -> assert false
-  | Mode_unlogged -> 
-     ppf_ifthenelse sarg siftrue siffalse
-  | Mode_line_token ->
+  | Mode_unlogged _ ->
      let sarg_with_token = Printf.sprintf "%s%s%s" token_start sarg token_stop in
      ppf_ifthenelse sarg_with_token siftrue siffalse
   | Mode_logged ->
@@ -347,12 +346,12 @@ let generate_logged_if loc ctx sintro sarg siftrue siffalse =
 let generate_logged_case loc spat binders ctx newctx sbody need_break =
   (* Note: binders is a list of pairs of id *)
   (* Note: if binders = [], then newctx = ctx *)
-  let (token_start, token_stop, token_loc) = token_fresh loc in
+  let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
   let (shead, sintro) =
     match !current_mode with
     | Mode_cmi -> assert false
-    | Mode_line_token -> 
-      (token_start, token_stop)
+    | Mode_unlogged _ ->
+        (token_start, token_stop)
     | Mode_logged ->
       let ids = List.map fst binders in
       let mk_binding x =
@@ -368,7 +367,6 @@ let generate_logged_case loc spat binders ctx newctx sbody need_break =
       let sintro = Printf.sprintf "%slog_event(%s, %s, \"case\");@,"
         spreintro token_loc newctx in
       ("", sintro)
-    | Mode_unlogged -> ("", "")
     in
   let sbinders = Printf.sprintf "%s%s" (if binders = [] then "" else "@;<1 2>") (ppf_match_binders binders) in
   (Printf.sprintf "@[<v 0>%s%s:%s%s@;<1 2>@[<v 0>%s%s@]@]"
@@ -380,8 +378,7 @@ let ppf_match sintro sarg sbranches =
   let sbranches = 
     match !current_mode with
     | Mode_cmi -> assert false
-    | Mode_unlogged -> sbranches
-    | Mode_line_token
+    | Mode_unlogged _ -> sbranches
     | Mode_logged -> sbranches 
       (* TODO: put back if there is not already a default case:
           ^ "@,default: throw \"No matching case for switch\";" *)
@@ -395,12 +392,10 @@ let generate_logged_match loc ctx sintro sarg sbranches arg_is_constant =
   (* arg_is_constant describes whether the argument of switch is a basic JS value,
      or whether it is an encoded object from which we need to read the tag field *)
   let sarg = if arg_is_constant then sarg else sarg ^ ".tag" in
-  let (token_start, token_stop, token_loc) = token_fresh loc in
+  let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
   match !current_mode with
   | Mode_cmi -> assert false
-  | Mode_unlogged -> 
-     ppf_match sintro sarg sbranches 
-  | Mode_line_token ->
+  | Mode_unlogged _ ->
      let sarg_with_token = Printf.sprintf "%s%s%s" token_start sarg token_stop in
      ppf_match sintro sarg_with_token sbranches 
   | Mode_logged ->
@@ -413,12 +408,10 @@ let generate_logged_match loc ctx sintro sarg sbranches arg_is_constant =
 (*--------- let ---------*)
 
 let generate_logged_let loc ids ctx newctx sdecl sbody =
-  let (token_start, token_stop, token_loc) = token_fresh loc in
+  let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
   match !current_mode with
   | Mode_cmi -> assert false
-  | Mode_unlogged -> 
-     Printf.sprintf "%s@,%s" sdecl sbody
-  | Mode_line_token ->
+  | Mode_unlogged _ -> 
      Printf.sprintf "%s%s%s@,%s" token_start sdecl token_stop sbody  
   | Mode_logged ->
     let mk_binding x =
@@ -432,12 +425,10 @@ let generate_logged_let loc ids ctx newctx sdecl sbody =
 (*--------- function call ---------*)
 
 let generate_logged_apply loc ctx sbody =
-  let (token_start, token_stop, token_loc) = token_fresh loc in
+  let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
   match !current_mode with
   | Mode_cmi -> assert false
-  | Mode_unlogged -> 
-     sbody
-  | Mode_line_token ->
+  | Mode_unlogged _ ->
      Printf.sprintf "%s%s%s" token_start sbody token_stop
   | Mode_logged ->
      Printf.sprintf "log_event(%s, %s, \"call\");@,%s" token_loc ctx sbody
@@ -446,11 +437,11 @@ let generate_logged_apply loc ctx sbody =
 (*--------- enter function body ---------*)
 
 let generate_logged_enter loc arg_ids ctx newctx sbody = 
-  let (token_start, token_stop, token_loc) = token_fresh loc in
+  let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
   let (shead1, shead2, sintro) =
     match !current_mode with
     | Mode_cmi -> assert false
-    | Mode_line_token -> (token_start, token_stop, "")
+    | Mode_unlogged _ -> (token_start, token_stop, "")
     | Mode_logged ->
       let mk_binding x =
         Printf.sprintf "{key: \"%s\", val: %s}" x x
@@ -461,7 +452,6 @@ let generate_logged_enter loc arg_ids ctx newctx sbody =
       let sintro = Printf.sprintf "var %s = ctx_push(%s, %s);@,log_event(%s, %s, \"enter\");@,"
         newctx ctx bindings token_loc newctx in
       ("", "", sintro)
-    | Mode_unlogged -> ("", "", "")
   in
   let args = String.concat ", " arg_ids in
   Printf.sprintf "%sfunction (%s)%s {@;<1 2>@[<v 0>%s%s@]@,}" shead1 args shead2 sintro sbody
@@ -472,12 +462,10 @@ let generate_logged_enter loc arg_ids ctx newctx sbody =
 (* possibly: optimize return when it's a value *)
 
 let generate_logged_return loc ctx sbody = 
-  let (token_start, token_stop, token_loc) = token_fresh loc in
+  let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
   match !current_mode with
   | Mode_cmi -> assert false
-  | Mode_unlogged ->
-     Printf.sprintf "@[<hv 2>return (@,%s);@]" sbody
-  | Mode_line_token ->
+  | Mode_unlogged _ ->
      Printf.sprintf "@[<hv 2>%sreturn (@,%s);%s@]" token_start sbody token_stop
   | Mode_logged ->
     let id = id_fresh "_return_" in
@@ -737,7 +725,7 @@ and js_of_expression ctx dest e =
         apply_dest' ctx dest wrapped_exp
      end else begin
         (* we need a token to match the Dest_return above *)
-        let (token_start, token_stop, _token_loc) = token_fresh loc in 
+        let (token_start, token_stop, _token_loc) = token_fresh !current_mode loc in 
         let sexp2 = generate_logged_apply loc ctx sexp in
         let sexp3 = Printf.sprintf "%s%s%s" token_start sexp2 token_stop in
         apply_dest' ctx dest sexp3
@@ -977,16 +965,26 @@ let to_javascript basename module_name typedtree =
   let (content,names_bound) = js_of_structure typedtree in
   let pre_res = ppf_module_wrap module_name content names_bound in
   let str_ppf = Format.str_formatter in
-  if (!current_mode = Mode_line_token) then begin
-  Format.pp_set_tags str_ppf true;
-  Format.pp_set_mark_tags str_ppf true;
-  Format.pp_set_formatter_tag_functions str_ppf
-    {Format.mark_open_tag = (fun t -> Printf.sprintf "#<%s#" t);
-     Format.mark_close_tag = (fun t -> Printf.sprintf "#%s>#" t);
-     Format.print_open_tag = (fun _ -> ());
-     Format.print_close_tag = (fun _ -> ())};
+  if (!current_mode = (Mode_unlogged TokenTrue)) then begin
+    Format.pp_set_tags str_ppf true;
+    Format.pp_set_mark_tags str_ppf true;
+    Format.pp_set_formatter_tag_functions str_ppf
+     { Format.mark_open_tag = (fun t -> Printf.sprintf "#<%s#" t);
+       Format.mark_close_tag = (fun t -> Printf.sprintf "#%s>#" t);
+       Format.print_open_tag = (fun _ -> ());
+       Format.print_close_tag = (fun _ -> ()) };
+    Format.fprintf str_ppf (Scanf.format_from_string pre_res "");
+    Format.flush_str_formatter ()
+ end else begin
+    Format.pp_set_tags str_ppf false;
+    Format.pp_set_mark_tags str_ppf false;
+    Format.pp_set_formatter_tag_functions str_ppf
+     { Format.mark_open_tag = (fun t -> "");
+       Format.mark_close_tag = (fun t -> "");
+       Format.print_open_tag = (fun _ -> ());
+       Format.print_close_tag = (fun _ -> ()) };
+    Format.fprintf str_ppf (Scanf.format_from_string pre_res "");
+    Format.flush_str_formatter ()
   end;
-  Format.fprintf str_ppf (Scanf.format_from_string pre_res "");
-  Format.flush_str_formatter ()
 
 

@@ -211,6 +211,12 @@ function jsvalue_of_value(v) {
 }
 
 function lookup_var_in_record_decl(name, env_record_decl) {
+  // TODO : replace with
+  // Heap.find name env_record_decl
+  /// --> mutability_flag * value 
+  // return value
+  // si not found, return undefined
+
    var items_array = array_of_heap(env_record_decl);
    for (var i = 0; i < items_array.length; i++) {
       var var_name = items_array[i][0];
@@ -256,6 +262,22 @@ function lookup_var_in_object(state, name, loc) {
 function lookup_var_in_lexical_env(state, name, lexical_env) {
    // var env_record_heap = state.state_env_record_heap;
    var env_loc_array = encoded_list_to_array(lexical_env);
+     // TODO: walk step by step the lexical env
+    /*   var r = [];
+    while (list.tag == "::") {
+      r.push(list.head);
+      list = list.tail;
+    }
+    return r;
+ 
+    function f() { 
+      var x = 2;
+      var g = function() { 
+          var x = 3;
+          breakpoint ==> S_core(x) == 3
+      }
+      }
+    */
    for (var i = 0; i < env_loc_array.length; i++) {
       var env_loc = env_loc_array[i];
       var env_record_opt = JsCommonAux.env_record_binds_pickable_option(state, env_loc);
