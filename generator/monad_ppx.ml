@@ -30,6 +30,10 @@ becomes
 becomes
    if_spec expr (fun s x -> cont) 
 
+and in pseudo:
+  Let%spec x = expr in
+  cont
+
  *)
 
 

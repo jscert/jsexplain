@@ -1,3 +1,49 @@
+  let%if_spec (s,x) = expr in cont
+becomes
+   if_spec expr (fun s x -> cont) 
+
+and in pseudo:
+  Let%spec x = expr in
+  cont
+
+
+------------
+
+
+  Let (x,y) = ...
+   
+
+------------
+
+            return (
+              if_run(
+                convert_twice_string(Coq_value_prim(w1), Coq_value_prim(w2)),
+                function (ss) {
+                  var s3 = ss[0], s4 = ss[1];
+                  return (
+                    res_out(
+                      Coq_out_ter(s2,
+                        res_val(
+                          Coq_value_prim(Coq_prim_string(strappend(s3, s4)))))));
+                }));
+
+
+
+
+          let%run (s3,s4) = convert_twice_string(Coq_value_prim(w1), Coq_value_prim(w2)) in
+              if_run(
+                ,
+                function (ss) {
+                  var s3 = ss[0], s4 = ss[1];
+                  return (
+                    res_out(
+                      Coq_out_ter(s2,
+                        res_val(
+                          Coq_value_prim(Coq_prim_string(strappend(s3, s4)))))));
+                }));
+
+
+
 
 --------------
 
@@ -18,10 +64,6 @@ BECOMES IN PSEUDO
 	   return (...);
 
 
-
-
------------------
-enlever les mlloc
 
 
 

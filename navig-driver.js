@@ -96,6 +96,8 @@ var source_files = [
   'eval("var x = { a : 1 };\\nx.b = 2;\\nx");',
   'var f = function() {return "f"}; eval("var g = function() {return \\"g\\"}; eval(\\"var h = function() {return \\\\\\"h\\\\\\"}; f(); g(); h()\\"); h();"); g(); h(); f();',
   'var t = {};\nfor (var i = 0; i < 3; i++) {\n  t[i] = eval("i + " + i); \n};\nt; ',
+  'function f() {\n   var x = 2;\n   function g() { var x = 3; return x; };\n   return g(); \n};\nf()',
+  'f()' // bug? return 0 on the value thrown
 ];
 
 source_files.reduce((select, file_content) => {
@@ -211,12 +213,20 @@ function jsvalue_of_value(v) {
 }
 
 function lookup_var_in_record_decl(name, env_record_decl) {
-  // TODO : replace with
-  // Heap.find name env_record_decl
-  /// --> mutability_flag * value 
-  // return value
-  // si not found, return undefined
-
+  var ro = Heap.read_option(string_eq, env_record_decl, name);
+  switch (ro.tag) {
+    case "None":
+      return undefined;
+    case "Some":
+      var r = ro.value;
+      var mutability = r[0];
+      var value = r[1];
+      return value;
+    default:
+      throw "unrecognized tag in lookup_var_in_record_decl";
+  }
+}
+  /* DEPRECATED, naive code for lookup_var_in_record_decl:
    var items_array = array_of_heap(env_record_decl);
    for (var i = 0; i < items_array.length; i++) {
       var var_name = items_array[i][0];
@@ -227,7 +237,7 @@ function lookup_var_in_record_decl(name, env_record_decl) {
       }
    }
    return undefined;
-}
+  */
 
 function lookup_var_in_object(state, name, loc) {
    var obj_opt = JsCommonAux.object_binds_pickable_option(state, loc);
@@ -261,53 +271,43 @@ function lookup_var_in_object(state, name, loc) {
 // todo : handle objects
 function lookup_var_in_lexical_env(state, name, lexical_env) {
    // var env_record_heap = state.state_env_record_heap;
-   var env_loc_array = encoded_list_to_array(lexical_env);
-     // TODO: walk step by step the lexical env
-    /*   var r = [];
-    while (list.tag == "::") {
-      r.push(list.head);
-      list = list.tail;
-    }
-    return r;
- 
-    function f() { 
-      var x = 2;
-      var g = function() { 
-          var x = 3;
-          breakpoint ==> S_core(x) == 3
-      }
-      }
-    */
-   for (var i = 0; i < env_loc_array.length; i++) {
+  /* DEPRECATED: naive processing of the loop
+    var env_loc_array = encoded_list_to_array(lexical_env);
+    for (var i = 0; i < env_loc_array.length; i++) {
       var env_loc = env_loc_array[i];
-      var env_record_opt = JsCommonAux.env_record_binds_pickable_option(state, env_loc);
-      if (env_record_opt.tag != "Some") throw "show_object: unbound object";
-      var env_record = env_record_opt.value;
+  */
+  var list = lexical_env;
+  while (list.tag == "::") {
+    var env_loc = list.head;
+    list = list.tail;
+    var env_record_opt = JsCommonAux.env_record_binds_pickable_option(state, env_loc);
+    if (env_record_opt.tag != "Some") throw "show_object: unbound object";
+    var env_record = env_record_opt.value;
 
-      switch (env_record.tag) {
-        case "Coq_env_record_decl":
-          var env_record_decl = env_record.value;
-          var r = lookup_var_in_record_decl(name, env_record_decl);
-          if (r !== undefined) {
-             return r;
-          }
-          break;
-        case "Coq_env_record_object":   
-          var object_loc = env_record.value;
-          var r = lookup_var_in_object(state, name, object_loc);
-          if (r !== undefined) {
-             return r;
-          }
-          /*
-          var obj_value = { tag: "Coq_value_object", value: object_loc };
-          var provide_this = env_record.provide_this;
-          */
-          break;
-        default: 
-          throw "invalid env_record.tag";
-      }
-   }
-   return undefined;
+    switch (env_record.tag) {
+      case "Coq_env_record_decl":
+        var env_record_decl = env_record.value;
+        var r = lookup_var_in_record_decl(name, env_record_decl);
+        if (r !== undefined) {
+           return r;
+        }
+        break;
+      case "Coq_env_record_object":   
+        var object_loc = env_record.value;
+        var r = lookup_var_in_object(state, name, object_loc);
+        if (r !== undefined) {
+           return r;
+        }
+        /*
+        var obj_value = { tag: "Coq_value_object", value: object_loc };
+        var provide_this = env_record.provide_this;
+        */
+        break;
+      default: 
+        throw "invalid env_record.tag";
+    }
+  }
+  return undefined;
 }
 
 function evalPred(item, pred) {
@@ -682,7 +682,7 @@ function string_of_any(v) {
 // --------------- Views for JS state/context ----------------
 
 function array_of_heap(heap) {
-  var items_list = Heap.to_list(LibString.string_comparable, heap);
+  var items_list = Heap.to_list(string_eq, heap);
   return encoded_list_to_array(items_list);
 } 
 
@@ -1322,6 +1322,11 @@ function assignExtraInfosInTrace() {
          var t = binding.val;
          if (t.loc != undefined) {
            last_loc = t.loc;
+           /*console.log("found source loc: " +
+             last_loc.start.line + "," + 
+             last_loc.start.column + " --> " + 
+             last_loc.end.line + "," + 
+             last_loc.end.column);*/
          }
        } else if (interp_val_is_state(binding.val)) {
          // assuming: 'is an state object' iff 'has a state_object_heap field'
@@ -1420,7 +1425,6 @@ readSourceParseAndRun();
 
 // stepTo(2466);
 
-// $("#reach_condition").val("S('x') == 2");
 // button_reach_handler();
 // $("#reach_condition").val("S_raw('x')");
 // button_test_handler();
@@ -1430,7 +1434,9 @@ readSourceParseAndRun();
 
 //
 //stepTo(5873);
-setExample(3);
+setExample(20);
+$("#reach_condition").val("S('x') == 2");
+
 
 function showCurrent() {
   console.log(tracer_items[tracer_pos]);
