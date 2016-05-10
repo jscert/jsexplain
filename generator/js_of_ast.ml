@@ -154,7 +154,7 @@ let ppf_apply f args =
                  f args
 
 let ppf_apply_infix f arg1 arg2 =
-  Printf.sprintf "%s %s %s"
+  Printf.sprintf "@[<hov 0>%s@ %s %s@]"
                  arg1 f arg2
 
 let ppf_match_case c =

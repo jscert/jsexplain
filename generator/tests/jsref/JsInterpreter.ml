@@ -4320,15 +4320,12 @@ and run_call_prealloc s c b vthis args =
                                            Coq_prealloc_error_proto)) v
   | Coq_prealloc_native_error ne ->
     let  v = (get_arg 0 args) in
-        build_error s (Coq_value_object (Coq_object_loc_prealloc
-                                           (Coq_prealloc_native_error_proto ne))) v
+    build_error s (Coq_value_object (Coq_object_loc_prealloc
+                                       (Coq_prealloc_native_error_proto ne))) v
   | Coq_prealloc_throw_type_error -> run_error s Coq_native_error_type
   | _ ->
     (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
-      (strappend
-         ("Call prealloc_")
-         (strappend (string_of_prealloc b)
-            (" not yet implemented")))
+      (strappend ("Call prealloc_") (strappend (string_of_prealloc b) (" not yet implemented")))
 
 (** val run_call :
     state -> execution_ctx -> object_loc -> value -> value list
@@ -4346,8 +4343,7 @@ and run_call s c l vthis args =
     let%some boundThis = obnd in
     let%some otrg = run_object_method object_target_function_ s l in
     let%some target = otrg in
-    let 
-      arguments_ = (LibList.append boundArgs args) in run_call s c target boundThis arguments_
+    let arguments_ = (LibList.append boundArgs args) in run_call s c target boundThis arguments_
   | Coq_call_prealloc b -> run_call_prealloc s c b vthis args
 
 (** val run_javascript : prog -> result **)
