@@ -77,7 +77,7 @@ let destr_list l d f =
     state -> res -> (unit -> 'a1 resultof) -> 'a1 resultof **)
 
 let if_empty_label s r k =
-  if label_comparable r.res_label Coq_label_empty
+  if label_compare r.res_label Coq_label_empty
   then k ()
   else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
          s
@@ -134,7 +134,7 @@ let if_success_state rv w k =
     | Coq_restype_normal ->
       if_empty_label s0 r (fun x ->
         k s0
-          (if resvalue_comparable r.res_value Coq_resvalue_empty
+          (if resvalue_compare r.res_value Coq_resvalue_empty
            then rv
            else r.res_value))
     | Coq_restype_throw -> res_ter s0 r
@@ -339,7 +339,7 @@ let if_abort o k =
   match o with
   | Coq_out_div -> k ()
   | Coq_out_ter (s0, r) ->
-    if restype_comparable r.res_type Coq_restype_normal
+    if restype_compare r.res_type Coq_restype_normal
     then (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
            s0
            ("[if_abort] received a normal result!")

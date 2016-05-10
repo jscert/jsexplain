@@ -1,7 +1,5 @@
-open LibReflect
-
 (** val prod_compare :
-    'a1 coq_Comparable -> 'a2 coq_Comparable -> ('a1 * 'a2) -> ('a1 * 'a2) ->
+     ('a1 -> 'a1 -> bool)  ->  ('a2 -> 'a2 -> bool)  -> ('a1 * 'a2) -> ('a1 * 'a2) ->
     bool **)
 
 let prod_compare h h0 x y =

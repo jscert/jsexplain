@@ -9,7 +9,6 @@ open JsSyntaxAux
 open LibList
 open LibOption
 open LibProd
-open LibReflect
 open List0
 open Shared
 
@@ -88,7 +87,7 @@ let equality_test_for_same_type ty v1 v2 =
   match ty with
   | Coq_type_undef -> true
   | Coq_type_null -> true
-  | Coq_type_bool -> value_comparable v1 v2
+  | Coq_type_bool -> value_compare v1 v2
   | Coq_type_number ->
     (match v1 with
      | Coq_value_prim p ->
@@ -119,15 +118,15 @@ let equality_test_for_same_type ty v1 v2 =
            | Coq_value_object o -> false)
         | Coq_prim_string s -> false)
      | Coq_value_object o -> false)
-  | Coq_type_string -> value_comparable v1 v2
-  | Coq_type_object -> value_comparable v1 v2
+  | Coq_type_string -> value_compare v1 v2
+  | Coq_type_object -> value_compare v1 v2
 
 (** val strict_equality_test : value -> value -> bool **)
 
 let strict_equality_test v1 v2 =
   let ty1 = type_of v1 in
   let ty2 = type_of v2 in
-  if type_comparable ty1 ty2
+  if type_compare ty1 ty2
   then equality_test_for_same_type ty1 v1 v2
   else false
 
@@ -230,7 +229,7 @@ let string_of_propname _foo_ = match _foo_ with
 let build_error s vproto vmsg =
   let o = object_new vproto ("Error") in
   let (l, s_2) = object_alloc s o in
-  if value_comparable vmsg (Coq_value_prim Coq_prim_undef)
+  if value_compare vmsg (Coq_value_prim Coq_prim_undef)
   then result_out (Coq_out_ter (s_2, (res_val (Coq_value_object l))))
   else (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
          ("Need [to_string] (this function shall be put in [runs_type].)")
@@ -299,7 +298,7 @@ let rec object_has_prop s c l x =
     res_ter s1
       (res_val (Coq_value_prim (Coq_prim_bool
                                   (not
-                                     (full_descriptor_comparable d Coq_full_descriptor_undef)))))
+                                     (full_descriptor_compare d Coq_full_descriptor_undef)))))
 
 (** val object_get_builtin :
     state -> execution_ctx -> builtin_get -> value -> object_loc
@@ -357,7 +356,7 @@ and run_object_get_prop s c l x =
   let%some b = (run_object_method object_get_prop_ s l) in
   match b with Coq_builtin_get_prop_default ->
     let%run (s1, d) = (run_object_get_own_prop s c l x) in
-    if full_descriptor_comparable d Coq_full_descriptor_undef
+    if full_descriptor_compare d Coq_full_descriptor_undef
     then let%some proto = (run_object_method object_proto_ s1 l) in
       match proto with
       | Coq_value_prim p ->
@@ -387,7 +386,7 @@ and object_proto_is_prototype_of s l0 l =
          s
          ("[run_object_method] returned a primitive in [object_proto_is_prototype_of_body]."))
   | Coq_value_object l_2 ->
-    if object_loc_comparable l_2 l0
+    if object_loc_compare l_2 l0
     then result_out (Coq_out_ter (s,
                                   (res_val (Coq_value_prim (Coq_prim_bool true)))))
     else object_proto_is_prototype_of s l0 l_2
@@ -512,7 +511,7 @@ and object_can_put s c l x =
                  res_ter s2
                    (res_val (Coq_value_prim (Coq_prim_bool
                                                (not
-                                                  (value_comparable aa.attributes_accessor_set
+                                                  (value_compare aa.attributes_accessor_set
                                                      (Coq_value_prim Coq_prim_undef)))))))
         end
       | Coq_full_descriptor_some a ->
@@ -525,7 +524,7 @@ and object_can_put s c l x =
            res_ter s1
              (res_val (Coq_value_prim (Coq_prim_bool
                                          (not
-                                            (value_comparable aa.attributes_accessor_set (Coq_value_prim
+                                            (value_compare aa.attributes_accessor_set (Coq_value_prim
                                                                                             Coq_prim_undef)))))))
     end
 
@@ -758,21 +757,21 @@ and run_to_descriptor s c _foo_ = match _foo_ with
                       (fun s4_2 desc2 ->
                          sub0 s4_2 desc2 ("get") (fun s5 v5 desc3 ->
                              if (bool_eq (is_callable_dec s5 v5) false)
-                             && (not (value_comparable v5 (Coq_value_prim Coq_prim_undef)))
+                             && (not (value_compare v5 (Coq_value_prim Coq_prim_undef)))
                              then throw_result (run_error s5 Coq_native_error_type)
                              else res_spec s5 (descriptor_with_get desc3 (Some v5)))
                            (fun s5_2 desc3 ->
                               sub0 s5_2 desc3 ("set") (fun s6 v6 desc4 ->
                                   if (bool_eq (is_callable_dec s6 v6) false)
-                                  && (not (value_comparable v6 (Coq_value_prim Coq_prim_undef)))
+                                  && (not (value_compare v6 (Coq_value_prim Coq_prim_undef)))
                                   then throw_result (run_error s6 Coq_native_error_type)
                                   else res_spec s6 (descriptor_with_set desc4 (Some v6)))
                                 (fun s7 desc4 ->
-                                   if ((not (option_compare value_comparable desc4.descriptor_get None))
+                                   if ((not (option_compare value_compare desc4.descriptor_get None))
                                        ||
-                                       (not (option_compare value_comparable desc4.descriptor_set None)))
+                                       (not (option_compare value_compare desc4.descriptor_set None)))
                                       &&
-                                      ((not (option_compare value_comparable desc4.descriptor_value None))
+                                      ((not (option_compare value_compare desc4.descriptor_value None))
                                        ||
                                        (not (option_compare bool_eq desc4.descriptor_writable None)))
                                    then throw_result (run_error s7 Coq_native_error_type)
@@ -970,7 +969,7 @@ and env_record_get_binding_value s c l x str =
       | Coq_env_record_decl ed ->
         let%some rm = (HeapStr.read_option ed x) in
             let (mu, v) = rm in
-            if mutability_comparable mu Coq_mutability_uninitialized_immutable
+            if mutability_compare mu Coq_mutability_uninitialized_immutable
             then out_error_or_cst s str Coq_native_error_ref (Coq_value_prim
                                                                 Coq_prim_undef)
             else res_ter s (res_val v)
@@ -1128,7 +1127,7 @@ and env_record_set_mutable_binding s c l x v str =
       | Coq_env_record_decl ed ->
         let%some rm = (HeapStr.read_option ed x) in
             let (mu, v_old) = rm in
-            if not (mutability_comparable mu Coq_mutability_immutable)
+            if not (mutability_compare mu Coq_mutability_immutable)
             then res_void (env_record_write_decl_env s l x mu v)
             else out_error_or_void s str Coq_native_error_type
       | Coq_env_record_object (l0, pt) -> object_put s c l0 x v str
@@ -1261,7 +1260,7 @@ and env_record_initialize_immutable_binding s l x v =
       match e with
       | Coq_env_record_decl ed ->
         let%some evs = (decl_env_record_pickable_option ed x) in
-            if prod_compare mutability_comparable value_comparable evs
+            if prod_compare mutability_compare value_compare evs
                 (Coq_mutability_uninitialized_immutable, (Coq_value_prim
                                                             Coq_prim_undef))
             then let s_2 = (env_record_write_decl_env s l x Coq_mutability_immutable v) in res_void s_2
@@ -1617,7 +1616,7 @@ and run_construct_default s c l args =
     (s1, v1) = (run_object_get s c l
        ("prototype")) in
        let
-          vproto = (if type_comparable (type_of v1) Coq_type_object
+          vproto = (if type_compare (type_of v1) Coq_type_object
           then v1
           else Coq_value_object (Coq_object_loc_prealloc
                                    Coq_prealloc_object_proto)) in
@@ -1629,7 +1628,7 @@ and run_construct_default s c l args =
                       let%value 
                         (s3, v2) = (run_call s2 c l (Coq_value_object l_2) args) in
                            let
-                              vr = (if type_comparable (type_of v2) Coq_type_object
+                              vr = (if type_compare (type_of v2) Coq_type_object
                               then v2
                               else Coq_value_object l_2) in res_ter s3 (res_val vr)
 
@@ -2031,7 +2030,7 @@ and execution_ctx_binding_inst s c ct funco p args =
     let  str = (prog_intro_strictness p) in
         let  follow = (fun s_2 names ->
             let 
-              bconfig = (codetype_comparable ct Coq_codetype_eval) in
+              bconfig = (codetype_compare ct Coq_codetype_eval) in
                  let  fds = (prog_funcdecl p) in
                      let%void
                        
@@ -2219,7 +2218,7 @@ and run_function_has_instance s lv _foo_ = match _foo_ with
                s
                ("Primitive found in the prototype chain in [run_object_has_instance_loop]."))
         | Coq_value_object proto ->
-          if object_loc_comparable proto lo
+          if object_loc_compare proto lo
           then res_ter s (res_val (Coq_value_prim (Coq_prim_bool true)))
           else run_function_has_instance s proto (Coq_value_object
                                                     lo)
@@ -2464,7 +2463,7 @@ and run_equal s c v1 v2 =
   let  checkTypesThen = (fun s0 v3 v4 k ->
       let ty1 = type_of v3 in
       let ty2 = type_of v4 in
-      if type_comparable ty1 ty2
+      if type_compare ty1 ty2
       then result_out (Coq_out_ter (s0,
                                     (res_val (Coq_value_prim (Coq_prim_bool
                                                                 (equality_test_for_same_type ty1 v3 v4))))))
@@ -2477,33 +2476,33 @@ and run_equal s c v1 v2 =
                  result_out (Coq_out_ter (s,
                                           (res_val (Coq_value_prim (Coq_prim_bool b)))))
                in
-               if (type_comparable ty1 Coq_type_null)
-                  && (type_comparable ty2 Coq_type_undef)
+               if (type_compare ty1 Coq_type_null)
+                  && (type_compare ty2 Coq_type_undef)
                then so true
-               else if (type_comparable ty1 Coq_type_undef)
-                   && (type_comparable ty2 Coq_type_null)
+               else if (type_compare ty1 Coq_type_undef)
+                   && (type_compare ty2 Coq_type_null)
                then so true
-               else if (type_comparable ty1 Coq_type_number)
-                  && (type_comparable ty2 Coq_type_string)
+               else if (type_compare ty1 Coq_type_number)
+                  && (type_compare ty2 Coq_type_string)
                then dc_conv v1 conv_number v2
                else if 
-                     (type_comparable ty1 Coq_type_string)
-                 &&  (type_comparable ty2 Coq_type_number)
+                     (type_compare ty1 Coq_type_string)
+                 &&  (type_compare ty2 Coq_type_number)
                then dc_conv v2 conv_number v1
-               else if type_comparable ty1 Coq_type_bool
+               else if type_compare ty1 Coq_type_bool
                then dc_conv v2 conv_number v1
-               else if type_comparable ty2 Coq_type_bool
+               else if type_compare ty2 Coq_type_bool
                then dc_conv v1 conv_number v2
                else if 
-                   (   (type_comparable ty1 Coq_type_string)
-                    || (type_comparable ty1 Coq_type_number))
+                   (   (type_compare ty1 Coq_type_string)
+                    || (type_compare ty1 Coq_type_number))
                 &&
-                   (type_comparable ty2 Coq_type_object)
+                   (type_compare ty2 Coq_type_object)
                then dc_conv v1 conv_primitive v2
                else if 
-                    (type_comparable ty1 Coq_type_object)
-                 && (   (type_comparable ty2 Coq_type_string)
-                     || (type_comparable ty2 Coq_type_number))
+                    (type_compare ty1 Coq_type_object)
+                 && (   (type_compare ty2 Coq_type_string)
+                     || (type_compare ty2 Coq_type_number))
                then dc_conv v2 conv_primitive v1
                else so false)
 
@@ -2552,12 +2551,12 @@ and issome : 'a1 . 'a1 option -> bool = fun _foo_ ->
     result **)
 
 and run_binary_op s c op v1 v2 =
-  if binary_op_comparable op Coq_binary_op_add
+  if binary_op_compare op Coq_binary_op_add
   then  let%run (s1, ww) = (convert_twice_primitive s c v1 v2) in
       (* let%run (s1,ww) = convert_twice_primitive s c v1 v2 in *)
       let (w1, w2) = ww in
-      if  (type_comparable (type_of (Coq_value_prim w1)) Coq_type_string)
-       || (type_comparable (type_of (Coq_value_prim w2)) Coq_type_string)
+      if  (type_compare (type_of (Coq_value_prim w1)) Coq_type_string)
+       || (type_compare (type_of (Coq_value_prim w2)) Coq_type_string)
       then let%run
            (s2, ss) = (convert_twice_string s1 c (Coq_value_prim w1)
              (Coq_value_prim w2)) in
@@ -2607,23 +2606,23 @@ and run_binary_op s c op v1 v2 =
                 let (wa, wb) = p in
                 let wr = inequality_test_primitive wa wb in
                 res_out (Coq_out_ter (s1,
-                                      (if prim_comparable wr Coq_prim_undef
+                                      (if prim_compare wr Coq_prim_undef
                                        then res_val (Coq_value_prim
                                                        (Coq_prim_bool false))
                                        else if 
                                            (bool_eq b_neg true)
-                                        && (prim_comparable wr
+                                        && (prim_compare wr
                                               (Coq_prim_bool true))
                                        then res_val (Coq_value_prim
                                                        (Coq_prim_bool false))
                                        else if 
                                             (bool_eq b_neg true)
-                                          &&  (prim_comparable wr (Coq_prim_bool false))
+                                          &&  (prim_compare wr (Coq_prim_bool false))
                                        then res_val (Coq_value_prim
                                                        (Coq_prim_bool true))
                                        else res_val (Coq_value_prim
                                                        wr))))
-  else if binary_op_comparable op
+  else if binary_op_compare op
       Coq_binary_op_instanceof
   then (match v2 with
       | Coq_value_prim p ->
@@ -2637,7 +2636,7 @@ and run_binary_op s c op v1 v2 =
                 (fun has_instance_id x ->
                    run_object_has_instance s c
                      has_instance_id l v1) b ())
-  else if binary_op_comparable op Coq_binary_op_in
+  else if binary_op_compare op Coq_binary_op_in
   then (match v2 with
       | Coq_value_prim p ->
         run_error s Coq_native_error_type
@@ -2645,10 +2644,10 @@ and run_binary_op s c op v1 v2 =
         let%string 
           (s2, x) = (to_string s c v1) in
              object_has_prop s2 c l x)
-  else if binary_op_comparable op
+  else if binary_op_compare op
       Coq_binary_op_equal
   then run_equal s c v1 v2
-  else if binary_op_comparable op
+  else if binary_op_compare op
       Coq_binary_op_disequal
   then let%bool
        (s0, b0) = (run_equal s c
@@ -2657,7 +2656,7 @@ and run_binary_op s c op v1 v2 =
             (res_val (Coq_value_prim
                         (Coq_prim_bool
                            (negb b0))))
-  else if binary_op_comparable op
+  else if binary_op_compare op
       Coq_binary_op_strict_equal
   then result_out (Coq_out_ter
                      (s,
@@ -2666,7 +2665,7 @@ and run_binary_op s c op v1 v2 =
                             (Coq_prim_bool
                                (strict_equality_test
                                   v1 v2))))))
-  else if binary_op_comparable
+  else if binary_op_compare
       op
       Coq_binary_op_strict_disequal
   then result_out
@@ -2677,7 +2676,7 @@ and run_binary_op s c op v1 v2 =
                              (negb
                                 (strict_equality_test
                                    v1 v2)))))))
-  else if binary_op_comparable
+  else if binary_op_compare
       op
       Coq_binary_op_coma
   then result_out
@@ -2994,8 +2993,8 @@ and run_expr_binary_op s c op e1 e2 =
    and run_expr_access s c e1 e2 =
    let%run (s1, v1) = (run_expr_get_value s c e1) in
     let%run (s2, v2) = (run_expr_get_value s1 c e2) in
-      if or_decidable (value_comparable v1 (Coq_value_prim Coq_prim_undef))
-           (value_comparable v1 (Coq_value_prim Coq_prim_null))
+      if or_decidable (value_compare v1 (Coq_value_prim Coq_prim_undef))
+           (value_compare v1 (Coq_value_prim Coq_prim_null))
       then run_error s2 Coq_native_error_type
       else let%string (s3, x) = (to_string s2 c v2) in
              res_ter s3
@@ -3005,8 +3004,8 @@ and run_expr_binary_op s c op e1 e2 =
 and run_expr_access s c e1 e2 =
   let%run (s1,v1) = run_expr_get_value s c e1 in
   let%run (s2,v2) = run_expr_get_value s1 c e2 in
-  if    (value_comparable v1 (Coq_value_prim Coq_prim_undef))
-     || (value_comparable v1 (Coq_value_prim Coq_prim_null))
+  if    (value_compare v1 (Coq_value_prim Coq_prim_undef))
+     || (value_compare v1 (Coq_value_prim Coq_prim_null))
   then run_error s2 Coq_native_error_type
   else let%string (s3,x) = to_string s2 c v2 in
     res_ter s3 (res_ref (ref_create_value v1 x c.execution_ctx_strict))
@@ -3146,7 +3145,7 @@ and run_expr_call s c e1 e2s =
                   | Coq_value_object l ->
                     if is_callable_dec s3 (Coq_value_object l)
                     then let  follow = (fun vthis ->
-                        if object_loc_comparable l (Coq_object_loc_prealloc
+                        if object_loc_compare l (Coq_object_loc_prealloc
                                                       Coq_prealloc_global_eval)
                         then run_eval s3 c is_eval_direct vs
                         else run_call s3 c l vthis vs) in
@@ -3201,7 +3200,7 @@ and run_expr_new s c e1 e2s =
 and run_stat_label s c lab t =
   let%break (s1, r1) = run_stat s c t in
       result_out (Coq_out_ter (s1,
-                               (if label_comparable r1.res_label lab
+                               (if label_compare r1.res_label lab
                                 then res_normal r1.res_value
                                 else r1)))
 
@@ -3243,19 +3242,19 @@ and run_stat_while s c rv labs e1 t2 =
           then let%ter (s2, r) = (run_stat s1 c t2) in
               let
                  rv_2 = (if not
-                    (resvalue_comparable r.res_value Coq_resvalue_empty)
+                    (resvalue_compare r.res_value Coq_resvalue_empty)
                  then r.res_value
                  else rv) in
                     let  loop = (fun x ->
                         run_stat_while s2 c rv_2 labs e1 t2) in
-                        if  (not (restype_comparable r.res_type Coq_restype_continue))
+                        if  (not (restype_compare r.res_type Coq_restype_continue))
                          || (not (res_label_in r labs))
                         then if 
-                             (restype_comparable r.res_type Coq_restype_break)
+                             (restype_compare r.res_type Coq_restype_break)
                            && (res_label_in r labs)
                           then res_ter s2 (res_normal rv_2)
                           else if not
-                              (restype_comparable r.res_type
+                              (restype_compare r.res_type
                                  Coq_restype_normal)
                           then res_ter s2 r
                           else loop ()
@@ -3365,7 +3364,7 @@ and run_stat_switch s c labs e sb =
 and run_stat_do_while s c rv labs e1 t2 =
   let%ter (s1, r) = (run_stat s c t2) in
       let
-         rv_2 = (if resvalue_comparable r.res_value Coq_resvalue_empty
+         rv_2 = (if resvalue_compare r.res_value Coq_resvalue_empty
          then rv
          else r.res_value) in
             let  loop = (fun x ->
@@ -3374,15 +3373,15 @@ and run_stat_do_while s c rv labs e1 t2 =
                         if b
                         then run_stat_do_while s2 c rv_2 labs e1 t2
                         else res_ter s2 (res_normal rv_2)) in
-                if  (restype_comparable r.res_type Coq_restype_continue)
+                if  (restype_compare r.res_type Coq_restype_continue)
                    && (res_label_in r labs)
                 then loop ()
                 else if 
-                    (restype_comparable r.res_type Coq_restype_break)
+                    (restype_compare r.res_type Coq_restype_break)
                  && (res_label_in r labs)
                 then res_ter s1 (res_normal rv_2)
                 else if not
-                    (restype_comparable r.res_type Coq_restype_normal)
+                    (restype_compare r.res_type Coq_restype_normal)
                 then res_ter s1 r
                 else loop ()
 
@@ -3443,17 +3442,17 @@ and run_stat_for_loop s c labs rv eo2 eo3 t =
       let%ter (s1, r) = (run_stat s0 c t) in
           let
              rv_2 = (if not
-                (resvalue_comparable r.res_value Coq_resvalue_empty)
+                (resvalue_compare r.res_value Coq_resvalue_empty)
              then r.res_value
              else rv) in
                 let  loop = (fun s2 ->
                     run_stat_for_loop s2 c labs rv_2 eo2 eo3 t) in
-                    if   (restype_comparable r.res_type Coq_restype_break)
+                    if   (restype_compare r.res_type Coq_restype_break)
                       && (res_label_in r labs)
                     then res_ter s1 (res_normal rv_2)
                     else if 
-                         (restype_comparable r.res_type Coq_restype_normal)
-                      || (    (restype_comparable r.res_type Coq_restype_continue)
+                         (restype_compare r.res_type Coq_restype_normal)
+                      || (    (restype_compare r.res_type Coq_restype_continue)
                            && (res_label_in r labs))
                     then (match eo3 with
                         | Some e3 ->
@@ -4243,7 +4242,7 @@ and run_call_prealloc s c b vthis args =
                   let%run (s2, ilen) = (to_uint32 s1 c vlen) in
                       let
                          rsep = (if not
-                            (value_comparable vsep (Coq_value_prim Coq_prim_undef))
+                            (value_compare vsep (Coq_value_prim Coq_prim_undef))
                          then vsep
                          else Coq_value_prim (Coq_prim_string (","))) in
                             let%string (s3, sep) = (to_string s2 c rsep) in
@@ -4295,7 +4294,7 @@ and run_call_prealloc s c b vthis args =
   | Coq_prealloc_string_proto_to_string ->
     (match vthis with
      | Coq_value_prim p ->
-       if type_comparable (type_of vthis) Coq_type_string
+       if type_compare (type_of vthis) Coq_type_string
        then res_ter s (res_val vthis)
        else run_error s Coq_native_error_type
      | Coq_value_object l ->
@@ -4306,7 +4305,7 @@ and run_call_prealloc s c b vthis args =
   | Coq_prealloc_string_proto_value_of ->
     (match vthis with
      | Coq_value_prim p ->
-       if type_comparable (type_of vthis) Coq_type_string
+       if type_compare (type_of vthis) Coq_type_string
        then res_ter s (res_val vthis)
        else run_error s Coq_native_error_type
      | Coq_value_object l ->

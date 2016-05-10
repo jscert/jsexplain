@@ -11,7 +11,7 @@ open Shared
 (** val res_overwrite_value_if_empty : resvalue -> res -> res **)
 
 let res_overwrite_value_if_empty rv r =
-  if resvalue_comparable r.res_value Coq_resvalue_empty
+  if resvalue_compare r.res_value Coq_resvalue_empty
   then res_with_value r rv
   else r
 

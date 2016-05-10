@@ -30,7 +30,6 @@ ASSEMBLY_JS_FILES := \
 	Datatypes.unlog.js \
 	Fappli_IEEE_bits.unlog.js \
 	Fappli_IEEE.unlog.js \
-	LibReflect.unlog.js \
 	LibList.unlog.js \
 	LibOption.unlog.js \
 	LibProd.unlog.js \

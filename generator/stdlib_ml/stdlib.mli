@@ -102,7 +102,7 @@ val ( >= ) : float -> float -> bool
 val fmod : float -> float -> float (*  mod_float, implemented as % operator in JS *)
 
 
-(** val number_comparable : number coq_Comparable **)
+(** val number_comparable : number -> number -> bool **)
 val number_comparable : float -> float -> bool  (* = (fun n1 n2 -> int_eq 0  (float_compare n1 n2)) *)
   (* same as (=) *)
 

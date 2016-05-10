@@ -1,7 +1,6 @@
 (*open JsNumber*)  
 open JsSyntax
 open LibList
-open LibReflect
 
 let int_of_native_error e =
   match e with
@@ -468,28 +467,14 @@ let mathop_compare m1 m2 =
     match m2 with
     | Coq_mathop_abs -> true
 
-(** val mathop_comparable : mathop coq_Comparable **)
-
-let mathop_comparable x y =
-  mathop_compare x y
 
 (** val native_error_compare : native_error -> native_error -> bool **)
 
 let native_error_compare ne1 ne2 = (ne1:native_error) === ne2
 
-(** val native_error_comparable : native_error coq_Comparable **)
-
-let native_error_comparable x y =
-  native_error_compare x y
-
 (** val prealloc_compare : prealloc -> prealloc -> bool **)
 
 let prealloc_compare bl1 bl2 = (bl1:prealloc) === bl2
-
-(** val prealloc_comparable : prealloc coq_Comparable **)
-
-let prealloc_comparable x y =
-  prealloc_compare x y
 
 (** val object_loc_compare : object_loc -> object_loc -> bool **)
 
@@ -502,12 +487,7 @@ let object_loc_compare l1 l2 =
   | Coq_object_loc_prealloc bl1 ->
     (match l2 with
      | Coq_object_loc_normal n -> false
-     | Coq_object_loc_prealloc bl2 -> prealloc_comparable bl1 bl2)
-
-(** val object_loc_comparable : object_loc coq_Comparable **)
-
-let object_loc_comparable x y =
-  object_loc_compare x y
+     | Coq_object_loc_prealloc bl2 -> prealloc_compare bl1 bl2)
 
 (** val prim_compare : prim -> prim -> bool **)
 
@@ -549,28 +529,18 @@ let prim_compare w1 w2 =
      | Coq_prim_number n -> false
      | Coq_prim_string s2 -> string_eq s1 s2)
 
-(** val prim_comparable : prim coq_Comparable **)
-
-let prim_comparable x y =
-  prim_compare x y
-
 (** val value_compare : value -> value -> bool **)
 
 let value_compare v1 v2 =
   match v1 with
   | Coq_value_prim w1 ->
     (match v2 with
-     | Coq_value_prim w2 -> prim_comparable w1 w2
+     | Coq_value_prim w2 -> prim_compare w1 w2
      | Coq_value_object o -> false)
   | Coq_value_object l1 ->
     (match v2 with
      | Coq_value_prim p -> false
-     | Coq_value_object l2 -> object_loc_comparable l1 l2)
-
-(** val value_comparable : value coq_Comparable **)
-
-let value_comparable x y =
-  value_compare x y
+     | Coq_value_object l2 -> object_loc_compare l1 l2)
 
 (** val mutability_compare : mutability -> mutability -> bool **)
 
@@ -601,40 +571,25 @@ let mutability_compare m1 m2 =
      | Coq_mutability_nondeletable -> false
      | Coq_mutability_deletable -> true)
 
-(** val mutability_comparable : mutability coq_Comparable **)
-
-let mutability_comparable x y =
-  mutability_compare x y
-
 (** val ref_base_type_compare : ref_base_type -> ref_base_type -> bool **)
 
 let ref_base_type_compare rb1 rb2 =
   match rb1 with
   | Coq_ref_base_type_value v1 ->
     (match rb2 with
-     | Coq_ref_base_type_value v2 -> value_comparable v1 v2
+     | Coq_ref_base_type_value v2 -> value_compare v1 v2
      | Coq_ref_base_type_env_loc e -> false)
   | Coq_ref_base_type_env_loc l1 ->
     (match rb2 with
      | Coq_ref_base_type_value v -> false
      | Coq_ref_base_type_env_loc l2 -> nat_eq l1 l2)
 
-(** val ref_base_type_comparable : ref_base_type coq_Comparable **)
-
-let ref_base_type_comparable x y =
-  ref_base_type_compare x y
-
 (** val ref_compare : ref -> ref -> bool **)
 
 let ref_compare r1 r2 =
-    (ref_base_type_comparable r1.ref_base r2.ref_base)
+    (ref_base_type_compare r1.ref_base r2.ref_base)
  && (string_eq r1.ref_name r2.ref_name)
  && (bool_eq r1.ref_strict r2.ref_strict)
-
-(** val ref_comparable : ref coq_Comparable **)
-
-let ref_comparable x y =
-  ref_compare x y
 
 (** val type_compare : coq_type -> coq_type -> bool **)
 
@@ -690,11 +645,6 @@ let type_compare t1 t2 =
      | Coq_type_string -> false
      | Coq_type_object -> true)
 
-(** val type_comparable : coq_type coq_Comparable **)
-
-let type_comparable x y =
-  type_compare x y
-
 (** val res_with_value : res -> resvalue -> res **)
 
 let res_with_value r rv =
@@ -713,18 +663,13 @@ let resvalue_compare rv1 rv2 =
   | Coq_resvalue_value v1 ->
     (match rv2 with
      | Coq_resvalue_empty -> false
-     | Coq_resvalue_value v2 -> value_comparable v1 v2
+     | Coq_resvalue_value v2 -> value_compare v1 v2
      | Coq_resvalue_ref r -> false)
   | Coq_resvalue_ref r1 ->
     (match rv2 with
      | Coq_resvalue_empty -> false
      | Coq_resvalue_value v -> false
-     | Coq_resvalue_ref r2 -> ref_comparable r1 r2)
-
-(** val resvalue_comparable : resvalue coq_Comparable **)
-
-let resvalue_comparable x y =
-  resvalue_compare x y
+     | Coq_resvalue_ref r2 -> ref_compare r1 r2)
 
 (** val binary_op_compare : binary_op -> binary_op -> bool **)
 
@@ -1354,11 +1299,7 @@ let rec binary_op_compare op1 op2 =
      | Coq_binary_op_and -> false
      | Coq_binary_op_or -> false
      | Coq_binary_op_coma -> true)
-
-(** val binary_op_comparable : binary_op coq_Comparable **)
-
-let binary_op_comparable x y =
-  binary_op_compare x y
+     (* TODO: cleanup! *)
 
 (** val prog_intro_strictness : prog -> strictness_flag **)
 
@@ -1422,11 +1363,6 @@ let restype_compare rt1 rt2 =
      | Coq_restype_return -> false
      | Coq_restype_throw -> true)
 
-(** val restype_comparable : restype coq_Comparable **)
-
-let restype_comparable x y =
-  restype_compare x y
-
 (** val label_compare : label -> label -> bool **)
 
 let label_compare lab1 lab2 =
@@ -1439,11 +1375,6 @@ let label_compare lab1 lab2 =
     (match lab2 with
      | Coq_label_empty -> false
      | Coq_label_string s2 -> string_eq s1 s2)
-
-(** val label_comparable : label coq_Comparable **)
-
-let label_comparable x y =
-  label_compare x y
 
 (** val label_set_empty : label_set **)
 
@@ -1463,7 +1394,7 @@ let label_set_add_empty labs =
 (** val label_set_mem : label -> label list -> bool **)
 
 let label_set_mem lab labs =
-  mem_decide label_comparable lab labs
+  mem_decide label_compare lab labs
 
 (** val attributes_data_with_value :
     attributes_data -> value -> attributes_data **)
@@ -1563,9 +1494,4 @@ let codetype_compare ct1 ct2 =
      | Coq_codetype_func -> false
      | Coq_codetype_global -> false
      | Coq_codetype_eval -> true)
-
-(** val codetype_comparable : codetype coq_Comparable **)
-
-let codetype_comparable x y =
-  codetype_compare x y
 

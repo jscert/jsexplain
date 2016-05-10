@@ -5,7 +5,6 @@ open JsSyntax
 open JsSyntaxAux
 open LibList
 open LibOption
-open LibReflect
 open Shared
 
 let __ = ()
@@ -28,7 +27,7 @@ let if_some_then_same_dec x y d =
 (** val same_value_dec : value -> value -> bool **)
 
 let same_value_dec v1 v2 =
-  let h0 = not (type_comparable (type_of v1) (type_of v2)) in
+   let h0 = not (type_compare (type_of v1) (type_of v2)) in
   (if h0
    then (fun _ -> false)
    else (fun _ ->
@@ -36,36 +35,36 @@ let same_value_dec v1 v2 =
           (match t with
            | Coq_type_undef -> (fun _ _ -> true)
            | Coq_type_null -> (fun _ _ -> true)
-           | Coq_type_bool -> (fun _ _ -> value_comparable v1 v2)
+           | Coq_type_bool -> (fun _ _ -> value_compare v1 v2)
            | Coq_type_number ->
              (fun _ _ ->
                let h2 =
-                     (value_comparable v1 (Coq_value_prim (Coq_prim_number JsNumber.nan)))
-                  && (value_comparable v2 (Coq_value_prim (Coq_prim_number JsNumber.nan)))
+                     (value_compare v1 (Coq_value_prim (Coq_prim_number JsNumber.nan)))
+                  && (value_compare v2 (Coq_value_prim (Coq_prim_number JsNumber.nan)))
                in
                (if h2
                 then (fun _ -> true)
                 else (fun _ ->
                        let h3 =
-                           (value_comparable v1 (Coq_value_prim (Coq_prim_number JsNumber.zero)))
-                        && (value_comparable v2 (Coq_value_prim (Coq_prim_number JsNumber.neg_zero)))
+                           (value_compare v1 (Coq_value_prim (Coq_prim_number JsNumber.zero)))
+                        && (value_compare v2 (Coq_value_prim (Coq_prim_number JsNumber.neg_zero)))
                        in
                        (if h3
                         then (fun _ -> false)
                         else (fun _ ->
                                let h4 =
-                                   (value_comparable v1 (Coq_value_prim
+                                   (value_compare v1 (Coq_value_prim
                                      (Coq_prim_number JsNumber.neg_zero)))
                                  &&
-                                   (value_comparable v2 (Coq_value_prim
+                                   (value_compare v2 (Coq_value_prim
                                      (Coq_prim_number JsNumber.zero)))
                                in
                                (if h4
                                 then (fun _ -> false)
-                                else (fun _ -> value_comparable v1 v2)) __))
+                                else (fun _ -> value_compare v1 v2)) __))
                          __)) __)
-           | Coq_type_string -> (fun _ _ -> value_comparable v1 v2)
-           | Coq_type_object -> (fun _ _ -> value_comparable v1 v2)) __ __))
+           | Coq_type_string -> (fun _ _ -> value_compare v1 v2)
+           | Coq_type_object -> (fun _ _ -> value_compare v1 v2)) __ __))
     __
 
 (** val attributes_data_compare :
@@ -80,15 +79,10 @@ let attributes_data_compare ad1 ad2 =
     attributes_data_enumerable = e2; attributes_data_configurable = c2 } =
     ad2
   in
-     (value_comparable v1 v2)
+     (value_compare v1 v2)
   && (bool_eq w1 w2)
   && (bool_eq e1 e2)
   && (bool_eq c1 c2)
-
-(** val attributes_data_comparable : attributes_data coq_Comparable **)
-
-let attributes_data_comparable x y =
-  attributes_data_compare x y
 
 (** val attributes_accessor_compare :
     attributes_accessor -> attributes_accessor -> bool **)
@@ -102,16 +96,10 @@ let attributes_accessor_compare aa1 aa2 =
     attributes_accessor_enumerable = e2; attributes_accessor_configurable =
     c2 } = aa2
   in
-     (value_comparable v1 v2)
-  && (value_comparable w1 w2)
+     (value_compare v1 v2)
+  && (value_compare w1 w2)
   && (bool_eq e1 e2)
   && (bool_eq c1 c2)
-
-(** val attributes_accessor_comparable :
-    attributes_accessor coq_Comparable **)
-
-let attributes_accessor_comparable x y =
-  attributes_accessor_compare x y
 
 (** val attributes_compare : attributes -> attributes -> bool **)
 
@@ -119,18 +107,13 @@ let attributes_compare a1 a2 =
   match a1 with
   | Coq_attributes_data_of ad1 ->
     (match a2 with
-     | Coq_attributes_data_of ad2 -> attributes_data_comparable ad1 ad2
+     | Coq_attributes_data_of ad2 -> attributes_data_compare ad1 ad2
      | Coq_attributes_accessor_of a -> false)
   | Coq_attributes_accessor_of aa1 ->
     (match a2 with
      | Coq_attributes_data_of a -> false
      | Coq_attributes_accessor_of aa2 ->
-       attributes_accessor_comparable aa1 aa2)
-
-(** val attributes_comparable : attributes coq_Comparable **)
-
-let attributes_comparable x y =
-  attributes_compare x y
+       attributes_accessor_compare aa1 aa2)
 
 (** val full_descriptor_compare :
     full_descriptor -> full_descriptor -> bool **)
@@ -144,12 +127,7 @@ let full_descriptor_compare an1 an2 =
   | Coq_full_descriptor_some a1 ->
     (match an2 with
      | Coq_full_descriptor_undef -> false
-     | Coq_full_descriptor_some a2 -> attributes_comparable a1 a2)
-
-(** val full_descriptor_comparable : full_descriptor coq_Comparable **)
-
-let full_descriptor_comparable x y =
-  full_descriptor_compare x y
+     | Coq_full_descriptor_some a2 -> attributes_compare a1 a2)
 
 (** val ref_kind_comparable : ref_kind coq_Comparable **)
 
@@ -215,15 +193,15 @@ let decl_env_record_pickable_option ed x =
 
 let descriptor_is_data_dec desc =
   not
-    (  (option_compare value_comparable desc.descriptor_value None)
+    (  (option_compare value_compare desc.descriptor_value None)
     && (option_compare bool_eq desc.descriptor_writable None))
 
 (** val descriptor_is_accessor_dec : descriptor -> bool **)
 
 let descriptor_is_accessor_dec desc =
   not
-    (   (option_compare value_comparable desc.descriptor_get None)
-     && (option_compare value_comparable desc.descriptor_set None))
+    (   (option_compare value_compare desc.descriptor_get None)
+     && (option_compare value_compare desc.descriptor_set None))
 
 (** val descriptor_is_generic_dec : descriptor -> bool **)
 

@@ -1,7 +1,6 @@
-open LibReflect
 
 (** val option_compare :
-    'a1 coq_Comparable -> 'a1 option -> 'a1 option -> bool **)
+    ('a1 -> 'a1 -> bool) -> 'a1 option -> 'a1 option -> bool **)
 
 let option_compare h o1 o2 =
   match o1 with
