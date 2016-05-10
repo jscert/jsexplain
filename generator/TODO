@@ -1,4 +1,21 @@
-  let%if_spec (s,x) = expr in cont
+
+
+inline let object_loc_comparable x y =
+ et al
+-----
+
+   Coq_out_ter (s1,x) ---> x
+
+	 res_ref r  -->  r
+	 res_val v -->  v
+	 res_normal rv -->  rv
+
+----
+
+
+
+
+let%if_spec (s,x) = expr in cont
 becomes
    if_spec expr (fun s x -> cont) 
 

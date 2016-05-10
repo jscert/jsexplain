@@ -213,7 +213,7 @@ function jsvalue_of_value(v) {
 }
 
 function lookup_var_in_record_decl(name, env_record_decl) {
-  var ro = Heap.read_option(string_eq, env_record_decl, name);
+  var ro = HeapStr.read_option(env_record_decl, name);
   switch (ro.tag) {
     case "None":
       return undefined;
@@ -244,7 +244,7 @@ function lookup_var_in_object(state, name, loc) {
    if (obj_opt.tag != "Some") throw "show_object: unbound object";
    var obj = obj_opt.value;
    var props = obj.object_properties_;
-   var ro = Heap.read_option(string_eq, props, name);
+   var ro = HeapStr.read_option(props, name);
    switch (ro.tag) {
      case "None":
        return undefined;
@@ -693,10 +693,13 @@ function string_of_any(v) {
 
 // --------------- Views for JS state/context ----------------
 
-function array_of_heap(heap) {
-  var items_list = Heap.to_list(string_eq, heap);
+/*
+function array_of_heap(compare, heap) {
+  var items_list = Heap.to_list(compare, heap);
   return encoded_list_to_array(items_list);
-} 
+}
+*/
+
 
 function string_of_prealloc(prealloc) {
     return (prealloc.tag).slice("Coq_prealloc_".length);
@@ -804,7 +807,7 @@ function show_object(state, loc, target, depth) {
    if (obj_opt.tag != "Some") throw "show_object: unbound object";
    var obj = obj_opt.value;
    var props = obj.object_properties_;
-   var key_value_pair_array = array_of_heap(props);
+   var key_value_pair_array = encoded_list_to_array(HeapStr.to_list(props));
    // 
    var is_global = (string_of_loc(loc) == "global");
    for (var j = 0; j < key_value_pair_array.length; j++) {
@@ -890,7 +893,7 @@ function show_value(state, v, target, depth) {
 function show_decl_env_record(state, env_record_decl, target) {
    // env_record_decl : (string, mutability * value) Heap.heap
    var t = $("#" + target);
-   var items_array = array_of_heap(env_record_decl);
+   var items_array = encoded_list_to_array(HeapStr.to_list(env_record_decl));
    for (var i = 0; i < items_array.length; i++) {
       var var_name = items_array[i][0];
       var mutability = items_array[i][1][0];
@@ -1449,7 +1452,7 @@ readSourceParseAndRun();
 //stepTo(5873);
 // setExample(20);
 setExample(3);
-$("#reach_condition").val("S_line() == 3 && S('i') == 1 && I_line() == 858");
+$("#reach_condition").val("S_line() == 3 && S('i') == 1");
 
 
 function showCurrent() {

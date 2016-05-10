@@ -34,13 +34,18 @@ ASSEMBLY_JS_FILES := \
 	LibList.unlog.js \
 	LibOption.unlog.js \
 	LibProd.unlog.js \
+	StdMap.unlog.js \
 	Heap.unlog.js \
+	HeapInt.unlog.js \
+	HeapStr.unlog.js \
+	HeapList.unlog.js \
 	Shared.unlog.js \
 	Compare.js \
 	Debug.js \
 	JsNumber.js \
 	JsSyntax.unlog.js \
 	JsSyntaxAux.unlog.js \
+	HeapObj.unlog.js \
 	Translate_syntax.js \
 	JsCommon.unlog.js \
 	JsCommonAux.unlog.js \
@@ -50,7 +55,7 @@ ASSEMBLY_JS_FILES := \
 	JsInterpreter.log.js
 ASSEMBLY_JS := $(STDLIB_DIR)/stdlib.js $(addprefix tests/jsref/,$(ASSEMBLY_JS_FILES))
 
-#	StdMap.unlog.js \
+#	
 
 
 ###############################################################

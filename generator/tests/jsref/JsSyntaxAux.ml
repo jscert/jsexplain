@@ -3,6 +3,110 @@ open JsSyntax
 open LibList
 open LibReflect
 
+let int_of_native_error e =
+  match e with
+  | Coq_native_error_eval -> 1
+  | Coq_native_error_range -> 2
+  | Coq_native_error_ref -> 3
+  | Coq_native_error_syntax -> 4
+  | Coq_native_error_type -> 5
+  | Coq_native_error_uri -> 6
+
+let int_of_mathop o =
+   match o with
+   | Coq_mathop_abs -> 1
+
+let int_of_prealloc p =
+  match p with
+  | Coq_prealloc_global -> 1
+  | Coq_prealloc_global_eval -> 2
+  | Coq_prealloc_global_parse_int -> 3
+  | Coq_prealloc_global_parse_float -> 4
+  | Coq_prealloc_global_is_finite -> 5
+  | Coq_prealloc_global_is_nan -> 6
+  | Coq_prealloc_global_decode_uri -> 7
+  | Coq_prealloc_global_decode_uri_component -> 8
+  | Coq_prealloc_global_encode_uri -> 9
+  | Coq_prealloc_global_encode_uri_component -> 10
+  | Coq_prealloc_object -> 11
+  | Coq_prealloc_object_get_proto_of -> 12
+  | Coq_prealloc_object_get_own_prop_descriptor -> 13
+  | Coq_prealloc_object_get_own_prop_name -> 14
+  | Coq_prealloc_object_create -> 15
+  | Coq_prealloc_object_define_prop -> 16
+  | Coq_prealloc_object_define_props -> 17
+  | Coq_prealloc_object_seal -> 18
+  | Coq_prealloc_object_freeze -> 19
+  | Coq_prealloc_object_prevent_extensions -> 20
+  | Coq_prealloc_object_is_sealed -> 21
+  | Coq_prealloc_object_is_frozen -> 22
+  | Coq_prealloc_object_is_extensible -> 23
+  | Coq_prealloc_object_keys -> 24
+  | Coq_prealloc_object_keys_call -> 25
+  | Coq_prealloc_object_proto -> 26
+  | Coq_prealloc_object_proto_to_string -> 27
+  | Coq_prealloc_object_proto_value_of -> 28
+  | Coq_prealloc_object_proto_has_own_prop -> 29
+  | Coq_prealloc_object_proto_is_prototype_of -> 30
+  | Coq_prealloc_object_proto_prop_is_enumerable -> 31
+  | Coq_prealloc_function -> 32
+  | Coq_prealloc_function_proto -> 33
+  | Coq_prealloc_function_proto_to_string -> 34
+  | Coq_prealloc_function_proto_apply -> 35
+  | Coq_prealloc_function_proto_call -> 36
+  | Coq_prealloc_function_proto_bind -> 37
+  | Coq_prealloc_bool -> 38
+  | Coq_prealloc_bool_proto -> 39
+  | Coq_prealloc_bool_proto_to_string -> 40
+  | Coq_prealloc_bool_proto_value_of -> 41
+  | Coq_prealloc_number -> 42
+  | Coq_prealloc_number_proto -> 43
+  | Coq_prealloc_number_proto_to_string -> 44
+  | Coq_prealloc_number_proto_value_of -> 45
+  | Coq_prealloc_number_proto_to_fixed -> 46
+  | Coq_prealloc_number_proto_to_exponential -> 47
+  | Coq_prealloc_number_proto_to_precision -> 48
+  | Coq_prealloc_array -> 49
+  | Coq_prealloc_array_is_array -> 50
+  | Coq_prealloc_array_proto -> 51
+  | Coq_prealloc_array_proto_to_string -> 52
+  | Coq_prealloc_array_proto_join -> 53
+  | Coq_prealloc_array_proto_pop -> 54
+  | Coq_prealloc_array_proto_push -> 55
+  | Coq_prealloc_string -> 56
+  | Coq_prealloc_string_proto -> 57
+  | Coq_prealloc_string_proto_to_string -> 58
+  | Coq_prealloc_string_proto_value_of -> 59
+  | Coq_prealloc_string_proto_char_at -> 60
+  | Coq_prealloc_string_proto_char_code_at -> 61
+  | Coq_prealloc_math -> 62
+  | Coq_prealloc_date -> 63
+  | Coq_prealloc_regexp -> 64
+  | Coq_prealloc_error -> 65
+  | Coq_prealloc_error_proto -> 66
+  | Coq_prealloc_error_proto_to_string -> 67
+  | Coq_prealloc_throw_type_error -> 68
+  | Coq_prealloc_json -> 69
+  | Coq_prealloc_mathop o -> 100 + int_of_mathop o
+  | Coq_prealloc_native_error e -> 200 + int_of_native_error e
+  | Coq_prealloc_native_error_proto e -> 300 + int_of_native_error e
+
+let prealloc_cmp p1 p2 =
+  int_compare (int_of_prealloc p1) (int_of_prealloc p2)
+
+let object_loc_cmp l1 l2 =
+   match l1 with
+   | Coq_object_loc_normal n1 ->
+      begin match l2 with 
+      | Coq_object_loc_normal n2 -> int_compare n1 n2
+      | Coq_object_loc_prealloc p2 -> 1
+      end
+   | Coq_object_loc_prealloc p1 ->
+      begin match l2 with 
+      | Coq_object_loc_normal n2 -> -1
+      | Coq_object_loc_prealloc p2 -> prealloc_cmp p1 p2
+      end
+
 (** val object_create :
     value -> class_name -> bool -> object_properties_type -> coq_object **)
 

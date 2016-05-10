@@ -212,16 +212,16 @@ type prealloc =
 | Coq_prealloc_string_proto_char_at [@f]
 | Coq_prealloc_string_proto_char_code_at [@f]
 | Coq_prealloc_math [@f]
-| Coq_prealloc_mathop  [@f mathop] of mathop
 | Coq_prealloc_date [@f]
 | Coq_prealloc_regexp [@f]
 | Coq_prealloc_error [@f]
 | Coq_prealloc_error_proto [@f]
-| Coq_prealloc_native_error  [@f error] of native_error
-| Coq_prealloc_native_error_proto  [@f error] of native_error
 | Coq_prealloc_error_proto_to_string [@f]
 | Coq_prealloc_throw_type_error [@f]
 | Coq_prealloc_json [@f]
+| Coq_prealloc_mathop  [@f mathop] of mathop
+| Coq_prealloc_native_error  [@f error] of native_error
+| Coq_prealloc_native_error_proto  [@f error] of native_error
 
 type call =
 | Coq_call_default [@f]

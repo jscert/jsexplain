@@ -58,7 +58,11 @@ val ( >= ) : float -> float -> bool
 
 var nat_eq = function(x, y) { return x === y; };
 var int_eq = function(x, y) { return x === y; };
+var int_lt = function(x, y) { return x < y; };
+var int_gt = function(x, y) { return x > y; };
+var int_le = function(x, y) { return x <= y; };
 var int_ge = function(x, y) { return x >= y; };
+var int_compare = function(x, y) { return x - y; };
 
 //----------------------------------------------------------------------------
 

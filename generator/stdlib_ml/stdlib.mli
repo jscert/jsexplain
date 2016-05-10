@@ -17,8 +17,12 @@ val ( / ) : int -> int -> int
 
 val nat_eq : int -> int -> bool (* nat_eq x y = int_eq x y  *)
 val int_eq : int -> int -> bool
+val int_lt : int -> int -> bool
+val int_gt : int -> int -> bool
+val int_le : int -> int -> bool
 val int_ge : int -> int -> bool
 (* val int_lt : int -> int -> bool*)
+val int_compare : int -> int -> int
 
 (*--------------------*)
 (* float operations *)
@@ -125,7 +129,7 @@ val ( || ) : bool -> bool -> bool  (* beware of strict vs lazy semantics: todo d
 (* todo : factorize and clean up *)
 
 val string_eq : string -> string -> bool (* === *)
-val string_compare : string -> string -> float (* actually returns an int *)
+val string_compare : string -> string -> int
 
 (*
    val string_concat : string -> string -> string (* + *)

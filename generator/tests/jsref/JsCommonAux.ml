@@ -196,20 +196,20 @@ let ref_kind_comparable x y =
 
 (* STATEFUL-RO *)
 let object_binds_pickable_option s l =
-  Heap.read_option object_loc_comparable s.state_object_heap l
+  HeapObj.read_option s.state_object_heap l
 
 (** val env_record_binds_pickable_option :
     state -> env_loc -> env_record coq_Pickable_option **)
 
 (* STATEFUL-RO *)
 let env_record_binds_pickable_option s l =
-  Heap.read_option nat_eq s.state_env_record_heap l
+  HeapInt.read_option s.state_env_record_heap l
 
 (** val decl_env_record_pickable_option :
     decl_env_record -> prop_name -> (mutability * value) coq_Pickable_option **)
 
 let decl_env_record_pickable_option ed x =
-  Heap.read_option string_eq ed x
+  HeapStr.read_option ed x
 
 (** val descriptor_is_data_dec : descriptor -> bool **)
 
@@ -398,6 +398,6 @@ let is_callable_dec s v =
 
 (* STATEFUL-RO *)
 let object_properties_keys_as_list_pickable_option s l =
-  map (fun props -> LibList.map fst (Heap.to_list string_eq props))
+  map (fun props -> LibList.map fst (HeapStr.to_list props))
     (map object_properties_ (object_binds_pickable_option s l))
 

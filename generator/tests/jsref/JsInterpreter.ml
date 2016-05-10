@@ -584,14 +584,14 @@ and object_define_own_prop s c l x desc throwcont =
                     else Coq_attributes_accessor_of
                         (attributes_accessor_of_descriptor desc0)) in
         let%some s2 = (object_heap_map_properties_pickable_option s1 l
-                         (fun p -> Heap.write p x0 a)) in
+                         (fun p -> HeapStr.write p x0 a)) in
         res_ter s2
           (res_val (Coq_value_prim (Coq_prim_bool true)))
       else reject s1 throwcont0
     | Coq_full_descriptor_some a ->
       let object_define_own_prop_write s2 a0 =
           let a_2 = attributes_update a0 desc0 in
-          let%some s3 = (object_heap_map_properties_pickable_option s2 l (fun p -> Heap.write p x0 a_2)) in
+          let%some s3 = (object_heap_map_properties_pickable_option s2 l (fun p -> HeapStr.write p x0 a_2)) in
           res_ter s3 (res_val (Coq_value_prim (Coq_prim_bool true))) in
       if descriptor_contains_dec (descriptor_of_attributes a) desc0
       then res_ter s1 (res_val (Coq_value_prim (Coq_prim_bool true)))
@@ -607,7 +607,7 @@ and object_define_own_prop s c l x desc throwcont =
             | Coq_attributes_accessor_of aa ->
               Coq_attributes_data_of (attributes_data_of_attributes_accessor aa)) in
           let%some s2 = (object_heap_map_properties_pickable_option
-                           s1 l (fun p -> Heap.write p x0 a_2)) in
+                           s1 l (fun p -> HeapStr.write p x0 a_2)) in
           object_define_own_prop_write s2 a_2
         else reject s1 throwcont0
       else if (attributes_is_data_dec a) && (descriptor_is_data_dec desc0)
@@ -801,7 +801,7 @@ and prim_new_object s _foo_ = match _foo_ with
     let%some s_2 = (object_heap_map_properties_pickable_option
                       s1 l
                       (fun p ->
-                         Heap.write p ("length")
+                         HeapStr.write p ("length")
                            (Coq_attributes_data_of
                               (attributes_data_intro_constant
                                  (Coq_value_prim
@@ -847,7 +847,7 @@ and env_record_has_binding s c l x =
       | Coq_env_record_decl ed ->
         result_out (Coq_out_ter (s,
                                  (res_val (Coq_value_prim (Coq_prim_bool
-                                                             (Heap.indom_decidable string_eq ed x))))))
+                                                             (HeapStr.indom_dec ed x))))))
       | Coq_env_record_object (l0, pt) -> object_has_prop s c l0 x
 
 (** val lexical_env_get_identifier_ref :
@@ -877,7 +877,7 @@ and object_delete_default s c l x str =
         if attributes_configurable a
         then let%some
              s_2 = (object_heap_map_properties_pickable_option s1 l (fun p ->
-                 Heap.rem string_eq p x)) in
+                 HeapStr.rem p x)) in
                 res_ter s_2 (res_val (Coq_value_prim (Coq_prim_bool true)))
         else out_error_or_cst s1 str Coq_native_error_type (Coq_value_prim
                                                               (Coq_prim_bool false))
@@ -914,7 +914,7 @@ and env_record_delete_binding s c l x =
   let%some e = (env_record_binds_pickable_option s l) in
       match e with
       | Coq_env_record_decl ed ->
-        (match Heap.read_option string_eq ed x with
+        (match HeapStr.read_option ed x with
          | Some p ->
            let (mu, v) = p in
            (match mu with
@@ -968,7 +968,7 @@ and env_record_get_binding_value s c l x str =
   let%some e = (env_record_binds_pickable_option s l) in
       match e with
       | Coq_env_record_decl ed ->
-        let%some rm = (Heap.read_option string_eq ed x) in
+        let%some rm = (HeapStr.read_option ed x) in
             let (mu, v) = rm in
             if mutability_comparable mu Coq_mutability_uninitialized_immutable
             then out_error_or_cst s str Coq_native_error_ref (Coq_value_prim
@@ -1126,7 +1126,7 @@ and env_record_set_mutable_binding s c l x v str =
   let%some e = (env_record_binds_pickable_option s l) in
       match e with
       | Coq_env_record_decl ed ->
-        let%some rm = (Heap.read_option string_eq ed x) in
+        let%some rm = (HeapStr.read_option ed x) in
             let (mu, v_old) = rm in
             if not (mutability_comparable mu Coq_mutability_immutable)
             then res_void (env_record_write_decl_env s l x mu v)
@@ -1202,7 +1202,7 @@ and env_record_create_mutable_binding s c l x deletable_opt =
       let%some e = (env_record_binds_pickable_option s l) in
           match e with
           | Coq_env_record_decl ed ->
-            if Heap.indom_decidable string_eq ed x
+            if HeapStr.indom_dec ed x
             then (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s
                 ("Already declared environnment record in [env_record_create_mutable_binding].")
@@ -1240,7 +1240,7 @@ and env_record_create_immutable_binding s l x =
   let%some e = (env_record_binds_pickable_option s l) in
       match e with
       | Coq_env_record_decl ed ->
-        if Heap.indom_decidable string_eq ed x
+        if HeapStr.indom_dec ed x
         then (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
             s
             ("Already declared environnment record in [env_record_create_immutable_binding].")
@@ -1305,7 +1305,7 @@ and array_args_map_loop s c l args ind =
   | [] -> res_void s
   | h :: rest ->
     let%some s_2 = (object_heap_map_properties_pickable_option s l (fun p ->
-           Heap.write p (JsNumber.to_string (of_int ind))
+           HeapStr.write p (JsNumber.to_string (of_int ind))
              (Coq_attributes_data_of (attributes_data_intro_all_true h)))) in array_args_map_loop s_2 c l rest (ind +. 1.)
 
 (** val string_of_prealloc : prealloc -> string **)
@@ -1492,7 +1492,7 @@ and run_construct_prealloc s c b args =
                   let  follow = (fun s_3 length0 ->
                       let%some
                          s0 = (object_heap_map_properties_pickable_option s_3 l (fun p0 ->
-                             Heap.write p0 ("length")
+                             HeapStr.write p0 ("length")
                                (Coq_attributes_data_of { attributes_data_value =
                                                            (Coq_value_prim (Coq_prim_number (of_int length0)));
                                                          attributes_data_writable = true;
@@ -1510,7 +1510,7 @@ and run_construct_prealloc s c b args =
                                      
                                      s0 = (object_heap_map_properties_pickable_option s_2 l
                                         (fun p1 ->
-                                           Heap.write p1 ("0") (Coq_attributes_data_of
+                                           HeapStr.write p1 ("0") (Coq_attributes_data_of
                                                                   (attributes_data_intro_all_true v)))) in
                                         follow s0 1.0
                                  | Coq_prim_null ->
@@ -1518,7 +1518,7 @@ and run_construct_prealloc s c b args =
                                      
                                      s0 = (object_heap_map_properties_pickable_option s_2 l
                                         (fun p1 ->
-                                           Heap.write p1 ("0") (Coq_attributes_data_of
+                                           HeapStr.write p1 ("0") (Coq_attributes_data_of
                                                                   (attributes_data_intro_all_true v)))) in
                                         follow s0 1.0
                                  | Coq_prim_bool b0 ->
@@ -1526,7 +1526,7 @@ and run_construct_prealloc s c b args =
                                      
                                      s0 = (object_heap_map_properties_pickable_option s_2 l
                                         (fun p1 ->
-                                           Heap.write p1 ("0") (Coq_attributes_data_of
+                                           HeapStr.write p1 ("0") (Coq_attributes_data_of
                                                                   (attributes_data_intro_all_true v)))) in
                                         follow s0 1.0
                                  | Coq_prim_number vlen ->
@@ -1541,20 +1541,20 @@ and run_construct_prealloc s c b args =
                                      
                                      s1 = (object_heap_map_properties_pickable_option s_2 l
                                         (fun p1 ->
-                                           Heap.write p1 ("0") (Coq_attributes_data_of
+                                           HeapStr.write p1 ("0") (Coq_attributes_data_of
                                                                   (attributes_data_intro_all_true v)))) in
                                         follow s1 1.0)
                               | Coq_value_object o0 ->
                                 let%some
                                    s0 = (object_heap_map_properties_pickable_option s_2 l
                                      (fun p0 ->
-                                        Heap.write p0 ("0") (Coq_attributes_data_of
+                                        HeapStr.write p0 ("0") (Coq_attributes_data_of
                                                                (attributes_data_intro_all_true v)))) in
                                       follow s0 1.0
                           else let%some
                                s0 = (object_heap_map_properties_pickable_option s_2 l
                                  (fun p0 ->
-                                    Heap.write p0
+                                    HeapStr.write p0
                                       ("length")
                                       (Coq_attributes_data_of { attributes_data_value =
                                                                   (Coq_value_prim (Coq_prim_number
@@ -1583,7 +1583,7 @@ and run_construct_prealloc s c b args =
                                                               (Coq_prim_number (number_of_int (strlength s1))))) in
                               let%some
                                  s_2 = (object_heap_map_properties_pickable_option s2 l (fun p ->
-                                     Heap.write p ("length")
+                                     HeapStr.write p ("length")
                                        (Coq_attributes_data_of lenDesc))) in
                                     res_ter s_2 (res_val (Coq_value_object l))) in
                    let  arg_len = (LibList.length args) in
@@ -2137,7 +2137,7 @@ and run_object_get_own_prop s c l x =
               res_spec s_2
                 (ifx_some_or_default
                    (convert_option_attributes
-                      (Heap.read_option string_eq p x))
+                      (HeapStr.read_option p x))
                    Coq_full_descriptor_undef (fun x -> x))) in
           match b with
           | Coq_builtin_get_own_prop_default -> def s
@@ -4064,7 +4064,7 @@ and run_call_prealloc s c b vthis args =
                                                                 let%some
                                                                   s11 = (object_heap_map_properties_pickable_option
                                                                      s10 l (fun p ->
-                                                                         Heap.write p
+                                                                         HeapStr.write p
                                                                            ("length")
                                                                            (Coq_attributes_data_of a0))) in
                                                                      let 

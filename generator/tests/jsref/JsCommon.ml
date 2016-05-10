@@ -174,7 +174,7 @@ let state_map_object_heap s f =
 
 (* STATEFUL *)
 let object_write s l o =
-  state_map_object_heap s (fun h -> Heap.write h l o)
+  state_map_object_heap s (fun h -> HeapObj.write h l o)
 
 (** val object_alloc : state -> coq_object -> object_loc * state **)
 
@@ -301,7 +301,7 @@ let state_map_env_record_heap s f =
 
 (* STATEFUL *)
 let env_record_write s l e =
-  state_map_env_record_heap s (fun h -> Heap.write h l e)
+  state_map_env_record_heap s (fun h -> HeapInt.write h l e)
 
 (** val env_record_alloc : state -> env_record -> int * state **)
 
@@ -312,7 +312,7 @@ let env_record_alloc s e =
   in
   let l =  state_fresh_locations0 in
   let alloc = state_fresh_locations0 + 1 in
-  let bindings' = Heap.write bindings l e in
+  let bindings' = HeapInt.write bindings l e in
   (l, { state_object_heap = cells; state_env_record_heap = bindings';
   state_fresh_locations = alloc })
 
@@ -340,20 +340,20 @@ let decl_env_record_empty =
     decl_env_record -> prop_name -> mutability -> value -> decl_env_record **)
 
 let decl_env_record_write ed x mu v =
-  Heap.write ed x (mu, v)
+  HeapStr.write ed x (mu, v)
 
 (** val decl_env_record_rem :
     decl_env_record -> prop_name -> decl_env_record **)
 
 let decl_env_record_rem ed x =
-  Heap.rem string_eq ed x
+  HeapStr.rem ed x
 
 (** val env_record_write_decl_env :
     state -> env_loc -> prop_name -> mutability -> value -> state **)
 
 (* STATEFUL *)
 let env_record_write_decl_env s l x mu v =
-  match Heap.read nat_eq s.state_env_record_heap l with
+  match HeapInt.read s.state_env_record_heap l with
   | Coq_env_record_decl ed ->
     let env' = decl_env_record_write ed x mu v in
     env_record_write s l (Coq_env_record_decl env')

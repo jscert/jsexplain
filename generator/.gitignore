@@ -2,6 +2,8 @@
 *.log.js
 *.unlog.js
 *.token.js
+*.pseudo.js
+*.ptoken.js
 *.mlloc.js
 *.pre
 tests/jsref/assembly.js

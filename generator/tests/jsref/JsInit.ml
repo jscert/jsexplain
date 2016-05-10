@@ -50,7 +50,7 @@ let object_create_builtin vproto sclass p =
 let object_create_prealloc_call_or_construct length p =
   let sclass = "Function" in
   let p' =
-    Heap.write p ("length")
+    HeapStr.write p ("length")
       (Coq_attributes_data_of (attrib_constant length))
   in
   object_create_builtin (Coq_value_object (Coq_object_loc_prealloc
@@ -76,7 +76,7 @@ let object_create_prealloc_constructor fprealloc length p =
     Heap.heap **)
 
 let write_native p name v =
-  Heap.write p name (Coq_attributes_data_of
+  HeapStr.write p name (Coq_attributes_data_of
     (prop_attributes_for_global_object v))
 
 (** val write_constant :
@@ -84,7 +84,7 @@ let write_native p name v =
     Heap.heap **)
 
 let write_constant p name value0 =
-  Heap.write p name (Coq_attributes_data_of (attrib_constant value0))
+  HeapStr.write p name (Coq_attributes_data_of (attrib_constant value0))
 
 (** val object_prealloc_global_proto : value **)
 
@@ -554,7 +554,7 @@ let object_prealloc_function_proto =
       (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_function))
   in
   let p0 =
-    Heap.write p ("length")
+    HeapStr.write p ("length")
       (Coq_attributes_data_of
       (attrib_constant (Coq_value_prim (Coq_prim_number
         0.0))))
@@ -987,43 +987,43 @@ let throw_type_error_object =
 
 let object_heap_initial_function_objects_1 h =
   let h0 =
-    Heap.write h (Coq_object_loc_prealloc Coq_prealloc_throw_type_error)
+    HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_throw_type_error)
       throw_type_error_object
   in
   let h1 =
-    Heap.write h0 (Coq_object_loc_prealloc Coq_prealloc_global_eval)
+    HeapObj.write h0 (Coq_object_loc_prealloc Coq_prealloc_global_eval)
       global_eval_function_object
   in
   let h2 =
-    Heap.write h1 (Coq_object_loc_prealloc Coq_prealloc_global_parse_int)
+    HeapObj.write h1 (Coq_object_loc_prealloc Coq_prealloc_global_parse_int)
       global_parse_int_function_object
   in
   let h3 =
-    Heap.write h2 (Coq_object_loc_prealloc Coq_prealloc_global_parse_float)
+    HeapObj.write h2 (Coq_object_loc_prealloc Coq_prealloc_global_parse_float)
       global_parse_float_function_object
   in
   let h4 =
-    Heap.write h3 (Coq_object_loc_prealloc Coq_prealloc_global_is_nan)
+    HeapObj.write h3 (Coq_object_loc_prealloc Coq_prealloc_global_is_nan)
       global_is_nan_function_object
   in
   let h5 =
-    Heap.write h4 (Coq_object_loc_prealloc Coq_prealloc_global_is_finite)
+    HeapObj.write h4 (Coq_object_loc_prealloc Coq_prealloc_global_is_finite)
       global_is_finite_function_object
   in
   let h6 =
-    Heap.write h5 (Coq_object_loc_prealloc Coq_prealloc_global_decode_uri)
+    HeapObj.write h5 (Coq_object_loc_prealloc Coq_prealloc_global_decode_uri)
       global_decode_uri_function_object
   in
   let h7 =
-    Heap.write h6 (Coq_object_loc_prealloc
+    HeapObj.write h6 (Coq_object_loc_prealloc
       Coq_prealloc_global_decode_uri_component)
       global_decode_uri_component_function_object
   in
   let h8 =
-    Heap.write h7 (Coq_object_loc_prealloc Coq_prealloc_global_encode_uri)
+    HeapObj.write h7 (Coq_object_loc_prealloc Coq_prealloc_global_encode_uri)
       global_encode_uri_function_object
   in
-  Heap.write h8 (Coq_object_loc_prealloc
+  HeapObj.write h8 (Coq_object_loc_prealloc
     Coq_prealloc_global_encode_uri_component)
     global_encode_uri_component_function_object
 
@@ -1033,53 +1033,53 @@ let object_heap_initial_function_objects_1 h =
 let object_heap_initial_function_objects_2 h =
   let h0 = object_heap_initial_function_objects_1 h in
   let h1 =
-    Heap.write h0 (Coq_object_loc_prealloc Coq_prealloc_object_get_proto_of)
+    HeapObj.write h0 (Coq_object_loc_prealloc Coq_prealloc_object_get_proto_of)
       object_get_proto_of_function_object
   in
   let h2 =
-    Heap.write h1 (Coq_object_loc_prealloc
+    HeapObj.write h1 (Coq_object_loc_prealloc
       Coq_prealloc_object_get_own_prop_descriptor)
       object_get_own_prop_descriptor_function_object
   in
   let h3 =
-    Heap.write h2 (Coq_object_loc_prealloc
+    HeapObj.write h2 (Coq_object_loc_prealloc
       Coq_prealloc_object_get_own_prop_name)
       object_get_own_prop_name_function_object
   in
   let h4 =
-    Heap.write h3 (Coq_object_loc_prealloc Coq_prealloc_object_create)
+    HeapObj.write h3 (Coq_object_loc_prealloc Coq_prealloc_object_create)
       object_create_function_object
   in
   let h5 =
-    Heap.write h4 (Coq_object_loc_prealloc Coq_prealloc_object_define_prop)
+    HeapObj.write h4 (Coq_object_loc_prealloc Coq_prealloc_object_define_prop)
       object_define_prop_function_object
   in
   let h6 =
-    Heap.write h5 (Coq_object_loc_prealloc Coq_prealloc_object_define_props)
+    HeapObj.write h5 (Coq_object_loc_prealloc Coq_prealloc_object_define_props)
       object_define_props_function_object
   in
   let h7 =
-    Heap.write h6 (Coq_object_loc_prealloc Coq_prealloc_object_seal)
+    HeapObj.write h6 (Coq_object_loc_prealloc Coq_prealloc_object_seal)
       object_seal_function_object
   in
   let h8 =
-    Heap.write h7 (Coq_object_loc_prealloc Coq_prealloc_object_freeze)
+    HeapObj.write h7 (Coq_object_loc_prealloc Coq_prealloc_object_freeze)
       object_freeze_function_object
   in
   let h9 =
-    Heap.write h8 (Coq_object_loc_prealloc
+    HeapObj.write h8 (Coq_object_loc_prealloc
       Coq_prealloc_object_prevent_extensions)
       object_prevent_extensions_function_object
   in
   let h10 =
-    Heap.write h9 (Coq_object_loc_prealloc Coq_prealloc_object_is_sealed)
+    HeapObj.write h9 (Coq_object_loc_prealloc Coq_prealloc_object_is_sealed)
       object_is_sealed_function_object
   in
   let h11 =
-    Heap.write h10 (Coq_object_loc_prealloc Coq_prealloc_object_is_frozen)
+    HeapObj.write h10 (Coq_object_loc_prealloc Coq_prealloc_object_is_frozen)
       object_is_frozen_function_object
   in
-  Heap.write h11 (Coq_object_loc_prealloc Coq_prealloc_object_is_extensible)
+  HeapObj.write h11 (Coq_object_loc_prealloc Coq_prealloc_object_is_extensible)
     object_is_extensible_function_object
 
 (** val object_heap_initial_function_objects_3 :
@@ -1088,44 +1088,44 @@ let object_heap_initial_function_objects_2 h =
 let object_heap_initial_function_objects_3 h =
   let h0 = object_heap_initial_function_objects_2 h in
   let h1 =
-    Heap.write h0 (Coq_object_loc_prealloc
+    HeapObj.write h0 (Coq_object_loc_prealloc
       Coq_prealloc_object_proto_to_string)
       object_proto_to_string_function_object
   in
   let h2 =
-    Heap.write h1 (Coq_object_loc_prealloc
+    HeapObj.write h1 (Coq_object_loc_prealloc
       Coq_prealloc_object_proto_value_of)
       object_proto_value_of_function_object
   in
   let h3 =
-    Heap.write h2 (Coq_object_loc_prealloc
+    HeapObj.write h2 (Coq_object_loc_prealloc
       Coq_prealloc_object_proto_has_own_prop)
       object_proto_has_own_prop_function_object
   in
   let h4 =
-    Heap.write h3 (Coq_object_loc_prealloc
+    HeapObj.write h3 (Coq_object_loc_prealloc
       Coq_prealloc_object_proto_is_prototype_of)
       object_proto_is_prototype_of_function_object
   in
   let h5 =
-    Heap.write h4 (Coq_object_loc_prealloc
+    HeapObj.write h4 (Coq_object_loc_prealloc
       Coq_prealloc_object_proto_prop_is_enumerable)
       object_proto_prop_is_enumerable_function_object
   in
   let h6 =
-    Heap.write h5 (Coq_object_loc_prealloc
+    HeapObj.write h5 (Coq_object_loc_prealloc
       Coq_prealloc_function_proto_to_string)
       function_proto_to_string_function_object
   in
   let h7 =
-    Heap.write h6 (Coq_object_loc_prealloc Coq_prealloc_function_proto_call)
+    HeapObj.write h6 (Coq_object_loc_prealloc Coq_prealloc_function_proto_call)
       function_proto_call_function_object
   in
   let h8 =
-    Heap.write h7 (Coq_object_loc_prealloc Coq_prealloc_function_proto_bind)
+    HeapObj.write h7 (Coq_object_loc_prealloc Coq_prealloc_function_proto_bind)
       function_proto_bind_function_object
   in
-  Heap.write h8 (Coq_object_loc_prealloc Coq_prealloc_function_proto_apply)
+  HeapObj.write h8 (Coq_object_loc_prealloc Coq_prealloc_function_proto_apply)
     function_proto_apply_function_object
 
 (** val object_heap_initial_function_objects_4 :
@@ -1134,41 +1134,41 @@ let object_heap_initial_function_objects_3 h =
 let object_heap_initial_function_objects_4 h =
   let h0 = object_heap_initial_function_objects_3 h in
   let h1 =
-    Heap.write h0 (Coq_object_loc_prealloc Coq_prealloc_array_is_array)
+    HeapObj.write h0 (Coq_object_loc_prealloc Coq_prealloc_array_is_array)
       array_is_array_function_object
   in
   let h2 =
-    Heap.write h1 (Coq_object_loc_prealloc
+    HeapObj.write h1 (Coq_object_loc_prealloc
       Coq_prealloc_array_proto_to_string)
       array_proto_to_string_function_object
   in
   let h3 =
-    Heap.write h2 (Coq_object_loc_prealloc Coq_prealloc_array_proto_join)
+    HeapObj.write h2 (Coq_object_loc_prealloc Coq_prealloc_array_proto_join)
       array_proto_join_function_object
   in
   let h4 =
-    Heap.write h3 (Coq_object_loc_prealloc Coq_prealloc_array_proto_pop)
+    HeapObj.write h3 (Coq_object_loc_prealloc Coq_prealloc_array_proto_pop)
       array_proto_pop_function_object
   in
   let h5 =
-    Heap.write h4 (Coq_object_loc_prealloc Coq_prealloc_array_proto_push)
+    HeapObj.write h4 (Coq_object_loc_prealloc Coq_prealloc_array_proto_push)
       array_proto_push_function_object
   in
   let h6 =
-    Heap.write h5 (Coq_object_loc_prealloc
+    HeapObj.write h5 (Coq_object_loc_prealloc
       Coq_prealloc_string_proto_to_string)
       string_proto_to_string_function_object
   in
   let h7 =
-    Heap.write h6 (Coq_object_loc_prealloc
+    HeapObj.write h6 (Coq_object_loc_prealloc
       Coq_prealloc_string_proto_value_of)
       string_proto_value_of_function_object
   in
   let h8 =
-    Heap.write h7 (Coq_object_loc_prealloc Coq_prealloc_bool_proto_to_string)
+    HeapObj.write h7 (Coq_object_loc_prealloc Coq_prealloc_bool_proto_to_string)
       bool_proto_to_string_function_object
   in
-  Heap.write h8 (Coq_object_loc_prealloc Coq_prealloc_bool_proto_value_of)
+  HeapObj.write h8 (Coq_object_loc_prealloc Coq_prealloc_bool_proto_value_of)
     bool_proto_value_of_function_object
 
 (** val object_heap_initial_function_objects :
@@ -1177,155 +1177,155 @@ let object_heap_initial_function_objects_4 h =
 let object_heap_initial_function_objects h =
   let h0 = object_heap_initial_function_objects_4 h in
   let h1 =
-    Heap.write h0 (Coq_object_loc_prealloc
+    HeapObj.write h0 (Coq_object_loc_prealloc
       Coq_prealloc_number_proto_to_string)
       number_proto_to_string_function_object
   in
   let h2 =
-    Heap.write h1 (Coq_object_loc_prealloc
+    HeapObj.write h1 (Coq_object_loc_prealloc
       Coq_prealloc_number_proto_value_of)
       number_proto_value_of_function_object
   in
-  Heap.write h2 (Coq_object_loc_prealloc Coq_prealloc_error_proto_to_string)
+  HeapObj.write h2 (Coq_object_loc_prealloc Coq_prealloc_error_proto_to_string)
     error_proto_to_string_function_object
 
-(** val object_heap_initial : (object_loc, coq_object) Heap.heap **)
+(** val object_heap_initial : (object_loc, coq_object) HeapObj.heap **)
 
 let object_heap_initial =
   let h =
-    Heap.write Heap.empty (Coq_object_loc_prealloc Coq_prealloc_global)
+    HeapObj.write Heap.empty (Coq_object_loc_prealloc Coq_prealloc_global)
       object_prealloc_global
   in
   let h0 =
-    Heap.write h (Coq_object_loc_prealloc Coq_prealloc_object)
+    HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_object)
       object_prealloc_object
   in
   let h1 =
-    Heap.write h0 (Coq_object_loc_prealloc Coq_prealloc_object_proto)
+    HeapObj.write h0 (Coq_object_loc_prealloc Coq_prealloc_object_proto)
       object_prealloc_object_proto
   in
   let h2 =
-    Heap.write h1 (Coq_object_loc_prealloc Coq_prealloc_bool)
+    HeapObj.write h1 (Coq_object_loc_prealloc Coq_prealloc_bool)
       object_prealloc_bool
   in
   let h3 =
-    Heap.write h2 (Coq_object_loc_prealloc Coq_prealloc_bool_proto)
+    HeapObj.write h2 (Coq_object_loc_prealloc Coq_prealloc_bool_proto)
       object_prealloc_bool_proto
   in
   let h4 =
-    Heap.write h3 (Coq_object_loc_prealloc Coq_prealloc_number)
+    HeapObj.write h3 (Coq_object_loc_prealloc Coq_prealloc_number)
       object_prealloc_number
   in
   let h5 =
-    Heap.write h4 (Coq_object_loc_prealloc Coq_prealloc_number_proto)
+    HeapObj.write h4 (Coq_object_loc_prealloc Coq_prealloc_number_proto)
       object_prealloc_number_proto
   in
   let h6 =
-    Heap.write h5 (Coq_object_loc_prealloc Coq_prealloc_function)
+    HeapObj.write h5 (Coq_object_loc_prealloc Coq_prealloc_function)
       object_prealloc_function
   in
   let h7 =
-    Heap.write h6 (Coq_object_loc_prealloc Coq_prealloc_function_proto)
+    HeapObj.write h6 (Coq_object_loc_prealloc Coq_prealloc_function_proto)
       object_prealloc_function_proto
   in
   let h8 =
-    Heap.write h7 (Coq_object_loc_prealloc Coq_prealloc_array)
+    HeapObj.write h7 (Coq_object_loc_prealloc Coq_prealloc_array)
       object_prealloc_array
   in
   let h9 =
-    Heap.write h8 (Coq_object_loc_prealloc Coq_prealloc_array_proto)
+    HeapObj.write h8 (Coq_object_loc_prealloc Coq_prealloc_array_proto)
       object_prealloc_array_proto
   in
   let h10 =
-    Heap.write h9 (Coq_object_loc_prealloc Coq_prealloc_string)
+    HeapObj.write h9 (Coq_object_loc_prealloc Coq_prealloc_string)
       object_prealloc_string
   in
   let h11 =
-    Heap.write h10 (Coq_object_loc_prealloc Coq_prealloc_string_proto)
+    HeapObj.write h10 (Coq_object_loc_prealloc Coq_prealloc_string_proto)
       object_prealloc_string_proto
   in
   let h12 =
-    Heap.write h11 (Coq_object_loc_prealloc Coq_prealloc_math)
+    HeapObj.write h11 (Coq_object_loc_prealloc Coq_prealloc_math)
       object_prealloc_math
   in
   let h13 =
-    Heap.write h12 (Coq_object_loc_prealloc Coq_prealloc_date)
+    HeapObj.write h12 (Coq_object_loc_prealloc Coq_prealloc_date)
       object_prealloc_date
   in
   let h14 =
-    Heap.write h13 (Coq_object_loc_prealloc Coq_prealloc_regexp)
+    HeapObj.write h13 (Coq_object_loc_prealloc Coq_prealloc_regexp)
       object_prealloc_regexp
   in
   let h15 =
-    Heap.write h14 (Coq_object_loc_prealloc Coq_prealloc_error_proto)
+    HeapObj.write h14 (Coq_object_loc_prealloc Coq_prealloc_error_proto)
       object_prealloc_error_proto
   in
   let h16 =
-    Heap.write h15 (Coq_object_loc_prealloc (Coq_prealloc_native_error_proto
+    HeapObj.write h15 (Coq_object_loc_prealloc (Coq_prealloc_native_error_proto
       Coq_native_error_eval))
       (object_prealloc_native_error_proto Coq_native_error_eval)
   in
   let h17 =
-    Heap.write h16 (Coq_object_loc_prealloc (Coq_prealloc_native_error_proto
+    HeapObj.write h16 (Coq_object_loc_prealloc (Coq_prealloc_native_error_proto
       Coq_native_error_range))
       (object_prealloc_native_error_proto Coq_native_error_range)
   in
   let h18 =
-    Heap.write h17 (Coq_object_loc_prealloc (Coq_prealloc_native_error_proto
+    HeapObj.write h17 (Coq_object_loc_prealloc (Coq_prealloc_native_error_proto
       Coq_native_error_ref))
       (object_prealloc_native_error_proto Coq_native_error_ref)
   in
   let h19 =
-    Heap.write h18 (Coq_object_loc_prealloc (Coq_prealloc_native_error_proto
+    HeapObj.write h18 (Coq_object_loc_prealloc (Coq_prealloc_native_error_proto
       Coq_native_error_syntax))
       (object_prealloc_native_error_proto Coq_native_error_syntax)
   in
   let h20 =
-    Heap.write h19 (Coq_object_loc_prealloc (Coq_prealloc_native_error_proto
+    HeapObj.write h19 (Coq_object_loc_prealloc (Coq_prealloc_native_error_proto
       Coq_native_error_type))
       (object_prealloc_native_error_proto Coq_native_error_type)
   in
   let h21 =
-    Heap.write h20 (Coq_object_loc_prealloc (Coq_prealloc_native_error_proto
+    HeapObj.write h20 (Coq_object_loc_prealloc (Coq_prealloc_native_error_proto
       Coq_native_error_uri))
       (object_prealloc_native_error_proto Coq_native_error_uri)
   in
   let h22 =
-    Heap.write h21 (Coq_object_loc_prealloc Coq_prealloc_error)
+    HeapObj.write h21 (Coq_object_loc_prealloc Coq_prealloc_error)
       object_prealloc_error
   in
   let h23 =
-    Heap.write h22 (Coq_object_loc_prealloc (Coq_prealloc_native_error
+    HeapObj.write h22 (Coq_object_loc_prealloc (Coq_prealloc_native_error
       Coq_native_error_eval))
       (object_prealloc_native_error Coq_native_error_eval)
   in
   let h24 =
-    Heap.write h23 (Coq_object_loc_prealloc (Coq_prealloc_native_error
+    HeapObj.write h23 (Coq_object_loc_prealloc (Coq_prealloc_native_error
       Coq_native_error_range))
       (object_prealloc_native_error Coq_native_error_range)
   in
   let h25 =
-    Heap.write h24 (Coq_object_loc_prealloc (Coq_prealloc_native_error
+    HeapObj.write h24 (Coq_object_loc_prealloc (Coq_prealloc_native_error
       Coq_native_error_ref))
       (object_prealloc_native_error Coq_native_error_ref)
   in
   let h26 =
-    Heap.write h25 (Coq_object_loc_prealloc (Coq_prealloc_native_error
+    HeapObj.write h25 (Coq_object_loc_prealloc (Coq_prealloc_native_error
       Coq_native_error_syntax))
       (object_prealloc_native_error Coq_native_error_syntax)
   in
   let h27 =
-    Heap.write h26 (Coq_object_loc_prealloc (Coq_prealloc_native_error
+    HeapObj.write h26 (Coq_object_loc_prealloc (Coq_prealloc_native_error
       Coq_native_error_type))
       (object_prealloc_native_error Coq_native_error_type)
   in
   let h28 =
-    Heap.write h27 (Coq_object_loc_prealloc (Coq_prealloc_native_error
+    HeapObj.write h27 (Coq_object_loc_prealloc (Coq_prealloc_native_error
       Coq_native_error_uri))
       (object_prealloc_native_error Coq_native_error_uri)
   in
   let h29 =
-    Heap.write h28 (Coq_object_loc_prealloc Coq_prealloc_json)
+    HeapObj.write h28 (Coq_object_loc_prealloc Coq_prealloc_json)
       object_prealloc_json
   in
   object_heap_initial_function_objects h29
@@ -1333,7 +1333,7 @@ let object_heap_initial =
 (** val env_record_heap_initial : (env_loc, env_record) Heap.heap **)
 
 let env_record_heap_initial =
-  Heap.write Heap.empty env_loc_global_env_record
+  HeapInt.write Heap.empty env_loc_global_env_record
     (env_record_object_default (Coq_object_loc_prealloc Coq_prealloc_global))
 
 (** val dummy_fresh_locations : int stream **)
