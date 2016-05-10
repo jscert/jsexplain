@@ -611,7 +611,9 @@ function cursor() {
 
 function get_file_extension(filename) {
   var re = /(?:\.([^.]+))?$/;
-  return re.exec(filename)[1];
+  var s = re.exec(filename)[1];
+  // if (s == "pseudo") { return "js"; }
+  return s;
 }
 
 // load files in CodeMirror view
@@ -1436,7 +1438,8 @@ function testLineof(filename, token) {
 }
 
 // for easy debugging, launch at startup:
-readSourceParseAndRun();
+//
+//  ---readSourceParseAndRun();
 
 // stepTo(2466);
 
@@ -1452,6 +1455,7 @@ readSourceParseAndRun();
 //stepTo(5873);
 // setExample(20);
 setExample(3);
+// setExample(11);
 $("#reach_condition").val("S_line() == 3 && S('i') == 1");
 
 

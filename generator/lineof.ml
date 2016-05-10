@@ -209,9 +209,8 @@ let _ =
 
 
 let generate_lineof_entries put =
-   ~~ List.iter !tokens (fun (basename, tokens_start, tokens_stop) ->
+   ~~ List.iter !tokens (fun (filename, tokens_start, tokens_stop) ->
      put "   lineof_temp = [];";
-     let filename = basename ^ ".js" in
      let keys = hashtbl_keys tokens_start in
      ~~ List.iter keys (fun key -> 
         let pos_start = try Hashtbl.find tokens_start key
@@ -344,12 +343,19 @@ let _ =
         let input_lines = XFile.get_lines filename in
         List.iter put input_lines;
      end else if (Filename.check_suffix filename ".token.js") then begin
-        let basename = Filename.chop_suffix (Filename.basename filename) ".token.js" in
+        let basename = (Filename.chop_suffix (Filename.basename filename) ".token.js") ^ ".js" in
+        let input_lines = XFile.get_lines filename in
+        gather_tokens basename input_lines
+     end else if (Filename.check_suffix filename ".ptoken.js") then begin
+        let basename = (Filename.chop_suffix (Filename.basename filename) ".ptoken.js") ^ ".pseudo" in
         let input_lines = XFile.get_lines filename in
         gather_tokens basename input_lines
      end else 
-        failwith "Input file must be of the form *.token.js"
+        failwith "Input file must be of the form *.token.js or *.ptoken.js or *.mlloc.js"
    );
+
+        (* let basename = Filename.basename filename in *)
+
 
    (*---------------------------------------------------*)
    (* generating output file *)

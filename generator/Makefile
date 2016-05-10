@@ -64,6 +64,9 @@ DISPLAYED_FILES := \
 
 DISPLAYED := $(addprefix tests/jsref/,$(DISPLAYED_FILES))
 
+ALL_DISPLAYED := $(DISPLAYED:.ml=.unlog.js) $(DISPLAYED:.ml=.pseudo.js) $(DISPLAYED)
+
+ALL_LINEOF := $(DISPLAYED:.ml=.token.js) $(DISPLAYED:.ml=.mlloc.js) $(DISPLAYED:.ml=.ptoken.js)
 
 
 ###############################################################
@@ -158,20 +161,21 @@ tests/%.ptoken.js: tests/%.ml main.byte stdlib tests/%.cmi
 
 ##### Rule for lineof.js
 
-$(JSREF_PATH)/lineof.js: lineof.byte $(DISPLAYED:.ml=.token.js) $(DISPLAYED:.ml=.mlloc.js)
-	./lineof.byte -o $@ $(DISPLAYED:.ml=.token.js) $(DISPLAYED:.ml=.mlloc.js)
+$(JSREF_PATH)/lineof.js: lineof.byte $(ALL_LINEOF)
+	./lineof.byte -o $@ $(ALL_LINEOF)
 
 ##### Rule for assembly.js
 
-# later add as dependencies the unlog files: $(JSREF_ML:.ml=.unlog.js) 
+#--LATER (optional) add as dependencies the unlog files: $(JSREF_ML:.ml=.unlog.js)
+
 $(JSREF_PATH)/assembly.js: assembly.byte $(ASSEMBLY_JS)
 	./assembly.byte -o $@ $(ASSEMBLY_JS)
 # -stdlib $(STDLIB_DIR)/stdlib.js 
 
 ##### Rule for displayed_sources.js
 
-$(JSREF_PATH)/displayed_sources.js: displayed_sources.byte $(DISPLAYED:.ml=.unlog.js) $(DISPLAYED)
-	$(DISPLAYGEN) -o $@ $(DISPLAYED:.ml=.unlog.js) $(DISPLAYED)
+$(JSREF_PATH)/displayed_sources.js: displayed_sources.byte  $(ALL_DISPLAYED)
+	$(DISPLAYGEN) -o $@ $(ALL_DISPLAYED)
 
 
 pseudo: tests/jsref/JsInterpreter.pseudo.js tests/jsref/JsInterpreter.ptoken.js

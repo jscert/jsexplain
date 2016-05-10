@@ -162,9 +162,13 @@ let _ =
       let showed_filename = 
          let short = Filename.basename filename in
          if (Filename.check_suffix short ".unlog.js") then begin
-            let basename = Filename.chop_suffix short ".unlog.js" in
-            basename ^ ".js" 
-         end else short  (* should be .ml file *)
+             let basename = Filename.chop_suffix short ".unlog.js" in
+              basename ^ ".js" 
+          end else if (Filename.check_suffix short ".pseudo.js") then begin
+             let basename = Filename.chop_suffix short ".pseudo.js" in
+              basename ^ ".pseudo" 
+          end else 
+            short (* must be .ml µ*)
          in
       put (Printf.sprintf "\n/* --------------------- %s --------------------- */" showed_filename);
       put_no_endline (Printf.sprintf "  { file: '%s', contents: '" showed_filename);

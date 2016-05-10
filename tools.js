@@ -37,15 +37,21 @@ function reset_datalog() {
 function log_event(filename, token, ctx, type) {
   // TODO populate state with object_heap, env_record_heap, fresh_locations, and populate env
 
-  // compute "foo.ml" from "foo.js"
+  // compute "foo.ml" and "foo.psuedo" from "foo.js"
   var len = filename.length;
-  var mlfilename = filename.replaceAt(len-2, "m");
-  mlfilename = mlfilename.replaceAt(len-1, "l");
+  var base = filename.substr(0, len-2);
+  var mlfilename = base + "ml";
+  var pseudofilename = base + "pseudo";
+
+  // var len = filename.length;
+  // var mlfilename = filename.replaceAt(len-2, "m");
+  // mlfilename = mlfilename.replaceAt(len-1, "l");
 
   var jsloc = lineof(filename, token);
   var mlloc = lineof(mlfilename, token);
+  var pseudoloc = lineof(pseudofilename, token);
 
-  var event = { token: token, locByExt: { "ml": mlloc, "js": jsloc },
+  var event = { token: token, locByExt: { "ml": mlloc, "js": jsloc, "pseudo": pseudoloc },
                 ctx : ctx, type : type, state: {}, env: {}};
   datalog.push(event);
 

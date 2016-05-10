@@ -718,9 +718,11 @@ and js_of_expression ctx dest e =
                                              | None -> out_of_scope loc "optional apply arguments" 
                                              | Some ei -> ei) in
 
-     let sl_clean = List.filter (fun ei -> is_visible_type ei.exp_type) sl_clean in
+     (* TODO: reimplement using list.mapfilter *)
+     let sl_and_translated = List.map (fun ei -> ei, inline_of_wrap ei) sl_clean in
+     let sl_and_translated = List.filter (fun (ei,sei) -> is_visible_type ei.exp_type) sl_and_translated in
+     let sl = List.map snd sl_and_translated in
 
-     let sl = sl_clean |> List.map (fun ei -> inline_of_wrap ei) in
      let se = inline_of_wrap f in
      let sexp = 
         if is_triple_equal_comparison f then begin
