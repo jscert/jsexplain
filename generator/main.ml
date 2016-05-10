@@ -51,13 +51,15 @@ let _ =
    let basename = Filename.chop_suffix (Filename.basename sourcefile) ".ml" in
    let dirname = Filename.dirname sourcefile in
    let pathname = if dirname = "" then basename else (dirname ^ "/" ^ basename) in
-   let log_output, unlog_output, token_output, mlloc_output =
+   let log_output, unlog_output, token_output, pseudo_output, ptoken_output, mlloc_output =
      match !outputfile with
      | None -> Filename.concat dirname (basename ^ ".log.js"),
                Filename.concat dirname (basename ^ ".unlog.js"),
                Filename.concat dirname (basename ^ ".token.js"),
+               Filename.concat dirname (basename ^ ".pseudo.js"),
+               Filename.concat dirname (basename ^ ".ptoken.js"),
                Filename.concat dirname (basename ^ ".mlloc.js")
-     | Some f -> f ^ ".log.js", f ^ ".unlog.js", f ^ ".token.js", f ^ ".mlloc.js"
+     | Some f -> f ^ ".log.js", f ^ ".unlog.js", f ^ ".token.js", f ^ ".pseudo.js", f ^ ".ptoken.js", f ^ ".mlloc.js"
    in
 
    (*---------------------------------------------------*)
@@ -109,6 +111,8 @@ let _ =
           let output_filename = match !current_mode with
             | Mode_unlogged TokenTrue -> token_output
             | Mode_unlogged TokenFalse -> unlog_output
+            | Mode_pseudo TokenTrue -> ptoken_output
+            | Mode_pseudo TokenFalse -> pseudo_output
             | Mode_logged -> log_output
             | _ -> assert false
           in

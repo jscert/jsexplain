@@ -1432,7 +1432,7 @@ readSourceParseAndRun();
 //stepTo(5873);
 setExample(3);
 
-function showCurrent() {
+function c {
   console.log(tracer_items[tracer_pos]);
 };
 

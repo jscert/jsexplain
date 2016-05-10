@@ -121,6 +121,20 @@ let map_cstr_fields ?loc bind (cstr : constructor_description) elements =
      error ?loc ("Insufficient fieldnames for arguments to " ^ cstr.cstr_name)
   
 
+
+
+(****************************************************************)
+(* Hiding of arguments for "Pseudo" mode *)
+
+let is_visible_type typ =
+  if not (is_mode_pseudo()) then true else
+    match (Ctype.repr typ).desc with
+    | Tconstr(path, tys, _) -> let s = Path.name path in
+       not (   s = "JsSyntax.execution_ctx" 
+            || s = "JsSyntax.state")
+    | _ -> true
+
+
 (****************************************************************)
 (* PPF HELPERS *)
 
@@ -195,7 +209,7 @@ let ppf_cstrs styp cstr_name rest =
   let styp_full =
     match !current_mode with
     | Mode_cmi -> assert false
-    | Mode_unlogged _ -> ""
+    | Mode_unlogged _ | Mode_pseudo _ -> ""
     | Mode_logged -> Printf.sprintf "type: \"%s\", " styp
     in
   Printf.sprintf "{@[<v 2>%stag: \"%s\"%s %s@]}" (* TODO: cleanup *)
@@ -329,7 +343,7 @@ let generate_logged_if loc ctx sintro sarg siftrue siffalse =
   let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
   match !current_mode with
   | Mode_cmi -> assert false
-  | Mode_unlogged _ ->
+  | Mode_unlogged _ | Mode_pseudo _ ->
      let sarg_with_token = Printf.sprintf "%s%s%s" token_start sarg token_stop in
      ppf_ifthenelse sarg_with_token siftrue siffalse
   | Mode_logged ->
@@ -350,7 +364,7 @@ let generate_logged_case loc spat binders ctx newctx sbody need_break =
   let (shead, sintro) =
     match !current_mode with
     | Mode_cmi -> assert false
-    | Mode_unlogged _ ->
+    | Mode_unlogged _ | Mode_pseudo _ ->
         (token_start, token_stop)
     | Mode_logged ->
       let ids = List.map fst binders in
@@ -378,7 +392,7 @@ let ppf_match sintro sarg sbranches =
   let sbranches = 
     match !current_mode with
     | Mode_cmi -> assert false
-    | Mode_unlogged _ -> sbranches
+    | Mode_unlogged _ | Mode_pseudo _ -> sbranches
     | Mode_logged -> sbranches 
       (* TODO: put back if there is not already a default case:
           ^ "@,default: throw \"No matching case for switch\";" *)
@@ -395,7 +409,7 @@ let generate_logged_match loc ctx sintro sarg sbranches arg_is_constant =
   let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
   match !current_mode with
   | Mode_cmi -> assert false
-  | Mode_unlogged _ ->
+  | Mode_unlogged _ | Mode_pseudo _ ->
      let sarg_with_token = Printf.sprintf "%s%s%s" token_start sarg token_stop in
      ppf_match sintro sarg_with_token sbranches 
   | Mode_logged ->
@@ -411,7 +425,7 @@ let generate_logged_let loc ids ctx newctx sdecl sbody =
   let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
   match !current_mode with
   | Mode_cmi -> assert false
-  | Mode_unlogged _ -> 
+  | Mode_unlogged _ | Mode_pseudo _ -> 
      Printf.sprintf "%s%s%s@,%s" token_start sdecl token_stop sbody  
   | Mode_logged ->
     let mk_binding x =
@@ -428,7 +442,7 @@ let generate_logged_apply loc ctx sbody =
   let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
   match !current_mode with
   | Mode_cmi -> assert false
-  | Mode_unlogged _ ->
+  | Mode_unlogged _ | Mode_pseudo _ ->
      Printf.sprintf "%s%s%s" token_start sbody token_stop
   | Mode_logged ->
      Printf.sprintf "log_event(%s, %s, \"call\");@,%s" token_loc ctx sbody
@@ -441,7 +455,7 @@ let generate_logged_enter loc arg_ids ctx newctx sbody =
   let (shead1, shead2, sintro) =
     match !current_mode with
     | Mode_cmi -> assert false
-    | Mode_unlogged _ -> (token_start, token_stop, "")
+    | Mode_unlogged _ | Mode_pseudo _ -> (token_start, token_stop, "")
     | Mode_logged ->
       let mk_binding x =
         Printf.sprintf "{key: \"%s\", val: %s}" x x
@@ -465,7 +479,7 @@ let generate_logged_return loc ctx sbody =
   let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
   match !current_mode with
   | Mode_cmi -> assert false
-  | Mode_unlogged _ ->
+  | Mode_unlogged _ | Mode_pseudo _ ->
      Printf.sprintf "@[<hv 2>%sreturn (@,%s);%s@]" token_start sbody token_stop
   | Mode_logged ->
     let id = id_fresh "_return_" in
@@ -672,12 +686,14 @@ and js_of_expression ctx dest e =
         let (p, e) = (c.c_lhs, c.c_rhs) in 
         explore (p :: pats) e
       | _ ->
-        List.map ident_of_pat @@ List.rev @@ pats, e 
+         List.rev pats, e 
       in
-    let arg_ids, body = explore [c.c_lhs] c.c_rhs in
+    let pats, body = explore [c.c_lhs] c.c_rhs in
+    let pats_clean = List.filter (fun pat -> is_visible_type pat.pat_type) pats in
+    let arg_ids = List.map ident_of_pat pats_clean in
     let newctx = ctx_fresh() in
     let sbody = js_of_expression newctx Dest_return body in
-    let sexp = generate_logged_enter loc arg_ids ctx newctx sbody in
+    let sexp = generate_logged_enter body.exp_loc arg_ids ctx newctx sbody in
     apply_dest' ctx dest sexp
 
   | Texp_apply (f, exp_l) ->
@@ -700,6 +716,9 @@ and js_of_expression ctx dest e =
               |> List.map (fun (_, eo, _) -> match eo with 
                                              | None -> out_of_scope loc "optional apply arguments" 
                                              | Some ei -> ei) in
+
+     let sl_clean = List.filter (fun ei -> is_visible_type ei.exp_type) sl_clean in
+
      let sl = sl_clean |> List.map (fun ei -> inline_of_wrap ei) in
      let se = inline_of_wrap f in
      let sexp = 
@@ -965,7 +984,8 @@ let to_javascript basename module_name typedtree =
   let (content,names_bound) = js_of_structure typedtree in
   let pre_res = ppf_module_wrap module_name content names_bound in
   let str_ppf = Format.str_formatter in
-  if (!current_mode = (Mode_unlogged TokenTrue)) then begin
+  begin match !current_mode with
+  | Mode_unlogged TokenTrue | Mode_pseudo TokenTrue ->
     Format.pp_set_tags str_ppf true;
     Format.pp_set_mark_tags str_ppf true;
     Format.pp_set_formatter_tag_functions str_ppf
@@ -973,9 +993,8 @@ let to_javascript basename module_name typedtree =
        Format.mark_close_tag = (fun t -> Printf.sprintf "#%s>#" t);
        Format.print_open_tag = (fun _ -> ());
        Format.print_close_tag = (fun _ -> ()) };
-    Format.fprintf str_ppf (Scanf.format_from_string pre_res "");
-    Format.flush_str_formatter ()
- end else begin
+  | _ -> ()
+    (* 
     Format.pp_set_tags str_ppf false;
     Format.pp_set_mark_tags str_ppf false;
     Format.pp_set_formatter_tag_functions str_ppf
@@ -985,6 +1004,9 @@ let to_javascript basename module_name typedtree =
        Format.print_close_tag = (fun _ -> ()) };
     Format.fprintf str_ppf (Scanf.format_from_string pre_res "");
     Format.flush_str_formatter ()
+    *)
   end;
+  Format.fprintf str_ppf (Scanf.format_from_string pre_res "");
+  Format.flush_str_formatter ()
 
 

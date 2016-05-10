@@ -62,7 +62,6 @@ DISPLAYED := $(addprefix tests/jsref/,$(DISPLAYED_FILES))
 
 
 
-
 ###############################################################
 # Global options
 
@@ -147,6 +146,12 @@ tests/%.unlog.js: tests/%.ml main.byte stdlib tests/%.cmi
 tests/%.token.js tests/%.mlloc.js: tests/%.ml main.byte stdlib tests/%.cmi
 	$(MLTOJS) -mode token -I $(<D) $<
 
+tests/%.pseudo.js: tests/%.ml main.byte stdlib tests/%.cmi
+	$(MLTOJS) -mode pseudo -I $(<D) $<
+
+tests/%.ptoken.js: tests/%.ml main.byte stdlib tests/%.cmi
+	$(MLTOJS) -mode ptoken -I $(<D) $<
+
 ##### Rule for lineof.js
 
 $(JSREF_PATH)/lineof.js: lineof.byte $(DISPLAYED:.ml=.token.js) $(DISPLAYED:.ml=.mlloc.js)
@@ -163,6 +168,10 @@ $(JSREF_PATH)/assembly.js: assembly.byte $(ASSEMBLY_JS)
 
 $(JSREF_PATH)/displayed_sources.js: displayed_sources.byte $(DISPLAYED:.ml=.unlog.js) $(DISPLAYED)
 	$(DISPLAYGEN) -o $@ $(DISPLAYED:.ml=.unlog.js) $(DISPLAYED)
+
+
+pseudo: tests/jsref/JsInterpreter.pseudo.js tests/jsref/JsInterpreter.ptoken.js
+
 
 
 #### maybe useful ??

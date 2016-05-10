@@ -1,3 +1,15 @@
+enlever les mlloc
+
+
+
+
+
+
+
+
+
+
+
 (** val object_write : state -> object_loc -> coq_object -> state **)
 => on pourrait faire
 (** val object_write : state -> object_loc -> coq_object -> unit*state **)
