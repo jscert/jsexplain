@@ -1,3 +1,26 @@
+
+--------------
+
+  switch (v2.tag) {
+	 case "Coq_value_prim":
+		var p = v2.value;
+		return (run_error(Coq_native_error_type()));
+	 case "Coq_value_object":
+		var l = v2.value;
+		return (...);
+
+BECOMES IN PSEUDO
+
+  match (v2) {
+	 case Coq_value_prim(p) :
+		return (run_error(Coq_native_error_type()));
+	 case Coq_value_object(l):
+	   return (...);
+
+
+
+
+-----------------
 enlever les mlloc
 
 
