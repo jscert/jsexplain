@@ -244,6 +244,30 @@ function lookup_var_in_object(state, name, loc) {
    if (obj_opt.tag != "Some") throw "show_object: unbound object";
    var obj = obj_opt.value;
    var props = obj.object_properties_;
+   var ro = Heap.read_option(string_eq, props, name);
+   switch (ro.tag) {
+     case "None":
+       return undefined;
+    case "Some":
+       var attribute = ro.value;
+       switch (attribute.tag) {
+         case "Coq_attributes_data_of":
+           var attr = attribute.value;
+           var prop_value = attr.attributes_data_value;
+           return prop_value;
+           break;
+         case "Coq_attributes_accessor_of": 
+           // raise error (?)
+           break;
+         default: 
+           throw "invalid attribute.tag";
+       }
+       break;
+     default:
+       throw "unrecognized tag in lookup_var_in_record_decl";
+   }
+}
+  /* DEPRECATED, naive code for lookup_var_in_object:
    var key_value_pair_array = array_of_heap(props);
    for (var i = 0; i < key_value_pair_array.length; i++) {
       var prop_name = key_value_pair_array[i][0];
@@ -251,21 +275,8 @@ function lookup_var_in_object(state, name, loc) {
          continue;
       }
       var attribute = key_value_pair_array[i][1];
-      switch (attribute.tag) {
-        case "Coq_attributes_data_of":
-          var attr = attribute.value;
-          var prop_value = attr.attributes_data_value;
-          return prop_value;
-          break;
-        case "Coq_attributes_accessor_of": 
-          // raise error
-          break;
-        default: 
-          throw "invalid attribute.tag";
-      }
-   }
-   return undefined;
-}
+  */
+
 
 
 // todo : handle objects
@@ -391,11 +402,12 @@ function goToPred(pred) {
 function button_test_handler() {
   var pred = $("#reach_condition").val();
   var r = evalPred(tracer_items[tracer_pos], pred);
+  // console.log(r);
   // $("#disp_infos").html(r);
-  if (r === undefined) {
+  /*if (r === undefined) {
      r = "undefined";
-  }
-  $("#action_output").html(r);
+  }*/
+  $("#action_output").html("" + r);
   var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 3000); 
 }
 
@@ -1432,10 +1444,12 @@ readSourceParseAndRun();
 //  $("#reach_condition").val("I_line()");
 //  button_test_handler();
 
-//
+//$("#reach_condition").val("S('x') == 2");
+
 //stepTo(5873);
-setExample(20);
-$("#reach_condition").val("S('x') == 2");
+// setExample(20);
+setExample(3);
+$("#reach_condition").val("S_line() == 3 && S('i') == 1 && I_line() == 858");
 
 
 function showCurrent() {
