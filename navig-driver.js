@@ -402,7 +402,7 @@ function goToPred(pred) {
 function button_test_handler() {
   var pred = $("#reach_condition").val();
   var r = evalPred(tracer_items[tracer_pos], pred);
-  // console.log(r);
+   console.log(r);
   // $("#disp_infos").html(r);
   /*if (r === undefined) {
      r = "undefined";
@@ -1417,7 +1417,7 @@ function readSourceParseAndRun() {
 
 // interpreter file displayed initially
 // -- viewFile(tracer_files[0].file);
-viewFile("JsInterpreter.ml");
+viewFile("JsInterpreter.pseudo");
 
 //$timeout(function() {codeMirror.refresh();});
 

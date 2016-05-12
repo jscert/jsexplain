@@ -18,6 +18,20 @@ let string_of_longident i =
 
 
 (****************************************************************)
+(* RENAMING OF CONSTRUCTOR NAMES *)
+
+let rename_constructor s =
+  if is_mode_not_pseudo() then s else begin
+    let n = String.length s in
+    if (n > 4 && s.[0] = 'C' && s.[1] = 'o' && s.[2] = 'q' && s.[3] = '_') then begin
+      let r = String.sub s 4 (n-4) in
+      r.[0] <- Char.uppercase r.[0];
+      r
+    end else s
+  end
+
+
+(****************************************************************)
 (* SHADOWING CHECKER *)
 
 let report_shadowing = 
@@ -124,15 +138,90 @@ let map_cstr_fields ?loc bind (cstr : constructor_description) elements =
 
 
 (****************************************************************)
-(* Hiding of arguments for "Pseudo" mode *)
+(* PSEUDO-CODE mode *)
 
-let is_visible_type typ =
-  if not (is_mode_pseudo()) then true else
-    match (Ctype.repr typ).desc with
-    | Tconstr(path, tys, _) -> let s = Path.name path in
-       not (   s = "JsSyntax.execution_ctx" 
-            || s = "JsSyntax.state")
-    | _ -> true
+(* Auxiliary function *)
+
+let is_ident e =
+  match e.exp_desc with
+  | Texp_ident (path, ident,  _) -> true
+  | _ -> false
+
+(* Hide all function arguments of type execution_ctx or state 
+   (for function definitions) *)
+
+let is_hidden_type typ =
+  match (Ctype.repr typ).desc with
+  | Tconstr(path, tys, _) -> let s = Path.name path in
+       (   s = "JsSyntax.execution_ctx" 
+        || s = "JsSyntax.state")
+  | _ -> false
+
+(* Hide all functions arguments of type execution_ctx or state 
+   (for function applications) *)
+
+let is_hidden_arg e =
+  is_hidden_type e.exp_type && is_ident e
+
+(* List of coercion functions *)
+
+let coercion_functions = 
+  [ 
+    "JsSyntax.res_normal"; 
+    "JsSyntax.res_ref"; 
+    "JsSyntax.res_val"; 
+    "JsInterpreterMonads.res_out"; 
+    "JsInterpreterMonads.res_ter"; 
+    "JsInterpreterMonads.result_out";
+    (* "JsIntepreterMonads.res_void"; --no arg *)
+  ]
+
+(* Do not generate events for particular functions *)
+
+let is_function_without_event f =
+  match f.exp_desc with
+  | Texp_ident (path, ident,  _) ->
+      let x = Path.name path in 
+      let m = Path.head path in
+      let h = Ident.name m in
+         List.mem h [ "JsSyntax"; "JsSyntaxAux" ]
+      || List.mem x coercion_functions
+  | _ -> false
+
+(* Do not display particular functions *)
+
+let is_coercion_function f =
+  match f.exp_desc with
+  | Texp_ident (path, ident,  _) -> 
+      let x = Path.name path in
+      List.mem x coercion_functions
+  | _ -> false
+
+let is_coercion_constructor lident =
+    let x = string_of_longident lident in
+    (*  Printf.printf "%s\n" x; *)
+    let b = List.mem x [ (* todo: where is JsSyntax? *)
+      "Coq_out_ter"; 
+      "Coq_prim_bool"; 
+      "Coq_prim_number"; 
+      "Coq_prim_string"; 
+      "Coq_value_prim"; 
+      "Coq_object_loc_prealloc"; 
+      "Coq_value_object"; 
+      "Coq_attributes_data_of"; 
+      "Coq_attributes_accessor_of"; 
+      "Coq_full_descriptor_some"; 
+      "Coq_env_record_decl"; 
+      "Coq_resvalue_value"; 
+      "Coq_resvalue_ref"; 
+      "Coq_resvalue_ref"; 
+      ] in 
+    if (is_mode_pseudo()) then Printf.printf "%s %s\n" x (if b then " [yes]" else ""); (* *)
+
+
+    b
+
+
 
 
 (****************************************************************)
@@ -217,7 +306,9 @@ let ppf_cstrs styp cstr_name rest =
     styp_full cstr_name comma rest
 
 let ppf_cstrs_fct cstr_fullname args =
-   ppf_apply cstr_fullname (show_list ",@ " args)
+  if is_mode_pseudo() && args = [] 
+    then cstr_fullname 
+    else ppf_apply cstr_fullname (show_list ",@ " args)
 
 let ppf_record llde =
   let rec aux acc = function
@@ -578,6 +669,7 @@ and js_of_structure_item s =
               let sargs = show_list ", " fields in
               let sbindings = map_filter_fields_elements ppf_cstr fields fields in
               let rest = show_list ", " sbindings in
+              let cstr_name = rename_constructor cstr_name in
               let sobj = ppf_cstrs styp cstr_name rest in 
               let sbody = Printf.sprintf "function %s(%s) { return %s; }" cstr_name sargs sobj in
               (sbody, [cstr_name])
@@ -690,7 +782,7 @@ and js_of_expression ctx dest e =
          List.rev pats, e 
       in
     let pats, body = explore [c.c_lhs] c.c_rhs in
-    let pats_clean = List.filter (fun pat -> is_visible_type pat.pat_type) pats in
+    let pats_clean = List.filter (fun pat -> is_mode_not_pseudo() || not (is_hidden_type pat.pat_type)) pats in
     let arg_ids = List.map ident_of_pat pats_clean in
     let newctx = ctx_fresh() in
     let sbody = js_of_expression newctx Dest_return body in
@@ -720,7 +812,8 @@ and js_of_expression ctx dest e =
 
      (* TODO: reimplement using list.mapfilter *)
      let sl_and_translated = List.map (fun ei -> ei, inline_of_wrap ei) sl_clean in
-     let sl_and_translated = List.filter (fun (ei,sei) -> is_visible_type ei.exp_type) sl_and_translated in
+     let sl_and_translated = List.filter (fun (ei,sei) -> 
+        is_mode_not_pseudo() || not (is_hidden_arg ei)) sl_and_translated in
      let sl = List.map snd sl_and_translated in
 
      let se = inline_of_wrap f in
@@ -737,22 +830,32 @@ and js_of_expression ctx dest e =
         end else begin
            ppf_apply se (String.concat ",@ " sl)
         end in
-
-     if !current_mode = Mode_logged then begin
-        (* use this to prevent logging of the result
-           let return_exp = Printf.sprintf "return %s;" sexp in *)
-        let return_exp = apply_dest' ctx Dest_return sexp in
-        let logged_sexp = generate_logged_apply loc ctx return_exp in
-        let wrapped_exp = ppf_lambda_wrap logged_sexp in
-        apply_dest' ctx dest wrapped_exp
-     end else begin
-        (* we need a token to match the Dest_return above *)
-        let (token_start, token_stop, _token_loc) = token_fresh !current_mode loc in 
-        let sexp2 = generate_logged_apply loc ctx sexp in
-        let sexp3 = Printf.sprintf "%s%s%s" token_start sexp2 token_stop in
-        apply_dest' ctx dest sexp3
-     end
-
+  
+     let sexp_instrumented =
+       if is_function_without_event f then begin
+           if is_mode_pseudo() && is_coercion_function f then begin
+              if (List.length sl) <> 1
+                then out_of_scope loc "coercion is not applied to a single element";
+              (String.concat ",@ " sl)
+           end else begin
+              sexp
+           end
+       end else if !current_mode = Mode_logged then begin
+          (* use this to prevent logging of the result
+             let return_exp = Printf.sprintf "return %s;" sexp in *)
+          let return_exp = apply_dest' ctx Dest_return sexp in
+          let logged_sexp = generate_logged_apply loc ctx return_exp in
+          let wrapped_exp = ppf_lambda_wrap logged_sexp in
+          wrapped_exp
+       end else begin
+          (* we need a token to match the Dest_return above *)
+          let (token_start, token_stop, _token_loc) = token_fresh !current_mode loc in 
+          let sexp2 = generate_logged_apply loc ctx sexp in
+          let sexp3 = Printf.sprintf "%s%s%s" token_start sexp2 token_stop in
+          sexp3
+       end 
+       in
+     apply_dest' ctx dest sexp_instrumented
 
   | Texp_match (obj, l, [], Total) ->
      reject_inline dest;
@@ -772,15 +875,35 @@ and js_of_expression ctx dest e =
     let cstr_fullname = 
       if cstr_fullname = "[]" then "mk_nil" 
       else if cstr_fullname = "::" then "mk_cons" 
-      else cstr_fullname in  (* TODO: clean up this hack *)
+      else begin (* rename the constructor to remove "Coq_" prefix *)
+        let id2 = 
+          match p.txt with
+          | Longident.Lident s -> Longident.Lident (rename_constructor s)
+          | Longident.Ldot(l, s) -> Longident.Ldot(l, rename_constructor s)  
+          | Longident.Lapply(_, _) -> unsupported "Longident.Lapply"
+          in
+        string_of_longident id2 
+      end in  
     (*let styp = string_of_type_exp e.exp_type in*)
+
+     (* TODO: factorize the pattern below with function applications *)
+     let sl_and_translated = List.map (fun ei -> ei, inline_of_wrap ei) el in
+     let sl_and_translated = List.filter (fun (ei,sei) -> 
+        is_mode_not_pseudo() || not (is_hidden_arg ei)) sl_and_translated in
+     let sl = List.map snd sl_and_translated in
+
     let sexp =
-      if is_sbool cstr_name then cstr_name else
-      if is_unit cstr_name then unit_repr else
-        begin
-          let expr_strs = List.map (fun exp -> inline_of_wrap exp) el in
-          ppf_cstrs_fct cstr_fullname expr_strs
-        end in
+      if is_sbool cstr_name then 
+        cstr_name 
+      else if is_unit cstr_name then 
+        unit_repr 
+      else if is_mode_pseudo() && is_coercion_constructor p.txt then begin
+        if (List.length sl) <> 1
+          then out_of_scope loc "coercion is not applied to a single element";
+        (String.concat ",@ " sl)
+      end else begin
+        ppf_cstrs_fct cstr_fullname sl
+      end in
     apply_dest' ctx dest sexp
 
   | Texp_array      (exp_l)           -> ppf_array @@ show_list_f (fun exp -> inline_of_wrap exp) ", " exp_l

@@ -1,6 +1,3 @@
-(** val negb : bool -> bool **)
-
-let negb b = if b then false else true
 
 (** val fst : ('a1 * 'a2) -> 'a1 **)
 

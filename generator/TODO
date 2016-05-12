@@ -1,4 +1,53 @@
 
+Cop_value_prim with value 2
+
+---
+
+number_comparable ==> ===
+---
+
+
+enter run_expr / exit run_expr
+
+----
+
+option_case
+
+elim bool_eq
+
+
+no event on coercions or stdlib
+
+-----
+
+coercions:
+Coercion prim_bool : bool >-> prim.
+Coercion prim_number : JsNumber.number >-> prim.
+Coercion prim_string : string >-> prim.
+Coercion value_prim : prim >-> value.
+Coercion object_loc_prealloc : prealloc >-> object_loc.
+Coercion value_object : object_loc >-> value.
+
+Coercion attributes_data_of : attributes_data >-> attributes.
+Coercion attributes_accessor_of : attributes_accessor >-> attributes.
+Coercion full_descriptor_some : attributes >-> full_descriptor.
+Coercion env_record_decl : decl_env_record >-> env_record.
+Coercion resvalue_value : value >-> resvalue.
+Coercion resvalue_ref : ref >-> resvalue.
+Coercion res_ref (r : ref) := res_intro restype_normal r label_empty.
+Coercion res_val (v : value) := res_intro restype_normal v label_empty.
+Coercion res_normal rv := res_intro restype_normal rv label_empty.
+
+
+
+---
+
+inline not
+
+----
+
+
+
 
 inline let object_loc_comparable x y =
  et al

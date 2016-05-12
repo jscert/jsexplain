@@ -31,4 +31,7 @@ let set_current_mode s =
 let is_mode_pseudo () = 
   (match !current_mode with Mode_pseudo _ -> true | _ -> false)
 
+let is_mode_not_pseudo () = 
+  not (is_mode_pseudo())
+
 let generate_qualified_names = ref false

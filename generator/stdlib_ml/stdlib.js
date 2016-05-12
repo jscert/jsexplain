@@ -74,7 +74,7 @@ var of_int = function(x) { return x; };
 
 var number_comparable = function(x, y) {
   if (typeof(x) != "number" || typeof(y) != "number")
-    throw "string_eq invalid arguments";
+    throw "number_comparable invalid arguments";
   return x === y; 
 };
 

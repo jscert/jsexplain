@@ -1724,7 +1724,7 @@ and creating_function_object s c names bd x str =
                                     false) in
                                      let%bool 
                                        (s3, b3) = (creating_function_object_proto s2 c l) in
-                                          if negb str
+                                          if not str
                                           then res_ter s3 (res_val (Coq_value_object l))
                                           else let  vthrower = (Coq_value_object (Coq_object_loc_prealloc
                                                                                 Coq_prealloc_throw_type_error)) in
@@ -2655,7 +2655,7 @@ and run_binary_op s c op v1 v2 =
           res_ter s0
             (res_val (Coq_value_prim
                         (Coq_prim_bool
-                           (negb b0))))
+                           (not b0))))
   else if binary_op_compare op
       Coq_binary_op_strict_equal
   then result_out (Coq_out_ter
@@ -2673,7 +2673,7 @@ and run_binary_op s c op v1 v2 =
                     (res_val
                        (Coq_value_prim
                           (Coq_prim_bool
-                             (negb
+                             (not
                                 (strict_equality_test
                                    v1 v2)))))))
   else if binary_op_compare

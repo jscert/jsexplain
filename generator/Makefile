@@ -74,7 +74,7 @@ ALL_LINEOF := $(DISPLAYED:.ml=.token.js) $(DISPLAYED:.ml=.mlloc.js) $(DISPLAYED:
 
 all: everything
 
-.PHONY: all clean .log.js .unlog.js .token.js .mlloc.js
+.PHONY: all clean .log.js .unlog.js .token.js .mlloc.js .ptoken.js .pseudo.js
    # all gen log unlog 
 
 # Do not delete intermediate files.
