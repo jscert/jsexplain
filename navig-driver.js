@@ -1008,7 +1008,7 @@ function interp_val_is_js_prim(v) {
 }
 
 function interp_val_is_js_value(v) {
-  return has_tag_in_set(v, [ "Coq_value_prim", "Coq_value_object" ]);
+  return has_tag_in_set(v, ["Coq_value_prim", "Coq_value_object" ]);
 }
 
 function interp_val_is_loc(v) {
@@ -1040,6 +1040,9 @@ function show_interp_val(state, v, target, depth) {
   }
   var t = $("#" + target);
   if (interp_val_is_base_value(v)) {
+    if (typeof(v) === "string") {
+      v = "\"" + v + "\"";
+    }
     t.append(html_escape("" + v));
   } else if (interp_val_is_loc(v)) {
     show_object(state, v, target, 0);
