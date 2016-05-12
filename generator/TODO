@@ -1,8 +1,18 @@
 
+
+pas forcément le bon affichage si dest_inline sur une monade
+
+----
+
+special display on "elseif"
+
+---------
+
 Cop_value_prim with value 2
 
 ---
 
+fix highlight using
 enter run_expr / exit run_expr
 
 ----
@@ -14,12 +24,31 @@ inline let object_loc_comparable x y =
 -----
 
 let%if_spec (s,x) = expr in cont
+
 becomes
    if_spec expr (fun s x -> cont) 
 
 and in pseudo:
   Let%spec x = expr in
   cont
+
+   [("run", "if_run");
+    ("string", "if_string");
+    ("object", "if_object");
+    ("value", "if_value");
+    ("prim", "if_prim");
+    ("number", "if_number");
+    ("some", "if_some");
+    ("bool", "if_bool");
+    ("void", "if_void");
+    ("success", "if_success");
+    ("not_throw", "if_not_throw");
+    ("ter", "if_ter");
+    ("break", "if_break");
+
+let if_run w k = if_spec w k
+if_string w k
+let if_object w k =
 
 
 ------------

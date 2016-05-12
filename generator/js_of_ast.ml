@@ -135,6 +135,20 @@ let map_cstr_fields ?loc bind (cstr : constructor_description) elements =
      error ?loc ("Insufficient fieldnames for arguments to " ^ cstr.cstr_name)
   
 
+(** Decomposition of functions *)
+
+let function_get_args_and_body e =
+  let rec aux pats body = 
+    match body.exp_desc with
+    | Texp_function (_, c :: [], Total) ->
+      let (p, body2) = (c.c_lhs, c.c_rhs) in 
+      aux (p :: pats) body2
+    | _ ->
+       List.rev pats, body 
+    in
+  aux [] e
+
+
 (****************************************************************)
 (* === comparison *)
 
@@ -180,6 +194,7 @@ let coercion_functions =
     "JsSyntax.res_normal"; 
     "JsSyntax.res_ref"; 
     "JsSyntax.res_val"; 
+    "JsInterpreterMonads.res_spec"; 
     "JsInterpreterMonads.res_out"; 
     "JsInterpreterMonads.res_ter"; 
     "JsInterpreterMonads.result_out";
@@ -232,6 +247,28 @@ let is_coercion_constructor lident =
 
     b
 
+
+(* Do not generate events for particular functions *)
+
+let is_monadic_function f =
+  match f.exp_desc with
+  | Texp_ident (path, ident,  _) ->
+      let x = Path.name path in 
+      List.mem x [
+        "JsInterpreterMonads.if_run";
+        "JsInterpreterMonads.if_string";
+        "JsInterpreterMonads.if_object";
+        "JsInterpreterMonads.if_value";
+        "JsInterpreterMonads.if_prim";
+        "JsInterpreterMonads.if_number";
+        "JsInterpreterMonads.if_some";
+        "JsInterpreterMonads.if_bool";
+        "JsInterpreterMonads.if_void";
+        "JsInterpreterMonads.if_success";
+        "JsInterpreterMonads.if_not_throw";
+        "JsInterpreterMonads.if_ter";
+        "JsInterpreterMonads.if_break";]
+  | _ -> false
 
 
 
@@ -821,20 +858,72 @@ and js_of_expression ctx dest e =
     sexp
 
   | Texp_function (_, c :: [], Total) ->
-    let rec explore pats e = match e.exp_desc with
-      | Texp_function (_, c :: [], Total) ->
-        let (p, e) = (c.c_lhs, c.c_rhs) in 
-        explore (p :: pats) e
-      | _ ->
-         List.rev pats, e 
-      in
-    let pats, body = explore [c.c_lhs] c.c_rhs in
+    let pats, body = function_get_args_and_body e 
+      (* DEPRECATED: function_get_args_and_body e  [c.c_lhs] c.c_rhs *) in
     let pats_clean = List.filter (fun pat -> is_mode_not_pseudo() || not (is_hidden_type pat.pat_type)) pats in
     let arg_ids = List.map ident_of_pat pats_clean in
     let newctx = ctx_fresh() in
     let sbody = js_of_expression newctx Dest_return body in
     let sexp = generate_logged_enter body.exp_loc arg_ids ctx newctx sbody in
     apply_dest' ctx dest sexp
+
+  | Texp_apply (f, exp_l) when is_monadic_function f ->
+      let sl_clean = exp_l
+              |> List.map (fun (_, eo, _) -> match eo with 
+                                             | None -> out_of_scope loc "optional apply arguments" 
+                                             | Some ei -> ei) in
+      let (e1,e2) =
+        match sl_clean with 
+        | [e1;e2] -> (e1,e2) 
+        | _ -> out_of_scope loc  "not exactly two arguments provided to monad"
+        in
+      let fname =
+        match f.exp_desc with
+        | Texp_ident (path, ident,  _) -> Path.last path
+        | _ -> assert false
+        in
+      let monad_name = 
+        let n = String.length fname in
+        if n <= 3 then out_of_scope loc "monad name does not start with 'if_'";
+        String.sub fname 3 (n-3)
+        in
+      let sexp1 = inline_of_wrap e1 in
+      let pats,body = function_get_args_and_body e2 in
+      let sbody = js_of_expression ctx Dest_return body in
+      let pats_clean = List.filter (fun pat -> is_mode_not_pseudo() || not (is_hidden_type pat.pat_type)) pats in
+      let arg_ids = List.map ident_of_pat pats_clean in
+      let (token_start1, token_stop1, _token_loc) = token_fresh !current_mode loc in 
+      let (token_start2, token_stop2, _token_loc) = token_fresh !current_mode loc in 
+       (* token1 placed on sexp1
+          token2 placed on ids *)
+      if is_mode_pseudo() then begin
+        let id =
+           match arg_ids with
+           | [] -> "_"
+              (*deprecated: Printf.sprintf "@[<hov 2>%s%s;%s@]@,%s" token_start sexp1 token_stop sbody*)
+           | [id] -> id
+           | _ -> out_of_scope loc "two argument bound by monad in pseudo-code mode"
+           in
+        (* e.g.:  var%spec x = expr in cont *)
+        let sexp = Printf.sprintf "@[<hov 2>var%s%s %s%s%s = %s%s%s;@]@,%s" "%%" monad_name token_start2 id  token_stop2 token_start1 sexp1 token_stop1 sbody in
+        begin match dest with
+        | Dest_assign _ ->
+          apply_dest' ctx dest (ppf_lambda_wrap sexp)
+        | Dest_ignore -> sexp
+        | Dest_return ->   (* do not display redundand return, but count it *)
+            let (token_start, token_stop, _token_loc) = token_fresh !current_mode loc in 
+            Printf.sprintf "%s%s%s" token_start sexp token_stop
+        | Dest_inline -> sexp (* TODO: check if ok *)
+        end
+
+      end else begin
+        (* e.g.:  if_spec(expr, (function(s, x) -> cont)) *)
+        let sexp1_token = Printf.sprintf "%s%s%s" token_start1 sexp1 token_stop1 in
+        let cont_token = Printf.sprintf "function(%s%s%s) {@;<1 2>@[<v 0>%s@]@,}" token_start2 (String.concat ",@ " arg_ids) token_stop2 sbody in
+        let sexp = ppf_apply fname (String.concat ",@ " [sexp1_token; cont_token]) in
+        apply_dest' ctx dest sexp
+
+      end 
 
   | Texp_apply (f, exp_l) ->
 
@@ -848,10 +937,6 @@ and js_of_expression ctx dest e =
         in
      if is_result_arrow then out_of_scope loc "partial application";
      
-     let sl' = exp_l  (* only used to know if infix *)
-               |> List.map (fun (_, eo, _) -> match eo with 
-                                              | None -> out_of_scope loc "optional apply arguments"
-                                              | Some ei -> ei) in
      let sl_clean = exp_l
               |> List.map (fun (_, eo, _) -> match eo with 
                                              | None -> out_of_scope loc "optional apply arguments" 
@@ -877,7 +962,7 @@ and js_of_expression ctx dest e =
             let stype = Str.global_replace (Str.regexp "\\.") "_" stype in
             ppf_apply ("_compare_" ^ stype) (String.concat ",@ " sl)
           end
-        end else if is_infix f sl' && List.length exp_l = 2 then begin
+        end else if is_infix f sl_clean && List.length exp_l = 2 then begin
            ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
         end else begin
            ppf_apply se (String.concat ",@ " sl)

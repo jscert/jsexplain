@@ -2422,31 +2422,30 @@ and run_binary_op_arith mathop s c v1 v2 =
   res_out (Coq_out_ter (s1, (res_val (Coq_value_prim (Coq_prim_number (mathop n1 n2))))))
 
 and run_binary_op_shift b_unsigned mathop s c v1 v2 =
-    let%run (s1, k1) = ((if b_unsigned then to_uint32 else to_int32) s c v1) in
-    let%run (s2, k2) = (to_uint32 s1 c v2) in
-    let k2_2 = JsNumber.modulo_32 k2 in
-    res_ter s2 (res_val (Coq_value_prim (Coq_prim_number (mathop k1 k2_2))))
+  let conv = (if b_unsigned then to_uint32 else to_int32) in
+  let%run (s1, k1) = (conv s c v1) in
+  let%run (s2, k2) = (to_uint32 s1 c v2) in
+  let k2_2 = JsNumber.modulo_32 k2 in
+  res_ter s2 (res_val (Coq_value_prim (Coq_prim_number (mathop k1 k2_2))))
 
 and run_binary_op_bitwise mathop s c v1 v2 =
-    let%run (s1, k1) = (to_int32 s c v1) in
-    let%run (s2, k2) = (to_int32 s1 c v2) in
-    res_ter s2 (res_val (Coq_value_prim (Coq_prim_number (mathop k1 k2))))
+  let%run (s1, k1) = (to_int32 s c v1) in
+  let%run (s2, k2) = (to_int32 s1 c v2) in
+  res_ter s2 (res_val (Coq_value_prim (Coq_prim_number (mathop k1 k2))))
 
 and run_binary_op_compare b_swap b_neg s c v1 v2 =
-      let%run (s1, ww) = convert_twice_primitive s c v1 v2 in
-      let (w1, w2) = ww in
-      let p = if b_swap then (w2, w1) else (w1, w2) in
-      let (wa, wb) = p in
-      let wr = inequality_test_primitive wa wb in
-      let v =
-        if prim_compare wr Coq_prim_undef
-        then res_val (Coq_value_prim (Coq_prim_bool false))
-        else if (b_neg) && (prim_compare wr (Coq_prim_bool true))
-        then res_val (Coq_value_prim (Coq_prim_bool false))
-        else if (b_neg) && (prim_compare wr (Coq_prim_bool false))
-        then res_val (Coq_value_prim (Coq_prim_bool true))
-        else res_val (Coq_value_prim wr) in
-      res_out (Coq_out_ter (s1, v))
+  let%run (s1, ww) = convert_twice_primitive s c v1 v2 in
+  let (w1, w2) = ww in
+  let p = if b_swap then (w2, w1) else (w1, w2) in
+  let (wa, wb) = p in
+  let wr = inequality_test_primitive wa wb in
+  if prim_compare wr Coq_prim_undef
+  then res_out (Coq_out_ter (s1, res_val (Coq_value_prim (Coq_prim_bool false))))
+  else if (b_neg) && (prim_compare wr (Coq_prim_bool true))
+  then res_out (Coq_out_ter (s1,res_val (Coq_value_prim (Coq_prim_bool false))))
+  else if (b_neg) && (prim_compare wr (Coq_prim_bool false))
+  then res_out (Coq_out_ter (s1,res_val (Coq_value_prim (Coq_prim_bool true))))
+  else res_out (Coq_out_ter (s1,res_val (Coq_value_prim wr)))
 
 and run_binary_op_instanceof s c v1 v2 =
   match v2 with
@@ -2496,8 +2495,8 @@ and run_binary_op s c op v1 v2 =
   | Coq_binary_op_strict_disequal ->
     result_out (Coq_out_ter (s, (res_val (Coq_value_prim (Coq_prim_bool (not (strict_equality_test v1 v2)))))))
   | Coq_binary_op_coma -> result_out (Coq_out_ter (s, (res_val v2)))
-  | Coq_binary_op_and -> assert false
-  | Coq_binary_op_or  -> assert false
+  | Coq_binary_op_and -> Coq_result_impossible
+  | Coq_binary_op_or  -> Coq_result_impossible
 
 (** val run_prepost_op : unary_op -> ((number -> number) * bool) option **)
 
@@ -3144,23 +3143,47 @@ and run_stat_switch_with_default_A s c found vi rv scs1 ts0 scs2 =
     state -> execution_ctx -> label_set -> expr -> switchbody ->
     result **)
 
+(* ALTERNATIVE VERSION, WITH LESS FACTORIZATION
 and run_stat_switch s c labs e sb =
   let%run (s1, vi) = run_expr_get_value s c e in
-      let  follow = (fun w ->
-      let%success (s0, r) =
-        let%break (s2, r) = w in
-        if res_label_in r labs
-        then result_out (Coq_out_ter (s2, (res_normal r.res_value)))
-        else result_out (Coq_out_ter (s2, r)) in
-      res_ter s0 (res_normal r)) in
-      match sb with
-      | Coq_switchbody_nodefault scs ->
-        follow
-          (run_stat_switch_no_default s1 c vi Coq_resvalue_empty scs)
-      | Coq_switchbody_withdefault (scs1, ts, scs2) ->
-        follow
-          (run_stat_switch_with_default_A s1 c false vi
-             Coq_resvalue_empty scs1 ts scs2)
+  match sb with
+  | Coq_switchbody_nodefault scs ->
+    let%success (s0, r) = begin
+      let%break (s2, r) =
+        run_stat_switch_no_default s1 c vi 
+        Coq_resvalue_empty scs in
+      if res_label_in r labs
+      then result_out (Coq_out_ter (s2, (res_normal r.res_value)))
+      else result_out (Coq_out_ter (s2, r))
+      end in
+    res_ter s0 (res_normal r)
+  | Coq_switchbody_withdefault (scs1, ts, scs2) ->
+    let%success (s0, r) = begin
+      let%break (s2, r) = 
+        run_stat_switch_with_default_A s1 c false vi
+         Coq_resvalue_empty scs1 ts scs2 in
+      if res_label_in r labs
+      then result_out (Coq_out_ter (s2, (res_normal r.res_value)))
+      else result_out (Coq_out_ter (s2, r)) end in
+    res_ter s0 (res_normal r)
+*)
+
+and run_stat_switch s c labs e sb =
+  let%run (s1, vi) = run_expr_get_value s c e in
+  let  follow = (fun w ->
+    let%success (s0, r) =
+      let%break (s2, r) = w in
+      if res_label_in r labs
+      then result_out (Coq_out_ter (s2, (res_normal r.res_value)))
+      else result_out (Coq_out_ter (s2, r)) in
+    res_ter s0 (res_normal r)) in
+  match sb with
+  | Coq_switchbody_nodefault scs ->
+    follow (run_stat_switch_no_default s1 c vi 
+              Coq_resvalue_empty scs)
+  | Coq_switchbody_withdefault (scs1, ts, scs2) ->
+    follow (run_stat_switch_with_default_A s1 c false vi
+              Coq_resvalue_empty scs1 ts scs2)
 
 (** val run_stat_do_while :
     state -> execution_ctx -> resvalue -> label_set -> expr ->
