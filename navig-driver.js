@@ -402,7 +402,7 @@ function goToPred(pred) {
 function button_test_handler() {
   var pred = $("#reach_condition").val();
   var r = evalPred(tracer_items[tracer_pos], pred);
-  // console.log(r);
+  console.log(r);
   // $("#disp_infos").html(r);
   /*if (r === undefined) {
      r = "undefined";
@@ -813,7 +813,7 @@ function show_object(state, loc, target, depth) {
    // 
    var is_global = (string_of_loc(loc) == "global");
    for (var j = 0; j < key_value_pair_array.length; j++) {
-      var i = (is_global) ? j : (key_value_pair_array.length-1-j);
+      var i = key_value_pair_array.length-j-1;
       var prop_name = key_value_pair_array[i][0];
       var attribute = key_value_pair_array[i][1];
 
@@ -1239,7 +1239,7 @@ function updateSelection() {
 // --------------- CodeMirror ----------------
 
 source = CodeMirror.fromTextArea(document.getElementById('source_code'), {
- mode: 'js',
+ mode: 'text/javascript',
  lineNumbers: true,
  lineWrapping: true
 });
@@ -1248,7 +1248,7 @@ source.setSize(500, 150);
 setInitialSourceCode("source.js", "source code here");
 
 interpreter = CodeMirror.fromTextArea(document.getElementById('interpreter_code'), {
- mode: 'js',
+ mode: 'text/javascript',
  lineNumbers: true,
  lineWrapping: true,
  readOnly: true,
