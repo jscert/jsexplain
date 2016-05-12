@@ -255,6 +255,13 @@ let ppf_match_binders binders =
   let binds = show_list ",@ " (List.map (fun (id,se) -> Printf.sprintf "%s = %s" id se) binders) in
   Printf.sprintf "@[<hov 2>var %s;@]" binds
 
+let ppf_let_tuple ids sbody =
+  assert (ids <> []);
+  Printf.sprintf "@[<hov 2>var (%s) = %s;@]" (show_list ",@ " ids) sbody
+
+let ppf_let_record ids sbody =
+  Printf.sprintf "@[<hov 2>var {%s} = %s;@]" (show_list ",@ " ids) sbody
+
 let ppf_array values =
   Printf.sprintf "[%s]"
                  values
@@ -453,11 +460,25 @@ let generate_logged_case loc spat binders ctx newctx sbody need_break =
   (* Note: binders is a list of pairs of id *)
   (* Note: if binders = [], then newctx = ctx *)
   let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
-  let (shead, sintro) =
+  let sbinders_common () = 
+    Printf.sprintf "%s%s" (if binders = [] then "" else "@;<1 2>") (ppf_match_binders binders) in
+  let (shead, spat, sbinders, sintro) =
     match !current_mode with
     | Mode_cmi -> assert false
-    | Mode_unlogged _ | Mode_pseudo _ ->
-        (token_start, token_stop)
+    | Mode_pseudo _ ->
+        let args = List.map fst binders in
+        let spat = (* LATER: use a cleaner separation with Case of (cstr,args) | Default *)
+          if spat = "case ::" then begin
+            let (x,y) = match args with [x;y] -> (x,y) | _ -> assert false in
+            Printf.sprintf "case (%s::%s)" x y
+          end else if args = [] then begin
+            spat 
+          end else begin
+            ppf_apply spat (show_list ",@ " args)
+          end in
+        (token_start, spat, "", token_stop)
+    | Mode_unlogged _ ->
+        (token_start, spat, sbinders_common(), token_stop)
     | Mode_logged ->
       let ids = List.map fst binders in
       let mk_binding x =
@@ -472,32 +493,31 @@ let generate_logged_case loc spat binders ctx newctx sbody need_break =
       in
       let sintro = Printf.sprintf "%slog_event(%s, %s, \"case\");@,"
         spreintro token_loc newctx in
-      ("", sintro)
+      ("", spat, sbinders_common(), sintro)
     in
-  let sbinders = Printf.sprintf "%s%s" (if binders = [] then "" else "@;<1 2>") (ppf_match_binders binders) in
   (Printf.sprintf "@[<v 0>%s%s:%s%s@;<1 2>@[<v 0>%s%s@]@]"
      shead spat sbinders sintro sbody
      (if need_break then "@,break;" else ""))
 
-
 let ppf_match sintro sarg sbranches =
-  let sbranches = 
+  let sswitch, sbranches = 
     match !current_mode with
     | Mode_cmi -> assert false
-    | Mode_unlogged _ | Mode_pseudo _ -> sbranches
-    | Mode_logged -> sbranches 
+    | Mode_pseudo _ -> (*"match"*) "switch", sbranches
+    | Mode_unlogged _ -> "switch", sbranches
+    | Mode_logged -> "switch", sbranches 
       (* TODO: put back if there is not already a default case:
           ^ "@,default: throw \"No matching case for switch\";" *)
     in
-  Printf.sprintf "%sswitch (%s) {@;<1 2>@[<v 0>%s@]@,}@,"
-    sintro sarg sbranches
+  Printf.sprintf "%s%s (%s) {@;<1 2>@[<v 0>%s@]@,}@,"
+    sintro sswitch sarg sbranches
 
 let generate_logged_match loc ctx sintro sarg sbranches arg_is_constant =
   (* sintro is useful not just in the logged case, but also in unlogged;
      this is needed for the semantics *)
   (* arg_is_constant describes whether the argument of switch is a basic JS value,
      or whether it is an encoded object from which we need to read the tag field *)
-  let sarg = if arg_is_constant then sarg else sarg ^ ".tag" in
+  let sarg = if arg_is_constant || is_mode_pseudo() then sarg else sarg ^ ".tag" in
   let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
   match !current_mode with
   | Mode_cmi -> assert false
@@ -603,7 +623,7 @@ let apply_dest loc ctx dest sbody =
 exception Not_good_for_dest_inline
 
 let reject_inline dest =
-  if dest = Dest_inline && is_mode_not_pseudo() 
+  if dest = Dest_inline
     then raise Not_good_for_dest_inline
 
 
@@ -710,7 +730,7 @@ and js_of_expression_wrapped ctx e = (* dest = Dest_return *)
 
 and js_of_expression_naming_argument_if_non_variable ctx obj name_prefix = 
   if is_mode_pseudo() then begin
-    js_of_expression ctx Dest_inline obj
+    "", js_of_expression ctx Dest_ignore obj
   end else begin
     match obj.exp_desc with
     | Texp_ident (path, ident,  _) -> 
@@ -750,9 +770,14 @@ and js_of_expression ctx dest e =
             in
           let binders = List.mapi bind el in
           let ids = List.map fst binders in
-          let sdecl = ppf_match_binders binders in
+          let sdecl =
+            if is_mode_pseudo() then begin
+              ppf_let_tuple ids seobj 
+            end else begin
+              ppf_match_binders binders
+            end in
           (ids, sintro ^ sdecl)
-      | [ { vb_pat = { pat_desc = Tpat_record (args, closed_flag) }; vb_expr = obj } ] -> (* binding records *)
+      | [ { vb_pat = { pat_desc = Tpat_record (args, closed_flag) }; vb_expr = obj } ] -> (* binding records --- TODO: this code does not seem to be used *)
           (* args : (Longident.t loc * label_description * pattern) list *)
          let (sintro, seobj) = js_of_expression_naming_argument_if_non_variable ctx obj "_record_arg_" in     
          let bind (arg_loc,label_descr,pat) = 
@@ -766,7 +791,12 @@ and js_of_expression ctx dest e =
             in
           let binders = List.map bind args in
           let ids = List.map fst binders in
-          let sdecl = ppf_match_binders binders in
+          let sdecl =
+            if is_mode_pseudo() then begin
+              ppf_let_record ids seobj 
+            end else begin
+              ppf_match_binders binders
+            end in
           (ids, sintro ^ sdecl)
       | _ -> (* other cases *)
         let (ids,sdecls) = List.split (List.map (fun vb -> show_value_binding ctx vb) @@ vb_l) in
@@ -1090,7 +1120,8 @@ and js_of_pattern pat obj =
      ppf_match_case (js_of_constant c), []
   | Tpat_construct (_, cd, el) ->
      let c = cd.cstr_name in
-     let spat = if is_sbool c then ppf_match_case c else ppf_match_case ("\"" ^ c ^ "\"") in
+     let spat = 
+      if is_sbool c || is_mode_pseudo() then ppf_match_case c else ppf_match_case ("\"" ^ c ^ "\"") in
      let bind field var = 
         match var.pat_desc with
         | Tpat_var (id, _) -> 
