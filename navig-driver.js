@@ -100,7 +100,8 @@ var source_files = [
   '(2 < 3) && ((3 > 5) || (true || x.f))',
   '2+2',
   '2+"foo"',
-  'f()' // bug? return 0 on the value thrown
+  'f()',
+  '2 === 2',
 ];
 
 source_files.reduce((select, file_content) => {

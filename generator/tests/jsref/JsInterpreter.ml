@@ -17,9 +17,9 @@ open Shared
 (** val convert_number_to_bool : number -> bool **)
 
 let convert_number_to_bool n =
-  if    (number_comparable n JsNumber.zero) 
-     || (number_comparable n JsNumber.neg_zero)
-     || (number_comparable n JsNumber.nan)
+  if    (n === JsNumber.zero) 
+     || (n === JsNumber.neg_zero)
+     || (n === JsNumber.nan)
   then false
   else true
 
@@ -56,12 +56,12 @@ let convert_prim_to_number _foo_ = match _foo_ with
 (** val convert_number_to_integer : number -> number **)
 
 let convert_number_to_integer n =
-  if number_comparable n JsNumber.nan
+  if n === JsNumber.nan
   then JsNumber.zero
-  else if   (number_comparable n JsNumber.zero)
-         || (number_comparable n JsNumber.neg_zero)
-         || (number_comparable n JsNumber.infinity)
-         || (number_comparable n JsNumber.neg_infinity)
+  else if   (n === JsNumber.zero)
+         || (n === JsNumber.neg_zero)
+         || (n === JsNumber.infinity)
+         || (n === JsNumber.neg_infinity)
        then n
        else  (JsNumber.sign n) *. (JsNumber.floor (JsNumber.absolute n))
 
@@ -103,17 +103,17 @@ let equality_test_for_same_type ty v1 v2 =
               | Coq_prim_null -> false
               | Coq_prim_bool b -> false
               | Coq_prim_number n2 ->
-                if number_comparable n1 JsNumber.nan
+                if n1 === JsNumber.nan
                 then false
-                else if number_comparable n2 JsNumber.nan
+                else if n2 === JsNumber.nan
                      then false
-                     else if   (number_comparable n1 JsNumber.zero)
-                            && (number_comparable n2 JsNumber.neg_zero)
+                     else if   (n1 === JsNumber.zero)
+                            && (n2 === JsNumber.neg_zero)
                           then true
-                          else if   (number_comparable n1 JsNumber.neg_zero)
-                                &&  (number_comparable n2 JsNumber.zero)
+                          else if   (n1 === JsNumber.neg_zero)
+                                &&  (n2 === JsNumber.zero)
                                then true
-                               else number_comparable n1 n2
+                               else n1 === n2
               | Coq_prim_string s -> false)
            | Coq_value_object o -> false)
         | Coq_prim_string s -> false)
@@ -133,23 +133,23 @@ let strict_equality_test v1 v2 =
 (** val inequality_test_number : number -> number -> prim **)
 
 let inequality_test_number n1 n2 =
-  if (number_comparable n1 JsNumber.nan) || (number_comparable n2 JsNumber.nan)
+  if (n1 === JsNumber.nan) || (n2 === JsNumber.nan)
   then Coq_prim_undef
-  else if number_comparable n1 n2
+  else if n1 === n2
        then Coq_prim_bool false
-       else if   (number_comparable n1 JsNumber.zero)
-              && (number_comparable n2 JsNumber.neg_zero)
+       else if   (n1 === JsNumber.zero)
+              && (n2 === JsNumber.neg_zero)
             then Coq_prim_bool false
-            else if (number_comparable n1 JsNumber.neg_zero)
-                 && (number_comparable n2 JsNumber.zero)
+            else if (n1 === JsNumber.neg_zero)
+                 && (n2 === JsNumber.zero)
                  then Coq_prim_bool false
-                 else if number_comparable n1 JsNumber.infinity
+                 else if n1 === JsNumber.infinity
                       then Coq_prim_bool false
-                      else if number_comparable n2 JsNumber.infinity
+                      else if n2 === JsNumber.infinity
                            then Coq_prim_bool true
-                           else if number_comparable n2 JsNumber.neg_infinity
+                           else if n2 === JsNumber.neg_infinity
                                 then Coq_prim_bool false
-                                else if number_comparable n1 JsNumber.neg_infinity
+                                else if n1 === JsNumber.neg_infinity
                                      then Coq_prim_bool true
                                      else Coq_prim_bool (n1 < n2)
 
@@ -535,16 +535,15 @@ and object_can_put s c l x =
 
 and run_object_define_own_prop_array_loop s c l newLen oldLen newLenDesc newWritable throwcont def =
   if newLen < oldLen
-  then let  oldLen_2 = (oldLen -. 1.) in
-    let%string (s0, slen) = (to_string s c (Coq_value_prim (Coq_prim_number
-                                                              (of_int oldLen_2)))) in
+  then let oldLen_2 = (oldLen -. 1.) in
+    let%string (s0, slen) = (to_string s c (Coq_value_prim (Coq_prim_number oldLen_2))) in
     let%bool (s1, deleteSucceeded) = (object_delete s0 c l slen false) in
     if not deleteSucceeded
     then let newLenDesc0 =
            (descriptor_with_value
               newLenDesc
               (Some (Coq_value_prim
-                       (Coq_prim_number (of_int (oldLen_2 +. 1.)))))) in
+                       (Coq_prim_number (oldLen_2 +. 1.))))) in
       let newLenDesc1 = (if not newWritable
                          then descriptor_with_writable newLenDesc0 (Some false)
                          else newLenDesc0) in
@@ -655,10 +654,10 @@ and object_define_own_prop s c l x desc throwcont =
                    | Some descValue ->
                      let%run (s1, newLen) = (to_uint32 s0 c descValue) in
                      let%number (s2, newLenN) = to_number s1 c descValue in
-                     if not (number_comparable (of_int newLen) newLenN)
+                     if not (newLen === newLenN)
                      then run_error s2 Coq_native_error_range
                      else let newLenDesc =
-                            (descriptor_with_value desc (Some (Coq_value_prim (Coq_prim_number (of_int newLen))))) in
+                            (descriptor_with_value desc (Some (Coq_value_prim (Coq_prim_number newLen)))) in
                        if le_int_decidable oldLen0 newLen
                        then def s2 ("length") newLenDesc throwcont
                        else if not a.attributes_data_writable
@@ -675,7 +674,7 @@ and object_define_own_prop s c l x desc throwcont =
                          else run_object_define_own_prop_array_loop s3 c l newLen oldLen0 newLenDesc0 newWritable throwcont def
                    | None -> def s0 ("length") desc throwcont)
                else let%run (s1, ilen) = (to_uint32 s0 c (Coq_value_prim (Coq_prim_string x))) in
-                 let%string (s2, slen) = (to_string s1 c (Coq_value_prim (Coq_prim_number (of_int ilen)))) in
+                 let%string (s2, slen) = (to_string s1 c (Coq_value_prim (Coq_prim_number ilen))) in
                  if (string_eq x slen) && (not ( ilen = 4294967295.))
                  then let%run (s3, index) = (to_uint32 s2 c (Coq_value_prim (Coq_prim_string x))) in
                    if  (le_int_decidable oldLen0 index) && (not a.attributes_data_writable)
@@ -686,7 +685,7 @@ and object_define_own_prop s c l x desc throwcont =
                      else if le_int_decidable oldLen0 index
                      then let a0 =
                             descriptor_with_value (descriptor_of_attributes (Coq_attributes_data_of a))
-                              (Some (Coq_value_prim (Coq_prim_number (of_int (index +. 1.))))) in
+                              (Some (Coq_value_prim (Coq_prim_number (index +. 1.)))) in
                        def s4 ("length") a0 false
                      else res_ter s4 (res_val (Coq_value_prim (Coq_prim_bool true)))
                  else def s2 x desc throwcont
@@ -1304,8 +1303,9 @@ and array_args_map_loop s c l args ind =
   | [] -> res_void s
   | h :: rest ->
     let%some s_2 = (object_heap_map_properties_pickable_option s l (fun p ->
-           HeapStr.write p (JsNumber.to_string (of_int ind))
-             (Coq_attributes_data_of (attributes_data_intro_all_true h)))) in array_args_map_loop s_2 c l rest (ind +. 1.)
+           HeapStr.write p (JsNumber.to_string ind)
+             (Coq_attributes_data_of (attributes_data_intro_all_true h)))) in
+             array_args_map_loop s_2 c l rest (ind +. 1.)
 
 (** val string_of_prealloc : prealloc -> string **)
 
@@ -1493,7 +1493,7 @@ and run_construct_prealloc s c b args =
                          s0 = (object_heap_map_properties_pickable_option s_3 l (fun p0 ->
                              HeapStr.write p0 ("length")
                                (Coq_attributes_data_of { attributes_data_value =
-                                                           (Coq_value_prim (Coq_prim_number (of_int length0)));
+                                                           (Coq_value_prim (Coq_prim_number length0));
                                                          attributes_data_writable = true;
                                                          attributes_data_enumerable = false;
                                                          attributes_data_configurable = false }))) in
@@ -1532,7 +1532,7 @@ and run_construct_prealloc s c b args =
                                    let%run
                                       (s0, ilen) = (to_uint32 s_2 c (Coq_value_prim
                                                          (Coq_prim_number vlen))) in
-                                         if number_comparable (of_int ilen) vlen
+                                         if ilen === vlen
                                          then follow s0 ilen
                                          else run_error s0 Coq_native_error_range
                                  | Coq_prim_string s0 ->
@@ -2188,7 +2188,7 @@ and run_object_get_own_prop s c l x =
                                           if le_int_decidable len k0
                                           then res_spec s5 Coq_full_descriptor_undef
                                           else let resultStr =
-                                                 string_sub str (int_of_float k0) 1
+                                                 string_sub str (int_of_number k0) 1
                                                  (* TODO: check k0 is not negative *)
                                             in
                                             let a = { attributes_data_value =
@@ -2425,12 +2425,12 @@ and run_binary_op_shift b_unsigned mathop s c v1 v2 =
     let%run (s1, k1) = ((if b_unsigned then to_uint32 else to_int32) s c v1) in
     let%run (s2, k2) = (to_uint32 s1 c v2) in
     let k2_2 = JsNumber.modulo_32 k2 in
-    res_ter s2 (res_val (Coq_value_prim (Coq_prim_number (of_int (mathop k1 k2_2)))))
+    res_ter s2 (res_val (Coq_value_prim (Coq_prim_number (mathop k1 k2_2))))
 
 and run_binary_op_bitwise mathop s c v1 v2 =
     let%run (s1, k1) = (to_int32 s c v1) in
     let%run (s2, k2) = (to_int32 s1 c v2) in
-    res_ter s2 (res_val (Coq_value_prim (Coq_prim_number (of_int (mathop k1 k2)))))
+    res_ter s2 (res_val (Coq_value_prim (Coq_prim_number (mathop k1 k2))))
 
 and run_binary_op_compare b_swap b_neg s c v1 v2 =
       let%run (s1, ww) = convert_twice_primitive s c v1 v2 in
@@ -2601,8 +2601,7 @@ and run_unary_op s c op e =
             | Coq_unary_op_bitwise_not ->
               let%run (s2, k) = (to_int32 s1 c v) in
                   res_ter s2
-                    (res_val (Coq_value_prim (Coq_prim_number
-                                                (of_int (JsNumber.int32_bitwise_not k)))))
+                    (res_val (Coq_value_prim (Coq_prim_number (JsNumber.int32_bitwise_not k))))
             | Coq_unary_op_not ->
               res_ter s1
                 (res_val (Coq_value_prim (Coq_prim_bool
@@ -2713,7 +2712,7 @@ and init_array s c l oes =
                               let%not_throw
                                  (s4, x) = (object_put s3 c l0
                                    ("length")
-                                   (Coq_value_prim (Coq_prim_number (of_int len)))
+                                   (Coq_value_prim (Coq_prim_number len))
                                    throw_false) in
                                     result_out (Coq_out_ter (s4,
                                                              (res_val (Coq_value_object l0))))
@@ -3382,7 +3381,7 @@ and run_prog s c _term_ = match _term_ with
     -> result **)
 
 and push s c l args ilen =
-  let  vlen = (of_int ilen) in
+  let vlen = ilen in
       match args with
       | [] ->
         let%not_throw
@@ -3520,8 +3519,7 @@ and run_object_is_frozen s c l _foo_ = match _foo_ with
 and run_get_args_for_apply s c l index n =
   if  index < n
   then let%string
-       (s0, sindex) = (to_string s c (Coq_value_prim (Coq_prim_number
-                                        (of_int index)))) in
+       (s0, sindex) = (to_string s c (Coq_value_prim (Coq_prim_number index))) in
           let%value (s1, v) = (run_object_get s0 c l sindex) in
               let
                 
@@ -3536,7 +3534,7 @@ and run_get_args_for_apply s c l index n =
 and valueToStringForJoin s c l k =
   let%string
     
-    (s0, prop) = (to_string s c (Coq_value_prim (Coq_prim_number (of_int k)))) in
+    (s0, prop) = (to_string s c (Coq_value_prim (Coq_prim_number k))) in
        let%value (s1, v) = (run_object_get s0 c l prop) in
            match v with
            | Coq_value_prim p ->
@@ -3578,15 +3576,15 @@ and run_call_prealloc s c b vthis args =
             res_ter s0
               (res_val (Coq_value_prim (Coq_prim_bool
                                           (not
-                                             (   (number_comparable n JsNumber.nan)
-                                              || (number_comparable n JsNumber.infinity)
-                                              || (number_comparable n JsNumber.neg_infinity))))))
+                                             (   (n === JsNumber.nan)
+                                              || (n === JsNumber.infinity)
+                                              || (n === JsNumber.neg_infinity))))))
   | Coq_prealloc_global_is_nan ->
     let  v = (get_arg 0 args) in
         let%number (s0, n) = (to_number s c v) in
             res_ter s0
               (res_val (Coq_value_prim (Coq_prim_bool
-                                          (number_comparable n JsNumber.nan))))
+                                          (n === JsNumber.nan))))
   | Coq_prealloc_object ->
     let  value0 = (get_arg 0 args) in begin
         match value0 with
@@ -3861,8 +3859,7 @@ and run_call_prealloc s c b vthis args =
                                                        let%run (s10, length0) = (vlength) in
                                                            let 
                                                              a0 = ({ attributes_data_value =
-                                                                           (Coq_value_prim (Coq_prim_number
-                                                                                              (of_int length0)));
+                                                                           (Coq_value_prim (Coq_prim_number  length0));
                                                                          attributes_data_writable = false;
                                                                          attributes_data_enumerable = false;
                                                                          attributes_data_configurable = false }) in
@@ -4074,7 +4071,7 @@ and run_call_prealloc s c b vthis args =
                                                   (res_val (Coq_value_prim Coq_prim_undef))))
                   else let%string
                        (s3, sindx) = (to_string s2 c (Coq_value_prim (Coq_prim_number
-                                                         (of_int (ilen -. 1.))))) in
+                                                         (ilen -. 1.)))) in
                           let%value 
                             (s4, velem) = (run_object_get s3 c l sindx) in
                                let%not_throw

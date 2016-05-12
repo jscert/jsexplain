@@ -66,18 +66,8 @@ var int_compare = function(x, y) { return x - y; };
 
 //----------------------------------------------------------------------------
 
-var int_of_float = function(x) { return x; };
+var int_of_number = function(x) { return x; };
 var number_of_int = function(x) { return x; };
-var of_int = function(x) { return x; };
-
-//----------------------------------------------------------------------------
-
-var number_comparable = function(x, y) {
-  if (typeof(x) != "number" || typeof(y) != "number")
-    throw "number_comparable invalid arguments";
-  return x === y; 
-};
-
 
 //----------------------------------------------------------------------------
 

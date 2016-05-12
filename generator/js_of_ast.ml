@@ -135,6 +135,16 @@ let map_cstr_fields ?loc bind (cstr : constructor_description) elements =
      error ?loc ("Insufficient fieldnames for arguments to " ^ cstr.cstr_name)
   
 
+(****************************************************************)
+(* === comparison *)
+
+let is_triple_equal_type typ =
+  match (Ctype.repr typ).desc with
+  | Tconstr(path, tys, _) -> let s = Path.name path in
+       (   s = "JsNumber.number" 
+        || s = "int")
+        (* TODO: add string? *)
+  | _ -> false
 
 
 (****************************************************************)
@@ -173,6 +183,7 @@ let coercion_functions =
     "JsInterpreterMonads.res_out"; 
     "JsInterpreterMonads.res_ter"; 
     "JsInterpreterMonads.result_out";
+    "Stdlib.number_of_int";
     (* "JsIntepreterMonads.res_void"; --no arg *)
   ]
 
@@ -749,6 +760,7 @@ and js_of_expression ctx dest e =
 
   | Texp_ident (path, ident,  _) -> 
       let sexp = js_of_path_longident path ident in
+      let sexp = if sexp = "not" then "!" else sexp in (* hack for renaming "not" on the fly *)
       apply_dest' ctx dest sexp
 
   | Texp_constant c -> 
@@ -858,8 +870,13 @@ and js_of_expression ctx dest e =
             then out_of_scope loc "=== should be applied to 2 arguments";
           let typ = (List.hd sl_clean).exp_type in
           let stype = Print_type.string_of_type_exp typ in
-          let stype = Str.global_replace (Str.regexp "\\.") "_" stype in
-          ppf_apply ("_compare_" ^ stype) (String.concat ",@ " sl)
+          if is_triple_equal_type typ then begin
+            let (x,y) = match sl with [x;y] -> (x,y) | _ -> assert false in
+            ppf_apply_infix "===" x y
+          end else begin
+            let stype = Str.global_replace (Str.regexp "\\.") "_" stype in
+            ppf_apply ("_compare_" ^ stype) (String.concat ",@ " sl)
+          end
         end else if is_infix f sl' && List.length exp_l = 2 then begin
            ppf_apply_infix se (List.hd sl) (List.hd (List.tl sl))
         end else begin

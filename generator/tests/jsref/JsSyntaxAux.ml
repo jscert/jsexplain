@@ -468,13 +468,17 @@ let mathop_compare m1 m2 =
     | Coq_mathop_abs -> true
 
 
-(** val native_error_compare : native_error -> native_error -> bool **)
+(* NEVER USED
+    (** val native_error_compare : native_error -> native_error -> bool **)
 
-let native_error_compare ne1 ne2 = (ne1:native_error) === ne2
+  let native_error_compare ne1 ne2 = (ne1:native_error) === ne2
+
+*)
 
 (** val prealloc_compare : prealloc -> prealloc -> bool **)
 
 let prealloc_compare bl1 bl2 = (bl1:prealloc) === bl2
+
 
 (** val object_loc_compare : object_loc -> object_loc -> bool **)
 
@@ -519,7 +523,7 @@ let prim_compare w1 w2 =
      | Coq_prim_undef -> false
      | Coq_prim_null -> false
      | Coq_prim_bool b -> false
-     | Coq_prim_number n2 -> number_comparable n1 n2
+     | Coq_prim_number n2 -> n1 === n2
      | Coq_prim_string s -> false)
   | Coq_prim_string s1 ->
     (match w2 with

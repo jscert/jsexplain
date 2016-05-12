@@ -80,9 +80,9 @@ let attributes_data_compare ad1 ad2 =
     ad2
   in
      (value_compare v1 v2)
-  && (bool_eq w1 w2)
-  && (bool_eq e1 e2)
-  && (bool_eq c1 c2)
+  && (w1 === w2)
+  && (e1 === e2)
+  && (c1 === c2)
 
 (** val attributes_accessor_compare :
     attributes_accessor -> attributes_accessor -> bool **)

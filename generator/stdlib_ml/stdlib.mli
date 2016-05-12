@@ -77,12 +77,9 @@ val max : float -> float -> float
 (* Alan: Ideally we would add these to the spec, but for the moment conversion
    to a string is doing a foo+"", and conversion to an int is doing +foo *)
 
-val int_of_float : float -> int (* will be removed, since only used by substring *)
+val int_of_number : float -> int (* will be removed, since only used by substring *)
 val number_of_int : int -> float  (* = fun x -> float_of_int x *)
 
-(** val of_int : float -> number **)
-val of_int : float -> float (* = fun x -> x,  
-  that is, an identity function, kept in files for documentation *)
 
 
 (*val float_of_string : string -> float*)
@@ -101,10 +98,6 @@ val ( <= ) : float -> float -> bool
 val ( >= ) : float -> float -> bool
 val fmod : float -> float -> float (*  mod_float, implemented as % operator in JS *)
 
-
-(** val number_comparable : number -> number -> bool **)
-val number_comparable : float -> float -> bool  (* = (fun n1 n2 -> int_eq 0  (float_compare n1 n2)) *)
-  (* same as (=) *)
 
 (*val compare : 'a -> 'a -> int*)
 (*val float_lt : float -> float -> bool
