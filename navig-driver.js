@@ -97,6 +97,9 @@ var source_files = [
   'var f = function() {return "f"}; eval("var g = function() {return \\"g\\"}; eval(\\"var h = function() {return \\\\\\"h\\\\\\"}; f(); g(); h()\\"); h();"); g(); h(); f();',
   'var t = {};\nfor (var i = 0; i < 3; i++) {\n  t[i] = eval("i + " + i); \n};\nt; ',
   'function f() {\n   var x = 2;\n   function g() { var x = 3; return x; };\n   return g(); \n};\nf()',
+  '(2 < 3) && ((3 > 5) || (true || x.f))',
+  '2+2',
+  '2+"foo"',
   'f()' // bug? return 0 on the value thrown
 ];
 

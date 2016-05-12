@@ -2312,148 +2312,6 @@ and from_prop_descriptor s c _foo_ = match _foo_ with
                                     (descriptor_of_attributes (Coq_attributes_data_of a2))
                                     throw_false) in follow s3 v
 
-(** val is_lazy_op : binary_op -> bool option **)
-
-and is_lazy_op _foo_ = match _foo_ with
-  | Coq_binary_op_mult -> None
-  | Coq_binary_op_div -> None
-  | Coq_binary_op_mod -> None
-  | Coq_binary_op_add -> None
-  | Coq_binary_op_sub -> None
-  | Coq_binary_op_left_shift -> None
-  | Coq_binary_op_right_shift -> None
-  | Coq_binary_op_unsigned_right_shift -> None
-  | Coq_binary_op_lt -> None
-  | Coq_binary_op_gt -> None
-  | Coq_binary_op_le -> None
-  | Coq_binary_op_ge -> None
-  | Coq_binary_op_instanceof -> None
-  | Coq_binary_op_in -> None
-  | Coq_binary_op_equal -> None
-  | Coq_binary_op_disequal -> None
-  | Coq_binary_op_strict_equal -> None
-  | Coq_binary_op_strict_disequal -> None
-  | Coq_binary_op_bitwise_and -> None
-  | Coq_binary_op_bitwise_or -> None
-  | Coq_binary_op_bitwise_xor -> None
-  | Coq_binary_op_and -> Some false
-  | Coq_binary_op_or -> Some true
-  | Coq_binary_op_coma -> None
-
-(** val get_puremath_op :
-    binary_op -> (number -> number -> number) option **)
-
-and get_puremath_op _foo_ = match _foo_ with
-  | Coq_binary_op_mult -> Some (fun x y -> x *. y)
-  | Coq_binary_op_div -> Some (fun x y -> x /. y)
-  | Coq_binary_op_mod -> Some JsNumber.fmod
-  | Coq_binary_op_add -> None
-  | Coq_binary_op_sub -> Some (fun x y -> x -. y)
-  | Coq_binary_op_left_shift -> None
-  | Coq_binary_op_right_shift -> None
-  | Coq_binary_op_unsigned_right_shift -> None
-  | Coq_binary_op_lt -> None
-  | Coq_binary_op_gt -> None
-  | Coq_binary_op_le -> None
-  | Coq_binary_op_ge -> None
-  | Coq_binary_op_instanceof -> None
-  | Coq_binary_op_in -> None
-  | Coq_binary_op_equal -> None
-  | Coq_binary_op_disequal -> None
-  | Coq_binary_op_strict_equal -> None
-  | Coq_binary_op_strict_disequal -> None
-  | Coq_binary_op_bitwise_and -> None
-  | Coq_binary_op_bitwise_or -> None
-  | Coq_binary_op_bitwise_xor -> None
-  | Coq_binary_op_and -> None
-  | Coq_binary_op_or -> None
-  | Coq_binary_op_coma -> None
-
-(** val get_inequality_op : binary_op -> (bool * bool) option **)
-
-and get_inequality_op _foo_ = match _foo_ with
-  | Coq_binary_op_mult -> None
-  | Coq_binary_op_div -> None
-  | Coq_binary_op_mod -> None
-  | Coq_binary_op_add -> None
-  | Coq_binary_op_sub -> None
-  | Coq_binary_op_left_shift -> None
-  | Coq_binary_op_right_shift -> None
-  | Coq_binary_op_unsigned_right_shift -> None
-  | Coq_binary_op_lt -> Some (false, false)
-  | Coq_binary_op_gt -> Some (true, false)
-  | Coq_binary_op_le -> Some (true, true)
-  | Coq_binary_op_ge -> Some (false, true)
-  | Coq_binary_op_instanceof -> None
-  | Coq_binary_op_in -> None
-  | Coq_binary_op_equal -> None
-  | Coq_binary_op_disequal -> None
-  | Coq_binary_op_strict_equal -> None
-  | Coq_binary_op_strict_disequal -> None
-  | Coq_binary_op_bitwise_and -> None
-  | Coq_binary_op_bitwise_or -> None
-  | Coq_binary_op_bitwise_xor -> None
-  | Coq_binary_op_and -> None
-  | Coq_binary_op_or -> None
-  | Coq_binary_op_coma -> None
-
-(** val get_shift_op :
-    binary_op -> (bool * (float -> float -> float)) option **)
-
-and get_shift_op _foo_ = match _foo_ with
-  | Coq_binary_op_mult -> None
-  | Coq_binary_op_div -> None
-  | Coq_binary_op_mod -> None
-  | Coq_binary_op_add -> None
-  | Coq_binary_op_sub -> None
-  | Coq_binary_op_left_shift -> Some (false, JsNumber.int32_left_shift)
-  | Coq_binary_op_right_shift -> Some (false, JsNumber.int32_right_shift)
-  | Coq_binary_op_unsigned_right_shift -> Some (true, JsNumber.uint32_right_shift)
-  | Coq_binary_op_lt -> None
-  | Coq_binary_op_gt -> None
-  | Coq_binary_op_le -> None
-  | Coq_binary_op_ge -> None
-  | Coq_binary_op_instanceof -> None
-  | Coq_binary_op_in -> None
-  | Coq_binary_op_equal -> None
-  | Coq_binary_op_disequal -> None
-  | Coq_binary_op_strict_equal -> None
-  | Coq_binary_op_strict_disequal -> None
-  | Coq_binary_op_bitwise_and -> None
-  | Coq_binary_op_bitwise_or -> None
-  | Coq_binary_op_bitwise_xor -> None
-  | Coq_binary_op_and -> None
-  | Coq_binary_op_or -> None
-  | Coq_binary_op_coma -> None
-
-(** val get_bitwise_op : binary_op -> (float -> float -> float) option **)
-
-and get_bitwise_op _foo_ = match _foo_ with
-  | Coq_binary_op_mult -> None
-  | Coq_binary_op_div -> None
-  | Coq_binary_op_mod -> None
-  | Coq_binary_op_add -> None
-  | Coq_binary_op_sub -> None
-  | Coq_binary_op_left_shift -> None
-  | Coq_binary_op_right_shift -> None
-  | Coq_binary_op_unsigned_right_shift -> None
-  | Coq_binary_op_lt -> None
-  | Coq_binary_op_gt -> None
-  | Coq_binary_op_le -> None
-  | Coq_binary_op_ge -> None
-  | Coq_binary_op_instanceof -> None
-  | Coq_binary_op_in -> None
-  | Coq_binary_op_equal -> None
-  | Coq_binary_op_disequal -> None
-  | Coq_binary_op_strict_equal -> None
-  | Coq_binary_op_strict_disequal -> None
-  | Coq_binary_op_bitwise_and -> Some JsNumber.int32_bitwise_and
-  | Coq_binary_op_bitwise_or -> Some JsNumber.int32_bitwise_or
-  | Coq_binary_op_bitwise_xor -> Some JsNumber.int32_bitwise_xor
-  | Coq_binary_op_and -> None
-  | Coq_binary_op_or -> None
-  | Coq_binary_op_coma -> None
-
 (** val run_equal :
     state -> execution_ctx -> value -> value -> result **)
 
@@ -2546,146 +2404,100 @@ and issome : 'a1 . 'a1 option -> bool = fun _foo_ ->
   | Some t -> true
   | None -> false
 
+and run_binary_op_add s c v1 v2 =
+  let%run (s1, ww) = (convert_twice_primitive s c v1 v2) in
+  let w1, w2 = ww in
+  if  (type_compare (type_of (Coq_value_prim w1)) Coq_type_string)
+   || (type_compare (type_of (Coq_value_prim w2)) Coq_type_string)
+  then let%run (s2, ss) = (convert_twice_string s1 c (Coq_value_prim w1) (Coq_value_prim w2)) in
+    let (s3, s4) = ss in
+    res_out (Coq_out_ter (s2, (res_val (Coq_value_prim (Coq_prim_string (strappend s3 s4))))))
+  else let%run (s2, nn) = (convert_twice_number s1 c (Coq_value_prim w1) (Coq_value_prim w2)) in
+    let (n1, n2) = nn in
+    res_out (Coq_out_ter (s2, (res_val (Coq_value_prim (Coq_prim_number (n1 +. n2))))))
+
+and run_binary_op_arith mathop s c v1 v2 =
+  let%run (s1, nn) = (convert_twice_number s c v1 v2) in
+  let (n1, n2) = nn in
+  res_out (Coq_out_ter (s1, (res_val (Coq_value_prim (Coq_prim_number (mathop n1 n2))))))
+
+and run_binary_op_shift b_unsigned mathop s c v1 v2 =
+    let%run (s1, k1) = ((if b_unsigned then to_uint32 else to_int32) s c v1) in
+    let%run (s2, k2) = (to_uint32 s1 c v2) in
+    let k2_2 = JsNumber.modulo_32 k2 in
+    res_ter s2 (res_val (Coq_value_prim (Coq_prim_number (of_int (mathop k1 k2_2)))))
+
+and run_binary_op_bitwise mathop s c v1 v2 =
+    let%run (s1, k1) = (to_int32 s c v1) in
+    let%run (s2, k2) = (to_int32 s1 c v2) in
+    res_ter s2 (res_val (Coq_value_prim (Coq_prim_number (of_int (mathop k1 k2)))))
+
+and run_binary_op_compare b_swap b_neg s c v1 v2 =
+      let%run (s1, ww) = convert_twice_primitive s c v1 v2 in
+      let (w1, w2) = ww in
+      let p = if b_swap then (w2, w1) else (w1, w2) in
+      let (wa, wb) = p in
+      let wr = inequality_test_primitive wa wb in
+      let v =
+        if prim_compare wr Coq_prim_undef
+        then res_val (Coq_value_prim (Coq_prim_bool false))
+        else if (bool_eq b_neg true) && (prim_compare wr (Coq_prim_bool true))
+        then res_val (Coq_value_prim (Coq_prim_bool false))
+        else if (bool_eq b_neg true) && (prim_compare wr (Coq_prim_bool false))
+        then res_val (Coq_value_prim (Coq_prim_bool true))
+        else res_val (Coq_value_prim wr) in
+      res_out (Coq_out_ter (s1, v))
+
+and run_binary_op_instanceof s c v1 v2 =
+  match v2 with
+  | Coq_value_prim p -> run_error s Coq_native_error_type
+  | Coq_value_object l ->
+    let%some b = (run_object_method object_has_instance_ s l) in
+    match b with
+    | None -> run_error s Coq_native_error_type
+    | Some has_instance_id -> run_object_has_instance s c has_instance_id l v1
+
+and run_binary_op_in s c v1 v2 =
+  match v2 with
+  | Coq_value_prim p -> run_error s Coq_native_error_type
+  | Coq_value_object l ->
+    let%string (s2, x) = (to_string s c v1) in
+    object_has_prop s2 c l x
+
 (** val run_binary_op :
     state -> execution_ctx -> binary_op -> value -> value ->
     result **)
 
 and run_binary_op s c op v1 v2 =
-  if binary_op_compare op Coq_binary_op_add
-  then  let%run (s1, ww) = (convert_twice_primitive s c v1 v2) in
-      (* let%run (s1,ww) = convert_twice_primitive s c v1 v2 in *)
-      let (w1, w2) = ww in
-      if  (type_compare (type_of (Coq_value_prim w1)) Coq_type_string)
-       || (type_compare (type_of (Coq_value_prim w2)) Coq_type_string)
-      then let%run
-           (s2, ss) = (convert_twice_string s1 c (Coq_value_prim w1)
-             (Coq_value_prim w2)) in
-              let (s3, s4) = ss in
-              res_out (Coq_out_ter (s2,
-                                    (res_val (Coq_value_prim (Coq_prim_string (strappend s3 s4))))))
-      else let%run
-           (s2, nn) = (convert_twice_number s1 c (Coq_value_prim w1)
-             (Coq_value_prim w2)) in
-              let (n1, n2) = nn in
-              res_out (Coq_out_ter (s2,
-                                    (res_val (Coq_value_prim (Coq_prim_number (n1 +. n2))))))
-  else if issome (get_puremath_op op)
-  then let%some mop = (get_puremath_op op) in
-      let%run (s1, nn) = (convert_twice_number s c v1 v2) in
-          let (n1, n2) = nn in
-          res_out (Coq_out_ter (s1,
-                                (res_val (Coq_value_prim (Coq_prim_number (mop n1 n2))))))
-  else if issome (get_shift_op op)
-  then let%some so = (get_shift_op op) in
-      let (b_unsigned, f) = so in
-      let%run
-         (s1, k1) = ((if b_unsigned then to_uint32 else to_int32) s c
-           v1) in
-            let%run (s2, k2) = (to_uint32 s1 c v2) in
-                let k2_2 = JsNumber.modulo_32 k2 in
-                res_ter s2
-                  (res_val (Coq_value_prim (Coq_prim_number
-                                              (of_int (f k1 k2_2)))))
-  else if issome (get_bitwise_op op)
-  then let%some bo = (get_bitwise_op op) in
-      let%run (s1, k1) = (to_int32 s c v1) in
-          let%run (s2, k2) = (to_int32 s1 c v2) in
-              res_ter s2
-                (res_val (Coq_value_prim (Coq_prim_number
-                                            (of_int (bo k1 k2)))))
-  else if issome (get_inequality_op op)
-  then let%some io = (get_inequality_op op) in
-      let (b_swap, b_neg) = io in
-      let%run
-        
-        (s1, ww) = (convert_twice_primitive s c v1 v2) in
-           let (w1, w2) = ww in
-           let
-             
-             p = (if b_swap then (w2, w1) else (w1, w2)) in
-                let (wa, wb) = p in
-                let wr = inequality_test_primitive wa wb in
-                res_out (Coq_out_ter (s1,
-                                      (if prim_compare wr Coq_prim_undef
-                                       then res_val (Coq_value_prim
-                                                       (Coq_prim_bool false))
-                                       else if 
-                                           (bool_eq b_neg true)
-                                        && (prim_compare wr
-                                              (Coq_prim_bool true))
-                                       then res_val (Coq_value_prim
-                                                       (Coq_prim_bool false))
-                                       else if 
-                                            (bool_eq b_neg true)
-                                          &&  (prim_compare wr (Coq_prim_bool false))
-                                       then res_val (Coq_value_prim
-                                                       (Coq_prim_bool true))
-                                       else res_val (Coq_value_prim
-                                                       wr))))
-  else if binary_op_compare op
-      Coq_binary_op_instanceof
-  then (match v2 with
-      | Coq_value_prim p ->
-        run_error s Coq_native_error_type
-      | Coq_value_object l ->
-        let%some
-           b = (run_object_method object_has_instance_
-             s l) in
-              option_case (fun x ->
-                  run_error s Coq_native_error_type)
-                (fun has_instance_id x ->
-                   run_object_has_instance s c
-                     has_instance_id l v1) b ())
-  else if binary_op_compare op Coq_binary_op_in
-  then (match v2 with
-      | Coq_value_prim p ->
-        run_error s Coq_native_error_type
-      | Coq_value_object l ->
-        let%string 
-          (s2, x) = (to_string s c v1) in
-             object_has_prop s2 c l x)
-  else if binary_op_compare op
-      Coq_binary_op_equal
-  then run_equal s c v1 v2
-  else if binary_op_compare op
-      Coq_binary_op_disequal
-  then let%bool
-       (s0, b0) = (run_equal s c
-         v1 v2) in
-          res_ter s0
-            (res_val (Coq_value_prim
-                        (Coq_prim_bool
-                           (negb b0))))
-  else if binary_op_compare op
-      Coq_binary_op_strict_equal
-  then result_out (Coq_out_ter
-                     (s,
-                      (res_val
-                         (Coq_value_prim
-                            (Coq_prim_bool
-                               (strict_equality_test
-                                  v1 v2))))))
-  else if binary_op_compare
-      op
-      Coq_binary_op_strict_disequal
-  then result_out
-      (Coq_out_ter (s,
-                    (res_val
-                       (Coq_value_prim
-                          (Coq_prim_bool
-                             (negb
-                                (strict_equality_test
-                                   v1 v2)))))))
-  else if binary_op_compare
-      op
-      Coq_binary_op_coma
-  then result_out
-      (Coq_out_ter
-         (s,
-          (res_val v2)))
-  else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-      s
-      ("Undealt lazy operator in [run_binary_op].")
+  match op with
+  | Coq_binary_op_mult -> run_binary_op_arith (fun x y -> x *. y) s c v1 v2
+  | Coq_binary_op_div -> run_binary_op_arith (fun x y -> x /. y) s c v1 v2
+  | Coq_binary_op_mod -> run_binary_op_arith (fun x y -> JsNumber.fmod x y) s c v1 v2
+  | Coq_binary_op_sub -> run_binary_op_arith (fun x y -> x -. y) s c v1 v2
+  | Coq_binary_op_lt -> run_binary_op_compare false false s c v1 v2
+  | Coq_binary_op_gt -> run_binary_op_compare true false s c v1 v2
+  | Coq_binary_op_le -> run_binary_op_compare true true s c v1 v2
+  | Coq_binary_op_ge -> run_binary_op_compare false true s c v1 v2
+  | Coq_binary_op_left_shift -> run_binary_op_shift false JsNumber.int32_left_shift s c v1 v2
+  | Coq_binary_op_right_shift -> run_binary_op_shift false JsNumber.int32_right_shift s c v1 v2
+  | Coq_binary_op_unsigned_right_shift -> run_binary_op_shift true JsNumber.uint32_right_shift s c v1 v2
+  | Coq_binary_op_bitwise_and -> run_binary_op_bitwise JsNumber.int32_bitwise_and s c v1 v2
+  | Coq_binary_op_bitwise_or  -> run_binary_op_bitwise JsNumber.int32_bitwise_or s c v1 v2
+  | Coq_binary_op_bitwise_xor -> run_binary_op_bitwise JsNumber.int32_bitwise_xor s c v1 v2
+  | Coq_binary_op_add -> run_binary_op_add s c v1 v2
+  | Coq_binary_op_instanceof -> run_binary_op_instanceof s c v1 v2
+  | Coq_binary_op_in -> run_binary_op_in s c v1 v2
+  | Coq_binary_op_equal -> run_equal s c v1 v2
+  | Coq_binary_op_disequal ->
+    let%bool (s0, b0) = (run_equal s c v1 v2) in
+    res_ter s0 (res_val (Coq_value_prim (Coq_prim_bool (negb b0))))
+  | Coq_binary_op_strict_equal ->
+    result_out (Coq_out_ter (s, (res_val (Coq_value_prim (Coq_prim_bool (strict_equality_test v1 v2))))))
+  | Coq_binary_op_strict_disequal ->
+    result_out (Coq_out_ter (s, (res_val (Coq_value_prim (Coq_prim_bool (negb (strict_equality_test v1 v2)))))))
+  | Coq_binary_op_coma -> result_out (Coq_out_ter (s, (res_val v2)))
+  | Coq_binary_op_and -> assert false
+  | Coq_binary_op_or  -> assert false
 
 (** val run_prepost_op : unary_op -> ((number -> number) * bool) option **)
 
@@ -2951,37 +2763,31 @@ and run_block s c _foo_ = match _foo_ with
         ifx_success_state rv0 (run_stat s0 c t) (fun x x0 ->
             result_out (Coq_out_ter (x, (res_normal x0))))
 
+and run_binary_op_and s c e1 e2 =
+  let%run (s1, v1) = (run_expr_get_value s c e1) in
+  let b1 = (convert_value_to_boolean v1) in
+  if bool_eq b1 false
+  then res_ter s1 (res_val v1)
+  else let%run (s2, v) = (run_expr_get_value s1 c e2) in
+    res_ter s2 (res_val v)
+
+and run_binary_op_or s c e1 e2 =
+  let%run (s1, v1) = (run_expr_get_value s c e1) in
+  let b1 = (convert_value_to_boolean v1) in
+  if bool_eq b1 true
+  then res_ter s1 (res_val v1)
+  else let%run (s2, v) = (run_expr_get_value s1 c e2) in
+    res_ter s2 (res_val v)
+
 (** val run_expr_binary_op :
     state -> execution_ctx -> binary_op -> expr -> expr ->
     result **)
 
-(* TODO: DEPRECATED 
-   and run_expr_binary_op s c op e1 e2 =
-   match is_lazy_op op with
-   | Some b_ret ->
-    let%run (s1, v1) = (run_expr_get_value s c e1) in
-      let  b1 = (convert_value_to_boolean v1) in
-        if bool_eq b1 b_ret
-        then res_ter s1 (res_val v1)
-        else let%run (s2, v) = (run_expr_get_value s1 c e2) in
-               res_ter s2 (res_val v)
-   | None ->
-    let%run (s1, v1) = (run_expr_get_value s c e1) in
-      let%run (s2, v2) = (run_expr_get_value s1 c e2) in
-        run_binary_op s2 c op v1 v2
-
-*)
-
 and run_expr_binary_op s c op e1 e2 =
-  match is_lazy_op op with
-  | Some b_ret ->
-    let%run (s1, v1) = (run_expr_get_value s c e1) in
-        let  b1 = (convert_value_to_boolean v1) in
-            if bool_eq b1 b_ret
-            then res_ter s1 (res_val v1)
-            else let%run (s2, v) = (run_expr_get_value s1 c e2) in
-                res_ter s2 (res_val v)
-  | None ->
+  match op with
+  | Coq_binary_op_and -> run_binary_op_and s c e1 e2
+  | Coq_binary_op_or -> run_binary_op_or s c e1 e2
+  | _ ->
     let%run (s1,v1) = run_expr_get_value s c e1 in
     let%run (s2,v2) = run_expr_get_value s1 c e2 in
     run_binary_op s2 c op v1 v2
