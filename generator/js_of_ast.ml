@@ -603,7 +603,8 @@ let apply_dest loc ctx dest sbody =
 exception Not_good_for_dest_inline
 
 let reject_inline dest =
-  if dest = Dest_inline then raise Not_good_for_dest_inline
+  if dest = Dest_inline && is_mode_not_pseudo() 
+    then raise Not_good_for_dest_inline
 
 
 
@@ -708,13 +709,17 @@ and js_of_expression_wrapped ctx e = (* dest = Dest_return *)
   ppf_lambda_wrap (js_of_expression ctx Dest_return e)
 
 and js_of_expression_naming_argument_if_non_variable ctx obj name_prefix = 
-  match obj.exp_desc with
-  | Texp_ident (path, ident,  _) -> 
-      "", (js_of_path_longident path ident)
-  | _ ->  (* generate  var id = sexp;  *)
-      let id = id_fresh name_prefix in
-      let sintro = js_of_expression ctx (Dest_assign id) obj in
-      (sintro ^ "@,"), id
+  if is_mode_pseudo() then begin
+    js_of_expression ctx Dest_inline obj
+  end else begin
+    match obj.exp_desc with
+    | Texp_ident (path, ident,  _) -> 
+        "", (js_of_path_longident path ident)
+    | _ ->  (* generate  var id = sexp;  *)
+        let id = id_fresh name_prefix in
+        let sintro = js_of_expression ctx (Dest_assign id) obj in
+        (sintro ^ "@,"), id
+  end
 
 and js_of_expression ctx dest e =
   let inline_of_wrap = js_of_expression_inline_or_wrap ctx in (* shorthand *)
@@ -863,7 +868,6 @@ and js_of_expression ctx dest e =
      let sbranches = String.concat "@," (List.map (fun b -> js_of_branch ctx dest b sarg) l) in
      let arg_is_constant = exp_type_is_constant obj in
      generate_logged_match loc ctx sintro sarg sbranches arg_is_constant
-
 
   | Texp_tuple (tl) -> 
      let sexp = ppf_tuple @@ show_list_f (fun exp -> inline_of_wrap exp) ", " tl in
