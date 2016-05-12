@@ -308,7 +308,7 @@ let descriptor_set_not_same_dec aa desc =
     attributes -> descriptor -> bool **)
 
 let attributes_change_enumerable_on_non_configurable_dec a desc =
-    (bool_eq (attributes_configurable a) false)
+    (not (attributes_configurable a))
   &&
     ((option_compare bool_eq desc.descriptor_configurable (Some
         true)) 
@@ -318,9 +318,9 @@ let attributes_change_enumerable_on_non_configurable_dec a desc =
     attributes_data -> descriptor -> bool **)
 
 let attributes_change_data_on_non_configurable_dec ad desc =
-    (bool_eq (attributes_configurable (Coq_attributes_data_of ad)) false)
+    (not (attributes_configurable (Coq_attributes_data_of ad)))
   &&
-    (bool_eq ad.attributes_data_writable false)
+    (not ad.attributes_data_writable)
   &&  (   (option_compare bool_eq desc.descriptor_writable (Some true)) 
        || (descriptor_value_not_same_dec ad desc))
 
@@ -328,7 +328,7 @@ let attributes_change_data_on_non_configurable_dec ad desc =
     attributes_accessor -> descriptor -> bool **)
 
 let attributes_change_accessor_on_non_configurable_dec aa desc =
-     (bool_eq (attributes_configurable (Coq_attributes_accessor_of aa)) false)
+     (not (attributes_configurable (Coq_attributes_accessor_of aa)))
   && (    (descriptor_get_not_same_dec aa desc)
        || (descriptor_set_not_same_dec aa desc))
 

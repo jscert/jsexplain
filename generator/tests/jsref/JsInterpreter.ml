@@ -756,13 +756,13 @@ and run_to_descriptor s c _foo_ = match _foo_ with
                          res_spec s4 (descriptor_with_writable desc2 (Some b)))
                       (fun s4_2 desc2 ->
                          sub0 s4_2 desc2 ("get") (fun s5 v5 desc3 ->
-                             if (bool_eq (is_callable_dec s5 v5) false)
+                             if (not (is_callable_dec s5 v5))
                              && (not (value_compare v5 (Coq_value_prim Coq_prim_undef)))
                              then throw_result (run_error s5 Coq_native_error_type)
                              else res_spec s5 (descriptor_with_get desc3 (Some v5)))
                            (fun s5_2 desc3 ->
                               sub0 s5_2 desc3 ("set") (fun s6 v6 desc4 ->
-                                  if (bool_eq (is_callable_dec s6 v6) false)
+                                  if (not (is_callable_dec s6 v6))
                                   && (not (value_compare v6 (Coq_value_prim Coq_prim_undef)))
                                   then throw_result (run_error s6 Coq_native_error_type)
                                   else res_spec s6 (descriptor_with_set desc4 (Some v6)))
@@ -1822,8 +1822,8 @@ and binding_inst_function_decls s c l fds str bconfig =
                                                          true) in follow s0
                                                 else if 
                                                        (descriptor_is_accessor_dec (descriptor_of_attributes a))                                                  
-                                                    || (bool_eq (attributes_writable a) false)
-                                                    || (bool_eq (attributes_enumerable a) false)
+                                                    || (not (attributes_writable a))
+                                                    || (not (attributes_enumerable a))
                                                 then run_error s3 Coq_native_error_type
                                                 else follow s3
                                       else follow s2
@@ -1892,7 +1892,7 @@ and arguments_object_map_loop s c l xs len args x str lmap xsmap =
                         then arguments_object_map_loop_2 s1 xsmap
                         else let dummy = "" in
                           let  x0 = (nth_def dummy len_2 xs) in
-                              if    (bool_eq str true)
+                              if    (str)
                                  || (mem_decide string_eq x0 xsmap)
                               then arguments_object_map_loop_2 s1 xsmap
                               else let%object 
@@ -2441,9 +2441,9 @@ and run_binary_op_compare b_swap b_neg s c v1 v2 =
       let v =
         if prim_compare wr Coq_prim_undef
         then res_val (Coq_value_prim (Coq_prim_bool false))
-        else if (bool_eq b_neg true) && (prim_compare wr (Coq_prim_bool true))
+        else if (b_neg) && (prim_compare wr (Coq_prim_bool true))
         then res_val (Coq_value_prim (Coq_prim_bool false))
-        else if (bool_eq b_neg true) && (prim_compare wr (Coq_prim_bool false))
+        else if (b_neg) && (prim_compare wr (Coq_prim_bool false))
         then res_val (Coq_value_prim (Coq_prim_bool true))
         else res_val (Coq_value_prim wr) in
       res_out (Coq_out_ter (s1, v))
@@ -2766,17 +2766,17 @@ and run_block s c _foo_ = match _foo_ with
 and run_binary_op_and s c e1 e2 =
   let%run (s1, v1) = (run_expr_get_value s c e1) in
   let b1 = (convert_value_to_boolean v1) in
-  if bool_eq b1 false
-  then res_ter s1 (res_val v1)
-  else let%run (s2, v) = (run_expr_get_value s1 c e2) in
+  if not b1
+    then res_ter s1 (res_val v1)
+    else let%run (s2, v) = (run_expr_get_value s1 c e2) in
     res_ter s2 (res_val v)
 
 and run_binary_op_or s c e1 e2 =
   let%run (s1, v1) = (run_expr_get_value s c e1) in
   let b1 = (convert_value_to_boolean v1) in
-  if bool_eq b1 true
-  then res_ter s1 (res_val v1)
-  else let%run (s2, v) = (run_expr_get_value s1 c e2) in
+  if b1 
+    then res_ter s1 (res_val v1)
+    else let%run (s2, v) = (run_expr_get_value s1 c e2) in
     res_ter s2 (res_val v)
 
 (** val run_expr_binary_op :
