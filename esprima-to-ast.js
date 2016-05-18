@@ -3,6 +3,7 @@
 //https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API$revision/707671
 
 function esprimaToAST(prog, sourceText, filename) {
+  filename = filename === undefined ? "" : filename;
 
   var returnSourceText = filename.startsWith("_eval_");
 
