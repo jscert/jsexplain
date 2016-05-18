@@ -4171,13 +4171,15 @@ and run_call s c l vthis args =
     let arguments_ = (LibList.append boundArgs args) in run_call s c target boundThis arguments_
   | Coq_call_prealloc b -> run_call_prealloc s c b vthis args
 
-(** val run_javascript_with_state : prog -> state -> result **)
+(** val run_javascript_from_state : state -> prog -> result **)
 
 and run_javascript_from_state s p =
   let c = execution_ctx_initial (prog_intro_strictness p) in
   let%void s_2 =
     execution_ctx_binding_inst s c Coq_codetype_global None p [] in
   run_prog s_2 c p
+
+(** val run_javascript_from_result : result -> prog -> result **)
 
 and run_javascript_from_result w p =
   if_success w (fun s _ -> run_javascript_from_state s p)

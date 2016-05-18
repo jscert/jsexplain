@@ -51,7 +51,8 @@ ASSEMBLY_JS_FILES := \
 	JsPreliminary.unlog.js \
 	JsInit.unlog.js \
 	JsInterpreterMonads.unlog.js \
-	JsInterpreter.log.js
+	JsInterpreter.log.js \
+	ModuleExport.js
 ASSEMBLY_JS := $(STDLIB_DIR)/stdlib.js $(addprefix tests/jsref/,$(ASSEMBLY_JS_FILES))
 
 #	
