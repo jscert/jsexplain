@@ -889,7 +889,8 @@ and js_of_expression ctx dest e =
         in
       let sexp1 = inline_of_wrap e1 in
       let pats,body = function_get_args_and_body e2 in
-      let sbody = js_of_expression ctx Dest_return body in
+      let newctx = ctx_fresh() in
+      let sbody = js_of_expression newctx Dest_return body in
       let pats_clean = List.filter (fun pat -> is_mode_not_pseudo() || not (is_hidden_type pat.pat_type)) pats in
       let arg_ids = List.map ident_of_pat pats_clean in
       let (token_start1, token_stop1, _token_loc) = token_fresh !current_mode loc in 
@@ -905,6 +906,7 @@ and js_of_expression ctx dest e =
            | _ -> out_of_scope loc "two argument bound by monad in pseudo-code mode"
            in
         (* e.g.:  var%spec x = expr in cont *)
+        let (_token_start3, _token_stop3, _token_loc) = token_fresh !current_mode loc in (* for logged_let *)
         let sexp = Printf.sprintf "@[<hov 2>var%s%s %s%s%s = %s%s%s;@]@,%s" "%%" monad_name token_start2 id  token_stop2 token_start1 sexp1 token_stop1 sbody in
         begin match dest with
         | Dest_assign _ ->
@@ -919,7 +921,8 @@ and js_of_expression ctx dest e =
       end else begin
         (* e.g.:  if_spec(expr, (function(s, x) -> cont)) *)
         let sexp1_token = Printf.sprintf "%s%s%s" token_start1 sexp1 token_stop1 in
-        let cont_token = Printf.sprintf "function(%s%s%s) {@;<1 2>@[<v 0>%s@]@,}" token_start2 (String.concat ",@ " arg_ids) token_stop2 sbody in
+        let sbody_logged = generate_logged_let loc arg_ids ctx newctx "" sbody in
+        let cont_token = Printf.sprintf "function(%s%s%s) {@;<1 2>@[<v 0>%s@]@,}" token_start2 (String.concat ",@ " arg_ids) token_stop2 sbody_logged in
         let sexp = ppf_apply fname (String.concat ",@ " [sexp1_token; cont_token]) in
         apply_dest' ctx dest sexp
 
