@@ -113,6 +113,13 @@ let list_index k l =
       in
    aux 0 l 
 
+let list_split3 l =
+   let l1 = List.map (fun (x,_,_) -> x) l in
+   let l2 = List.map (fun (_,x,_) -> x) l in
+   let l3 = List.map (fun (_,_,x) -> x) l in
+   (l1,l2,l3)
+
+
 (**************************************************************)
 (** String manipulation functions *)
 

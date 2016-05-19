@@ -2405,15 +2405,12 @@ and issome : 'a1 . 'a1 option -> bool = fun _foo_ ->
   | None -> false
 
 and run_binary_op_add s c v1 v2 =
-  let%run (s1, ww) = (convert_twice_primitive s c v1 v2) in
-  let w1, w2 = ww in
+  let%run (s1, (w1, w2)) = (convert_twice_primitive s c v1 v2) in
   if  (type_compare (type_of (Coq_value_prim w1)) Coq_type_string)
    || (type_compare (type_of (Coq_value_prim w2)) Coq_type_string)
-  then let%run (s2, ss) = (convert_twice_string s1 c (Coq_value_prim w1) (Coq_value_prim w2)) in
-    let (s3, s4) = ss in
-    res_out (Coq_out_ter (s2, (res_val (Coq_value_prim (Coq_prim_string (strappend s3 s4))))))
-  else let%run (s2, nn) = (convert_twice_number s1 c (Coq_value_prim w1) (Coq_value_prim w2)) in
-    let (n1, n2) = nn in
+  then let%run (s2, (str1, str2)) = (convert_twice_string s1 c (Coq_value_prim w1) (Coq_value_prim w2)) in
+    res_out (Coq_out_ter (s2, (res_val (Coq_value_prim (Coq_prim_string (strappend str1 str2))))))
+  else let%run (s2, (n1, n2)) = (convert_twice_number s1 c (Coq_value_prim w1) (Coq_value_prim w2)) in
     res_out (Coq_out_ter (s2, (res_val (Coq_value_prim (Coq_prim_number (n1 +. n2))))))
 
 and run_binary_op_arith mathop s c v1 v2 =

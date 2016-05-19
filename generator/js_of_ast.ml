@@ -675,9 +675,61 @@ let reject_inline dest =
     then raise Not_good_for_dest_inline
 
 
-
 (****************************************************************)
-(* TRANSLATION *)
+(* HELPER FUNCTIONS *)
+
+and js_of_constant = function
+  | Const_int       n     -> string_of_int n
+  | Const_char      c     -> String.make 1 c
+  | Const_string   (s, _) -> "\"" ^ (String.escaped (String.escaped s)) ^ "\"" (* Warning: 2 levels of printf *)
+  | Const_float     f     -> f
+  | Const_int32     n     -> Int32.to_string n
+  | Const_int64     n     -> Int64.to_string n
+  | Const_nativeint n     -> Nativeint.to_string n
+
+let js_of_path_longident path ident =
+  match String.concat "." @@ Longident.flatten ident.txt with
+  (* for unit: *)
+  | "()"  -> unit_repr
+  (* for bool: *)
+  | "&&"  -> "&&"
+  | "||"  -> "||"
+  (* for float: *)
+  | "="  -> "=="
+  | "+."  -> "+"
+  | "*."  -> "*"
+  | "-."  -> "-"
+  | "~-." -> "-"
+  | "/."  -> "/"
+  | "<"   -> "<"
+  | ">"   -> ">"
+  | "<="   -> "<="
+  | ">="   -> ">="
+  (* for int: *)
+  | "+"  -> "+"
+  | "*"  -> "*"
+  | "-"  -> "-"
+  | "/"  -> "/"
+  (* for string *)
+  | "^"   -> "+" (* !!TODO: we want to claim ability to type our sublanguage, so we should not use this *)
+  | res   -> 
+      let res = if !generate_qualified_names && (Path.head path).Ident.name <> "Stdlib" 
+                   then ppf_path path else res in
+      ppf_ident_name res
+
+let is_triple_equal_comparison e =
+   match e.exp_desc with
+   | Texp_ident (path, ident,  _) ->
+      let sexp = js_of_path_longident path ident in
+      sexp = "==="
+      (* TODO: this text could be optimized *)
+   | _ -> false
+
+let ident_of_pat pat = match pat.pat_desc with
+  | Tpat_var (id, _) -> ppf_ident id
+  | Tpat_any         -> id_fresh "_pat_any_"
+  | _ -> error ~loc:pat.pat_loc "functions can't deconstruct values"
+
 
 (* takes a list of pairs made of: list of strings, and list of strings, 
    and return a pair of a string (the string concat with newlines of the fst strings),
@@ -686,6 +738,27 @@ let reject_inline dest =
 let combine_list_output args = 
    let (strs,bss) = List.split args in
    (show_list "@,@," strs), (List.flatten bss)
+
+(* returns a pair (x,e), where [x] in the name in [pat]
+   and where [e] is the access to "stupleobj[index]" *)
+let tuple_component_bind stupleobj index pat = 
+   let loc = pat.pat_loc in
+   match pat.pat_desc with
+   | Tpat_var (id, _) -> 
+       let sid = ppf_ident id in
+       (sid, Printf.sprintf "%s[%d]" stupleobj index)
+   | Tpat_any -> out_of_scope loc "Underscore pattern in let-tuple"
+   | _ -> out_of_scope loc "Nested pattern matching"
+
+(* returns a list of pairs of the form (x,e), corresponding
+   to the bindings to be performed for decomposing [stupleobj]
+    as the tuple of patterns [pl]. *)
+let tuple_binders stupleobj pl =
+   List.mapi (tuple_component_bind stupleobj) pl
+
+
+(****************************************************************)
+(* TRANSLATION *)
 
 let rec js_of_structure s =
    let rec extract_opens acc items =
@@ -807,21 +880,13 @@ and js_of_expression ctx dest e =
   | Texp_let (_, vb_l, e) ->
     reject_inline dest;
     let (ids, sdecl) = begin match vb_l with  
-      | [ { vb_pat = { pat_desc = Tpat_tuple el }; vb_expr = obj } ] -> (* binding tuples *)
-         let (sintro, seobj) = js_of_expression_naming_argument_if_non_variable ctx obj "_tuple_arg_" in     
-         let bind i var = 
-            match var.pat_desc with
-            | Tpat_var (id, _) -> 
-                let sid = ppf_ident id in
-                (sid, Printf.sprintf "%s[%d]" seobj i)
-            | Tpat_any -> out_of_scope var.pat_loc "Underscore pattern in let-tuple"
-            | _ -> out_of_scope var.pat_loc "Nested pattern matching"
-            in
-          let binders = List.mapi bind el in
+      | [ { vb_pat = { pat_desc = Tpat_tuple pl }; vb_expr = obj } ] -> (* binding tuples *)
+          let (sintro, stupleobj) = js_of_expression_naming_argument_if_non_variable ctx obj "_tuple_arg_" in     
+          let binders = tuple_binders stupleobj pl in
           let ids = List.map fst binders in
           let sdecl =
             if is_mode_pseudo() then begin
-              ppf_let_tuple ids seobj 
+              ppf_let_tuple ids stupleobj 
             end else begin
               ppf_match_binders binders
             end in
@@ -862,10 +927,42 @@ and js_of_expression ctx dest e =
       (* DEPRECATED: function_get_args_and_body e  [c.c_lhs] c.c_rhs *) in
     let pats_clean = List.filter (fun pat -> is_mode_not_pseudo() || not (is_hidden_type pat.pat_type)) pats in
     let arg_ids = List.map ident_of_pat pats_clean in
+       (* FUTURE USE: (for function taking tuples as args)
+       let arg_idss, tuplebindingss = List.split (List.map (fun pat ->
+         match pat.pat_desc with
+         | Tpat_var (id, _) -> let x = ppf_ident id in [x], []
+         | Tpat_any         -> let x = id_fresh "_pat_any_" in [x], [] 
+         | Tpat_tuple pl -> 
+            let a = id_fresh "_tuple_arg_" in
+            let binders = tuple_binders a pl in
+            if is_mode_pseudo() then begin
+               (* the name [a] is ignored in this case *)
+               let xs = List.map fst binders in
+               let x = Printf.sprintf "(%s)" (show_list ",@ " xs) in
+               [x], []
+            end else begin 
+               [a], binders
+            end
+         | _ -> error ~loc:pat.pat_loc "functions can't deconstruct values unless tuple"
+         ) pats_clean) in
+       let arg_ids = List.concat arg_idss in
+       let tuple_bindings = List.concat tuplebindingss in
+       (* - In normal mode, [arg_ids] contains the list of all identifiers
+            bound by the arguments (including those in tuples), and
+            [tuplebindings] is a list of pairs of the form (xi,ei), where
+            each [xi] is a variable bound by a tuple pattern, and each
+            [ei] is an expression of the form "tuple_arg_[3]" giving the
+            expression to which [xi] should be bound. 
+         - In pseudo-code mode, [arg_ids] contains the names of the arguments,
+           possibly directly in the tupled form, e.g. "(x,y)", and [tuplebindings]
+           is empty. *)
+       let stuplebindings = ppf_match_binders tuple_bindings in
+       *)
+    let stuplebindings = "" in
     let newctx = ctx_fresh() in
     let sbody = js_of_expression newctx Dest_return body in
     let sexp = generate_logged_enter body.exp_loc arg_ids ctx newctx sbody in
-    apply_dest' ctx dest sexp
+    apply_dest' ctx dest (stuplebindings ^ sexp)
 
   | Texp_apply (f, exp_l) when is_monadic_function f ->
       let sl_clean = exp_l
@@ -892,22 +989,54 @@ and js_of_expression ctx dest e =
       let newctx = ctx_fresh() in
       let sbody = js_of_expression newctx Dest_return body in
       let pats_clean = List.filter (fun pat -> is_mode_not_pseudo() || not (is_hidden_type pat.pat_type)) pats in
-      let arg_ids = List.map ident_of_pat pats_clean in
+      (* OLD let arg_ids = List.map ident_of_pat pats_clean in*)
+      let arg_idss, bound_idss, tuplebindingss = list_split3 (List.map (fun pat ->
+         match pat.pat_desc with
+         | Tpat_var (id, _) -> let x = ppf_ident id in [x], [x], []
+         | Tpat_any         -> let x = id_fresh "_pat_any_" in [x], [], [] 
+         | Tpat_tuple pl -> 
+            let a = id_fresh "_tuple_arg_" in
+            let binders = tuple_binders a pl in
+            let xs = List.map fst binders in
+            if is_mode_pseudo() then begin
+               (* the name [a] is ignored in this case *)
+               let arg = Printf.sprintf "(%s)" (show_list ",@ " xs) in
+               [arg], xs, []
+            end else begin 
+               [a], xs, binders
+            end
+         | _ -> error ~loc:pat.pat_loc "functions can't deconstruct values unless tuple"
+         ) pats_clean) in
+      let arg_ids = List.concat arg_idss in
+      let bound_ids = List.concat bound_idss in
+      let tuple_bindings = List.concat tuplebindingss in
+       (* - In normal mode, [arg_ids] contains the name of the arguments
+            as identifiers, [bound_ids] contains the list of all identifiers
+            bound by the arguments (including those in tuples), and
+            [tuplebindings] is a list of pairs of the form (xi,ei), where
+            each [xi] is a variable bound by a tuple pattern, and each
+            [ei] is an expression of the form "tuple_arg_[3]" giving the
+            expression to which [xi] should be bound. 
+         - In pseudo-code mode, [arg_ids] contains the names of the arguments,
+           possibly directly in the tupled form, e.g. "(x,y)", [bound_ids] is
+           as before, and [tuplebindings] are empty. *)
+      let stuplebindings = ppf_match_binders tuple_bindings in
+
       let (token_start1, token_stop1, _token_loc) = token_fresh !current_mode loc in 
       let (token_start2, token_stop2, _token_loc) = token_fresh !current_mode loc in 
        (* token1 placed on sexp1
           token2 placed on ids *)
       if is_mode_pseudo() then begin
-        let id =
+        let sargs =
            match arg_ids with
            | [] -> "_"
               (*deprecated: Printf.sprintf "@[<hov 2>%s%s;%s@]@,%s" token_start sexp1 token_stop sbody*)
-           | [id] -> id
+           | [sarg] -> sarg
            | _ -> out_of_scope loc "two argument bound by monad in pseudo-code mode"
            in
         (* e.g.:  var%spec x = expr in cont *)
         let (_token_start3, _token_stop3, _token_loc) = token_fresh !current_mode loc in (* for logged_let *)
-        let sexp = Printf.sprintf "@[<hov 2>var%s%s %s%s%s = %s%s%s;@]@,%s" "%%" monad_name token_start2 id  token_stop2 token_start1 sexp1 token_stop1 sbody in
+        let sexp = Printf.sprintf "@[<hov 2>var%s%s %s%s%s = %s%s%s;@]@,%s" "%%" monad_name token_start2 sargs  token_stop2 token_start1 sexp1 token_stop1 sbody in
         begin match dest with
         | Dest_assign _ ->
           apply_dest' ctx dest (ppf_lambda_wrap sexp)
@@ -921,8 +1050,8 @@ and js_of_expression ctx dest e =
       end else begin
         (* e.g.:  if_spec(expr, (function(s, x) -> cont)) *)
         let sexp1_token = Printf.sprintf "%s%s%s" token_start1 sexp1 token_stop1 in
-        let sbody_logged = generate_logged_let loc arg_ids ctx newctx "" sbody in
-        let cont_token = Printf.sprintf "function(%s%s%s) {@;<1 2>@[<v 0>%s@]@,}" token_start2 (String.concat ",@ " arg_ids) token_stop2 sbody_logged in
+        let sbody_logged = generate_logged_let loc bound_ids ctx newctx "" sbody in
+        let cont_token = Printf.sprintf "function(%s%s%s) {@;<1 2>@[<v 0>%s%s%s@]@,}" token_start2 (String.concat ",@ " arg_ids) token_stop2 stuplebindings (if stuplebindings <> "" then "@," else "") sbody_logged in
         let sexp = ppf_apply fname (String.concat ",@ " [sexp1_token; cont_token]) in
         apply_dest' ctx dest sexp
 
@@ -1126,59 +1255,6 @@ and js_of_expression ctx dest e =
   | Texp_lazy        _                -> out_of_scope loc "lazy expressions"
   | Texp_object     (_,_)             -> out_of_scope loc "objects"
   | Texp_pack        _                -> out_of_scope loc "packing"
-
-and js_of_constant = function
-  | Const_int       n     -> string_of_int n
-  | Const_char      c     -> String.make 1 c
-  | Const_string   (s, _) -> "\"" ^ (String.escaped (String.escaped s)) ^ "\"" (* Warning: 2 levels of printf *)
-  | Const_float     f     -> f
-  | Const_int32     n     -> Int32.to_string n
-  | Const_int64     n     -> Int64.to_string n
-  | Const_nativeint n     -> Nativeint.to_string n
-
-
-and js_of_path_longident path ident =
-  match String.concat "." @@ Longident.flatten ident.txt with
-  (* for unit: *)
-  | "()"  -> unit_repr
-  (* for bool: *)
-  | "&&"  -> "&&"
-  | "||"  -> "||"
-  (* for float: *)
-  | "="  -> "=="
-  | "+."  -> "+"
-  | "*."  -> "*"
-  | "-."  -> "-"
-  | "~-." -> "-"
-  | "/."  -> "/"
-  | "<"   -> "<"
-  | ">"   -> ">"
-  | "<="   -> "<="
-  | ">="   -> ">="
-  (* for int: *)
-  | "+"  -> "+"
-  | "*"  -> "*"
-  | "-"  -> "-"
-  | "/"  -> "/"
-  (* for string *)
-  | "^"   -> "+" (* !!TODO: we want to claim ability to type our sublanguage, so we should not use this *)
-  | res   -> 
-      let res = if !generate_qualified_names && (Path.head path).Ident.name <> "Stdlib" 
-                   then ppf_path path else res in
-      ppf_ident_name res
-
-and is_triple_equal_comparison e =
-   match e.exp_desc with
-   | Texp_ident (path, ident,  _) ->
-      let sexp = js_of_path_longident path ident in
-      sexp = "==="
-      (* TODO: this text could be optimized *)
-   | _ -> false
-
-and ident_of_pat pat = match pat.pat_desc with
-  | Tpat_var (id, _) -> ppf_ident id
-  | Tpat_any         -> id_fresh "_pat_any_"
-  | _ -> error ~loc:pat.pat_loc "functions can't deconstruct values"
 
 (* returns the name bound and the code that assigns a value to this name *)
 and js_of_let_pattern ctx pat expr =
