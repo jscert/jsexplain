@@ -1,29 +1,17 @@
 "use strict";
 
-var fs = require('mz/fs');
-var walk = require('klaw');
-var filter = require('through2-filter');
-fs.readlinkSync = require('readlink').sync; // a non-broken readlink...
 var assert = require('chai').assert;
 
 var esprima = require('esprima');
 var esprimaToAST = require('../esprima-to-ast.js');
 
+var test262tests = require('./helper-test262.js');
+
 /* Tests whether a given test is negative.
+ * Param: negative (boolean or string): Return value of helper-test262.testNegativity
  * Returns: a string if type of failure specified, true, or false
  */
-function testNegativity(str) {
-  var result = /@negative[ \t]*(\S*)?[ \t]*$/m.exec(str);
-  if(result) {
-    result = result[1] || true;
-  } else {
-    result = false;
-  }
-  return result;
-}
-
-function isParserNegativeTest(str) {
-  var negative = testNegativity(str);
+function isParserNegativeTest(negative) {
   if (typeof negative === 'boolean') {
     return negative;
   }
@@ -200,7 +188,7 @@ function typecheckAST(ast) {
   return typecheck("prog", ast);
 }
 
-describe("Custom testcases", function() {
+describe("EsprimaToAST", function() {
   it("Extracts function body strings", function() {
     var source =
 `function f() {
@@ -269,60 +257,33 @@ a()};`;
   });
 });
 
-var test262path = fs.readlinkSync(__dirname + '/test262');
-var tests = [];
-
-walk(test262path)
-.pipe(filter.obj(file => file.stats.isFile() && file.path.endsWith(".js")))
-.on('readable', function() {
-  var item;
-  while((item = this.read())) { tests.push(item.path); }
-})
-.on('end', function() {
-  describe("test262", function() {
-    tests.forEach(item => {
-      describe(item, function() {
-
-        var source;
-        var negative = '';
-
-        before(function(done) {
-          fs.readFile(item).then(
-            data => {
-              source = data.toString();
-              negative = isParserNegativeTest(source);
-            }
-          ).then(done);
-        });
-
-        it('parses', function() {
-          try {
-            esprima.parse(source, {loc: true, range: true});
-          } catch(e) {
-            if (!negative) {
-              throw e;
-            }
-          }
-        });
-
-        it('converts', function() {
-          try {
-            var prog = esprima.parse(source, {loc: true, range: true});
-          } catch(e) { return; }
-
-          try {
-            var ast = esprimaToAST.esprimaToAST(prog, source);
-            typecheckAST(ast);
-          } catch (e) {
-            if (e instanceof esprimaToAST.UnsupportedSyntaxError) {
-            } else {
-              throw e;
-            }
-          }
-        });
-      })
-    });
+test262tests.push(args => {
+  it('parse', function() {
+    var negative = isParserNegativeTest(args.negative);
+    try {
+      esprima.parse(args.source, {loc: true, range: true});
+    } catch(e) {
+      if (!negative) {
+        throw e;
+      }
+    }
   });
+});
 
-  run();
+test262tests.push(args => {
+  it('convert ast', function() {
+    try {
+      var prog = esprima.parse(args.source, {loc: true, range: true});
+    } catch(e) { return; }
+
+    try {
+      var ast = esprimaToAST.esprimaToAST(prog, args.source);
+      typecheckAST(ast);
+    } catch (e) {
+      if (e instanceof esprimaToAST.UnsupportedSyntaxError) {
+      } else {
+        throw e;
+      }
+    }
+  });
 });
