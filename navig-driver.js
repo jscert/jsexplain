@@ -81,7 +81,7 @@ var source_files = [
   'var t = [];\nfor (var i = 0; i < 3; i++) {\n  t[i] = function() { return i; } \n};\nt[0](); ',
   'var t = [];\nfor (var i = 0; i < 3; i++) {\n  t[i] = (function(j) {\n      return function() { return j; }; \n    })(i); \n};\nt[0](); ',
   '2+3',
-  '2+"foo"',
+  'var x = 2+"foo"',
   '(+{}+[])[+!![]]',
   'var f = function() {return "f"}; eval("var g = function() {return \\"g\\"}; eval(\\"var h = function() {return \\\\\\"h\\\\\\"}; f(); g(); h()\\"); h();"); g(); h(); f();',
   '(function (x) {return arguments;})(3)',
