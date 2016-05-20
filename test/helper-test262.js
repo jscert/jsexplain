@@ -31,6 +31,8 @@ function testNegativity(str) {
 }
 
 before(function(done) {
+  this.timeout(0); // Otherwise it fails on slow filesystems
+
   var test262path = fs.readlinkSync(__dirname + '/test262');
   var tests = [];
 
