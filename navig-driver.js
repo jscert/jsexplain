@@ -77,10 +77,13 @@ var initialSourceName = "";
 var source_files = [
   // '',
   'var x = 1;\nx++;\nx',
-  'var x = { a : { c: 1 } };\n x.a.b = 2;\nx.a.x = x;\nx',
-  '(+{}+[])[+!![]]',
+  'var x = { a : { c : 1 } };\nx.a.b = 2;\nx.a.x = x;\nx',
   'var t = [];\nfor (var i = 0; i < 3; i++) {\n  t[i] = function() { return i; } \n};\nt[0](); ',
   'var t = [];\nfor (var i = 0; i < 3; i++) {\n  t[i] = (function(j) {\n      return function() { return j; }; \n    })(i); \n};\nt[0](); ',
+  '2+3',
+  '2+"foo"',
+  '(+{}+[])[+!![]]',
+  'var f = function() {return "f"}; eval("var g = function() {return \\"g\\"}; eval(\\"var h = function() {return \\\\\\"h\\\\\\"}; f(); g(); h()\\"); h();"); g(); h(); f();',
   '(function (x) {return arguments;})(3)',
   'var s = "val(\\"++x\\")";\neval("x=0; e" + s)',
   'var x = 2;\nx',
@@ -94,12 +97,10 @@ var source_files = [
   '(function (x) {return 1;})()',
   '(function (x) {\nreturn 1;\n})({a:{b:2}})',
   'eval("var x = { a : 1 };\\nx.b = 2;\\nx");',
-  'var f = function() {return "f"}; eval("var g = function() {return \\"g\\"}; eval(\\"var h = function() {return \\\\\\"h\\\\\\"}; f(); g(); h()\\"); h();"); g(); h(); f();',
   'var t = {};\nfor (var i = 0; i < 3; i++) {\n  t[i] = eval("i + " + i); \n};\nt; ',
   'function f() {\n   var x = 2;\n   function g() { var x = 3; return x; };\n   return g(); \n};\nf()',
   '(2 < 3) && ((3 > 5) || (true || x.f))',
   '2+2',
-  '2+"foo"',
   'f()',
   '2 === 2',
 ];
@@ -1461,7 +1462,7 @@ function testLineof(filename, token) {
 
 //stepTo(5873);
 // setExample(20);
-setExample(3);
+setExample(0);
 // setExample(11);
 $("#reach_condition").val("S_line() == 3 && S('i') == 1");
 

@@ -1035,8 +1035,8 @@ and js_of_expression ctx dest e =
            | _ -> out_of_scope loc "two argument bound by monad in pseudo-code mode"
            in
         (* e.g.:  var%spec x = expr in cont *)
-        let (_token_start3, _token_stop3, _token_loc) = token_fresh !current_mode loc in (* for logged_let *)
-        let sexp = Printf.sprintf "@[<hov 2>var%s%s %s%s%s = %s%s%s;@]@,%s" "%%" monad_name token_start2 sargs  token_stop2 token_start1 sexp1 token_stop1 sbody in
+        let (token_start3, token_stop3, _token_loc) = token_fresh !current_mode loc in (* for logged_let *)
+        let sexp = Printf.sprintf "@[<hov 2>%svar%s%s %s%s%s%s = %s%s%s;@]@,%s" token_start3 "%%" monad_name token_start2 sargs token_stop2 token_stop3 token_start1 sexp1 token_stop1 sbody in
         begin match dest with
         | Dest_assign _ ->
           apply_dest' ctx dest (ppf_lambda_wrap sexp)
