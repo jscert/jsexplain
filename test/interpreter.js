@@ -5,7 +5,7 @@ var esprimaToAST = require('../esprima-to-ast.js').esprimaToAST;
 var JsInterpreter = require('../generator/tests/jsref/assembly.js');
 
 require('./parser.js');
-var test262tests = require('./helper-test262.js');
+var test262tests = require('./helpers/test262.js');
 
 // Stub logging functions
 ['ctx_empty', 'ctx_push', 'log_event'].forEach(f => global[f] = function(){})

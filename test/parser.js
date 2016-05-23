@@ -5,7 +5,7 @@ var assert = require('chai').assert;
 var esprima = require('esprima');
 var esprimaToAST = require('../esprima-to-ast.js');
 
-var test262tests = require('./helper-test262.js');
+var test262tests = require('./helpers/test262.js');
 
 /* Tests whether a given test is negative.
  * Param: negative (boolean or string): Return value of helper-test262.testNegativity

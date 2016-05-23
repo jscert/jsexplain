@@ -33,7 +33,7 @@ function testNegativity(str) {
 before(function(done) {
   this.timeout(0); // Otherwise it fails on slow filesystems
 
-  var test262path = fs.readlinkSync(__dirname + '/test262');
+  var test262path = fs.readlinkSync(__dirname + '/../test262');
   var tests = [];
 
   walk(test262path)
@@ -55,6 +55,7 @@ before(function(done) {
           var source;
           var negative = '';
 
+          // Lazy-load the source file prior to tests
           before(function(doneFile) {
             fs.readFile(item).then(
               data => {
@@ -64,6 +65,8 @@ before(function(done) {
             ).then(doneFile);
           });
 
+          // args only gets populated prior to the execution of this item
+          // (it is empty at the point of construction of the test)
           testConstructors.forEach(constructor => constructor(args));
         });
       });
