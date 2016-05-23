@@ -817,6 +817,9 @@ function show_object(state, loc, target, depth) {
    var key_value_pair_array = encoded_list_to_array(HeapStr.to_list(props));
    // 
    var is_global = (string_of_loc(loc) == "global");
+
+   key_value_pair_array.push(["[[Prototype]]", obj.object_proto_]);
+
    for (var j = 0; j < key_value_pair_array.length; j++) {
       var i = key_value_pair_array.length-j-1;
       var prop_name = key_value_pair_array[i][0];
@@ -839,7 +842,13 @@ function show_object(state, loc, target, depth) {
           // TODO: complete
 
           break;
+        case "Coq_value_prim":
+        case "Coq_value_object":
+          show_value(state, attribute, targetsub, depth-1);
+          break;
+
         default: 
+          console.log(attribute);
           throw "invalid attribute.tag";
       }
    }
