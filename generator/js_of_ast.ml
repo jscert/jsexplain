@@ -5,7 +5,6 @@ open Log
 open Misc
 open Mytools
 open Parse_type
-open Print_type
 open Types
 open Typedtree
 
@@ -150,16 +149,22 @@ let function_get_args_and_body e =
 
 
 (****************************************************************)
+exception Not_a_Tconstr
+
+(* Extract type name from Tconstr type expressions *)
+let get_type_name typ =
+  match (Ctype.repr typ).desc with
+  | Tconstr(path, _, _) -> Path.name path
+  | _ -> raise Not_a_Tconstr
+
+let test_type_name names typ =
+  try List.mem (get_type_name typ) names
+  with Not_a_Tconstr -> false
+
 (* === comparison *)
 
-let is_triple_equal_type typ =
-  match (Ctype.repr typ).desc with
-  | Tconstr(path, tys, _) -> let s = Path.name path in
-       (   s = "JsNumber.number" 
-        || s = "int")
-        (* TODO: add string? *)
-  | _ -> false
-
+let is_triple_equal_type = test_type_name ["JsNumber.number"; "int"]
+  (* TODO: add string? *)
 
 (****************************************************************)
 (* PSEUDO-CODE mode *)
@@ -174,12 +179,7 @@ let is_ident e =
 (* Hide all function arguments of type execution_ctx or state 
    (for function definitions) *)
 
-let is_hidden_type typ =
-  match (Ctype.repr typ).desc with
-  | Tconstr(path, tys, _) -> let s = Path.name path in
-       (   s = "JsSyntax.execution_ctx" 
-        || s = "JsSyntax.state")
-  | _ -> false
+let is_hidden_type = test_type_name ["JsSyntax.execution_ctx"; "JsSyntax.state"]
 
 (* Hide all functions arguments of type execution_ctx or state 
    (for function applications) *)
@@ -1086,7 +1086,7 @@ and js_of_expression ctx dest e =
           if (List.length exp_l <> 2) 
             then out_of_scope loc "=== should be applied to 2 arguments";
           let typ = (List.hd sl_clean).exp_type in
-          let stype = Print_type.string_of_type_exp typ in
+          let stype = get_type_name typ in
           if is_triple_equal_type typ then begin
             let (x,y) = match sl with [x;y] -> (x,y) | _ -> assert false in
             ppf_apply_infix "===" x y

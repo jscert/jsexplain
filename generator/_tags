@@ -1,12 +1,7 @@
-true: package(str)
+true: package(str), package(compiler-libs.common)
 
 # Generate cmt type information files
 true: bin_annot
-
-<parsing>: include
-<typing>: include
-<utils>: include
-<driver>: include
 
 # <tests>: precious
 # <stdlib_ml>: precious
