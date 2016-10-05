@@ -43,13 +43,13 @@ type binary_op =
 
 type literal =
 | Coq_literal_null [@f]
-| Coq_literal_bool  [@f value] of bool
-| Coq_literal_number  [@f value] of JsNumber.number
-| Coq_literal_string  [@f value] of string
+| Coq_literal_bool of bool [@f value]
+| Coq_literal_number of JsNumber.number [@f value]
+| Coq_literal_string of string [@f value]
 
 type label =
 | Coq_label_empty [@f]
-| Coq_label_string  [@f value] of string
+| Coq_label_string of string [@f value]
 
 type label_set = label list
 
@@ -61,61 +61,61 @@ let strictness_false =
   false
 
 type propname =
-| Coq_propname_identifier  [@f value] of string
-| Coq_propname_string  [@f value] of string
-| Coq_propname_number  [@f value] of JsNumber.number
+| Coq_propname_identifier of string [@f value]
+| Coq_propname_string of string [@f value]
+| Coq_propname_number of JsNumber.number [@f value]
 
 type expr =
 | Coq_expr_this [@f]
-| Coq_expr_identifier  [@f name] of string
-| Coq_expr_literal  [@f value] of literal
-| Coq_expr_object  [@f fields] of (propname * propbody) list
-| Coq_expr_array  [@f elements] of expr option list
-| Coq_expr_function  [@f func_name_opt, arg_names, body] of string option * string list * funcbody
-| Coq_expr_access  [@f obj, field] of expr * expr
-| Coq_expr_member  [@f obj, field_name] of expr * string
-| Coq_expr_new  [@f func, args] of expr * expr list
-| Coq_expr_call  [@f func, args] of expr * expr list
-| Coq_expr_unary_op  [@f op, arg] of unary_op * expr
-| Coq_expr_binary_op  [@f arg1, op, arg2] of expr * binary_op * expr
-| Coq_expr_conditional  [@f cond, then_branch, else_branch] of expr * expr * expr
-| Coq_expr_assign  [@f left_expr, op_opt, right_expr] of expr * binary_op option * expr
+| Coq_expr_identifier of string [@f name]
+| Coq_expr_literal of literal [@f value]
+| Coq_expr_object of (propname * propbody) list [@f fields]
+| Coq_expr_array of expr option list [@f elements]
+| Coq_expr_function of string option * string list * funcbody [@f func_name_opt, arg_names, body]
+| Coq_expr_access of expr * expr [@f obj, field]
+| Coq_expr_member of expr * string [@f obj, field_name]
+| Coq_expr_new of expr * expr list [@f func, args]
+| Coq_expr_call of expr * expr list [@f func, args]
+| Coq_expr_unary_op of unary_op * expr [@f op, arg]
+| Coq_expr_binary_op of expr * binary_op * expr [@f arg1, op, arg2]
+| Coq_expr_conditional of expr * expr * expr [@f cond, then_branch, else_branch]
+| Coq_expr_assign of expr * binary_op option * expr [@f left_expr, op_opt, right_expr]
 and propbody =
-| Coq_propbody_val  [@f expr] of expr
-| Coq_propbody_get  [@f body] of funcbody
-| Coq_propbody_set  [@f names, body] of string list * funcbody
+| Coq_propbody_val of expr [@f expr]
+| Coq_propbody_get of funcbody [@f body]
+| Coq_propbody_set of string list * funcbody [@f names, body]
 and funcbody =
-| Coq_funcbody_intro  [@f prog, source] of prog * string
+| Coq_funcbody_intro of prog * string [@f prog, source]
 and stat =
-| Coq_stat_expr  [@f expr] of expr
-| Coq_stat_label  [@f label, stat] of string * stat
-| Coq_stat_block  [@f stats] of stat list
-| Coq_stat_var_decl  [@f decls] of (string * expr option) list
-| Coq_stat_if  [@f cond, then_branch, else_branch] of expr * stat * stat option
-| Coq_stat_do_while  [@f labels, body, cond] of label_set * stat * expr
-| Coq_stat_while  [@f labels, cond, body] of label_set * expr * stat
-| Coq_stat_with  [@f obj, stat] of expr * stat
-| Coq_stat_throw  [@f arg] of expr
-| Coq_stat_return  [@f arg_opt] of expr option
-| Coq_stat_break  [@f label] of label
-| Coq_stat_continue  [@f label] of label
-| Coq_stat_try  [@f body, catch_stats_opt, finally_opt] of stat * (string * stat) option * stat option
-| Coq_stat_for  [@f labels, init, cond, step, body] of label_set * expr option * expr option * expr option * stat
-| Coq_stat_for_var  [@f labels, init, cond, step, body] of label_set * (string * expr option) list * expr option * expr option * stat
-| Coq_stat_for_in  [@f labels, id, obj, body] of label_set * expr * expr * stat
-| Coq_stat_for_in_var  [@f labels, id, init, obj, body] of label_set * string * expr option * expr * stat
+| Coq_stat_expr of expr [@f expr]
+| Coq_stat_label of string * stat [@f label, stat]
+| Coq_stat_block of stat list [@f stats]
+| Coq_stat_var_decl of (string * expr option) list [@f decls]
+| Coq_stat_if of expr * stat * stat option [@f cond, then_branch, else_branch]
+| Coq_stat_do_while of label_set * stat * expr [@f labels, body, cond]
+| Coq_stat_while of label_set * expr * stat [@f labels, cond, body]
+| Coq_stat_with of expr * stat [@f obj, stat]
+| Coq_stat_throw of expr [@f arg]
+| Coq_stat_return of expr option [@f arg_opt]
+| Coq_stat_break of label [@f label]
+| Coq_stat_continue of label [@f label]
+| Coq_stat_try of stat * (string * stat) option * stat option [@f body, catch_stats_opt, finally_opt]
+| Coq_stat_for of label_set * expr option * expr option * expr option * stat [@f labels, init, cond, step, body]
+| Coq_stat_for_var of label_set * (string * expr option) list * expr option * expr option * stat [@f labels, init, cond, step, body]
+| Coq_stat_for_in of label_set * expr * expr * stat [@f labels, id, obj, body]
+| Coq_stat_for_in_var of label_set * string * expr option * expr * stat [@f labels, id, init, obj, body]
 | Coq_stat_debugger [@f]
-| Coq_stat_switch  [@f labels, arg, body] of label_set * expr * switchbody
+| Coq_stat_switch of label_set * expr * switchbody [@f labels, arg, body]
 and switchbody =
-| Coq_switchbody_nodefault  [@f clauses] of switchclause list
-| Coq_switchbody_withdefault  [@f clauses_before, clause_default, clauses_after] of switchclause list * stat list * switchclause list
+| Coq_switchbody_nodefault of switchclause list [@f clauses]
+| Coq_switchbody_withdefault of switchclause list * stat list * switchclause list [@f clauses_before, clause_default, clauses_after]
 and switchclause =
-| Coq_switchclause_intro  [@f arg, stats] of expr * stat list
+| Coq_switchclause_intro of expr * stat list [@f arg, stats]
 and prog =
-| Coq_prog_intro  [@f strictness, elements] of strictness_flag * element list
+| Coq_prog_intro of strictness_flag * element list [@f strictness, elements]
 and element =
-| Coq_element_stat  [@f stat] of stat
-| Coq_element_func_decl  [@f func_name, arg_names, body] of string * string list * funcbody
+| Coq_element_stat of stat [@f stat]
+| Coq_element_func_decl of string * string list * funcbody [@f func_name, arg_names, body]
 
 type propdefs = (propname * propbody) list
 
@@ -218,19 +218,19 @@ type prealloc =
 | Coq_prealloc_error_proto_to_string [@f]
 | Coq_prealloc_throw_type_error [@f]
 | Coq_prealloc_json [@f]
-| Coq_prealloc_mathop  [@f mathop] of mathop
-| Coq_prealloc_native_error  [@f error] of native_error
-| Coq_prealloc_native_error_proto  [@f error] of native_error
+| Coq_prealloc_mathop of mathop [@f mathop]
+| Coq_prealloc_native_error of native_error [@f error]
+| Coq_prealloc_native_error_proto of native_error [@f error]
 
 type call =
 | Coq_call_default [@f]
 | Coq_call_after_bind [@f]
-| Coq_call_prealloc  [@f prealloc] of prealloc
+| Coq_call_prealloc of prealloc [@f prealloc]
 
 type construct =
 | Coq_construct_default [@f]
 | Coq_construct_after_bind [@f]
-| Coq_construct_prealloc  [@f prealloc] of prealloc
+| Coq_construct_prealloc of prealloc [@f prealloc]
 
 type builtin_has_instance =
 | Coq_builtin_has_instance_function [@f]
@@ -271,19 +271,19 @@ type builtin_define_own_prop =
 | Coq_builtin_define_own_prop_args_obj [@f]
 
 type object_loc =
-| Coq_object_loc_normal  [@f address] of int
-| Coq_object_loc_prealloc  [@f prealloc] of prealloc
+| Coq_object_loc_normal of int [@f address]
+| Coq_object_loc_prealloc of prealloc [@f prealloc]
 
 type prim =
 | Coq_prim_undef [@f]
 | Coq_prim_null [@f]
-| Coq_prim_bool  [@f value] of bool
-| Coq_prim_number  [@f value] of JsNumber.number
-| Coq_prim_string  [@f value] of string
+| Coq_prim_bool of bool [@f value]
+| Coq_prim_number of JsNumber.number [@f value]
+| Coq_prim_string of string [@f value]
 
 type value =
-| Coq_value_prim  [@f value] of prim
-| Coq_value_object  [@f value] of object_loc
+| Coq_value_prim of prim [@f value]
+| Coq_value_object of object_loc [@f value]
 
 type coq_type =
 | Coq_type_undef [@f]
@@ -336,8 +336,8 @@ let attributes_accessor_enumerable x = x.attributes_accessor_enumerable
 let attributes_accessor_configurable x = x.attributes_accessor_configurable
 
 type attributes =
-| Coq_attributes_data_of [@f value] of attributes_data
-| Coq_attributes_accessor_of [@f value] of attributes_accessor
+| Coq_attributes_data_of of attributes_data [@f value]
+| Coq_attributes_accessor_of of attributes_accessor [@f value]
 
 type descriptor = { descriptor_value : value option;
                     descriptor_writable : bool option;
@@ -372,7 +372,7 @@ let descriptor_configurable x = x.descriptor_configurable
 
 type full_descriptor =
 | Coq_full_descriptor_undef [@f]
-| Coq_full_descriptor_some  [@f value] of attributes
+| Coq_full_descriptor_some of attributes [@f value]
 
 type mutability =
 | Coq_mutability_uninitialized_immutable [@f]
@@ -385,8 +385,8 @@ type decl_env_record = (string, mutability * value) Heap.heap
 type provide_this_flag = bool
 
 type env_record =
-| Coq_env_record_decl  [@f value] of decl_env_record
-| Coq_env_record_object  [@f value, provide_this] of object_loc * provide_this_flag
+| Coq_env_record_decl of decl_env_record [@f value]
+| Coq_env_record_object of object_loc * provide_this_flag [@f value, provide_this]
 
 type env_loc = int
 
@@ -420,8 +420,8 @@ let execution_ctx_strict x = x.execution_ctx_strict
 type prop_name = string
 
 type ref_base_type =
-| Coq_ref_base_type_value  [@f value] of value
-| Coq_ref_base_type_env_loc  [@f value] of env_loc
+| Coq_ref_base_type_value of value [@f value]
+| Coq_ref_base_type_env_loc of env_loc [@f value]
 
 type ref = { ref_base : ref_base_type; ref_name : prop_name;
              ref_strict : bool }
@@ -563,10 +563,9 @@ let object_bound_args_ x = x.object_bound_args_
 let object_parameter_map_ x = x.object_parameter_map_
 
 type event =
-| Coq_delete_event  [@f loc, name, locopt] of object_loc * prop_name * object_loc option
-| Coq_mutateproto_event  [@f loc, fields] of object_loc * (object_loc * prop_name) list
-   * (object_loc * prop_name) list
-| Coq_enumchange_event  [@f loc, name] of object_loc * prop_name
+| Coq_delete_event of object_loc * prop_name * object_loc option [@f loc, name, locopt]
+| Coq_mutateproto_event of object_loc * (object_loc * prop_name) list * (object_loc * prop_name) list [@f loc, fields]
+| Coq_enumchange_event of object_loc * prop_name [@f loc, name]
 
 type state = { state_object_heap : (object_loc, coq_object) Heap.heap;
                state_env_record_heap : (env_loc, env_record) Heap.heap;
@@ -589,8 +588,8 @@ type restype =
 
 type resvalue =
 | Coq_resvalue_empty [@f]
-| Coq_resvalue_value  [@f value] of value
-| Coq_resvalue_ref  [@f ref] of ref
+| Coq_resvalue_value of value [@f value]
+| Coq_resvalue_ref of ref [@f ref]
 
 type res = { res_type : restype; res_value : resvalue; res_label : label }
 
@@ -656,7 +655,7 @@ let res_throw v =
 
 type out =
 | Coq_out_div [@f]
-| Coq_out_ter  [@f state, res] of state * res
+| Coq_out_ter of state * res [@f state, res]
 
 (** val out_void : state -> out **)
 
@@ -664,8 +663,8 @@ let out_void s =
   Coq_out_ter (s, res_empty)
 
 type 't specret =
-| Coq_specret_val  [@f state, res] of state * 't
-| Coq_specret_out  [@f out] of out
+| Coq_specret_val of state * 't [@f state, res]
+| Coq_specret_out of out [@f out]
 
 type codetype =
 | Coq_codetype_func [@f]

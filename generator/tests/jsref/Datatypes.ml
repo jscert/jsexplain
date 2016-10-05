@@ -8,7 +8,7 @@ let fst p = let (x, y) = p in x
 let snd p = let (x, y) = p in y
 
 type comparison =
-| Eq [@f]  (** Auto Generated Attributes **)
-| Lt [@f]  (** Auto Generated Attributes **)
-| Gt [@f]  (** Auto Generated Attributes **)
+| Eq [@f]  (* Auto Generated Attributes *)
+| Lt [@f]  (* Auto Generated Attributes *)
+| Gt [@f]  (* Auto Generated Attributes *)
 

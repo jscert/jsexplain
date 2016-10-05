@@ -831,7 +831,9 @@ and js_of_structure_item s =
   | Tstr_class      _  -> out_of_scope loc "objects"
   | Tstr_class_type _  -> out_of_scope loc "class types"
   | Tstr_include    _  -> out_of_scope loc "includes"
-  | Tstr_attribute  _  -> out_of_scope loc "attributes"
+  | Tstr_attribute (l, _) ->
+      if l.txt = "ocaml.doc" || l.txt = "ocaml.text" then ("",[])
+      else out_of_scope loc "attributes"
 
 and js_of_branch ctx dest b eobj =
   let spat, binders = js_of_pattern b.c_lhs eobj in

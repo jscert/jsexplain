@@ -17,7 +17,7 @@ foreach $fname (@ARGV) {
 				}
 			}
 			$annot = $annot . "] ";
-			print NEW $1 . $annot . $2 . " (** Auto Generated Attributes **)\n";
+			print NEW $1 . $annot . $2 . " (* Auto Generated Attributes *)\n";
 		} else {
 			print NEW $line;
 		}

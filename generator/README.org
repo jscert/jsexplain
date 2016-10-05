@@ -14,7 +14,7 @@
    - `node.js` and the `esprima` package. In order to get the esprima
      package the more convenient way is to get `npm` (/node package
      manager/) and run `npm install esprima`.
-   - ocaml 4.02.1
+   - ocaml >= 4.02.2, < 4.03
 
 ** How to run it
 
@@ -34,8 +34,8 @@ make cleanall
 ** How does it work?
 
    In order to get the statically typed abstract syntax tree (STAST) of
-   OCaml we usethe same files that are used in the compiler of OCaml
-   4.02.1 (hence the dependency).
+   OCaml we link against compiler-libs, we have tested against versions
+   4.02.2 and 4.02.3.
 
    On top, of this STAST, there is a custom back-end that
    transliterate OCaml to ECMAScript. The code written in OCaml cannot
@@ -59,11 +59,7 @@ make cleanall
 #+BEGIN_src
 
 type 'a tree =
-  | Leaf [@f value] of `a
-  | Node [@f left, value, right] of `a tree * `a * `a tree          
+  | Leaf of `a [@f value]
+  | Node of `a tree * `a * `a tree [@f left, value, right]
 
 #+END_src
-
-Special note: from OCaml 4.02.2 annotations do not have the same
-syntax, but for now we work with OCaml 4.02.1 so the code above
-works and is recommended.

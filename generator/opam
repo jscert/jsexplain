@@ -1,0 +1,16 @@
+opam-version: "1.2"
+name: "jsjsref"
+version: "1.0~dev"
+maintainer: "Thomas Wood <thomas.wood09@imperial.ac.uk>"
+authors: ["Arthur Charguéraud <arthur@chargueraud.org>"
+          "Alan Schmitt <alan.schmitt@inria.fr"
+          "Thomas Wood <thomas.wood09@imperial.ac.uk>"]
+homepage: "http://jscert.org/"
+license: "BSD 3-clause"
+available: [ocaml-version >= "4.02.2" && ocaml-version < "4.03"]
+build: [
+  [make]
+]
+depends: [
+  "ocamlfind" {build}
+]

@@ -5,12 +5,20 @@
 #    make lineof  # build lineof.js
 #    make interp  # build interp.js
 #
-# requires: opam switch 4.02.1; eval `opam config env`
+# requires: opam switch 4.02.3; eval `opam config env`
 
 # TODO: test/lambda is not longer supported
 
 ###############################################################
 # Paths
+
+all: everything
+init:
+	opam switch 4.02.3
+	eval `opam config env`
+	opam pin -yn add jsjsref .
+	opam install -y jsjsref --deps-only
+
 
 STDLIB_DIR  := stdlib_ml
 TESTS_DIR   := tests
@@ -73,8 +81,6 @@ ALL_LINEOF := $(DISPLAYED:.ml=.token.js) $(DISPLAYED:.ml=.mlloc.js) $(DISPLAYED:
 ###############################################################
 # Global options
 
-all: everything
-
 .PHONY: all clean .log.js .unlog.js .token.js .mlloc.js .ptoken.js .pseudo.js
    # all gen log unlog 
 
@@ -103,7 +109,7 @@ DISPLAYGEN := $(OCAMLPAR) ./displayed_sources.byte
 
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 #-include $(JSREF_ML:.ml=.ml.d)
--include $(JSREF_PATH)/.depends
+include $(JSREF_PATH)/.depends
 endif
 
 
@@ -122,9 +128,6 @@ $(STDLIB_DIR)/stdlib.cmi: $(STDLIB_DIR)/stdlib.mli
 monad_ppx.native: monad_ppx.ml
 	$(OCAMLBUILD) $@
 
-#ocamlfind ocamlc -linkpkg -o $@ $<
-# -package compiler-libs.common
-
 ##### Rule for binaries
 
 %.byte: *.ml _tags monad_ppx.native
@@ -135,8 +138,8 @@ monad_ppx.native: monad_ppx.ml
 $(JSREF_PATH)/.depends: $(JSREF_ML)
 	$(OCAMLDEP) -all -I $(<D) $(<D)/* > $@
 
-##### Rule for cmi
 
+##### Rule for cmi
 tests/%.cmi: tests/%.ml main.byte stdlib
 	$(MLTOJS) -mode cmi -I $(<D) $<
 
