@@ -60,8 +60,8 @@ let generate_mapper namesid = function argv ->
               Exp.apply ~loc (Exp.ident
                                 (Location.mkloc
                                    (Longident.Lident ident) Location.none))
-                [("", aux e);
-                 ("", Exp.fun_ "" None p (aux cont))]
+                [(Nolabel, aux e);
+                 (Nolabel, Exp.fun_ Nolabel None p (aux cont))]
             | PStr [{ pstr_desc =
                         Pstr_eval ({ pexp_loc  = loc;
                                      pexp_desc = Pexp_let
@@ -75,8 +75,8 @@ let generate_mapper namesid = function argv ->
               Exp.apply ~loc (Exp.ident
                                 (Location.mkloc
                                    (Longident.Lident ident) Location.none))
-                [("", aux e);
-                 ("", Exp.fun_ "" None p1 (Exp.fun_ "" None p2 (aux cont)))]
+                [(Nolabel, aux e);
+                 (Nolabel, Exp.fun_ Nolabel None p1 (Exp.fun_ Nolabel None p2 (aux cont)))]
             | _ ->
               raise (Location.Error (
                   Location.error ~loc ("error with let%"^name)))

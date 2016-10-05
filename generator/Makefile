@@ -5,7 +5,6 @@
 #    make lineof  # build lineof.js
 #    make interp  # build interp.js
 #
-# requires: opam switch 4.02.3; eval `opam config env`
 
 # TODO: test/lambda is not longer supported
 
@@ -14,7 +13,7 @@
 
 all: everything
 init:
-	opam switch 4.02.3
+	opam switch 4.03.0
 	eval `opam config env`
 	opam pin -yn add jsjsref .
 	opam install -y jsjsref --deps-only

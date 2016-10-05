@@ -800,7 +800,7 @@ and js_of_structure_item s =
         let sbody = js_of_expression_inline_or_wrap ctx_initial vb.vb_expr in
         let s = Printf.sprintf "@[<v 0>var %s = %s;@]" id sbody in
         (s, [id])))
-  | Tstr_type decls -> 
+  | Tstr_type (rec_flag, decls) ->
      combine_list_output (~~ List.map decls (fun decl -> 
         match decl.typ_type.type_kind with
         | Type_variant cstr_decls ->
@@ -968,7 +968,7 @@ and js_of_expression ctx dest e =
 
   | Texp_apply (f, exp_l) when is_monadic_function f ->
       let sl_clean = exp_l
-              |> List.map (fun (_, eo, _) -> match eo with 
+              |> List.map (fun (_, eo) -> match eo with 
                                              | None -> out_of_scope loc "optional apply arguments" 
                                              | Some ei -> ei) in
       let (e1,e2) =
@@ -1072,7 +1072,7 @@ and js_of_expression ctx dest e =
      if is_result_arrow then out_of_scope loc "partial application";
      
      let sl_clean = exp_l
-              |> List.map (fun (_, eo, _) -> match eo with 
+              |> List.map (fun (_, eo) -> match eo with 
                                              | None -> out_of_scope loc "optional apply arguments" 
                                              | Some ei -> ei) in
 
@@ -1212,7 +1212,7 @@ and js_of_expression ctx dest e =
       Printf.sprintf "throw %s;" sexp
       (* TODO: what about apply_dest? *)
 
-  | Texp_function (label, cases, Total) when label = "" -> 
+  | Texp_function (Nolabel, cases, Total) ->
       let mk_pat pat_des =
         { pat_desc = pat_des;
           pat_loc = e.exp_loc;
@@ -1238,7 +1238,7 @@ and js_of_expression ctx dest e =
            c_guard = None;
            c_rhs = mk_exp (Texp_match (thearg, cases, [], Total));
           } in
-      let exp = mk_exp (Texp_function (label, [thecase], Total)) in
+      let exp = mk_exp (Texp_function (Nolabel, [thecase], Total)) in
       js_of_expression ctx dest exp
 
   | Texp_match      (_,_,_, Partial)  -> out_of_scope loc "partial matching"

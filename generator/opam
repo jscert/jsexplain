@@ -7,7 +7,7 @@ authors: ["Arthur Charguéraud <arthur@chargueraud.org>"
           "Thomas Wood <thomas.wood09@imperial.ac.uk>"]
 homepage: "http://jscert.org/"
 license: "BSD 3-clause"
-available: [ocaml-version >= "4.02.2" && ocaml-version < "4.03"]
+available: [ocaml-version >= "4.03.0" && ocaml-version < "4.04"]
 build: [
   [make]
 ]

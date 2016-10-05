@@ -14,7 +14,7 @@
    - `node.js` and the `esprima` package. In order to get the esprima
      package the more convenient way is to get `npm` (/node package
      manager/) and run `npm install esprima`.
-   - ocaml >= 4.02.2, < 4.03
+   - ocaml 4.03.0
 
 ** How to run it
 
@@ -35,7 +35,7 @@ make cleanall
 
    In order to get the statically typed abstract syntax tree (STAST) of
    OCaml we link against compiler-libs, we have tested against versions
-   4.02.2 and 4.02.3.
+   4.03.0. Previous versions are available for >= 4.02.1.
 
    On top, of this STAST, there is a custom back-end that
    transliterate OCaml to ECMAScript. The code written in OCaml cannot

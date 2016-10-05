@@ -83,13 +83,10 @@ and extract_expression e = match e.pexp_desc with
   | Pexp_extension   _          -> error "An identifier, a tuple or an array was expected but an extension was found"
   
 and extract_constant = function
-  | Const_int       _     -> error "A string or a char was expected but an int was found"
-  | Const_char      c     -> String.make 1 c
-  | Const_string   (s, _) -> s
-  | Const_float     _     -> error "A string or a char was expected but a float was found"
-  | Const_int32     _     -> error "A string or a char was expected but a int32 was found"
-  | Const_int64     _     -> error "A string or a char was expected but a int64 was found"
-  | Const_nativeint _     -> error "A string or a char was expected but a nativeint was found"
+  | Pconst_char     c     -> String.make 1 c
+  | Pconst_string  (s, _) -> s
+  | Pconst_integer  _     -> error "A string or a char was expected but an int was found"
+  | Pconst_float    _     -> error "A string or a char was expected but a float was found"
 
 let fetch_builtin_attrs cstr_name =
   List.assoc cstr_name builtin_attributes
