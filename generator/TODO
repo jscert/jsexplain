@@ -317,7 +317,6 @@ TRICK-- HERE IS HOW TO PRINT BROWSER STACK SIZE LIMIT:
 
 =========================================================
 
-- use bin-annot [[https://github.com/clarus/coq-of-ocaml/blob/master/src/coqOfOCaml.ml#L19][source]]
 - clean up todo list
 - documentation
 - run tests with the new JSInterpreter.ml
