@@ -235,6 +235,7 @@ clean_stdlib:
 
 clean: clean_genjs clean_tests clean_stdlib
 	rm -rf _build
+	bash -c "rm -rf .ocamldebug"
 	rm -f *.native *.byte
 
 
@@ -242,7 +243,10 @@ clean: clean_genjs clean_tests clean_stdlib
 #####################################################################
 # Extra
 
-debug: main.d.byte
+debug: main.d.byte .ocamldebug
+
+.ocamldebug: _tags
+	grep -o "package([^)]*)" _tags | sed "s/package(\([^)]*\))/\1/" | xargs ocamlfind query -recursive | sed "s/^/directory /" > .ocamldebug
 
 native: _tags
 	$(OCAMLBUILD) main.native
