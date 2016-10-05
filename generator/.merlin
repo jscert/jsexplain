@@ -1,6 +1,3 @@
-S parsing
-S typing
-S utils
-
 B _build
-B _build/**
+PKG str
+PKG compiler-libs.common
