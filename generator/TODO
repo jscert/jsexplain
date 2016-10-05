@@ -316,3 +316,24 @@ TRICK-- HERE IS HOW TO PRINT BROWSER STACK SIZE LIMIT:
 	then print value of "i".
 
 =========================================================
+
+- use bin-annot [[https://github.com/clarus/coq-of-ocaml/blob/master/src/coqOfOCaml.ml#L19][source]]
+- clean up todo list
+- documentation
+- run tests with the new JSInterpreter.ml
+- find out how to get rid of value_prim
+- in run_binary_op_compare, the « if (b_swap) » bit of code is ugly
+- in pseudo_code
+  - find out how to have syntax highlighting
+  - hide or change these:
+    - var%void _ = // hide
+    - return (r);  // get rid of parentheses
+    - Debug.impossible_with_heap_because(__LOC__, m); // hide
+  - remplace « with » with « open »
+  - deal better with « else if » (see run_equal)
+- jsinterpreter.ml
+  - replace 
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)  s ("[run_object_method] returned a primitive in [object_proto_is_prototype_of_body].")
+    with (after defining an « impossible » function)
+      impossible s "[run_object_method] returned a primitive in [object_proto_is_prototype_of_body]."
+- navig_driver.js: deal better with src_next and src_prev by looking at the context that has an _term_ in it with an enter or an exit event
