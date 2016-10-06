@@ -3,3 +3,5 @@
 *.unlog.js
 *.token.js
 *.pre
+tests/jsref/assembly.js
+tests/jsref/lineof.js

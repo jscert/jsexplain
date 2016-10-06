@@ -36,7 +36,7 @@ ASSEMBLY_JS := \
 	Shared.log.js \
 	LibString.log.js \
 	LibOption.log.js \
-	JsNumber.log.js \
+	JsNumber.js \
 	JsSyntax.log.js \
 	JsSyntaxAux.log.js \
 	Translate_syntax.js \
