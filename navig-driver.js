@@ -97,6 +97,9 @@ var source_files = [
   'var f = function() {return "f"}; eval("var g = function() {return \\"g\\"}; eval(\\"var h = function() {return \\\\\\"h\\\\\\"}; f(); g(); h()\\"); h();"); g(); h(); f();',
   'var t = {};\nfor (var i = 0; i < 3; i++) {\n  t[i] = eval("i + " + i); \n};\nt; ',
   'function f() {\n   var x = 2;\n   function g() { var x = 3; return x; };\n   return g(); \n};\nf()',
+  '(2 < 3) && ((3 > 5) || (true || x.f))',
+  '2+2',
+  '2+"foo"',
   'f()' // bug? return 0 on the value thrown
 ];
 
@@ -813,7 +816,7 @@ function show_object(state, loc, target, depth) {
    // 
    var is_global = (string_of_loc(loc) == "global");
    for (var j = 0; j < key_value_pair_array.length; j++) {
-      var i = (is_global) ? j : (key_value_pair_array.length-1-j);
+      var i = key_value_pair_array.length-j-1;
       var prop_name = key_value_pair_array[i][0];
       var attribute = key_value_pair_array[i][1];
 
@@ -1005,7 +1008,7 @@ function interp_val_is_js_prim(v) {
 }
 
 function interp_val_is_js_value(v) {
-  return has_tag_in_set(v, [ "Coq_value_prim", "Coq_value_object" ]);
+  return has_tag_in_set(v, ["Coq_value_prim", "Coq_value_object" ]);
 }
 
 function interp_val_is_loc(v) {
@@ -1037,6 +1040,9 @@ function show_interp_val(state, v, target, depth) {
   }
   var t = $("#" + target);
   if (interp_val_is_base_value(v)) {
+    if (typeof(v) === "string") {
+      v = "\"" + v + "\"";
+    }
     t.append(html_escape("" + v));
   } else if (interp_val_is_loc(v)) {
     show_object(state, v, target, 0);
@@ -1239,7 +1245,7 @@ function updateSelection() {
 // --------------- CodeMirror ----------------
 
 source = CodeMirror.fromTextArea(document.getElementById('source_code'), {
- mode: 'js',
+ mode: 'text/javascript',
  lineNumbers: true,
  lineWrapping: true
 });
@@ -1248,7 +1254,7 @@ source.setSize(500, 150);
 setInitialSourceCode("source.js", "source code here");
 
 interpreter = CodeMirror.fromTextArea(document.getElementById('interpreter_code'), {
- mode: 'js',
+ mode: 'text/javascript',
  lineNumbers: true,
  lineWrapping: true,
  readOnly: true,
