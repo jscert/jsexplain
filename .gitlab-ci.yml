@@ -1,0 +1,16 @@
+---
+stages:
+- Git Sync
+- build
+- test
+- deploy
+git-sync:
+  before_script:
+  - eval `ssh-agent`
+  - echo "$PUSH_KEY" | ssh-add -
+  script:
+  - git sync-remote git@github.com:jscert/jsexplain.git git@gitlab.doc.ic.ac.uk:resource-reasoning/jsexplain.git
+  - ssh-agent -k
+  only:
+  - triggers
+  stage: Git Sync
