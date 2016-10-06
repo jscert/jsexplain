@@ -70,7 +70,6 @@ walk(test262path)
             prog = esprima.parse(source);
           } catch(e) {}
 
-          console.log(prog);
           esprimaToAST(prog);
         });
       })
