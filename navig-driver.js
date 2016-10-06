@@ -70,6 +70,7 @@ var source = null;
 var interpreter = null;
 
 var source_docs = {};
+var initialSourceName = "";
 
 // Initial source code
 
@@ -118,10 +119,24 @@ function newSourceDoc(name, text, readOnly) {
                 .text(name)
                 .click(e => selectSourceDoc(e.target.textContent))
                 .appendTo('#source_tabs');
+    if (name === '_eval_') { tab.hide(); }
+    source_docs[name].doc_name = name;
     source_docs[name].tab = tab;
     source_docs[name].readOnly = Boolean(readOnly);
   }
   return source_docs[name];
+}
+
+function selectSourceDocFromLoc(loc) {
+  var name = loc.file;
+  if (name === '_eval_') {
+    source_docs['_eval_'].tab.show();
+    source_docs['_eval_'].setValue(loc.sourceText);
+  }
+  var old_doc = selectSourceDoc(loc.file);
+  if (old_doc.doc_name === "_eval_" && name !== "_eval_") {
+    source_docs['_eval_'].tab.hide();
+  }
 }
 
 // Switches current source doc
@@ -130,12 +145,14 @@ function selectSourceDoc(name) {
   if (old_doc.tab) old_doc.tab.removeClass('file_item_current');
   source_docs[name].tab.addClass('file_item_current');
   source.setOption('readOnly', source_docs[name].readOnly);
+  return old_doc;
 }
 
 // Sets the initial source doc
 function setInitialSourceCode(name, text) {
   initSourceDocs();
   var doc = newSourceDoc(name, text);
+  initialSourceName = name;
 
   $("#source_code").val(text);
 
@@ -145,7 +162,9 @@ function setInitialSourceCode(name, text) {
   }
 }
 
-$('#select_source_code').change(e => { setInitialSourceCode("_toplevel_", e.target.value)});
+$('#select_source_code').change(e => {
+  setInitialSourceCode("example" + e.target.selectedOptions[0].index + ".js", e.target.value)
+});
 $('#select_file').change(e => {
   var f = e.target.files[0];
   var fr = new FileReader();
@@ -153,12 +172,11 @@ $('#select_file').change(e => {
   fr.readAsText(f);
 });
 
-// --------------- Initialization ----------------
+function setExample(idx) {
+  $('#select_source_code option')[idx].selected = true;
+  $('#select_source_code').change();
+}
 
-// WARNING: do not move this initialization further down in the file
-// source code displayed initially
-
-setInitialSourceCode("_toplevel_", source_files[0]);
 
 
 // --------------- Predicate search ----------------
@@ -1145,9 +1163,7 @@ function updateSelection() {
      // source panel
      source_loc_selected = item.source_loc;
 
-     newSourceDoc(item.source_loc.file, item.source_loc.sourceText);
-     selectSourceDoc(item.source_loc.file);
-
+     selectSourceDocFromLoc(source_loc_selected);
      updateSelectionInCodeMirror(source, source_loc_selected);
      // console.log(source_loc_selected);
 
@@ -1340,7 +1356,7 @@ function readSourceParseAndRun() {
    // TODO handle parsing error
    // TODO handle out of scope errors
    try {
-     program = parseSource(code, "_toplevel_");
+     program = parseSource(code, initialSourceName);
    } catch (e) {
      return "Parse error";
    }
@@ -1387,8 +1403,8 @@ readSourceParseAndRun();
 //  $("#reach_condition").val("I_line()");
 //  button_test_handler();
 
-// setSourceCode(source_files[3]);
-// stepTo(5873);
+//setExample(3);
+//stepTo(5873);
 
 function showCurrent() {
   console.log(tracer_items[tracer_pos]);
