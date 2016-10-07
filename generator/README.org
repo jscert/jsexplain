@@ -63,3 +63,13 @@ type 'a tree =
   | Node of `a tree * `a * `a tree [@f left, value, right]
 
 #+END_src
+
+** Notes
+
+   Historical versions of the repository required the OCaml 4.02.1 compiler
+   source code to compile directly against. We are unable to redistribute
+   these files for licensing reasons. If for some reason you want to build a
+   historic version, then drop the parsing, typing and utils directories from
+   the OCaml distribution into this directory, some further configuration may
+   be required... Team members may find the whole historic distribution
+   archived in the private jscert_dev repository.
