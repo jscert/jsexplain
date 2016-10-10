@@ -21,9 +21,10 @@ jsjsref: generator
 	$(MAKE) -C jsref
 
 test_init:
+	git submodule update --init test/test262
 	npm install
 
-test: generator
+test: jsjsref
 	node_modules/.bin/mocha
 
 .PHONY: publish jsjsref generator test_init test

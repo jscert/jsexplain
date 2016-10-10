@@ -38,12 +38,10 @@ before(function(done) {
 
   walk(test262path)
   .pipe(filter.obj(file => file.stats.isFile() && file.path.endsWith(".js")))
-  .on('readable', function() {
-    var item;
-    while((item = this.read())) { tests.push(item.path); }
-  })
+  .on('data', (item) => { tests.push(item.path); })
   .on('end', function() {
     describe("test262", function() {
+      if (tests.length === 0) { throw new Error("Unable to find any test262 tests (uninitialised git submodule?)") }
       tests.forEach(item => {
         describe(item, function() {
           // Preseed test arguments with safe defaults

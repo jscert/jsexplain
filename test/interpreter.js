@@ -2,7 +2,7 @@
 
 var esprima = require('esprima');
 var esprimaToAST = require('../esprima-to-ast.js').esprimaToAST;
-var JsInterpreter = require('../generator/tests/jsref/assembly.js');
+var JsInterpreter = require('../jsref/assembly.js');
 
 require('./parser.js');
 var test262tests = require('./helpers/test262.js');
