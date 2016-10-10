@@ -242,9 +242,7 @@ let is_coercion_constructor lident =
       "Coq_resvalue_ref"; 
       "Coq_resvalue_ref"; 
       ] in 
-    if (is_mode_pseudo()) then Printf.printf "%s %s\n" x (if b then " [yes]" else ""); (* *)
-
-
+    (* if (is_mode_pseudo()) then Printf.printf "%s %s\n" x (if b then " [yes]" else ""); *)
     b
 
 
