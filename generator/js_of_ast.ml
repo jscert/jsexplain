@@ -4,7 +4,6 @@ open Attributes
 open Log
 open Misc
 open Mytools
-open Parse_type
 open Types
 open Typedtree
 
