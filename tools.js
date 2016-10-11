@@ -37,7 +37,7 @@ function reset_datalog() {
 function log_event(filename, token, ctx, type) {
   // TODO populate state with object_heap, env_record_heap, fresh_locations, and populate env
 
-  // compute "foo.ml" and "foo.psuedo" from "foo.js"
+  // compute "foo.ml" and "foo.pseudo" from "foo.js"
   var len = filename.length;
   var base = filename.substr(0, len-2);
   var mlfilename = base + "ml";

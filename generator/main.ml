@@ -12,15 +12,11 @@ open Mytools
 (*#########################################################################*)
 
 let ppf = Format.std_formatter
-let outputfile = ref None
 
 (* err_formatter *)
 
 
 (*#########################################################################*)
-
-let add_to_list li s =
-  li := s :: !li
 
 
 let tool_name = "ml2js"
@@ -31,7 +27,6 @@ let init_path () =
   Env.reset_cache ()
 
 (** Return the initial environment in which compilation proceeds. *)
-
 let initial_env () =
   try
     let env = Env.initial_unsafe_string in
@@ -39,11 +34,13 @@ let initial_env () =
   with Not_found ->
     Misc.fatal_error "cannot open stdlib"
 
-(** Analysis of an implementation file. Returns (Some typedtree) if
-   no error occured, else None and an error message is printed.*)
-let process_implementation_file ppf sourcefile =
+(** Analysis of an implementation file.
+ *  ppf: error printer
+ *  sourcefile: path/filename of source file
+ *  oprefix: output file name prefix (possibly manually set with -o)
+ **)
+let process_implementation_file ppf sourcefile oprefix =
   init_path ();
-  let oprefix = Compenv.output_prefix sourcefile in
   let modulename = Compenv.module_of_filename ppf sourcefile oprefix in
   Env.set_unit_name modulename;
   let env = initial_env () in
@@ -56,18 +53,14 @@ let process_implementation_file ppf sourcefile =
     Location.report_exception ppf e;
     exit 2
 
-
-
-
 let _ =
    (*---------------------------------------------------*)
    (* parsing of command line *)
 
    let files = ref [] in
    Arg.parse
-     [ ("-I", Arg.String (fun i -> Clflags.include_dirs := i :: !Clflags.include_dirs),
-                      "includes a directory where to look for interface files");
-       ("-o", Arg.String (fun s -> outputfile := Some s), "set the output file name");
+     [ ("-I", Arg.String (add_to_list Clflags.include_dirs), "includes a directory where to look for interface files");
+       ("-o", Arg.String (fun s -> Clflags.output_name := Some s), "set the output file");
        ("-debug", Arg.Set debug, "trace the various steps");
        ("-dsource", Arg.Set Clflags.dump_source, "dump source after ppx");
        ("-ppx", Arg.String (add_to_list Clflags.all_ppx (* TODO Compenv.first_ppx *) ), "load ppx");
@@ -81,22 +74,14 @@ let _ =
    if List.length !files <> 1 then
       failwith "Expects one argument: the filename of the ML source file";
    let sourcefile = List.hd !files in
+
    if not (Filename.check_suffix sourcefile ".ml") then
      failwith "The file name must be of the form *.ml";
-   let basename = Filename.chop_suffix (Filename.basename sourcefile) ".ml" in
-   let dirname = Filename.dirname sourcefile in
-   let pathname = if dirname = "" then basename else (dirname ^ "/" ^ basename) in
-   (* Could use Clflags.output_name and Compenv.output_prefix? *)
-   let log_output, unlog_output, token_output, pseudo_output, ptoken_output, mlloc_output =
-     match !outputfile with
-     | None -> Filename.concat dirname (basename ^ ".log.js"),
-               Filename.concat dirname (basename ^ ".unlog.js"),
-               Filename.concat dirname (basename ^ ".token.js"),
-               Filename.concat dirname (basename ^ ".pseudo.js"),
-               Filename.concat dirname (basename ^ ".ptoken.js"),
-               Filename.concat dirname (basename ^ ".mlloc.js")
-     | Some f -> f ^ ".log.js", f ^ ".unlog.js", f ^ ".token.js", f ^ ".pseudo.js", f ^ ".ptoken.js", f ^ ".mlloc.js"
-   in
+
+   let sourcebase = Filename.basename sourcefile in   (* Input file basename, for logging *)
+   let oprefix = Compenv.output_prefix sourcefile in (* Output filename prefix, inc. path *)
+   let output_filename = oprefix ^ (get_mode_extension !current_mode) in
+   let mlloc_output = oprefix ^ ".mlloc.js" in
 
    (*---------------------------------------------------*)
    (* set flags *)
@@ -115,40 +100,27 @@ let _ =
 
    let generate_mlloc_file () =
       let outchannel = open_out mlloc_output in
-      let put str =
-         output_string outchannel str;
-         output_string outchannel "\n" in
+      let put = output_endline outchannel in
       put "   lineof_temp = [];";
-      let filename = basename ^ ".ml" in
       Js_of_ast.(
          ~~ Hashtbl.iter token_locs (fun key (pos_start,pos_stop) ->
            put (Printf.sprintf "   lineof_temp[%d] = [%d,%d,%d,%d];" 
                   key pos_start.pos_line pos_start.pos_col  
                       pos_stop.pos_line  pos_stop.pos_col);
          ));
-      put (Printf.sprintf "lineof_data[\"%s\"] = lineof_temp;" filename);
+      put (Printf.sprintf "lineof_data[\"%s\"] = lineof_temp;" sourcebase);
       close_out outchannel;
+      Printf.printf "Wrote %s\n" mlloc_output;
       in
 
    (*---------------------------------------------------*)
    (* "reading and typing source file" *)
 
-   let (parsetree, (typedtree,_), module_name) = process_implementation_file ppf sourcefile in
-   match !current_mode with
-     | Mode_cmi -> Printf.printf "Wrote %s.cmi\n" pathname
-     | _ ->
-       let out = Js_of_ast.to_javascript basename module_name typedtree in
-       let output_filename = match !current_mode with
-         | Mode_unlogged TokenTrue -> token_output
-         | Mode_unlogged TokenFalse -> unlog_output
-         | Mode_pseudo TokenTrue -> ptoken_output
-         | Mode_pseudo TokenFalse -> pseudo_output
-         | Mode_logged -> log_output
-         | _ -> assert false
-       in
-       file_put_contents output_filename out;
-       Printf.printf "Wrote %s\n" output_filename;
-       if !current_mode = (Mode_unlogged TokenTrue) 
-         then generate_mlloc_file()
-
-
+   let (parsetree, (typedtree,_), module_name) = process_implementation_file ppf sourcefile oprefix in
+   if !current_mode <> Mode_cmi then begin
+     let out = Js_of_ast.to_javascript sourcebase module_name typedtree in
+     file_put_contents output_filename out;
+     if !current_mode = (Mode_unlogged TokenTrue) 
+       then generate_mlloc_file()
+   end;
+   Printf.printf "Wrote %s\n" output_filename

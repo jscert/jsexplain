@@ -180,6 +180,9 @@ let file_put_contents filename text =
    with Sys_error s -> 
      failwith ("Could not write in file: " ^ filename ^ "\n" ^ s)
 
+let output_endline outchannel str =
+  output_string outchannel str; output_char outchannel '\n'
+
 
 (**************************************************************)
 (** Try-with manipulation functions *)
@@ -246,4 +249,3 @@ let error ?loc s =
 let warning ?loc s =
   option_iter (Location.print_loc err_formatter) loc;
   Printf.printf "%s\n" ("Warning: " ^ s ^ ".")
-
