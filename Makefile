@@ -27,4 +27,8 @@ test_init:
 test: jsjsref
 	node_modules/.bin/mocha
 
-.PHONY: publish jsjsref generator test_init test
+clean:
+	$(MAKE) -C generator clean
+	$(MAKE) -C jsref clean
+
+.PHONY: publish jsjsref generator test_init test clean
