@@ -1,12 +1,14 @@
 OCAMLBUILD  := ocamlbuild -j 4 -classic-display -use-ocamlfind
-CC          := ocamlc -c
 STDLIB_DIR  := stdlib_ml
 EXECUTABLES := main monad_ppx displayed_sources lineof assembly
 
+default: byte stdlib
 all: byte native stdlib
 byte:   $(addsuffix .byte,$(EXECUTABLES))
 native: $(addsuffix .native,$(EXECUTABLES))
-stdlib: $(STDLIB_DIR)/stdlib.cmi
+
+stdlib:
+	$(MAKE) -C $(STDLIB_DIR)
 
 # Rules
 %.native: FORCE
@@ -14,9 +16,6 @@ stdlib: $(STDLIB_DIR)/stdlib.cmi
 
 %.byte: FORCE
 	$(OCAMLBUILD) $@
-
-$(STDLIB_DIR)/stdlib.cmi: $(STDLIB_DIR)/stdlib.mli
-	$(CC) $<
 
 # Debug
 debug:  $(addsuffix .d.byte,$(EXECUTABLES)) .ocamldebug
@@ -26,10 +25,10 @@ debug:  $(addsuffix .d.byte,$(EXECUTABLES)) .ocamldebug
 
 clean:
 	ocamlbuild -clean
-	rm -f $(STDLIB_DIR)/*.cmi
 	bash -c "rm -f .ocamldebug"
+	$(MAKE) -C $(STDLIB_DIR) clean
 
-.PHONY: all byte native stdlib debug clean
+.PHONY: default all byte native stdlib debug clean
 
 # Force rebuilds of OCaml targets via ocamlbuild, the FORCE file must not exist.
 FORCE:

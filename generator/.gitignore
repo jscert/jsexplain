@@ -2,5 +2,6 @@ _build
 *.byte
 *.native
 stdlib_ml/stdlib.cmi
+stdlib_ml/stdlib.cmo
 .ocamldebug
 

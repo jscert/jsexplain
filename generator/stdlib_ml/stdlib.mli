@@ -1,180 +1,177 @@
+(** {4 Js_of_ocaml bis Standard Library }
 
-(*--------------------*)
-(* int operations *)
+{5 Pervasives-compatible Definitions }
 
-(* todo : factorize and clean up *)
-(*
-val ( ~+ ) : int -> int
-val ( ~- ) : int -> int
+All functions in this section have the same type definitions as in OCaml's
+Pervasives. The semantics of mathematical operations may vary as, for now, the
+JS implementation will use floating-point based arithmetic.
+
+Definitions will proceed in the order of the OCaml Pervasives interface.
 *)
 
+(**{6 Js_of_ocaml bis Generator Requirements }*)
+(** The generator inserts calls to these functions/constructors directly into
+the generated JS code. *)
+
+(**{7 OCaml Syntax Helpers }*)
+(** The syntax [{ einit with lbl = exp }] is implemented in JS as a call to the
+JS function [record_with(einit, lbl, exp)] *)
+
+(**{7 OCaml Built-in Types }*)
+(** The following typedefs are built into the OCaml compiler, so are not
+required in this interface, however, they are included in the JS
+implementation of this library as the functions None, Some, mk_nil, mk_cons.
+[
+  type option 'a = None | Some of 'a
+  type list 'a = [] | :: of 'a * list 'a
+]
+*)
+
+(**{6 Exceptions }*)
+(** Behaves as [throw "Not_found"] in JS. *)
+val raise : exn -> 'a
+
+(**{6 Boolean operations }*)
+(** Note: Both OCaml and JS implement lazy evaluation for boolean operators. *)
+val not : bool -> bool
+val ( && ) : bool -> bool -> bool
+val ( || ) : bool -> bool -> bool
+
+(**{6 Debugging }*)
+val __LOC__ : string
+
+(**{6 Integer arithmetic }*)
 val ( + ) : int -> int -> int
 val ( - ) : int -> int -> int
 val ( * ) : int -> int -> int
 val ( / ) : int -> int -> int
 
-(*val int_abs : int -> int*)
+(**{6 Floating-point arithmetic }*)
+val ( +. ) : float -> float -> float
+val ( -. ) : float -> float -> float
+val ( *. ) : float -> float -> float
+val ( /. ) : float -> float -> float
 
-val nat_eq : int -> int -> bool (* nat_eq x y = int_eq x y  *)
+(*
+val ( ** ) : float -> float -> float
+val atan : float -> float
+val exp : float -> float
+val log : float -> float
+val mod_float : float -> float -> float (* Alan: % infix *)
+val float_of_int : int -> float
+val infinity : float
+val neg_infinity : float
+val nan : float
+val max_float : float
+val min_float : float
+*)
+
+(**{6 String operations }*)
+(*
+val (^) : string -> string -> string
+*)
+
+(**{6 Character operations }*)
+(*
+val int_of_char : char -> int
+*)
+
+(**{6 String conversion functions }*)
+(*
+val string_of_int : int -> string
+val string_of_float : float -> string
+val float_of_string : string -> float
+*)
+
+(**{6 Input/output }*)
+(*
+val print_endline : string -> unit
+val prerr_string : string -> unit
+val prerr_endline : string -> unit
+val prerr_newline : unit -> unit
+*)
+
+(**{6 References }*)
+(** for future use for the global heap
+val ref : 'a -> 'a ref
+val (:=) : 'a ref -> 'a -> unit
+val (!) : 'a ref -> 'a
+*)
+
+(**{5 Pervasives-incompatible Definitions }
+
+Functions in this section either deviate from the OCaml Pervasives type
+signature, or are additional functions to fill in holes left by making a
+polymorphic function not monomorphic.
+*)
+
+(**{6 Comparisons }*)
+(** The standard comparison operators have been restricted to floating-point
+operations only. *)
+val ( = ) : float -> float -> bool
+val ( < ) : float -> float -> bool
+val ( > ) : float -> float -> bool
+val ( <= ) : float -> float -> bool
+val ( >= ) : float -> float -> bool
+
+(*
+val compare : 'a -> 'a -> int
+val min : float -> float -> float
+val max : float -> float -> float
+*)
+
+(** We use this to compare types that are not known by stdlib, like
+Native_error; should be implemented in JS by comparing the objects, to see if
+they have the same "tag" fields (there should be no other fields, except
+perhaps "type") becomes === in js *)
+val ( === ) : 'a -> 'a -> bool
+
+(*
+val float_compare : float -> float -> int
+*)
 val int_eq : int -> int -> bool
 val int_lt : int -> int -> bool
 val int_gt : int -> int -> bool
 val int_le : int -> int -> bool
 val int_ge : int -> int -> bool
-(* val int_lt : int -> int -> bool*)
 val int_compare : int -> int -> int
+val bool_eq : bool -> bool -> bool
+val nat_eq : int -> int -> bool
+val string_eq : string -> string -> bool
+val string_compare : string -> string -> int
 
-(*--------------------*)
-(* float operations *)
+(**{6 Integer arithmetic }*)
+(* Function renamed from abs *)
+(*val int_abs : int -> int*)
 
-(* Alan: these can be implemented directly, using Number.NaN,
-   Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY *)
-(*
-val nan : float
-val infinity : float
-val neg_infinity : float
+(**{6 Floating-point arithmetic }*)
+(* Functions renamed:
+val fmod : float -> float -> float (*  mod_float, implemented as % operator in JS *)
+val float_neg : float -> float          (* ~-. *)
+val float_exp : float -> float -> float (* exp *)
 *)
-
-(* Alan: Do we need these ? If so, they are Number.MAX_VALUE and
-   Number.MIN_VALUE
-
-val max_float : float
-val min_float : float
-
- *)
-
-
-(* Alan: these should all be implemented along with the int operations as the JS
-   ones. ** is Math.pow *)
-
-(*
-val ( ~+. ) : float -> float
-val ( ~-. ) : float -> float
-*)
-
-val ( +. ) : float -> float -> float
-val ( -. ) : float -> float -> float
-val ( *. ) : float -> float -> float
-val ( /. ) : float -> float -> float
-(* val ( ** ) : float -> float -> float *)
-
-
-(*
-val mod_float : float -> float -> float (* Alan: % infix *)
-*)
-
-(* Alan: Why do we need these? If need be, they are all in Math *)
-
-(*
-val atan : float -> float
-val exp : float -> float
-val log : float -> float
-val min : float -> float -> float
-val max : float -> float -> float
-*)
-
 
 (* Alan: Ideally we would add these to the spec, but for the moment conversion
    to a string is doing a foo+"", and conversion to an int is doing +foo *)
-
 val int_of_number : float -> int (* will be removed, since only used by substring *)
 val number_of_int : int -> float  (* = fun x -> float_of_int x *)
 
+(**{6 String Operations }*)
+(** strappend is a renamed form of (^) *)
+val strappend : string -> string -> string
 
-
-(*val float_of_string : string -> float*)
-(*val float_of_int : int -> float*)
-(*
-val int_of_char : char -> int
-val string_of_float : float -> string
-val string_of_int : int -> string
-*)
-
-(* no need to implement those in stdlib.js because JS has them already *)
-val ( = ) : float -> float -> bool
-val ( < ) : float -> float -> bool
-val ( > ) : float -> float -> bool
-val ( <= ) : float -> float -> bool 
-val ( >= ) : float -> float -> bool
-val fmod : float -> float -> float (*  mod_float, implemented as % operator in JS *)
-
-
-(*val compare : 'a -> 'a -> int*)
-(*val float_lt : float -> float -> bool
-val float_le : float -> float -> bool*)
-(*val float_compare : float -> float -> int*)
-(* val float_neg : float -> float  ~-.*)
-(* val float_exp : float -> float -> float (* ( ** ) *) *)
-
-
-(*--------------------*)
-(* bool operations *)
-
-val bool_eq : bool -> bool -> bool (* should be "===" in  JS *)
-val ( && ) : bool -> bool -> bool  (* beware of strict vs lazy semantics: todo discuss --> just map to  *)
-val not : bool -> bool
-val ( || ) : bool -> bool -> bool  (* beware of strict vs lazy semantics: todo discuss --> just map to  *)
-
-
-(*--------------------*)
-(* string operations *)
-
-(* todo : factorize and clean up *)
-
-val string_eq : string -> string -> bool (* === *)
-val string_compare : string -> string -> int
+(**{5 String library }*)
+(** Operations here are present in the OCaml standard library's String module
+However cannot be used directly due to a potential module name collision when
+linking to the standard library. (TODO: Work out if this can be avoided) *)
 
 (*
-   val string_concat : string -> string -> string (* + *)
-   val (^) : string -> string -> string
+Conflicts with String.concat definition? Wrong type signature!
+val string_concat : string -> string -> string (* + *)
 *)
 
-(* let append s1 s2 = String.append s1 s2 *)
-val strappend : string -> string -> string  (* + *)
-
-(* let strlength s = String.length s *)
 val strlength : string -> int (* in JS :  function (x) { return x.length; } *)
 
-(* let substring n m s = String.sub s n m *)
+(** Substring extraction. Note different ordering of arguments from String.sub:
+[ substring n m s = String.sub s n m ] *)
 val substring : int -> int -> string -> string  (* function(x) { return x.slice(n, n+m); } *)
- (* only need to implement this when m=1 *)
-
-
-(*--------------------*)
-(* special operations *)
-
-(* We use this to compare types that are not known by stdlib, like Native_error;
-  should be implemented in JS by comparing the objects, to see if they have the same
-  "tag" fields (there should be no other fields, except perhaps "type") *)
-val ( === ) : 'a -> 'a -> bool  (* becomes === in js *)
-
-
-
-(*--------------------*)
-(* JSRef specific functions, useful for debugging *)
-
-(* val print_endline : string -> unit *)
-
-val __LOC__ : string (* todo: will not be needed in the future *)
-
-(*
-val prerr_string : string -> unit
-val prerr_newline : unit -> unit
-val prerr_endline : string -> unit
-*)
-
-val raise : exn -> 'a   (* bind to  throw "Not_found" *)
-(*val stuck : string -> 'a*)
-
-
-
-
-
-(*--------------------*)
-(* for future use for the global heap
-
-val ref : 'a -> 'a ref
-val (:=) : 'a ref -> 'a -> unit
-val (!) : 'a ref -> 'a
- *)
-
