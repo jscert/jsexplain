@@ -2,9 +2,6 @@ let debug = ref false
 
 let (~~) f x y = f y x
 
-let add_to_list li s =
-  li := s :: !li
-
 (****************************************************************)
 (* MODES *)
 

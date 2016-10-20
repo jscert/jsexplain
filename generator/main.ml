@@ -1,4 +1,3 @@
-
 open Params
 open Format
 open Mytools
@@ -12,6 +11,7 @@ open Mytools
 (*#########################################################################*)
 
 let ppf = Format.std_formatter
+let stdlib_path = ref "stdlib_ml"
 
 (* err_formatter *)
 
@@ -21,18 +21,21 @@ let ppf = Format.std_formatter
 
 let tool_name = "ml2js"
 
+(** Configures the compilers load paths from the commandline and stdlib *)
+(* FIXME: Relative stdlib dir should be absolute or findlib derived
+ * we're manually specified using -I for now... *)
 let init_path () =
-  Config.load_path :=
-    "stdlib_ml" :: List.rev (Config.standard_library :: !Clflags.include_dirs);
+  (* Compmisc.init_path false; (* to use this, lots of parameters need tweaking *)*)
+  Config.load_path := "" :: List.rev_append !Clflags.include_dirs [!stdlib_path];
   Env.reset_cache ()
 
 (** Return the initial environment in which compilation proceeds. *)
 let initial_env () =
-  try
-    let env = Env.initial_unsafe_string in
-    Env.open_pers_signature "Stdlib" env
-  with Not_found ->
-    Misc.fatal_error "cannot open stdlib"
+  Clflags.nopervasives := true;
+  (* Stdlib module name, instead of Pervasives *)
+  add_to_list Compenv.implicit_modules "Stdlib";
+  Compmisc.initial_env ()
+
 
 (** Analysis of an implementation file.
  *  ppf: error printer
@@ -43,8 +46,8 @@ let process_implementation_file ppf sourcefile oprefix =
   init_path ();
   let modulename = Compenv.module_of_filename ppf sourcefile oprefix in
   Env.set_unit_name modulename;
-  let env = initial_env () in
   try
+    let env = initial_env () in
     let parsetree = Pparse.parse_implementation ~tool_name ppf sourcefile in
     if !Clflags.dump_source then fprintf ppf "%a@." Pprintast.structure parsetree;
     let typing = Typemod.type_implementation sourcefile oprefix modulename env parsetree in
@@ -59,7 +62,8 @@ let _ =
 
    let files = ref [] in
    Arg.parse
-     [ ("-I", Arg.String (add_to_list Clflags.include_dirs), "includes a directory where to look for interface files");
+     [ ("-stdlib", Arg.Set_string stdlib_path, "path to look for Stdlib (defaults to 'stdlib_ml')");
+       ("-I", Arg.String (add_to_list Clflags.include_dirs), "includes a directory where to look for interface files");
        ("-o", Arg.String (fun s -> Clflags.output_name := Some s), "set the output file");
        ("-debug", Arg.Set debug, "trace the various steps");
        ("-dsource", Arg.Set Clflags.dump_source, "dump source after ppx");

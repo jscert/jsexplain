@@ -119,6 +119,8 @@ let list_split3 l =
    let l3 = List.map (fun (_,_,x) -> x) l in
    (l1,l2,l3)
 
+let add_to_list li s =
+  li := s :: !li
 
 (**************************************************************)
 (** String manipulation functions *)
