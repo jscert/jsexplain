@@ -120,10 +120,15 @@ val min : float -> float -> float
 val max : float -> float -> float
 *)
 
-(** We use this to compare types that are not known by stdlib, like
-Native_error; should be implemented in JS by comparing the objects, to see if
-they have the same "tag" fields (there should be no other fields, except
-perhaps "type") becomes === in js *)
+(** This function is treated specially by the Generator. For 'known' types, it
+compiles directly down to the === operator in JS. For unknown types, it
+converts it into a function call to _compare_TYPENAME. Known type are listed
+in js_of_ast.ml#is_triple_equal_type (currently int, bool, string).
+
+Precise semantics of this operator are awkward. It is not implemented by
+default for floats due to incosnsitencies of requirements about the equiality
+of +0 and -0, and NaN values. JSRef has a custom implementation making +0=≠=-0
+and NaN===NaN *)
 val ( === ) : 'a -> 'a -> bool
 
 (*
