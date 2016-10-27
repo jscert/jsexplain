@@ -6,20 +6,37 @@
 #    make interp  # build interp.js
 #
 ###############################################################
-# Paths
 
-all: # Defined below
+all: jsjsref mljsref
 
-JSREF_ML  := $(filter-out JsOutput.ml,$(wildcard *.ml))
+ML_FRONTEND_SRC := ml_frontend
+
+###############################################################
+##### Dependencies
+
+# Avoid dependency generation for non-jsjsref build targets
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)
+include .depends
+endif
+
+.depends: $(JSREF_ML) $(PPX_BIN)
+	$(OCAMLDEP) -ppx $(PPX_BIN) -I . -all * $(ML_FRONTEND_SRC)/* > $@
+
+###############################################################
+###############################################################
+# JS-JSRef
+JSREF_ML  := $(wildcard *.ml)
 JSREF_MLI := $(wildcard *.mli)
 
 GENERATOR_DIR := ../generator
+
 STDLIB_DIR := $(GENERATOR_DIR)/stdlib_ml
+STDLIB_FLAG := -I $(STDLIB_DIR) -open Stdlib
+REPLACE_STDLIB := -nopervasives -nostdlib $(STDLIB_FLAG)
 
-###############################################################
-
-# ASSEMBLY_JS must respect dependencies order
+# ASSEMBLY_JS_FILES must respect dependencies order
 ASSEMBLY_JS_FILES := \
+	$(STDLIB_DIR)/stdlib.js \
 	BinNums.unlog.js \
 	Bool0.unlog.js \
 	List0.unlog.js \
@@ -36,7 +53,6 @@ ASSEMBLY_JS_FILES := \
 	HeapList.unlog.js \
 	Shared.unlog.js \
 	Compare.js \
-	Debug.js \
 	JsNumber.js \
 	JsSyntax.unlog.js \
 	JsSyntaxAux.unlog.js \
@@ -46,11 +62,14 @@ ASSEMBLY_JS_FILES := \
 	JsCommonAux.unlog.js \
 	JsPreliminary.unlog.js \
 	JsInit.unlog.js \
+	Prheap.js \
+	Debug.js \
 	JsInterpreterMonads.unlog.js \
 	JsInterpreter.log.js \
-	ModuleExport.js
-ASSEMBLY_JS := $(STDLIB_DIR)/stdlib.js $(ASSEMBLY_JS_FILES)
 
+ASSEMBLY_JS := \
+	$(ASSEMBLY_JS_FILES) \
+	ModuleExport.js
 
 ###############################################################
 
@@ -62,7 +81,7 @@ ALL_DISPLAYED := $(DISPLAYED:.ml=.unlog.js) $(DISPLAYED:.ml=.pseudo.js) $(DISPLA
 ALL_LINEOF := $(DISPLAYED:.ml=.token.js) $(DISPLAYED:.ml=.mlloc.js) $(DISPLAYED:.ml=.ptoken.js)
 
 ###############################################################
-# Tools
+##### Tools
 
 OCAMLDEP := ocamldep -one-line
 OCAMLPAR := OCAMLRUNPARAM="l=200M"
@@ -70,9 +89,11 @@ OCAMLPAR := OCAMLRUNPARAM="l=200M"
 LINEOF_BIN := $(GENERATOR_DIR)/lineof.byte
 LINEOF     := $(OCAMLPAR) $(LINEOF_BIN)
 
+PPX_BIN    := $(GENERATOR_DIR)/monad_ppx.byte
+PPX_FLAG   := -ppx $(PPX_BIN)
+
 MLTOJS_BIN := $(GENERATOR_DIR)/main.byte
-PPX_BIN    := $(GENERATOR_DIR)/monad_ppx.native
-MLTOJS 	   := $(OCAMLPAR) $(MLTOJS_BIN) -ppx $(PPX_BIN)
+MLTOJS 	   := $(OCAMLPAR) $(MLTOJS_BIN) $(PPX_FLAG)
 # -dsource is automatically considered by main.byte
 
 ASSEMBLY_BIN := $(GENERATOR_DIR)/assembly.byte
@@ -85,27 +106,17 @@ DISPLAYGEN     := $(OCAMLPAR) $(DISPLAYGEN_BIN)
 $(MLTOJS_BIN) $(LINEOF_BIN) $(PPX_BIN) $(ASSEMBLY_BIN) $(DISPLAYGEN_BIN):
 	$(error Missing generator tools, build from project root, or set paths.)
 
-###############################################################
-# Dependencies
-
-ifeq ($(filter clean%,$(MAKECMDGOALS)),)
-include .depends
-endif
-
 
 ###############################################################
 # Rules
 
-##### Rule for dependencies
-.depends: $(JSREF_ML)
-	$(OCAMLDEP) -all $(<D)/* > $@
-
 ##### Rule for cmi
+# Ordering of these rules is important, mli rule must be first.
+%.cmi: %.mli
+	ocamlc $(REPLACE_STDLIB) $<
+
 %.cmi: %.ml $(MLTOJS_BIN)
 	$(MLTOJS) -mode cmi -I $(STDLIB_DIR) $<
-
-%.cmi: %.mli
-	ocamlc -I $(STDLIB_DIR) -open Stdlib $<
 
 ##### Rule for log/unlog/token
 
@@ -133,21 +144,18 @@ lineof.js: $(ALL_LINEOF) $(LINEOF_BIN)
 
 #--LATER (optional) add as dependencies the unlog files: $(JSREF_ML:.ml=.unlog.js)
 
-assembly.js: $(ASSEMBLY_JS) $(ASSEMBLY_BIN)
+assembly.js: $(ASSEMBLY_JS) $(ASEMBLY_BIN)
 	$(ASSEMBLY) -o $@ $(ASSEMBLY_JS)
-# -stdlib $(STDLIB_DIR)/stdlib.js 
 
 ##### Rule for displayed_sources.js
 
 displayed_sources.js: $(ALL_DISPLAYED) $(DISPLAYGEN_BIN)
 	$(DISPLAYGEN) -o $@ $(ALL_DISPLAYED)
 
-
-#####################################################################
+###############################################################
 # Short targets
 
-ALL_TARGETS := lineof.js assembly.js displayed_sources.js
-all: $(ALL_TARGETS)
+jsjsref: assembly lineof display
 
 cmi: $(JSREF_ML:.ml=.cmi) $(JSREF_MLI:.mli=.cmi) 
 
@@ -167,22 +175,58 @@ assembly: assembly.js
 
 display: displayed_sources.js
 
+DIRTY_EXTS := {log,unlog,token,pseudo,ptoken,mlloc}.js
+clean_jsjsref:
+	sh -c "rm -f {lineof,assembly,displayed_sources}.js"
+	sh -c "rm -f *.$(DIRTY_EXTS)"
+
+.PHONY: jsjsref cmi gen ref pseudo log unlog lineof assembly display clean_jsjsref
+
 ###############################################################
+###############################################################
+# ML-JSRef
+
+# Strip all extensions of $(ASSEMBLY_JS) and replace with .cmo
+ASSEMBLY_ML_FILES := $(addsuffix .cmo,$(basename $(basename $(ASSEMBLY_JS_FILES))))
+ASSEMBLY_ML := $(ASSEMBLY_ML_FILES) \
+	run_js.cmo
+
+mljsref: main.byte
+
+main.byte: $(ASSEMBLY_ML)
+	ocamlfind ocamlc -linkpkg -package JS_Parser -o $@ $^
+
+run_js.cmo: run_js.ml run_js.mli run_js.cmi
+	ocamlfind ocamlc -c -package JS_Parser $<
+
+Translate_syntax.cmo: Translate_syntax.ml Translate_syntax.mli Translate_syntax.cmi
+	ocamlfind ocamlc -c -package JS_Parser $<
+
+# Ordering of the .cmo rules is important. mli dependency forces "standard" compilation
+%.cmo: %.ml %.mli %.cmi $(PPX_BIN)
+	ocamlc -c $(PPX_FLAG) $<
+
+# Standalone .ml files
+%.cmo: %.ml %.cmi $(PPX_BIN)
+	ocamlc -c $(REPLACE_STDLIB) $(PPX_FLAG) $<
+
+clean_mljsref:
+	sh -c "rm -f $(ML_FRONTEND_SRC)/*.mli"
+	sh -c "rm -f {,$(ML_FRONTEND_SRC)/}*.{cmo,byte}"
+
+.PHONY: mljsref clean_mljsref
+
+##############################################################
+##############################################################
 # Global options
 
-.PHONY: all cmi gen ref pseudo log unlog lineof assembly display clean
+clean: clean_jsjsref clean_mljsref
+	sh -c "rm -f *.cmi"
+	sh -c "rm -f .depends"
+
+# Phony global targets
+.PHONY: all clean
 
 # Do not delete intermediate files.
 .SECONDARY:
 
-
-#####################################################################
-# Clean
-
-DIRTY_EXTS := cmi,{mlloc,log,unlog,pseudo,token,ptoken}.js
-
-
-clean:
-	bash -c "rm -f $(ALL_TARGETS)"
-	bash -c "rm -f *.{$(DIRTY_EXTS)}"
-	bash -c "rm -f .depends"

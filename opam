@@ -1,16 +1,22 @@
 opam-version: "1.2"
-name: "jsjsref"
+name: "jsjsref-generator"
 version: "1.0~dev"
 maintainer: "Thomas Wood <thomas.wood09@imperial.ac.uk>"
-authors: ["Arthur Charguéraud <arthur@chargueraud.org>"
-          "Alan Schmitt <alan.schmitt@inria.fr"
-          "Thomas Wood <thomas.wood09@imperial.ac.uk>"]
+authors: [
+  "Arthur Charguéraud <arthur@chargueraud.org>"
+  "Alan Schmitt <alan.schmitt@inria.fr"
+  "Thomas Wood <thomas.wood09@imperial.ac.uk>"
+]
 homepage: "http://jscert.org/"
+bug-reports: "https://github.com/jscert/jsexplain/issues"
 license: "BSD 3-clause"
-available: [ocaml-version >= "4.03.0" && ocaml-version < "4.04"]
+dev-repo: "https://github.com/jscert/jsexplain.git"
+
+available: [ocaml-version >= "4.03.0" & ocaml-version < "4.04"]
 build: [
   [make]
 ]
 depends: [
   "ocamlfind" {build}
+  "JS_Parser" { >= "0.1" & < "0.2" }
 ]

@@ -1,6 +1,6 @@
 var Translate_syntax = {
   eval_counter: 0,
-  parse_esprima: function (strictness, src) {
+  parse_js_syntax: function (strictness, src) {
     try {
       // EVAL: Uncomment line below to enable multiple eval tabs
       //return Some(parseSource(src, "_eval_" + Translate_syntax.eval_counter++, true));

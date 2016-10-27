@@ -585,7 +585,7 @@ let elision_tail_remove ol =
 (** val parse_pickable : string -> bool -> prog coq_Pickable_option **)
 
 let parse_pickable = (fun s strict ->
-  Translate_syntax.parse_esprima strict s
+  Translate_syntax.parse_js_syntax strict s
     (*Translate_syntax.parse_esprima strict s*)
     (* with
       (* | Translate_syntax.CoqSyntaxDoesNotSupport _ -> assert false (* Temporary *) *)

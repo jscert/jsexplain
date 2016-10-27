@@ -10,3 +10,6 @@ assembly.js
 lineof.js
 .depends
 displayed_sources.js
+*.cmo
+*.byte
+*.native

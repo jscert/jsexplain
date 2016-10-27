@@ -1,3 +1,4 @@
+(* JS Number type *)
 type number = float
 
 val floor : float -> float
