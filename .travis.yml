@@ -1,0 +1,29 @@
+language: c
+sudo: required
+
+install:
+  - wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-ocaml.sh
+  - bash -ex .travis-ocaml.sh
+  - make init
+  - eval `opam config env`
+
+script:
+  - make
+
+env:
+  global:
+    - OCAML_VERSION=4.03
+    - OPAMYES=true
+
+os:
+  - linux
+  - osx
+
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: make publish-github
+  on:
+    condition: $TRAVIS_OS_NAME = linux
+    all_branches: true
+
