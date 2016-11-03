@@ -5,7 +5,6 @@ open JsSyntax
 open JsSyntaxAux
 open LibList
 open LibOption
-open List0
 open Shared
 
 (** val res_overwrite_value_if_empty : resvalue -> res -> res **)
@@ -437,7 +436,7 @@ let prog_funcdecl p =
 let rec stat_vardecl _foo_ = match _foo_ with
 | Coq_stat_expr e -> []
 | Coq_stat_label (s0, s) -> stat_vardecl s
-| Coq_stat_block ts -> concat (map stat_vardecl ts)
+| Coq_stat_block ts -> concat (LibList.map stat_vardecl ts)
 | Coq_stat_var_decl nes -> LibList.map fst nes
 | Coq_stat_if (e, s1, s2o) ->
   append (stat_vardecl s1)
@@ -466,16 +465,16 @@ let rec stat_vardecl _foo_ = match _foo_ with
 (** val switchbody_vardecl : switchbody -> string list **)
 
 and switchbody_vardecl _foo_ = match _foo_ with
-| Coq_switchbody_nodefault scl -> concat (map switchclause_vardecl scl)
+| Coq_switchbody_nodefault scl -> concat (LibList.map switchclause_vardecl scl)
 | Coq_switchbody_withdefault (scl1, sl, scl2) ->
-  append (concat (map switchclause_vardecl scl1))
-    (append (concat (map stat_vardecl sl))
-      (concat (map switchclause_vardecl scl2)))
+  append (concat (LibList.map switchclause_vardecl scl1))
+    (append (concat (LibList.map stat_vardecl sl))
+      (concat (LibList.map switchclause_vardecl scl2)))
 
 (** val switchclause_vardecl : switchclause -> string list **)
 
 and switchclause_vardecl _foo_ = match _foo_ with
-| Coq_switchclause_intro (e, sl) -> concat (map stat_vardecl sl)
+| Coq_switchclause_intro (e, sl) -> concat (LibList.map stat_vardecl sl)
 
 (** val element_vardecl : element -> string list **)
 

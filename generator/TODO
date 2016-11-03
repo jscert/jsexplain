@@ -15,8 +15,6 @@
 
 *) make sure the "reach condition" works properly
 
-*) remove "tests" folder in "generator" : put jsref directly as subfolder of generator
-
 *) clean up the ML code for: type_compare mutability_compare prim_compare;
    for prim_compare, we should be able to match on pairs of arguments, with a catch-all
 
@@ -26,8 +24,6 @@
 *) bigger test262 testing.
 
 *) Flag to force esprima to parse in strict mode
-
-*) LATER: remove useless files such as LibReflect LibString etc...
 
 *) put online the tool on the jscert website
 	  - make sure to describe the supported features 

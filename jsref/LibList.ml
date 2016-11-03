@@ -1,3 +1,14 @@
+(** val hd : 'a1 -> 'a1 list -> 'a1 **)
+
+let hd d l = match l with
+| [] -> d
+| x :: l0 -> x
+
+(** val tl : 'a1 list -> 'a1 list **)
+
+let tl l = match l with
+| [] -> []
+| a :: m -> m
 
 (** val list_eq_nil_decidable : 'a1 list -> bool **)
 

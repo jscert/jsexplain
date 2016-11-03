@@ -9,7 +9,6 @@ open JsSyntaxAux
 open LibList
 open LibOption
 open LibProd
-open List0
 open Shared
 
 (*------------JS preliminary -----------*)

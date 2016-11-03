@@ -38,8 +38,6 @@ REPLACE_STDLIB := -nopervasives -nostdlib $(STDLIB_FLAG)
 ASSEMBLY_JS_FILES := \
 	$(STDLIB_DIR)/stdlib.js \
 	BinNums.unlog.js \
-	Bool0.unlog.js \
-	List0.unlog.js \
 	Datatypes.unlog.js \
 	Fappli_IEEE_bits.unlog.js \
 	Fappli_IEEE.unlog.js \
