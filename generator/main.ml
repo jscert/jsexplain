@@ -82,10 +82,12 @@ let _ =
    if not (Filename.check_suffix sourcefile ".ml") then
      failwith "The file name must be of the form *.ml";
 
-   let sourcebase = Filename.basename sourcefile in   (* Input file basename, for logging *)
-   let oprefix = Compenv.output_prefix sourcefile in (* Output filename prefix, inc. path *)
-   let output_filename = oprefix ^ (get_mode_extension !current_mode) in
-   let mlloc_output = oprefix ^ ".mlloc.js" in
+   let sourcebase  = Filename.basename sourcefile in       (* Input file basename, for logging *)
+   let prefix_file = Filename.chop_extension sourcebase in (* File basename, no extension *)
+   let prefix_path = Filename.chop_extension sourcefile in (* Output file path, no extension *)
+
+   let output_file  = prefix_path ^ (get_mode_extension !current_mode) in
+   let mlloc_output = prefix_path ^ ".mlloc.js" in
 
    (*---------------------------------------------------*)
    (* set flags *)
@@ -120,11 +122,11 @@ let _ =
    (*---------------------------------------------------*)
    (* "reading and typing source file" *)
 
-   let (parsetree, (typedtree,_), module_name) = process_implementation_file ppf sourcefile oprefix in
+   let (parsetree, (typedtree,_), module_name) = process_implementation_file ppf sourcefile prefix_path in
    if !current_mode <> Mode_cmi then begin
-     let out = Js_of_ast.to_javascript sourcebase module_name typedtree in
-     file_put_contents output_filename out;
+     let out = Js_of_ast.to_javascript prefix_file module_name typedtree in
+     file_put_contents output_file out;
      if !current_mode = (Mode_unlogged TokenTrue) 
        then generate_mlloc_file()
    end;
-   Printf.printf "Wrote %s\n" output_filename
+   Printf.printf "Wrote %s\n" output_file
