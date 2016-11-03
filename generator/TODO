@@ -1,234 +1,35 @@
 
 
-pas forcément le bon affichage si dest_inline sur une monade
-
-----
-
-special display on "elseif"
-
----------
-
-Cop_value_prim with value 2
-
----
-
-fix highlight using
-enter run_expr / exit run_expr
-
-----
-
-
-
-inline let object_loc_comparable x y =
- et al
------
-
-let%if_spec (s,x) = expr in cont
-
-becomes
-   if_spec expr (fun s x -> cont) 
-
-and in pseudo:
-  Let%spec x = expr in
-  cont
-
-   [("run", "if_run");
-    ("string", "if_string");
-    ("object", "if_object");
-    ("value", "if_value");
-    ("prim", "if_prim");
-    ("number", "if_number");
-    ("some", "if_some");
-    ("bool", "if_bool");
-    ("void", "if_void");
-    ("success", "if_success");
-    ("not_throw", "if_not_throw");
-    ("ter", "if_ter");
-    ("break", "if_break");
-
-let if_run w k = if_spec w k
-if_string w k
-let if_object w k =
-
-
-------------
-
-
-  Let (x,y) = ...
-   
-
-------------
-
-            return (
-              if_run(
-                convert_twice_string(Coq_value_prim(w1), Coq_value_prim(w2)),
-                function (ss) {
-                  var s3 = ss[0], s4 = ss[1];
-                  return (
-                    res_out(
-                      Coq_out_ter(s2,
-                        res_val(
-                          Coq_value_prim(Coq_prim_string(strappend(s3, s4)))))));
-                }));
-
-
-
-
-          let%run (s3,s4) = convert_twice_string(Coq_value_prim(w1), Coq_value_prim(w2)) in
-              if_run(
-                ,
-                function (ss) {
-                  var s3 = ss[0], s4 = ss[1];
-                  return (
-                    res_out(
-                      Coq_out_ter(s2,
-                        res_val(
-                          Coq_value_prim(Coq_prim_string(strappend(s3, s4)))))));
-                }));
-
-
-
-
---------------
-
-  switch (v2.tag) {
-	 case "Coq_value_prim":
-		var p = v2.value;
-		return (run_error(Coq_native_error_type()));
-	 case "Coq_value_object":
-		var l = v2.value;
-		return (...);
-
-BECOMES IN PSEUDO
-
-  match (v2) {
-	 case Coq_value_prim(p) :
-		return (run_error(Coq_native_error_type()));
-	 case Coq_value_object(l):
-	   return (...);
-
-
-
-
-
-
-
-
-
-
-
-
-
-(** val object_write : state -> object_loc -> coq_object -> state **)
-=> on pourrait faire
-(** val object_write : state -> object_loc -> coq_object -> unit*state **)
-
-
- -----------
-
-    let_binding (fun s0 ->
-      if_value (def s0 l) (fun s_2 v ->
-        if spec_function_get_error_case_dec s_2 x v
-        then run_error s_2 Coq_native_error_type
-        else res_ter s_2 (res_val v))) (fun function0 -> ...)
-  
- -----------
-   spec_function_get_error_case_dec (@pure)
-
-	let function0 = fun () -> (* implicity bind s0 *)
-		 let%value v = (def l) in     (* implicitly from s0 to s_2 *)
-		 let%ter_ro b = spec_function_get_error_case_dec x v in	 (* implicy pass s_2 en read-only *)
-       if b
-         then run_error Coq_native_error_type  (* on s2 implicitly *)
-         else return_val v)) (* res on s2 implicitly *) (* where  return_val v = res_ter (res_val v) *)
-   in ...
-
-
- -----------
-
-state as last arg
-
- -----------
-TODO inliner:
+*) remove deprecated functions
 	let if_any_or_throw w k1 k2 =
 	let if_success_or_return w k1 k2 =
 
- -----------
-TODO 
+*) rename "decl_env_record_pickable_option" into "decl_env_record_option"
 
-	let if_success_state rv w k =
-	=> inliner if_ter 
-	  et nommer la fonction à l'intérieur, qui est stateless
+*) let if_success_state rv w k 
+	=> inline the definition of "if_ter" inside its body
+	  and assign an explicit name to the local function there
 
- -----------
-
-inline or_decidable
- and all of libreflect
+*) remove Coq_value_prim (flatten the value data type)
 
 
- ----
- rename decl_env_record_pickable_option into
- decl_env_record_option
-----------
+*) make sure the "reach condition" works properly
 
-remove Coq_value_prim
-----
+*) remove "tests" folder in "generator" : put jsref directly as subfolder of generator
 
-TODO: regexp pour cacher les %s et %c
-----
+*) clean up the ML code for: type_compare mutability_compare prim_compare;
+   for prim_compare, we should be able to match on pairs of arguments, with a catch-all
 
+*) move prim_compare and value_compare to JsInterpreter because it is interesting and should be logged;
+   move same_value_dec from jscommonaux 
 
-(* TODO: one day
-    let%spec v1 = run_expr_get_value e1 in
-    let%spec v2 = run_expr_get_value e2 in
-    run_binary_op op v1 v2
-*)
+*) bigger test262 testing.
 
-
-=========================================================
-
-list.rev on ctx
-
-display quotes 1717
-
-reach condition
-
-
-
-=========================================================
-CURRENT TODO
-
-
-*) Thomas: more testing
-
-*) Alan: proof read JSNumber
-
-*) Arthur: inline let_binding
-
-*) Alan/Thomas: test "eval"
-    Still need to implement parsing with a given strictness
-
-*) ? 
-  update the ML code for: type_compare mutability_compare prim_compare 
-  (for prim_compare, we should be able to match on pairs of arguments, with a catch-all)
-
-*) 
-   - move prim_compare and value_compare to JsInterpreter because it is interesting and should be logged
-   - move same_value_dec from jscommonaux 
-
-*) See if we can inline the "%able" functions, e.g. string_comparable
-
-
-
-*) [thomas]
-- bigger test262 testing.
-- Flag to force esprima to parse in strict mode
+*) Flag to force esprima to parse in strict mode
 
 *) LATER: remove useless files such as LibReflect LibString etc...
 
-
-*) [thomas]
-- put online the tool on the jscert website
+*) put online the tool on the jscert website
 	  - make sure to describe the supported features 
 	    (ecma5 minus for-in and a few other things)
      - explain that currently JS files are generated
@@ -237,61 +38,59 @@ CURRENT TODO
     - assembly.js should have a header
        to tell people not to use this file
 
-
-*) Arthur: full display	of heap information
-	  add a "+details" button 
+*) make display of heap information more complete;
+     add a "+details" button 
 	  to show additional information about an object, like the
 	  getter and setter methods, and also for each field we need
 	  to see additional information like enumerable/configurable...
 
-
-*) Arthur: search by predicate in the trace
-	- remove the "with (obj)" hack that is currently there
-	- introduce functions
-	   - INTERP_RAW("x") : returns the value bound to "x" in the
-		  current context, by looking up the linked list of arrays
-		- PROG_RAW("x") : returns the value bound to "x" in the
-		  environment, using the prototype chain resolution function
-		- JSOF(v) : lift the encoding of a JS value to the corresponding JS value
-		- INTERP_VAL("x") = JSOF(INTERP_RAW("x"))
-		- PROG_VAL("x") = JSOF(PROG_RAW("x"))
-
-
-*) Alan:
-  There is one place where we compute a "substring" in the code;
+*) There is one place where we compute a "substring" in the code;
   need to check whether the argument is always nonnegative.
-
 
 *) Coq extraction has generated cases in the order of the definition
   of the constructors in the inductive definition; this is not the
   same order as in the original coq files; we should put back in
   the right order, i'm afraid we need to do this by hand.
 
+*) Only introduce logging instructions in files for which
+   they are going to be used. [DEPRECATED?]
+
+*) Js_of_ast should prevent use of "tag" or "type" as object field name 
+   (for safety)
+
+*) generate a "type: " field in smart constructors
+
+*) in run_binary_op_compare, the « if (b_swap) » bit of code is ugly
+
+*) find out how to have syntax highlighting
+
+*) make sure to document that if doing "make" before "make init", 
+   then it is needed to do a "make clean" before compilation may work.
 
 
+*) in pseudo_code
+  - hide or change these:
+    - var%void _ = // hide
+    - return (r);  // get rid of parentheses
+    - Debug.impossible_with_heap_because(__LOC__, m); // hide
+  - remplace « with » with « open »
+  - deal better with « else if » (see run_equal)
+  
+ 
+*) jsinterpreter.ml: replace 
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)  s ("[run_object_method]   returned a primitive in [object_proto_is_prototype_of_body].")
+    with (after defining an « impossible » function)
+      impossible s "[run_object_method] returned a primitive in [object_proto_is_prototype_of_body]."
 
 
-=========================================================
-LATER-- OPTIMIZATIONS
+*) navig_driver.js: fix highlighting using a stack of events, with push and pop operations
+   based on events enter and exit in the run_expr function.
+   That is, deal better with src_next and src_prev by looking at
+   the context that has an _term_ in it with an enter or an exit event
 
-- The representation of the heap could be optimized by
-  having "remove" nodes in the list describing a heap,
-  this would avoid filtering through the heap in O(n).
-
-- Optimize heap representations using trees, to improve
-  lookups from O(n) to O(log n).
-
-- Only introduce logging instructions in files for which
-  they are going to be used.
-
-
-
-=========================================================
-LATER-- FOR A BETTER ML TO JS TRANSLATION
-
-- Js_of_ast prevent use of "tag" or "type" as object field name 
-
-- generate "type: " in smart constructors [optional until display is needed]
+ 
+ =========================================================
+LATER 
 
 - Reactivate the generation of the lines of the form:
 	  default: throw "No matching case for switch";
@@ -317,22 +116,11 @@ TRICK-- HERE IS HOW TO PRINT BROWSER STACK SIZE LIMIT:
 
 =========================================================
 
-- clean up todo list
-- documentation
-- run tests with the new JSInterpreter.ml
-- find out how to get rid of value_prim
-- in run_binary_op_compare, the « if (b_swap) » bit of code is ugly
-- in pseudo_code
-  - find out how to have syntax highlighting
-  - hide or change these:
-    - var%void _ = // hide
-    - return (r);  // get rid of parentheses
-    - Debug.impossible_with_heap_because(__LOC__, m); // hide
-  - remplace « with » with « open »
-  - deal better with « else if » (see run_equal)
-- jsinterpreter.ml
-  - replace 
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)  s ("[run_object_method] returned a primitive in [object_proto_is_prototype_of_body].")
-    with (after defining an « impossible » function)
-      impossible s "[run_object_method] returned a primitive in [object_proto_is_prototype_of_body]."
-- navig_driver.js: deal better with src_next and src_prev by looking at the context that has an _term_ in it with an enter or an exit event
+
+
+
+
+
+
+
+
