@@ -7,18 +7,17 @@ init:
 	opam pin -yn add jsjsref .
 	opam pin -yn add JS_Parser "https://github.com/resource-reasoning/JS_Parser.git#v0.1.0"
 	opam install -y jsjsref --deps-only
+	@echo
+	@echo 'You now need to execute: eval `opam config env`'
 
 # Build Stages
 generator:
 	$(MAKE) -C generator
 
-generator-stdlib:
-	$(MAKE) -C generator stdlib
-
 jsjsref: generator
 	$(MAKE) -C jsref jsjsref
 
-mljsref: generator-stdlib
+mljsref: generator # (requires the ppx)
 	$(MAKE) -C jsref mljsref
 
 # Test Stages

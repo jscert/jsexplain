@@ -2,8 +2,65 @@
 stages:
 - Git Sync
 - build
-- test
-- deploy
+- integration
+
+cache:
+  key: "branch-$CI_BUILD_REF_NAME"
+  paths:
+  - .git/modules
+  - tools/runtests/env
+
+variables:
+  OPAMYES: "true"
+  OPAMROOT: "/tmp/opam-$CI_BUILD_ID"
+
+mljsref:
+  stage: build
+  before_script:
+  - opam init -n
+  - opam update -u
+  - make init
+  - eval `opam config env`
+  script:
+  - make mljsref
+  after_script:
+  - rm -Rf $OPAMROOT
+  except:
+  - triggers
+  artifacts:
+    paths:
+    - jsref/
+    expire_in: 1 day
+
+# FIXME: Packaged JS_Parser means that we now need to distribute opam instance to condor runs
+condor:
+  before_script:
+  - export CI_BUILD_REF_SUBJ="$(git show --pretty=format:%s -s)"
+  - export TEST262_VERSION="$(git rev-parse --verify HEAD:test/data/test262)"
+  - git submodule update --init --force tools/runtests test/data/test262
+  - source tools/runtests/scripts/set-voldir.sh jsexplain
+  - "# OPAM initialisation"
+  - export OPAMROOT=$VOLDIR/.opam
+  - opam init -n
+  - opam update -u
+  - make init
+  - eval `opam config env`
+  - export OCAMLFIND_CONF=$OPAMROOT/$(opam switch show)/lib/findlib.conf
+  - "# Runtests initialisation"
+  - source tools/runtests/scripts/init-env.sh
+  - cp -R tools/runtests test/data/test262 test/data/test_prelude.js jsref/main.byte $VOLDIR
+  - cd $VOLDIR
+  script:
+  - 'runtests/runtests.py --interp mljsref --executor condor --batch_size 2 --condor_log --db postgres --db_pg_schema jsil --interp_version $CI_BUILD_REF --title "mljsref $CI_BUILD_REF_NAME autobuild: $CI_BUILD_REF_SUBJ" --tests_version $TEST262_VERSION --timeout 300 test262/test/suite'
+  - runtests/scripts/condor-wait.sh
+  after_script:
+  - "#tools/runtests/scripts/clean-voldir.sh jsexplain"
+  stage: integration
+  tags:
+  - condor
+  except:
+  - triggers
+
 git-sync:
   before_script:
   - eval `ssh-agent`
