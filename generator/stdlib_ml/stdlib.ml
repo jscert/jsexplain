@@ -99,6 +99,7 @@ let min = Pervasives.min;;
 let max = Pervasives.max;;
 *)
 
+(* FIXME: THIS IS INCORRECT FOR FLOATS *)
 let ( === ) = Pervasives.( = );;
 
 (*
