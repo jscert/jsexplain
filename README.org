@@ -1,0 +1,11 @@
+To install:
+#+BEGIN_SRC shell
+make init
+make
+#+END_SRC
+
+To test:
+#+BEGIN_SRC shell
+make test_init
+make test
+#+END_SRC
