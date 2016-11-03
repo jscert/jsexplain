@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Uploads given directory (default: dist) to gh-pages branch under directory <branch name>
 # usage: upload-github-pages.sh [directory]
 
@@ -17,6 +17,9 @@ DEPLOY_SRC=${1:-dist}
 
 DEPLOY_TARGET=${TRAVIS_TAG:+tag/$TRAVIS_TAG}
 DEPLOY_TARGET=${DEPLOY_TARGET:-branch/$TRAVIS_BRANCH}
+
+REPO_USER=${TRAVIS_REPO_SLUG%/*}
+REPO_NAME=${TRAVIS_REPO_SLUG#*/}
 
 REDACT_PATTERN=""
 
@@ -46,7 +49,13 @@ cp -rT $DEPLOY_SRC $DOCDIR/$DEPLOY_TARGET
 git -C $DOCDIR add -A .
 git -C $DOCDIR config user.email "travis@travis-ci.org"
 git -C $DOCDIR config user.name "Travis"
-git -C $DOCDIR commit --allow-empty -m "Travis build $TRAVIS_BUILD_NUMBER for $TRAVIS_BRANCH $TRAVIS_COMMIT pushed docs to gh-pages"
+
+git -C $DOCDIR commit --allow-empty \
+  -m "Travis build $TRAVIS_BUILD_NUMBER for $TRAVIS_BRANCH (${TRAVIS_COMMIT:0:8})" \
+  -m "Original commit: $TRAVIS_COMMIT
+Publication location: https://${REPO_USER}.github.io/${REPO_NAME}/${DEPLOY_TARGET}
+Travis job: https://travis-ci.org/${TRAVIS_REPO_SLUG}/jobs/${TRAVIS_JOB_ID}"
+
 git -C $DOCDIR push origin gh-pages 2>&1 | sed -e "$REDACT_PATTERN"
 
 if [ -n "$GH_DEPLOY_KEY" ]; then eval `ssh-agent -k`; fi
