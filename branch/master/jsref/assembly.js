@@ -199,77 +199,6 @@ var BinNums = (function() {
 return {};
 })();
 
-/* --------------------- Bool0.unlog.js --------------------- */
-
-var Bool0 = (function() {
-
-var eqb = function (b1, b2) {
-  if (b1) {
-    if (b2) {
-      return (true);
-    } else {
-      return (false);
-    }
-  } else {
-    if (b2) {
-      return (false);
-    } else {
-      return (true);
-    }
-  }
-};
-
-return {
-  eqb: eqb};
-})();
-
-/* --------------------- List0.unlog.js --------------------- */
-
-var List0 = (function() {
-
-var hd = function (d, l) {
-  switch (l.tag) {
-    case "[]":
-      return (d);
-    case "::":
-      var x = l.head, l0 = l.tail;
-      return (x);
-  }
-  
-};
-
-
-
-var tl = function (l) {
-  switch (l.tag) {
-    case "[]":
-      return (mk_nil());
-    case "::":
-      var a = l.head, m = l.tail;
-      return (m);
-  }
-  
-};
-
-
-
-var map = function (f, l) {
-  switch (l.tag) {
-    case "[]":
-      return (mk_nil());
-    case "::":
-      var a = l.head, t = l.tail;
-      return (mk_cons(f(a), map(f, t)));
-  }
-  
-};
-
-return {
-  hd: hd, 
-  tl: tl, 
-  map: map};
-})();
-
 /* --------------------- Datatypes.unlog.js --------------------- */
 
 var Datatypes = (function() {
@@ -321,6 +250,32 @@ return {};
 /* --------------------- LibList.unlog.js --------------------- */
 
 var LibList = (function() {
+
+var hd = function (d, l) {
+  switch (l.tag) {
+    case "[]":
+      return (d);
+    case "::":
+      var x = l.head, l0 = l.tail;
+      return (x);
+  }
+  
+};
+
+
+
+var tl = function (l) {
+  switch (l.tag) {
+    case "[]":
+      return (mk_nil());
+    case "::":
+      var a = l.head, m = l.tail;
+      return (m);
+  }
+  
+};
+
+
 
 var list_eq_nil_decidable = function (l) {
   switch (l.tag) {
@@ -462,6 +417,8 @@ var mem_decide = function (h, x, l) {
 };
 
 return {
+  hd: hd, 
+  tl: tl, 
   list_eq_nil_decidable: list_eq_nil_decidable, 
   fold_right: fold_right, 
   fold_left: fold_left, 
@@ -5493,7 +5450,6 @@ with (JsSyntax) {
 with (JsSyntaxAux) {
 with (LibList) {
 with (LibOption) {
-with (List0) {
 with (Shared) {
 
 var res_overwrite_value_if_empty = function (rv, r) {
@@ -6125,7 +6081,7 @@ var stat_vardecl = function (_foo_) {
       return (stat_vardecl(s));
     case "Coq_stat_block":
       var ts = _foo_.stats;
-      return (concat(map(stat_vardecl, ts)));
+      return (concat(LibList.map(stat_vardecl, ts)));
     case "Coq_stat_var_decl":
       var nes = _foo_.decls;
       return (LibList.map(fst, nes));
@@ -6193,14 +6149,14 @@ var switchbody_vardecl = function (_foo_) {
   switch (_foo_.tag) {
     case "Coq_switchbody_nodefault":
       var scl = _foo_.clauses;
-      return (concat(map(switchclause_vardecl, scl)));
+      return (concat(LibList.map(switchclause_vardecl, scl)));
     case "Coq_switchbody_withdefault":
       var scl1 = _foo_.clauses_before, sl = _foo_.clause_default,
         scl2 = _foo_.clauses_after;
       return (
-        append(concat(map(switchclause_vardecl, scl1)),
-          append(concat(map(stat_vardecl, sl)),
-            concat(map(switchclause_vardecl, scl2)))));
+        append(concat(LibList.map(switchclause_vardecl, scl1)),
+          append(concat(LibList.map(stat_vardecl, sl)),
+            concat(LibList.map(switchclause_vardecl, scl2)))));
   }
   
 };
@@ -6209,7 +6165,7 @@ var switchclause_vardecl = function (_foo_) {
   switch (_foo_.tag) {
     case "Coq_switchclause_intro":
       var e = _foo_.arg, sl = _foo_.stats;
-      return (concat(map(stat_vardecl, sl)));
+      return (concat(LibList.map(stat_vardecl, sl)));
   }
   
 };
@@ -6410,7 +6366,6 @@ var parse_pickable = function (s, strict) {
 }// end of with JsSyntaxAux
 }// end of with LibList
 }// end of with LibOption
-}// end of with List0
 }// end of with Shared
 
 return {
@@ -9164,7 +9119,6 @@ with (JsSyntaxAux) {
 with (LibList) {
 with (LibOption) {
 with (LibProd) {
-with (List0) {
 with (Shared) {
 
 var convert_number_to_bool = function (n) {
@@ -33728,7 +33682,6 @@ var run_javascript = function (p) {
 }// end of with LibList
 }// end of with LibOption
 }// end of with LibProd
-}// end of with List0
 }// end of with Shared
 
 return {
