@@ -65,5 +65,7 @@ var JsNumber = {
   e : Math.E,
   ln2 : Math.LN2,
 
-  /* TODO: what about other functions from Math? */
+  isnan : isNaN,
+  isposzero : function (n) { return (n === 0) && ((1/n) > 0) },
+  isnegzero : function (n) { return (n === 0) && ((1/n) < 0) }
 };

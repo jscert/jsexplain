@@ -125,10 +125,9 @@ compiles directly down to the === operator in JS. For unknown types, it
 converts it into a function call to _compare_TYPENAME. Known type are listed
 in js_of_ast.ml#is_triple_equal_type (currently int, bool, string).
 
-Precise semantics of this operator are awkward. It is not implemented by
-default for floats due to incosnsitencies of requirements about the equiality
-of +0 and -0, and NaN values. JSRef has a custom implementation making +0=≠=-0
-and NaN===NaN *)
+Floating point equality is implemented directly as === in JS, meaning that NaNs
+are unequal and 0===-0.
+*)
 val ( === ) : 'a -> 'a -> bool
 
 (*

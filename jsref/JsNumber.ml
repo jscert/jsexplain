@@ -89,3 +89,10 @@ let modulo_32 x =
   if x < 0. then r +. 32. else r
 
 let fmod = mod_float
+
+let isnan n = match classify_float n with
+  | FP_nan -> true
+  | _      -> false
+
+let isposzero n = (n = 0.) && (copysign 1. n > 0.)
+let isnegzero n = (n = 0.) && (copysign 1. n < 0.)

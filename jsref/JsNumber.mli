@@ -39,3 +39,8 @@ val absolute : number -> number
 val modulo_32 : number -> number
 
 val fmod : number -> number -> number
+
+val isnan : number -> bool
+val isposzero : number -> bool
+val isnegzero : number -> bool
+

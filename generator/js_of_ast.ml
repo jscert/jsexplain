@@ -162,7 +162,7 @@ let test_type_name names typ =
 
 (* === comparison *)
 
-let is_triple_equal_type = test_type_name ["int"; "bool"; "string"]
+let is_triple_equal_type = test_type_name ["int"; "bool"; "string"; "float"; "JsNumber.number"]
 
 (****************************************************************)
 (* PSEUDO-CODE mode *)

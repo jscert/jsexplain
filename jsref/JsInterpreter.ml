@@ -16,9 +16,9 @@ open Shared
 (** val convert_number_to_bool : number -> bool **)
 
 let convert_number_to_bool n =
-  if    (n === JsNumber.zero) 
-     || (n === JsNumber.neg_zero)
-     || (n === JsNumber.nan)
+  if    (JsNumber.isposzero n)
+     || (JsNumber.isnegzero n)
+     || (JsNumber.isnan n)
   then false
   else true
 
@@ -55,10 +55,10 @@ let convert_prim_to_number _foo_ = match _foo_ with
 (** val convert_number_to_integer : number -> number **)
 
 let convert_number_to_integer n =
-  if n === JsNumber.nan
+  if JsNumber.isnan n
   then JsNumber.zero
-  else if   (n === JsNumber.zero)
-         || (n === JsNumber.neg_zero)
+  else if   (JsNumber.isposzero n)
+         || (JsNumber.isnegzero n)
          || (n === JsNumber.infinity)
          || (n === JsNumber.neg_infinity)
        then n
@@ -102,15 +102,15 @@ let equality_test_for_same_type ty v1 v2 =
               | Coq_prim_null -> false
               | Coq_prim_bool b -> false
               | Coq_prim_number n2 ->
-                if n1 === JsNumber.nan
+                if JsNumber.isnan n1
                 then false
-                else if n2 === JsNumber.nan
+                else if JsNumber.isnan n2
                      then false
-                     else if   (n1 === JsNumber.zero)
-                            && (n2 === JsNumber.neg_zero)
+                     else if   (JsNumber.isposzero n1)
+                            && (JsNumber.isnegzero n2)
                           then true
-                          else if   (n1 === JsNumber.neg_zero)
-                                &&  (n2 === JsNumber.zero)
+                          else if   (JsNumber.isnegzero n1)
+                                &&  (JsNumber.isposzero n2)
                                then true
                                else n1 === n2
               | Coq_prim_string s -> false)
@@ -132,15 +132,15 @@ let strict_equality_test v1 v2 =
 (** val inequality_test_number : number -> number -> prim **)
 
 let inequality_test_number n1 n2 =
-  if (n1 === JsNumber.nan) || (n2 === JsNumber.nan)
+  if (JsNumber.isnan n1) || (JsNumber.isnan n2)
   then Coq_prim_undef
   else if n1 === n2
        then Coq_prim_bool false
-       else if   (n1 === JsNumber.zero)
-              && (n2 === JsNumber.neg_zero)
+       else if   (JsNumber.isposzero n1)
+              && (JsNumber.isnegzero n2)
             then Coq_prim_bool false
-            else if (n1 === JsNumber.neg_zero)
-                 && (n2 === JsNumber.zero)
+            else if (JsNumber.isnegzero n1)
+                 && (JsNumber.isposzero n2)
                  then Coq_prim_bool false
                  else if n1 === JsNumber.infinity
                       then Coq_prim_bool false
@@ -3595,7 +3595,7 @@ and run_call_prealloc s c b vthis args =
             res_ter s0
               (res_val (Coq_value_prim (Coq_prim_bool
                                           (not
-                                             (   (n === JsNumber.nan)
+                                             (   (JsNumber.isnan n)
                                               || (n === JsNumber.infinity)
                                               || (n === JsNumber.neg_infinity))))))
   | Coq_prealloc_global_is_nan ->
@@ -3603,7 +3603,7 @@ and run_call_prealloc s c b vthis args =
         let%number (s0, n) = (to_number s c v) in
             res_ter s0
               (res_val (Coq_value_prim (Coq_prim_bool
-                                          (n === JsNumber.nan))))
+                                          (JsNumber.isnan n))))
   | Coq_prealloc_object ->
     let  value0 = (get_arg 0 args) in begin
         match value0 with
