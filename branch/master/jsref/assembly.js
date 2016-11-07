@@ -10270,7 +10270,8 @@ var build_error = function (s, vproto, vmsg) {
                               return (_return_178); 
                             }())
                             ;
-                            var _return_177 = Coq_result_impossible();
+                            var _return_177 = Coq_result_not_yet_implemented(
+                                                );
                             log_event("JsInterpreter.js", 345, ctx_push(ctx_54, [{key: "#RETURN_VALUE#", val: _return_177}]), "return");
                             return (_return_177); }(
                           "Need [to_string] (this function shall be put in [runs_type].)");
@@ -18336,7 +18337,8 @@ var run_construct_prealloc = function (s, c, b, args) {
                                  return (_return_1194); 
                                }())
                                ;
-                               var _return_1193 = Coq_result_impossible();
+                               var _return_1193 = Coq_result_not_yet_implemented(
+                                                    );
                                log_event("JsInterpreter.js", 2715, ctx_push(ctx_490, [{key: "#RETURN_VALUE#", val: _return_1193}]), "return");
                                return (_return_1193); }((function () {
                                log_event("JsInterpreter.js", 2714, ctx_431, "call");
@@ -28438,7 +28440,8 @@ var run_stat = function (s, c, _term_) {
                                  return (_return_2441); 
                                }())
                                ;
-                               var _return_2440 = Coq_result_impossible();
+                               var _return_2440 = Coq_result_not_yet_implemented(
+                                                    );
                                log_event("JsInterpreter.js", 5773, ctx_push(ctx_1092, [{key: "#RETURN_VALUE#", val: _return_2440}]), "return");
                                return (_return_2440); }("stat_for_in");
         log_event("JsInterpreter.js", 5777, ctx_push(ctx_1091, [{key: "#RETURN_VALUE#", val: _return_2442}]), "return");
@@ -28465,7 +28468,8 @@ var run_stat = function (s, c, _term_) {
                                  return (_return_2445); 
                                }())
                                ;
-                               var _return_2444 = Coq_result_impossible();
+                               var _return_2444 = Coq_result_not_yet_implemented(
+                                                    );
                                log_event("JsInterpreter.js", 5781, ctx_push(ctx_1094, [{key: "#RETURN_VALUE#", val: _return_2444}]), "return");
                                return (_return_2444); }("stat_for_in_var");
         log_event("JsInterpreter.js", 5785, ctx_push(ctx_1093, [{key: "#RETURN_VALUE#", val: _return_2446}]), "return");
@@ -30929,7 +30933,8 @@ var run_call_prealloc = function (s, c, b, vthis, args) {
                                    return (_return_2747); 
                                  }())
                                  ;
-                                 var _return_2746 = Coq_result_impossible();
+                                 var _return_2746 = Coq_result_not_yet_implemented(
+                                                      );
                                  log_event("JsInterpreter.js", 6573, ctx_push(ctx_1250, [{key: "#RETURN_VALUE#", val: _return_2746}]), "return");
                                  return (_return_2746); }(
                                "Function.prototype.toString() is implementation dependent.");
@@ -33402,7 +33407,8 @@ var run_call_prealloc = function (s, c, b, vthis, args) {
                                  return (_return_3060); 
                                }())
                                ;
-                               var _return_3059 = Coq_result_impossible();
+                               var _return_3059 = Coq_result_not_yet_implemented(
+                                                    );
                                log_event("JsInterpreter.js", 7293, ctx_push(ctx_1372, [{key: "#RETURN_VALUE#", val: _return_3059}]), "return");
                                return (_return_3059); }((function () {
                                log_event("JsInterpreter.js", 7292, ctx_1169, "call");
