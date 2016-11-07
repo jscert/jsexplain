@@ -17,7 +17,7 @@ let ( && ) = Pervasives.( && );;
 let ( || ) = Pervasives.( || );;
 
 (**{6 Debugging }*)
-let __LOC__ = Pervasives.__LOC__;;
+external __LOC__ : string = "%loc_LOC"
 
 (**{6 Integer arithmetic }*)
 let ( + ) = Pervasives.( + );;

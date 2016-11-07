@@ -38,7 +38,7 @@ val ( && ) : bool -> bool -> bool
 val ( || ) : bool -> bool -> bool
 
 (**{6 Debugging }*)
-val __LOC__ : string
+external __LOC__ : string = "%loc_LOC"
 
 (**{6 Integer arithmetic }*)
 val ( + ) : int -> int -> int
