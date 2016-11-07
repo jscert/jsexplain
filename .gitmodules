@@ -4,4 +4,4 @@
 	branch = es5-tests
 [submodule "tools/runtests"]
 	path = tools/runtests
-	url = git@github.com:edgemaster/runtests.git
+	url = https://github.com/edgemaster/runtests.git
