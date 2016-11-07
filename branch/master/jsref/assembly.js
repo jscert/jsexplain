@@ -1121,17 +1121,6 @@ return {
  * generated code in place of ===
  */
 
-/* Compare floating point numbers.
- * +0 = +0, -0 = -0, but +0 <> -0, and -0 <> +0
- * NaN = NaN
- */
-var _compare_JsNumber_number = function(x, y) {
-  if (x === 0 && y === 0) {
-    return (1/x > 0 && 1/y > 0) || (1/x < 0 && 1/y < 0);
-  }
-  return (Math.isNaN(x) && Math.isNaN(y)) || (x === y);
-};
-
 var _compare_JsSyntax_mathop = function(x, y) {
    return (x.tag == y.tag);
 };
@@ -1221,7 +1210,9 @@ var JsNumber = {
   e : Math.E,
   ln2 : Math.LN2,
 
-  /* TODO: what about other functions from Math? */
+  isnan : isNaN,
+  isposzero : function (n) { return (n === 0) && ((1/n) > 0) },
+  isnegzero : function (n) { return (n === 0) && ((1/n) < 0) }
 };
 
 /* --------------------- JsSyntax.unlog.js --------------------- */
@@ -3434,7 +3425,7 @@ var prim_compare = function (w1, w2) {
           return (false);
         case "Coq_prim_number":
           var n2 = w2.value;
-          return (_compare_JsNumber_number(n1, n2));
+          return ((n1 === n2));
         case "Coq_prim_string":
           var s = w2.value;
           return (false);
@@ -9128,22 +9119,18 @@ var convert_number_to_bool = function (n) {
     log_event("JsInterpreter.js", 10, ctx_1, "call");
     var _return_6 = ((function () {
                       log_event("JsInterpreter.js", 2, ctx_1, "call");
-                      var _return_2 = _compare_JsNumber_number(n,
-                                        JsNumber.zero);
+                      var _return_2 = JsNumber.isposzero(n);
                       log_event("JsInterpreter.js", 1, ctx_push(ctx_1, [{key: "#RETURN_VALUE#", val: _return_2}]), "return");
                       return (_return_2); }()) || (function () {
                       log_event("JsInterpreter.js", 8, ctx_1, "call");
                       var _return_5 = ((function () {
                                         log_event("JsInterpreter.js", 4, ctx_1, "call");
-                                        var _return_3 = _compare_JsNumber_number(
-                                                          n,
-                                                          JsNumber.neg_zero);
+                                        var _return_3 = JsNumber.isnegzero(n);
                                         log_event("JsInterpreter.js", 3, ctx_push(ctx_1, [{key: "#RETURN_VALUE#", val: _return_3}]), "return");
                                         return (_return_3); }())
                                       || (function () {
                                         log_event("JsInterpreter.js", 6, ctx_1, "call");
-                                        var _return_4 = _compare_JsNumber_number(
-                                                          n, JsNumber.nan);
+                                        var _return_4 = JsNumber.isnan(n);
                                         log_event("JsInterpreter.js", 5, ctx_push(ctx_1, [{key: "#RETURN_VALUE#", val: _return_4}]), "return");
                                         return (_return_4); }()));
                       log_event("JsInterpreter.js", 7, ctx_push(ctx_1, [{key: "#RETURN_VALUE#", val: _return_5}]), "return");
@@ -9335,7 +9322,7 @@ var convert_number_to_integer = function (n) {
   log_event("JsInterpreter.js", 90, ctx_14, "enter");
   var _if_arg_30 = (function () {
     log_event("JsInterpreter.js", 62, ctx_14, "call");
-    var _return_31 = _compare_JsNumber_number(n, JsNumber.nan);
+    var _return_31 = JsNumber.isnan(n);
     log_event("JsInterpreter.js", 61, ctx_push(ctx_14, [{key: "#RETURN_VALUE#", val: _return_31}]), "return");
     return (_return_31); 
   }())
@@ -9350,16 +9337,14 @@ var convert_number_to_integer = function (n) {
       log_event("JsInterpreter.js", 76, ctx_14, "call");
       var _return_39 = ((function () {
                          log_event("JsInterpreter.js", 64, ctx_14, "call");
-                         var _return_33 = _compare_JsNumber_number(n,
-                                            JsNumber.zero);
+                         var _return_33 = JsNumber.isposzero(n);
                          log_event("JsInterpreter.js", 63, ctx_push(ctx_14, [{key: "#RETURN_VALUE#", val: _return_33}]), "return");
                          return (_return_33); }()) || (function () {
                          log_event("JsInterpreter.js", 74, ctx_14, "call");
                          var _return_38 = ((function () {
                                             log_event("JsInterpreter.js", 66, ctx_14, "call");
-                                            var _return_34 = _compare_JsNumber_number(
-                                                               n,
-                                                               JsNumber.neg_zero);
+                                            var _return_34 = JsNumber.isnegzero(
+                                                               n);
                                             log_event("JsInterpreter.js", 65, ctx_push(ctx_14, [{key: "#RETURN_VALUE#", val: _return_34}]), "return");
                                             return (_return_34); }())
                                           || (function () {
@@ -9367,18 +9352,16 @@ var convert_number_to_integer = function (n) {
                                             var _return_37 = ((function () {
                                                                log_event("JsInterpreter.js", 68, ctx_14, "call");
                                                                var _return_35 = 
-                                                               _compare_JsNumber_number(
-                                                                 n,
-                                                                 JsNumber.infinity);
+                                                               (n
+                                                               === JsNumber.infinity);
                                                                log_event("JsInterpreter.js", 67, ctx_push(ctx_14, [{key: "#RETURN_VALUE#", val: _return_35}]), "return");
                                                                return (_return_35); 
                                                              }())
                                                              || (function () {
                                                                log_event("JsInterpreter.js", 70, ctx_14, "call");
                                                                var _return_36 = 
-                                                               _compare_JsNumber_number(
-                                                                 n,
-                                                                 JsNumber.neg_infinity);
+                                                               (n
+                                                               === JsNumber.neg_infinity);
                                                                log_event("JsInterpreter.js", 69, ctx_push(ctx_14, [{key: "#RETURN_VALUE#", val: _return_36}]), "return");
                                                                return (_return_36); 
                                                              }()));
@@ -9581,8 +9564,7 @@ var equality_test_for_same_type = function (ty, v1, v2) {
                     
                       var _if_arg_65 = (function () {
                         log_event("JsInterpreter.js", 132, ctx_26, "call");
-                        var _return_66 = _compare_JsNumber_number(n1,
-                                           JsNumber.nan);
+                        var _return_66 = JsNumber.isnan(n1);
                         log_event("JsInterpreter.js", 131, ctx_push(ctx_26, [{key: "#RETURN_VALUE#", val: _return_66}]), "return");
                         return (_return_66); 
                       }())
@@ -9595,8 +9577,7 @@ var equality_test_for_same_type = function (ty, v1, v2) {
                       } else {
                         var _if_arg_67 = (function () {
                           log_event("JsInterpreter.js", 134, ctx_26, "call");
-                          var _return_68 = _compare_JsNumber_number(n2,
-                                             JsNumber.nan);
+                          var _return_68 = JsNumber.isnan(n2);
                           log_event("JsInterpreter.js", 133, ctx_push(ctx_26, [{key: "#RETURN_VALUE#", val: _return_68}]), "return");
                           return (_return_68); 
                         }())
@@ -9611,16 +9592,14 @@ var equality_test_for_same_type = function (ty, v1, v2) {
                             log_event("JsInterpreter.js", 140, ctx_26, "call");
                             var _return_72 = ((function () {
                                                log_event("JsInterpreter.js", 136, ctx_26, "call");
-                                               var _return_70 = _compare_JsNumber_number(
-                                                                  n1,
-                                                                  JsNumber.zero);
+                                               var _return_70 = JsNumber.isposzero(
+                                                                  n1);
                                                log_event("JsInterpreter.js", 135, ctx_push(ctx_26, [{key: "#RETURN_VALUE#", val: _return_70}]), "return");
                                                return (_return_70); }())
                                              && (function () {
                                                log_event("JsInterpreter.js", 138, ctx_26, "call");
-                                               var _return_71 = _compare_JsNumber_number(
-                                                                  n2,
-                                                                  JsNumber.neg_zero);
+                                               var _return_71 = JsNumber.isnegzero(
+                                                                  n2);
                                                log_event("JsInterpreter.js", 137, ctx_push(ctx_26, [{key: "#RETURN_VALUE#", val: _return_71}]), "return");
                                                return (_return_71); }()));
                             log_event("JsInterpreter.js", 139, ctx_push(ctx_26, [{key: "#RETURN_VALUE#", val: _return_72}]), "return");
@@ -9637,16 +9616,14 @@ var equality_test_for_same_type = function (ty, v1, v2) {
                               log_event("JsInterpreter.js", 146, ctx_26, "call");
                               var _return_76 = ((function () {
                                                  log_event("JsInterpreter.js", 142, ctx_26, "call");
-                                                 var _return_74 = _compare_JsNumber_number(
-                                                                    n1,
-                                                                    JsNumber.neg_zero);
+                                                 var _return_74 = JsNumber.isnegzero(
+                                                                    n1);
                                                  log_event("JsInterpreter.js", 141, ctx_push(ctx_26, [{key: "#RETURN_VALUE#", val: _return_74}]), "return");
                                                  return (_return_74); }())
                                                && (function () {
                                                  log_event("JsInterpreter.js", 144, ctx_26, "call");
-                                                 var _return_75 = _compare_JsNumber_number(
-                                                                    n2,
-                                                                    JsNumber.zero);
+                                                 var _return_75 = JsNumber.isposzero(
+                                                                    n2);
                                                  log_event("JsInterpreter.js", 143, ctx_push(ctx_26, [{key: "#RETURN_VALUE#", val: _return_75}]), "return");
                                                  return (_return_75); }()));
                               log_event("JsInterpreter.js", 145, ctx_push(ctx_26, [{key: "#RETURN_VALUE#", val: _return_76}]), "return");
@@ -9661,8 +9638,7 @@ var equality_test_for_same_type = function (ty, v1, v2) {
                             } else {
                               var _return_78 = (function () {
                                 log_event("JsInterpreter.js", 148, ctx_26, "call");
-                                var _return_77 = _compare_JsNumber_number(n1,
-                                                   n2);
+                                var _return_77 = (n1 === n2);
                                 log_event("JsInterpreter.js", 147, ctx_push(ctx_26, [{key: "#RETURN_VALUE#", val: _return_77}]), "return");
                                 return (_return_77); 
                               }())
@@ -9776,13 +9752,11 @@ var inequality_test_number = function (n1, n2) {
     log_event("JsInterpreter.js", 198, ctx_34, "call");
     var _return_98 = ((function () {
                        log_event("JsInterpreter.js", 194, ctx_34, "call");
-                       var _return_96 = _compare_JsNumber_number(n1,
-                                          JsNumber.nan);
+                       var _return_96 = JsNumber.isnan(n1);
                        log_event("JsInterpreter.js", 193, ctx_push(ctx_34, [{key: "#RETURN_VALUE#", val: _return_96}]), "return");
                        return (_return_96); }()) || (function () {
                        log_event("JsInterpreter.js", 196, ctx_34, "call");
-                       var _return_97 = _compare_JsNumber_number(n2,
-                                          JsNumber.nan);
+                       var _return_97 = JsNumber.isnan(n2);
                        log_event("JsInterpreter.js", 195, ctx_push(ctx_34, [{key: "#RETURN_VALUE#", val: _return_97}]), "return");
                        return (_return_97); }()));
     log_event("JsInterpreter.js", 197, ctx_push(ctx_34, [{key: "#RETURN_VALUE#", val: _return_98}]), "return");
@@ -9797,7 +9771,7 @@ var inequality_test_number = function (n1, n2) {
   } else {
     var _if_arg_99 = (function () {
       log_event("JsInterpreter.js", 200, ctx_34, "call");
-      var _return_100 = _compare_JsNumber_number(n1, n2);
+      var _return_100 = (n1 === n2);
       log_event("JsInterpreter.js", 199, ctx_push(ctx_34, [{key: "#RETURN_VALUE#", val: _return_100}]), "return");
       return (_return_100); 
     }())
@@ -9812,13 +9786,11 @@ var inequality_test_number = function (n1, n2) {
         log_event("JsInterpreter.js", 206, ctx_34, "call");
         var _return_104 = ((function () {
                             log_event("JsInterpreter.js", 202, ctx_34, "call");
-                            var _return_102 = _compare_JsNumber_number(n1,
-                                                JsNumber.zero);
+                            var _return_102 = JsNumber.isposzero(n1);
                             log_event("JsInterpreter.js", 201, ctx_push(ctx_34, [{key: "#RETURN_VALUE#", val: _return_102}]), "return");
                             return (_return_102); }()) && (function () {
                             log_event("JsInterpreter.js", 204, ctx_34, "call");
-                            var _return_103 = _compare_JsNumber_number(n2,
-                                                JsNumber.neg_zero);
+                            var _return_103 = JsNumber.isnegzero(n2);
                             log_event("JsInterpreter.js", 203, ctx_push(ctx_34, [{key: "#RETURN_VALUE#", val: _return_103}]), "return");
                             return (_return_103); }()));
         log_event("JsInterpreter.js", 205, ctx_push(ctx_34, [{key: "#RETURN_VALUE#", val: _return_104}]), "return");
@@ -9835,13 +9807,11 @@ var inequality_test_number = function (n1, n2) {
           log_event("JsInterpreter.js", 212, ctx_34, "call");
           var _return_108 = ((function () {
                               log_event("JsInterpreter.js", 208, ctx_34, "call");
-                              var _return_106 = _compare_JsNumber_number(n1,
-                                                  JsNumber.neg_zero);
+                              var _return_106 = JsNumber.isnegzero(n1);
                               log_event("JsInterpreter.js", 207, ctx_push(ctx_34, [{key: "#RETURN_VALUE#", val: _return_106}]), "return");
                               return (_return_106); }()) && (function () {
                               log_event("JsInterpreter.js", 210, ctx_34, "call");
-                              var _return_107 = _compare_JsNumber_number(n2,
-                                                  JsNumber.zero);
+                              var _return_107 = JsNumber.isposzero(n2);
                               log_event("JsInterpreter.js", 209, ctx_push(ctx_34, [{key: "#RETURN_VALUE#", val: _return_107}]), "return");
                               return (_return_107); }()));
           log_event("JsInterpreter.js", 211, ctx_push(ctx_34, [{key: "#RETURN_VALUE#", val: _return_108}]), "return");
@@ -9856,7 +9826,7 @@ var inequality_test_number = function (n1, n2) {
         } else {
           var _if_arg_109 = (function () {
             log_event("JsInterpreter.js", 214, ctx_34, "call");
-            var _return_110 = _compare_JsNumber_number(n1, JsNumber.infinity);
+            var _return_110 = (n1 === JsNumber.infinity);
             log_event("JsInterpreter.js", 213, ctx_push(ctx_34, [{key: "#RETURN_VALUE#", val: _return_110}]), "return");
             return (_return_110); 
           }())
@@ -9869,8 +9839,7 @@ var inequality_test_number = function (n1, n2) {
           } else {
             var _if_arg_111 = (function () {
               log_event("JsInterpreter.js", 216, ctx_34, "call");
-              var _return_112 = _compare_JsNumber_number(n2,
-                                  JsNumber.infinity);
+              var _return_112 = (n2 === JsNumber.infinity);
               log_event("JsInterpreter.js", 215, ctx_push(ctx_34, [{key: "#RETURN_VALUE#", val: _return_112}]), "return");
               return (_return_112); 
             }())
@@ -9883,8 +9852,7 @@ var inequality_test_number = function (n1, n2) {
             } else {
               var _if_arg_113 = (function () {
                 log_event("JsInterpreter.js", 218, ctx_34, "call");
-                var _return_114 = _compare_JsNumber_number(n2,
-                                    JsNumber.neg_infinity);
+                var _return_114 = (n2 === JsNumber.neg_infinity);
                 log_event("JsInterpreter.js", 217, ctx_push(ctx_34, [{key: "#RETURN_VALUE#", val: _return_114}]), "return");
                 return (_return_114); 
               }())
@@ -9897,8 +9865,7 @@ var inequality_test_number = function (n1, n2) {
               } else {
                 var _if_arg_115 = (function () {
                   log_event("JsInterpreter.js", 220, ctx_34, "call");
-                  var _return_116 = _compare_JsNumber_number(n1,
-                                      JsNumber.neg_infinity);
+                  var _return_116 = (n1 === JsNumber.neg_infinity);
                   log_event("JsInterpreter.js", 219, ctx_push(ctx_34, [{key: "#RETURN_VALUE#", val: _return_116}]), "return");
                   return (_return_116); 
                 }())
@@ -12794,9 +12761,8 @@ var object_define_own_prop = function (s, c, l, x, desc, throwcont) {
                                                                     (function () {
                                                                     log_event("JsInterpreter.js", 1118, ctx_201, "call");
                                                                     var _return_506 = 
-                                                                    _compare_JsNumber_number(
-                                                                    newLen,
-                                                                    newLenN);
+                                                                    (newLen
+                                                                    === newLenN);
                                                                     log_event("JsInterpreter.js", 1117, ctx_push(ctx_201, [{key: "#RETURN_VALUE#", val: _return_506}]), "return");
                                                                     return (_return_506); 
                                                                     }()));
@@ -17914,8 +17880,7 @@ var run_construct_prealloc = function (s, c, b, args) {
                                        log_event("JsInterpreter.js", 2600, ctx_468, "let");
                                        var _if_arg_1143 = (function () {
                                          log_event("JsInterpreter.js", 2590, ctx_468, "call");
-                                         var _return_1144 = _compare_JsNumber_number(
-                                                              ilen, vlen);
+                                         var _return_1144 = (ilen === vlen);
                                          log_event("JsInterpreter.js", 2589, ctx_push(ctx_468, [{key: "#RETURN_VALUE#", val: _return_1144}]), "return");
                                          return (_return_1144); 
                                        }())
@@ -29678,9 +29643,8 @@ var run_call_prealloc = function (s, c, b, vthis, args) {
                                                               ((function () {
                                                                 log_event("JsInterpreter.js", 6154, ctx_1171, "call");
                                                                 var _return_2589 = 
-                                                                _compare_JsNumber_number(
-                                                                  n,
-                                                                  JsNumber.nan);
+                                                                JsNumber.isnan(
+                                                                  n);
                                                                 log_event("JsInterpreter.js", 6153, ctx_push(ctx_1171, [{key: "#RETURN_VALUE#", val: _return_2589}]), "return");
                                                                 return (_return_2589); 
                                                               }())
@@ -29690,18 +29654,16 @@ var run_call_prealloc = function (s, c, b, vthis, args) {
                                                                 ((function () {
                                                                   log_event("JsInterpreter.js", 6156, ctx_1171, "call");
                                                                   var _return_2590 = 
-                                                                  _compare_JsNumber_number(
-                                                                    n,
-                                                                    JsNumber.infinity);
+                                                                  (n
+                                                                  === JsNumber.infinity);
                                                                   log_event("JsInterpreter.js", 6155, ctx_push(ctx_1171, [{key: "#RETURN_VALUE#", val: _return_2590}]), "return");
                                                                   return (_return_2590); 
                                                                 }())
                                                                 || (function () {
                                                                   log_event("JsInterpreter.js", 6158, ctx_1171, "call");
                                                                   var _return_2591 = 
-                                                                  _compare_JsNumber_number(
-                                                                    n,
-                                                                    JsNumber.neg_infinity);
+                                                                  (n
+                                                                  === JsNumber.neg_infinity);
                                                                   log_event("JsInterpreter.js", 6157, ctx_push(ctx_1171, [{key: "#RETURN_VALUE#", val: _return_2591}]), "return");
                                                                   return (_return_2591); 
                                                                 }()));
@@ -29746,8 +29708,7 @@ var run_call_prealloc = function (s, c, b, vthis, args) {
                                                         (function () {
                                                           log_event("JsInterpreter.js", 6177, ctx_1173, "call");
                                                           var _return_2599 = 
-                                                          _compare_JsNumber_number(
-                                                            n, JsNumber.nan);
+                                                          JsNumber.isnan(n);
                                                           log_event("JsInterpreter.js", 6176, ctx_push(ctx_1173, [{key: "#RETURN_VALUE#", val: _return_2599}]), "return");
                                                           return (_return_2599); 
                                                         }())))));
