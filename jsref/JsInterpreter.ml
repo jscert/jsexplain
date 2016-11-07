@@ -230,7 +230,7 @@ let build_error s vproto vmsg =
   let (l, s_2) = object_alloc s o in
   if value_compare vmsg (Coq_value_prim Coq_prim_undef)
   then result_out (Coq_out_ter (s_2, (res_val (Coq_value_object l))))
-  else (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
+  else (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_not_yet_implemented)
          ("Need [to_string] (this function shall be put in [runs_type].)")
 
 (** val run_error : state -> native_error -> 'a1 specres **)
@@ -1599,7 +1599,7 @@ and run_construct_prealloc s c b args =
         build_error s (Coq_value_object (Coq_object_loc_prealloc
                                            (Coq_prealloc_native_error_proto ne))) v
   | _ ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_not_yet_implemented)
       (strappend
          ("Construct prealloc_")
          (strappend (string_of_prealloc b)
@@ -3368,10 +3368,10 @@ and run_stat s c _term_ = match _term_ with
   | Coq_stat_for_var (ls, ds, eo2, eo3, s0) ->
     run_stat_for_var s c ls ds eo2 eo3 s0
   | Coq_stat_for_in (ls, e1, e2, s0) ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_not_yet_implemented)
       ("stat_for_in")
   | Coq_stat_for_in_var (ls, x, e1o, e2, s0) ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_not_yet_implemented)
       ("stat_for_in_var")
   | Coq_stat_debugger -> result_out (Coq_out_ter (s, res_empty))
   | Coq_stat_switch (labs, e, sb) -> run_stat_switch s c labs e sb
@@ -3780,7 +3780,7 @@ and run_call_prealloc s c b vthis args =
     result_out (Coq_out_ter (s, (res_val (Coq_value_prim Coq_prim_undef))))
   | Coq_prealloc_function_proto_to_string ->
     if is_callable_dec s vthis
-    then (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
+    then (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_not_yet_implemented)
         ("Function.prototype.toString() is implementation dependent.")
     else run_error s Coq_native_error_type
   | Coq_prealloc_function_proto_apply ->
@@ -4145,7 +4145,7 @@ and run_call_prealloc s c b vthis args =
                                        (Coq_prealloc_native_error_proto ne))) v
   | Coq_prealloc_throw_type_error -> run_error s Coq_native_error_type
   | _ ->
-    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_impossible)
+    (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_not_yet_implemented)
       (strappend ("Call prealloc_") (strappend (string_of_prealloc b) (" not yet implemented")))
 
 (** val run_call :
