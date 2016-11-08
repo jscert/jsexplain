@@ -133,10 +133,16 @@ var nat_eq = function(x, y) { return x === y; };
 
 // val string_eq : string -> string -> bool (* === *)
 var string_eq = function(x, y) {
-  // Thomas: Why do we need an explicit type check here?
   if (typeof(x) != "string" || typeof(y) != "string")
     throw "string_eq invalid arguments";
   return x === y;
+};
+
+// val string_lt : string -> string -> bool
+var string_lt = function(x, y) {
+  if (typeof(x) != "string" || typeof(y) != "string")
+    throw "string_lt invalid arguments";
+  return x < y;
 };
 
 // val string_compare : string -> string -> int

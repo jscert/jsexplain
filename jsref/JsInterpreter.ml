@@ -169,7 +169,7 @@ let rec inequality_test_string s1 s2 =
        then inequality_test_string s1_2 s2_2
        else lt_int_decidable (int_of_char c1) (int_of_char c2))
 *)
-let inequality_test_string s1 s2 = (not (string_eq s1 s2))
+let inequality_test_string s1 s2 = string_lt s1 s2
 
 
 (** val inequality_test_primitive : prim -> prim -> prim **)

@@ -112,7 +112,9 @@ let int_ge = Pervasives.(>=);;
 let int_compare = Pervasives.compare;;
 let bool_eq = Pervasives.(=);;
 let nat_eq = Pervasives.(=);;
+
 let string_eq = Pervasives.(=);;
+let string_lt = Pervasives.(<);;
 let string_compare = Pervasives.compare;;
 
 (**{6 Integer arithmetic }*)

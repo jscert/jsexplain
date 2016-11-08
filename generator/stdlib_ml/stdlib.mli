@@ -98,6 +98,10 @@ val (:=) : 'a ref -> 'a -> unit
 val (!) : 'a ref -> 'a
 *)
 
+
+
+(* *************************************** *)
+
 (**{5 Pervasives-incompatible Definitions }
 
 Functions in this section either deviate from the OCaml Pervasives type
@@ -141,7 +145,9 @@ val int_ge : int -> int -> bool
 val int_compare : int -> int -> int
 val bool_eq : bool -> bool -> bool
 val nat_eq : int -> int -> bool
+
 val string_eq : string -> string -> bool
+val string_lt : string -> string -> bool
 val string_compare : string -> string -> int
 
 (**{6 Integer arithmetic }*)
