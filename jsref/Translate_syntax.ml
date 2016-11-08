@@ -370,6 +370,7 @@ let parse (p : ?force_strict:bool -> string -> Parser_syntax.exp) strictness s =
 
 let parse_js_syntax strictness str =
   try Some (parse Parser_main.exp_from_string strictness str)
-  with _ -> (prerr_endline ("Parser failure on input \"" ^ str ^ "\""); None)
+  with
+  | Parser.ParserFailure _ -> (prerr_endline ("Parser failure on input \"" ^ str ^ "\""); None)
 
 let parse_js_syntax_from_file = parse (Parser_main.exp_from_file ~init:false)
