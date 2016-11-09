@@ -4,7 +4,7 @@ make init
 make
 #+END_SRC
 
-To test:
+To test jsjsref:
 #+BEGIN_SRC shell
 make test_init
 make test

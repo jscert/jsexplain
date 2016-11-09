@@ -22,7 +22,7 @@ mljsref: generator # (requires the ppx)
 
 # Test Stages
 test_init:
-	git submodule update --init test/test262
+	git submodule update --init test/data/test262
 	npm install
 
 test: jsjsref
