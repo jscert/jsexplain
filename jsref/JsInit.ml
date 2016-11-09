@@ -414,7 +414,7 @@ let object_create_function_object =
 
 let object_define_prop_function_object =
   object_create_prealloc_call Coq_prealloc_object_define_prop (Coq_value_prim
-    (Coq_prim_number 2.0))
+    (Coq_prim_number 3.0))
     Heap.empty
 
 (** val object_define_props_function_object : coq_object **)
