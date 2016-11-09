@@ -9,3 +9,11 @@ To test jsjsref:
 make test_init
 make test
 #+END_SRC
+
+~make test~ tests jsjsref only at present.
+
+Latest version of jsjsref & debugger is automatically published at:
+https://jscert.github.io/jsexplain/branch/master/driver.html
+
+mljsref results are tested online and results published to:
+https://psvg.doc.ic.ac.uk/ci/jscert-testing/
