@@ -1191,14 +1191,18 @@ and js_of_expression ctx dest e =
     (* ppf_while (js_of_expression cd) (js_of_expression body) *)
   | Texp_for        (id, _, st, ed, fl, body) -> out_of_scope loc "for"
     (* ppf_for (ppf_ident id) (js_of_expression st) (js_of_expression ed) fl (js_of_expression body) *)
-  | Texp_record     (llde,None)          -> 
-      let sexp = ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, inline_of_wrap exp)) llde) in
+  | Texp_record     {fields=llde; extended_expression=None} ->
+      let sexp = ppf_record (Array.to_list (Array.map (fun (lbl, Overridden (_, exp)) -> (lbl.lbl_name, inline_of_wrap
+      exp)) llde)) in
       apply_dest' ctx dest sexp
-  | Texp_record  ([(_,lbl, exp)], Some einit) -> (* record_with(einit, lbl, exp) *)
+  | Texp_record  {fields=af; extended_expression=Some einit} -> (* record_with(einit, lbl, exp) *)
+      let over = Array.fold_right (fun (lbl, def) accu -> match def with Overridden (_, exp) -> (lbl, exp) :: accu | _ ->
+        accu) af [] in
+      if List.length over > 1 then out_of_scope loc "record with multiple fields overridden" else
+      let (lbl, exp) = List.hd over in
       let sexp = ppf_record_with (inline_of_wrap einit) (lbl.lbl_name) (inline_of_wrap exp) in
       apply_dest' ctx dest sexp
 
-  | Texp_record (_,Some e0)  -> out_of_scope loc "record with multiple fields assigned"
   | Texp_field      (exp, _, lbl)     ->
       let sexp = ppf_field_access (inline_of_wrap exp) lbl.lbl_name in
       apply_dest' ctx dest sexp

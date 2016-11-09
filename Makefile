@@ -2,7 +2,7 @@ all: generator mljsref jsjsref
 
 # Init stages
 init:
-	opam switch 4.03.0
+	opam switch 4.04.0
 	eval `opam config env`
 	opam pin -yn add jsjsref .
 	opam pin -yn add JS_Parser "https://github.com/resource-reasoning/JS_Parser.git#v0.1.0"
