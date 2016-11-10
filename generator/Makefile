@@ -30,5 +30,5 @@ clean:
 
 .PHONY: default all byte native stdlib debug clean
 
-# Force rebuilds of OCaml targets via ocamlbuild, the FORCE file must not exist.
-FORCE:
+FORCE: # Force rebuilds of OCaml targets via ocamlbuild, the FORCE file must not exist.
+.NOTPARALLEL: # Only one ocamlbuild can be run at a time
