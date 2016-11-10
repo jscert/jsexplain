@@ -64,6 +64,7 @@ ASSEMBLY_JS_FILES := \
 	Debug.js \
 	JsInterpreterMonads.unlog.js \
 	JsInterpreter.log.js \
+	JsInterpreterUtils.unlog.js
 
 ASSEMBLY_JS := \
 	$(ASSEMBLY_JS_FILES) \

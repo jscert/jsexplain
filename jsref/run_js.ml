@@ -1,3 +1,5 @@
+open JsInterpreterUtils
+
 exception AbnormalPreludeTermination of JsInterpreterMonads.result
 
 let file = ref ""
@@ -63,21 +65,6 @@ let arguments () =
     ]
     (fun s -> Format.eprintf "WARNING: Ignored argument %s.@." s)
     usage_msg
-
-let get_value_ref state r =
-    match JsInterpreter.ref_get_value
-        state (JsCommon.execution_ctx_initial false)
-        (JsSyntax.Coq_resvalue_ref r) with
-    | JsInterpreterMonads.Coq_result_some (JsSyntax.Coq_specret_val (_, v)) ->
-       Some v
-    | _ -> None
-
-let get_global_value state name =
-    let r =
-      JsCommon.ref_create_env_loc
-        JsSyntax.env_loc_global_env_record
-        name true in
-    get_value_ref state r
 
 let pr_test state =
   if not !noParasite then
@@ -150,10 +137,8 @@ let handle_result result =
                         print_endline ("Fetching the `__$ERROR__' field of this returned object resulted to:\t" ^ Prheap.prvalue v')
                       | None ->
                         print_endline "No `__$ERROR__' field has been defined in this returned object.")
-                         | JsSyntax.Coq_resvalue_ref _ ->
-                           print_endline "With a reference."
-                         | JsSyntax.Coq_resvalue_empty ->
-                           print_endline "No result with this throw.") ;
+                  | JsSyntax.Coq_resvalue_ref _ -> print_endline "With a reference."
+                  | JsSyntax.Coq_resvalue_empty -> print_endline "No result with this throw.") ;
               pr_test state ; exit_if_test ()
           end
         | JsSyntax.Coq_out_div ->

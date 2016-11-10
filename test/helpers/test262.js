@@ -10,7 +10,7 @@
 //
 // Arguments to testConstructorFunction:
 // - source: The raw test source code
-// - negativity: The @negative test header content
+// - negative: The @negative test header content
 // -
 
 var fs = require('mz/fs');
@@ -31,7 +31,8 @@ function testNegativity(str) {
 }
 
 setImmediate(() => {
-  var test262path = fs.readlinkSync(__dirname + '/../data/test262/test/suite');
+  var testDataDir = __dirname + '/../data';
+  var test262path = fs.readlinkSync(testDataDir + '/test262/test/suite');
   var tests = [];
 
   walk(test262path)
@@ -44,6 +45,7 @@ setImmediate(() => {
         describe(item, function() {
           // Preseed test arguments with safe defaults
           var args = {
+            path: "not initialised",
             source: "if // invalid syntax",
             negative: false
           };
@@ -55,6 +57,7 @@ setImmediate(() => {
           before(function(doneFile) {
             fs.readFile(item).then(
               data => {
+                args.path = item;
                 args.source = data.toString();
                 args.negative = testNegativity(args.source);
               }

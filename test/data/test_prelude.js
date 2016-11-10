@@ -3,7 +3,7 @@
 // initially, trying to access it will result in an exception.
 function $ERROR (str) {
     try {
-        __$ERROR__ = __$ERROR__ + " | " + str
+        __$ERROR__ = __$ERROR__ + "\n" + str
     }
     catch(ex) {
         __$ERROR__ = str
@@ -40,3 +40,5 @@ function fnExists(/*arguments*/) {
 // This could be used to print ...
 function $PRINT(s){ }
 
+var NotEarlyError = new Error();
+NotEarlyError.name = "NotEarlyError";
