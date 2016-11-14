@@ -1,7 +1,7 @@
 var Debug = {
-  not_yet_implemented_because : function() {},
-  impossible_because : function() {},
-  impossible_with_heap_because : function() {},
+  not_yet_implemented_because : function(_, s) { throw new Error("not_yet_implemented_because: "+s) },
+  impossible_because : function(_, s) { throw new Error("impossible_because: "+s) },
+  impossible_with_heap_because : function(_, s) { throw new Error("impossible_with_heap_because: "+s) },
   ref_get_value : function() {},
   ref_get_value_2 : function() {},
   run_object_method : function() {},
