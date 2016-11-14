@@ -30,10 +30,8 @@ function testNegativity(str) {
   return result;
 }
 
-before(function(done) {
-  this.timeout(0); // Otherwise it fails on slow filesystems
-
-  var test262path = fs.readlinkSync(__dirname + '/../data/test262');
+setImmediate(() => {
+  var test262path = fs.readlinkSync(__dirname + '/../data/test262/test/suite');
   var tests = [];
 
   walk(test262path)
@@ -70,7 +68,7 @@ before(function(done) {
       });
     });
 
-    done();
+    run();
   });
 });
 
