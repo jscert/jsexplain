@@ -2,10 +2,6 @@ language: node_js
 sudo: required
 dist: trusty
 
-# a reasonably recent node is required to run tests, it depends on
-node_js:
-  - "4"
-
 env:
   global:
     - OCAML_VERSION=4.03
@@ -15,10 +11,14 @@ env:
 matrix:
   include:
     - os: linux
-      env: TESTJSJSREF=true
-    - os: linux
+      node_js: "4"
       env: DEPLOY=true
     - os: osx
+      node_js: "4"
+  allow_failures:
+    - os: linux
+      node_js: "4"
+      env: TESTJSJSREF=true
 
 
 install:
