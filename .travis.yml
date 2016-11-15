@@ -1,5 +1,25 @@
-language: c
+language: node_js
 sudo: required
+dist: trusty
+
+# a reasonably recent node is required to run tests, it depends on
+node_js:
+  - "4"
+
+env:
+  global:
+    - OCAML_VERSION=4.03
+    - OPAMYES=true
+    - UBUNTU_TRUSTY=1
+
+matrix:
+  include:
+    - os: linux
+      env: TESTJSJSREF=true
+    - os: linux
+      env: DEPLOY=true
+    - os: osx
+
 
 install:
   - wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-ocaml.sh
@@ -11,19 +31,6 @@ install:
 script:
   - make
   - if [[ -v TESTJSJSREF ]]; then make test; fi
-
-env:
-  global:
-    - OCAML_VERSION=4.03
-    - OPAMYES=true
-
-matrix:
-  include:
-    - os: linux
-      env: TESTJSJSREF=true
-    - os: linux
-      env: DEPLOY=true
-    - os: osx
 
 deploy:
   skip_cleanup: true
