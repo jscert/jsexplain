@@ -5,25 +5,31 @@ install:
   - wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-ocaml.sh
   - bash -ex .travis-ocaml.sh
   - make init
+  - if [[ -v TESTJSJSREF ]]; make test_init; fi
   - eval `opam config env`
 
 script:
   - make
+  - if [[ -v TESTJSJSREF ]]; make test; fi
 
 env:
   global:
     - OCAML_VERSION=4.03
     - OPAMYES=true
 
-os:
-  - linux
-  - osx
+matrix:
+  include:
+    - os: linux
+      env: TESTJSJSREF=true
+    - os: linux
+      env: DEPLOY=true
+    - os: osx
 
 deploy:
   skip_cleanup: true
   provider: script
   script: make publish-github
   on:
-    condition: $TRAVIS_OS_NAME = linux
+    condition: $DEPLOY = true
     all_branches: true
 
