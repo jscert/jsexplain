@@ -5,12 +5,12 @@ install:
   - wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-ocaml.sh
   - bash -ex .travis-ocaml.sh
   - make init
-  - if [[ -v TESTJSJSREF ]]; make test_init; fi
+  - if [[ -v TESTJSJSREF ]]; then make test_init; fi
   - eval `opam config env`
 
 script:
   - make
-  - if [[ -v TESTJSJSREF ]]; make test; fi
+  - if [[ -v TESTJSJSREF ]]; then make test; fi
 
 env:
   global:
