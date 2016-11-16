@@ -1,10 +1,13 @@
 To install:
 #+BEGIN_SRC shell
 make init
+eval `opam config env`
 make
 #+END_SRC
 
-To test jsjsref:
+You can run the tool locally by opening the ~driver.html~ page.
+
+To test jsjsref using test262:
 #+BEGIN_SRC shell
 make test_init
 make test
