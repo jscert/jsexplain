@@ -86,6 +86,7 @@ let int_of_prealloc p =
   | Coq_prealloc_error_proto_to_string -> 67
   | Coq_prealloc_throw_type_error -> 68
   | Coq_prealloc_json -> 69
+  | Coq_prealloc_proxy -> 70
   | Coq_prealloc_mathop o -> 100 + int_of_mathop o
   | Coq_prealloc_native_error e -> 200 + int_of_native_error e
   | Coq_prealloc_native_error_proto e -> 300 + int_of_native_error e
@@ -110,20 +111,38 @@ let object_loc_cmp l1 l2 =
     value -> class_name -> bool -> object_properties_type -> coq_object **)
 
 let object_create vproto sclass bextens p =
-  { object_proto_ = vproto; object_class_ = sclass; object_extensible_ =
-    bextens; object_prim_value_ = None; object_properties_ = p; object_get_ =
-    Coq_builtin_get_default; object_get_own_prop_ =
-    Coq_builtin_get_own_prop_default; object_get_prop_ =
-    Coq_builtin_get_prop_default; object_put_ = Coq_builtin_put_default;
-    object_can_put_ = Coq_builtin_can_put_default; object_has_prop_ =
-    Coq_builtin_has_prop_default; object_delete_ =
-    Coq_builtin_delete_default; object_default_value_ =
-    Coq_builtin_default_value_default; object_define_own_prop_ =
-    Coq_builtin_define_own_prop_default; object_construct_ = None;
-    object_call_ = None; object_has_instance_ = None; object_scope_ = None;
-    object_formal_parameters_ = None; object_code_ = None;
-    object_target_function_ = None; object_bound_this_ = None;
-    object_bound_args_ = None; object_parameter_map_ = None }
+  { object_proto_ = vproto;
+    object_class_ = sclass;
+    object_extensible_ = bextens;
+    object_prim_value_ = None;
+    object_properties_ = p;
+    object_get_prototype_of_ = Coq_builtin_get_prototype_of_default;
+    object_set_prototype_of_ = Coq_builtin_set_prototype_of_default;
+    object_is_extensible_ = Coq_builtin_is_extensible_default;
+    object_prevent_extensions_ = Coq_builtin_prevent_extensions_default;
+    object_get_ = Coq_builtin_get_default;
+    object_get_own_prop_ = Coq_builtin_get_own_prop_default;
+    object_get_prop_ = Coq_builtin_get_prop_default;
+    object_put_ = Coq_builtin_put_default;
+    object_can_put_ = Coq_builtin_can_put_default;
+    object_has_prop_ = Coq_builtin_has_prop_default;
+    object_delete_ = Coq_builtin_delete_default;
+    object_default_value_ = Coq_builtin_default_value_default;
+    object_define_own_prop_ = Coq_builtin_define_own_prop_default;
+    object_own_property_keys_ = Coq_builtin_own_property_keys_default;
+    object_construct_ = None;
+    object_call_ = None;
+    object_has_instance_ = None;
+    object_scope_ = None;
+    object_formal_parameters_ = None;
+    object_code_ = None;
+    object_target_function_ = None;
+    object_bound_this_ = None;
+    object_bound_args_ = None;
+    object_parameter_map_ = None;
+    object_revocable_proxy_ = None;
+    object_proxy_target_ = None;
+    object_proxy_handler_ = None }
 
 (** val object_set_proto : coq_object -> value -> coq_object **)
 

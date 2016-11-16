@@ -148,6 +148,7 @@ type native_error =
 | Coq_native_error_type
 | Coq_native_error_uri
 
+(** Intrinsic Objects *)
 type prealloc =
 | Coq_prealloc_global
 | Coq_prealloc_global_eval
@@ -174,7 +175,7 @@ type prealloc =
 | Coq_prealloc_object_is_extensible
 | Coq_prealloc_object_keys
 | Coq_prealloc_object_keys_call
-| Coq_prealloc_object_proto
+| Coq_prealloc_object_proto                                   (** ObjectPrototype *)
 | Coq_prealloc_object_proto_to_string
 | Coq_prealloc_object_proto_value_of
 | Coq_prealloc_object_proto_has_own_prop
@@ -218,19 +219,26 @@ type prealloc =
 | Coq_prealloc_error_proto_to_string
 | Coq_prealloc_throw_type_error
 | Coq_prealloc_json
+| Coq_prealloc_proxy                                          (** Proxy *)
 | Coq_prealloc_mathop of mathop [@f mathop]
 | Coq_prealloc_native_error of native_error [@f error]
 | Coq_prealloc_native_error_proto of native_error [@f error]
 
+
+
+
+(** Identities of implementations for Object Internal Methods *)
 type call =
 | Coq_call_default
 | Coq_call_after_bind
 | Coq_call_prealloc of prealloc [@f prealloc]
+| Coq_call_proxy
 
 type construct =
 | Coq_construct_default
 | Coq_construct_after_bind
 | Coq_construct_prealloc of prealloc [@f prealloc]
+| Coq_construct_proxy
 
 type builtin_has_instance =
 | Coq_builtin_has_instance_function
@@ -240,28 +248,36 @@ type builtin_get =
 | Coq_builtin_get_default
 | Coq_builtin_get_function
 | Coq_builtin_get_args_obj
+| Coq_builtin_get_proxy
 
 type builtin_get_own_prop =
 | Coq_builtin_get_own_prop_default
 | Coq_builtin_get_own_prop_args_obj
 | Coq_builtin_get_own_prop_string
+| Coq_builtin_get_own_prop_proxy
 
+(* FIXME: REMOVED IN ES7 *)
 type builtin_get_prop =
 | Coq_builtin_get_prop_default
 
+(* FIXME: RENAMED TO SET IN ES7 *)
 type builtin_put =
 | Coq_builtin_put_default
 
+(* FIXME: REMOVED IN ES7 *)
 type builtin_can_put =
 | Coq_builtin_can_put_default
 
 type builtin_has_prop =
 | Coq_builtin_has_prop_default
+| Coq_builtin_has_prop_proxy
 
 type builtin_delete =
 | Coq_builtin_delete_default
 | Coq_builtin_delete_args_obj
+| Coq_builtin_delete_proxy
 
+(* FIXME: REMOVED IN ES7 *)
 type builtin_default_value =
 | Coq_builtin_default_value_default
 
@@ -269,6 +285,35 @@ type builtin_define_own_prop =
 | Coq_builtin_define_own_prop_default
 | Coq_builtin_define_own_prop_array
 | Coq_builtin_define_own_prop_args_obj
+| Coq_builtin_define_own_prop_proxy
+
+type builtin_get_prototype_of =
+| Coq_builtin_get_prototype_of_default
+| Coq_builtin_get_prototype_of_proxy
+
+type builtin_set_prototype_of =
+| Coq_builtin_set_prototype_of_default
+| Coq_builtin_set_prototype_of_proxy
+
+type builtin_is_extensible =
+| Coq_builtin_is_extensible_default
+| Coq_builtin_is_extensible_proxy
+
+type builtin_prevent_extensions =
+| Coq_builtin_prevent_extensions_default
+| Coq_builtin_prevent_extensions_proxy
+
+type builtin_set =
+| Coq_builtin_set_default
+| Coq_builtin_set_proxy
+
+type builtin_own_property_keys =
+| Coq_builtin_own_property_keys_default
+| Coq_builtin_own_property_keys_proxy
+
+
+
+
 
 type object_loc =
 | Coq_object_loc_normal of int [@f address]
@@ -442,19 +487,29 @@ type class_name = string
 
 type object_properties_type = (prop_name, attributes) Heap.heap
 
-type coq_object = { object_proto_ : value; object_class_ : class_name;
+
+(** Object type definition
+    es-id: sec-object-type *)
+(* FIXME: ES7 defines internal slots as being able to take the undefined value *)
+type coq_object = { object_proto_ : value;
+                    object_class_ : class_name;
                     object_extensible_ : bool;
                     object_prim_value_ : value option;
                     object_properties_ : object_properties_type;
-                    object_get_ : builtin_get;
+                    object_get_prototype_of_ : builtin_get_prototype_of;
+                    object_set_prototype_of_ : builtin_set_prototype_of;
+                    object_is_extensible_ : builtin_is_extensible;
+                    object_prevent_extensions_ : builtin_prevent_extensions;
                     object_get_own_prop_ : builtin_get_own_prop;
+                    object_has_prop_ : builtin_has_prop;
+                    object_get_ : builtin_get;
                     object_get_prop_ : builtin_get_prop;
                     object_put_ : builtin_put;
                     object_can_put_ : builtin_can_put;
-                    object_has_prop_ : builtin_has_prop;
                     object_delete_ : builtin_delete;
                     object_default_value_ : builtin_default_value;
                     object_define_own_prop_ : builtin_define_own_prop;
+                    object_own_property_keys_ : builtin_own_property_keys;
                     object_construct_ : construct option;
                     object_call_ : call option;
                     object_has_instance_ : builtin_has_instance option;
@@ -464,11 +519,15 @@ type coq_object = { object_proto_ : value; object_class_ : class_name;
                     object_target_function_ : object_loc option;
                     object_bound_this_ : value option;
                     object_bound_args_ : value list option;
-                    object_parameter_map_ : object_loc option }
+                    object_parameter_map_ : object_loc option;
+                    object_revocable_proxy_ : value option;
+                    object_proxy_target_ : value option;
+                    object_proxy_handler_ : value option }
 
 (** val object_proto_ : coq_object -> value **)
 
 let object_proto_ x = x.object_proto_
+let object_prototype_ x = x.object_proto_
 
 (** val object_class_ : coq_object -> class_name **)
 
@@ -485,6 +544,11 @@ let object_prim_value_ x = x.object_prim_value_
 (** val object_properties_ : coq_object -> object_properties_type **)
 
 let object_properties_ x = x.object_properties_
+
+let object_get_prototype_of_ x = x.object_get_prototype_of_
+let object_set_prototype_of_ x = x.object_set_prototype_of_
+let object_is_extensible_ x = x.object_is_extensible_
+let object_prevent_extensions_ x = x.object_prevent_extensions_
 
 (** val object_get_ : coq_object -> builtin_get **)
 

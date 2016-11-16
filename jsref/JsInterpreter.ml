@@ -240,13 +240,19 @@ let run_object_method proj s l =
      LibOption.map proj opt
 *)
 
+(** val run_object_heap_set :
+    (coq_object -> a' -> coq_object) -> state -> object_loc -> a' -> state option **)
+(** Updates an object's internal field with the given update function [prj].
+    (Update functions are defined in JsSyntaxAux) *)
+
+let run_object_set_internal prj s l v =
+  LibOption.map (fun o -> object_write s l (prj o v)) (object_binds_option s l)
 
 (** val run_object_heap_set_extensible :
     bool -> state -> object_loc -> state option **)
 
 let run_object_heap_set_extensible b s l =
-  LibOption.map (fun o -> object_write s l (object_set_extensible o b))
-    (object_binds_option s l)
+  run_object_set_internal object_set_extensible s l b
 
 (* DEBUG
    let run_object_heap_set_extensible b s l =
@@ -263,12 +269,14 @@ let run_object_heap_set_extensible b s l =
 
 let rec object_has_prop s c l x =
   let%some b = (run_object_method object_has_prop_ s l) in
-  match b with Coq_builtin_has_prop_default ->
+  match b with
+  | Coq_builtin_has_prop_default ->
     let%run (s1, d) = (run_object_get_prop s c l x) in
     res_ter s1
       (res_val (Coq_value_prim (Coq_prim_bool
                                   (not
                                      (full_descriptor_compare d Coq_full_descriptor_undef)))))
+  | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
 (** val build_error : state -> value -> value -> result **)
 
@@ -338,13 +346,14 @@ and object_get_builtin s c b vthis l x =
   match b with
   | Coq_builtin_get_default -> def s l
   | Coq_builtin_get_function -> function0 s
-  | Coq_builtin_get_args_obj ->
+  | Coq_builtin_get_args_obj -> (
     let%some lmapo = (run_object_method object_parameter_map_ s l) in
     let%some lmap = (lmapo) in
     let%run (s0, d) = (run_object_get_own_prop s c lmap x) in
     match d with
     | Coq_full_descriptor_undef -> function0 s0
-    | Coq_full_descriptor_some a -> run_object_get s0 c lmap x
+    | Coq_full_descriptor_some a -> run_object_get s0 c lmap x)
+  | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
 (** val run_object_get :
     state -> execution_ctx -> object_loc -> prop_name -> result **)
@@ -726,6 +735,7 @@ and object_define_own_prop s c l x desc throwcont =
             let%void s2 = (object_put s1 c lmap x v throwcont) in follow0 s2
           | None -> follow0 s1
     else reject s1 throwcont
+  | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
 (** val run_to_descriptor :
     state -> execution_ctx -> value -> descriptor specres **)
@@ -894,21 +904,20 @@ and object_delete s c l x str =
       match b with
       | Coq_builtin_delete_default -> object_delete_default s c l x str
       | Coq_builtin_delete_args_obj ->
-        let%some mo = (run_object_method object_parameter_map_ s l) in
-            let%some m = (mo) in
-                let%run (s1, d) = (run_object_get_own_prop s c m x) in
-                    let%bool (s2, b0) = (object_delete_default s1 c l x str) in
-                        if b0
-                        then (match d with
-                            | Coq_full_descriptor_undef ->
-                              res_ter s2
-                                (res_val (Coq_value_prim (Coq_prim_bool b0)))
-                            | Coq_full_descriptor_some a ->
-                              let%bool 
-                                (s3, b_2) = (object_delete s2 c m x false) in
-                                   res_ter s3
-                                     (res_val (Coq_value_prim (Coq_prim_bool b0))))
-                        else res_ter s2 (res_val (Coq_value_prim (Coq_prim_bool b0)))
+        begin
+          let%some mo = (run_object_method object_parameter_map_ s l) in
+          let%some m = (mo) in
+          let%run (s1, d) = (run_object_get_own_prop s c m x) in
+          let%bool (s2, b0) = (object_delete_default s1 c l x str) in
+          if b0 then (match d with
+            | Coq_full_descriptor_undef ->
+              res_ter s2 (res_val (Coq_value_prim (Coq_prim_bool b0)))
+            | Coq_full_descriptor_some a ->
+              let%bool (s3, b_2) = (object_delete s2 c m x false) in
+              res_ter s3 (res_val (Coq_value_prim (Coq_prim_bool b0))))
+          else res_ter s2 (res_val (Coq_value_prim (Coq_prim_bool b0)))
+        end
+      | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
 (** val env_record_delete_binding :
     state -> execution_ctx -> env_loc -> prop_name -> result **)
@@ -1657,6 +1666,7 @@ and run_construct s c co l args =
       | None -> run_error s c Coq_native_error_type
     end
   | Coq_construct_prealloc b -> run_construct_prealloc s c b args
+  | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
 (** val run_call_default :
     state -> execution_ctx -> object_loc -> result **)
@@ -2136,75 +2146,57 @@ and entering_func_code s c lf vthis args =
 
 and run_object_get_own_prop s c l x =
   let%some b = (run_object_method object_get_own_prop_ s l) in
-      let  def = (fun s_2 ->
-          let%some p = (run_object_method object_properties_ s_2 l) in
-              res_spec s_2
-                (ifx_some_or_default
-                   (convert_option_attributes
-                      (HeapStr.read_option p x))
-                   Coq_full_descriptor_undef (fun x -> x))) in
-          match b with
-          | Coq_builtin_get_own_prop_default -> def s
-          | Coq_builtin_get_own_prop_args_obj ->
-            let%run (s1, d) = (def s) in begin
-                match d with
-                | Coq_full_descriptor_undef ->
-                  res_spec s1 Coq_full_descriptor_undef
-                | Coq_full_descriptor_some a ->
-                  let%some 
-                    lmapo = (run_object_method object_parameter_map_ s1 l) in
-                       let%some lmap = (lmapo) in
-                           let%run 
-                             (s2, d0) = (run_object_get_own_prop s1 c lmap x) in
-                                let  follow = (fun s_2 a0 ->
-                                    res_spec s_2 (Coq_full_descriptor_some a0)) in
-                                    match d0 with
-                                    | Coq_full_descriptor_undef -> follow s2 a
-                                    | Coq_full_descriptor_some amap ->
-                                      let%value 
-                                        (s3, v) = (run_object_get s2 c lmap x) in
-                                           match a with
-                                           | Coq_attributes_data_of ad ->
-                                             follow s3 (Coq_attributes_data_of
-                                                          (attributes_data_with_value ad v))
-                                           | Coq_attributes_accessor_of aa ->
-                                             (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                                               s3
-                                               ("[run_object_get_own_prop]:  received an accessor property descriptor in a point where the specification suppose it never happens.")
-            end
-          | Coq_builtin_get_own_prop_string ->
-            let%run (s0, d) = (def s) in
-                match d with
-                | Coq_full_descriptor_undef ->
-                  let%run
-                    
-                    (s1, k) = (to_int32 s0 c (Coq_value_prim (Coq_prim_string x))) in
-                       let%string
-                         
-                         (s2, s3) = (to_string s1 c (Coq_value_prim
-                                            (Coq_prim_number (JsNumber.absolute k)))) in
-                            if not (string_eq x s3)
-                            then res_spec s2 Coq_full_descriptor_undef
-                            else let%string (s4, str) = (run_object_prim_value s2 l) in
-                                let%run
-                                   (s5, k0) = (to_int32 s4 c (Coq_value_prim
-                                                    (Coq_prim_string x))) in
-                                      let  len = (number_of_int (strlength str)) in
-                                          if le_int_decidable len k0
-                                          then res_spec s5 Coq_full_descriptor_undef
-                                          else let resultStr =
-                                                 string_sub str (int_of_number k0) 1
-                                                 (* TODO: check k0 is not negative *)
-                                            in
-                                            let a = { attributes_data_value =
-                                                        (Coq_value_prim (Coq_prim_string
-                                                                           resultStr)); attributes_data_writable =
-                                                                                          false; attributes_data_enumerable = true;
-                                                      attributes_data_configurable = false }
-                                            in
-                                            res_spec s5 (Coq_full_descriptor_some
-                                                           (Coq_attributes_data_of a))
-                | Coq_full_descriptor_some a -> res_spec s0 d
+  let def = (fun s_2 ->
+    let%some p = (run_object_method object_properties_ s_2 l) in
+    res_spec s_2 (ifx_some_or_default (convert_option_attributes (HeapStr.read_option p x))
+      Coq_full_descriptor_undef (fun x -> x))
+  ) in
+  match b with
+  | Coq_builtin_get_own_prop_default -> def s
+  | Coq_builtin_get_own_prop_args_obj ->
+    let%run (s1, d) = (def s) in
+    begin
+      match d with
+      | Coq_full_descriptor_undef -> res_spec s1 Coq_full_descriptor_undef
+      | Coq_full_descriptor_some a ->
+        let%some lmapo = (run_object_method object_parameter_map_ s1 l) in
+        let%some lmap = (lmapo) in
+        let%run (s2, d0) = (run_object_get_own_prop s1 c lmap x) in
+        let follow = (fun s_2 a0 -> res_spec s_2 (Coq_full_descriptor_some a0)) in
+        match d0 with
+        | Coq_full_descriptor_undef -> follow s2 a
+        | Coq_full_descriptor_some amap ->
+          let%value (s3, v) = (run_object_get s2 c lmap x) in
+          match a with
+          | Coq_attributes_data_of ad ->
+            follow s3 (Coq_attributes_data_of (attributes_data_with_value ad v))
+          | Coq_attributes_accessor_of aa ->
+            (Debug.impossible_with_heap_because __LOC__ s3
+              "[run_object_get_own_prop]:  received an accessor property descriptor in a point where the specification suppose it never happens.";
+              Coq_result_impossible)
+    end
+  | Coq_builtin_get_own_prop_string ->
+    let%run (s0, d) = def s in
+    (match d with
+    | Coq_full_descriptor_undef ->
+      let%run (s1, k) = (to_int32 s0 c (Coq_value_prim (Coq_prim_string x))) in
+      let%string (s2, s3) = (to_string s1 c (Coq_value_prim (Coq_prim_number (JsNumber.absolute k)))) in
+      if not (string_eq x s3)
+      then res_spec s2 Coq_full_descriptor_undef
+      else
+        let%string (s4, str) = (run_object_prim_value s2 l) in
+        let%run (s5, k0) = (to_int32 s4 c (Coq_value_prim (Coq_prim_string x))) in
+        let len = (number_of_int (strlength str)) in
+        if le_int_decidable len k0
+        then res_spec s5 Coq_full_descriptor_undef
+        else
+          let resultStr = string_sub str (int_of_number k0) 1 (* TODO: check k0 is not negative *) in
+          let a = { attributes_data_value = (Coq_value_prim (Coq_prim_string resultStr));
+                    attributes_data_writable = false; attributes_data_enumerable = true;
+                    attributes_data_configurable = false } in
+          res_spec s5 (Coq_full_descriptor_some (Coq_attributes_data_of a))
+    | Coq_full_descriptor_some a -> res_spec s0 d)
+  | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
 (** val run_function_has_instance :
     state -> object_loc -> value -> result **)
@@ -4172,13 +4164,13 @@ and run_call s c l vthis args =
     let%some target = otrg in
     let arguments_ = (LibList.append boundArgs args) in run_call s c target boundThis arguments_
   | Coq_call_prealloc b -> run_call_prealloc s c b vthis args
+  | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
 (** val run_javascript_from_state : state -> prog -> result **)
 
 and run_javascript_from_state s p =
   let c = execution_ctx_initial (prog_intro_strictness p) in
-  let%void s_2 =
-    execution_ctx_binding_inst s c Coq_codetype_global None p [] in
+  let%void s_2 = execution_ctx_binding_inst s c Coq_codetype_global None p [] in
   run_prog s_2 c p
 
 (** val run_javascript_from_result : result -> prog -> result **)
