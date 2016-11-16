@@ -237,11 +237,11 @@ let descriptor_intro_empty =
     descriptor_configurable = None }
 
 type ref_kind =
-| Coq_ref_kind_null [@f]  (* Auto Generated Attributes *)
-| Coq_ref_kind_undef [@f]  (* Auto Generated Attributes *)
-| Coq_ref_kind_primitive_base [@f]  (* Auto Generated Attributes *)
-| Coq_ref_kind_object [@f]  (* Auto Generated Attributes *)
-| Coq_ref_kind_env_record [@f]  (* Auto Generated Attributes *)
+| Coq_ref_kind_null
+| Coq_ref_kind_undef
+| Coq_ref_kind_primitive_base
+| Coq_ref_kind_object
+| Coq_ref_kind_env_record
 
 (** val ref_kind_of : ref -> ref_kind **)
 
@@ -488,8 +488,8 @@ let prog_vardecl p =
   concat (LibList.map element_vardecl (prog_elements p))
 
 type preftype =
-| Coq_preftype_number [@f]  (* Auto Generated Attributes *)
-| Coq_preftype_string [@f]  (* Auto Generated Attributes *)
+| Coq_preftype_number
+| Coq_preftype_string
 
 (** val method_of_preftype : preftype -> string **)
 
@@ -588,7 +588,7 @@ let parse_pickable = (fun s strict ->
     (*Translate_syntax.parse_esprima strict s*)
     (* with
       (* | Translate_syntax.CoqSyntaxDoesNotSupport _ -> assert false (* Temporary *) *)
-      | Parser.ParserFailure _ [@f]  (* Auto Generated Attributes *)
+      | Parser.ParserFailure _
       | Parser.InvalidArgument ->
         prerr_string ("Warning:  Parser error on eval.  Input string:  \"" ^ str ^ "\"\n");
         None

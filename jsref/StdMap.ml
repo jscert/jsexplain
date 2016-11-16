@@ -2,7 +2,7 @@
 
 
 type ('a,'b) t =
-    Empty [@f]
+    Empty
   | Node of ('a,'b) t * 'a * 'b * ('a,'b) t * int [@f l, x, d, r, h]
 
 let height = function

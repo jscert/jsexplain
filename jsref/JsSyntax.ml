@@ -3,52 +3,52 @@ open Heap
 open Shared
 
 type unary_op =
-| Coq_unary_op_delete [@f]
-| Coq_unary_op_void [@f]
-| Coq_unary_op_typeof [@f]
-| Coq_unary_op_post_incr [@f]
-| Coq_unary_op_post_decr [@f]
-| Coq_unary_op_pre_incr [@f]
-| Coq_unary_op_pre_decr [@f]
-| Coq_unary_op_add [@f]
-| Coq_unary_op_neg [@f]
-| Coq_unary_op_bitwise_not [@f]
-| Coq_unary_op_not [@f]
+| Coq_unary_op_delete
+| Coq_unary_op_void
+| Coq_unary_op_typeof
+| Coq_unary_op_post_incr
+| Coq_unary_op_post_decr
+| Coq_unary_op_pre_incr
+| Coq_unary_op_pre_decr
+| Coq_unary_op_add
+| Coq_unary_op_neg
+| Coq_unary_op_bitwise_not
+| Coq_unary_op_not
 
 type binary_op =
-| Coq_binary_op_mult [@f]
-| Coq_binary_op_div [@f]
-| Coq_binary_op_mod [@f]
-| Coq_binary_op_add [@f]
-| Coq_binary_op_sub [@f]
-| Coq_binary_op_left_shift [@f]
-| Coq_binary_op_right_shift [@f]
-| Coq_binary_op_unsigned_right_shift [@f]
-| Coq_binary_op_lt [@f]
-| Coq_binary_op_gt [@f]
-| Coq_binary_op_le [@f]
-| Coq_binary_op_ge [@f]
-| Coq_binary_op_instanceof [@f]
-| Coq_binary_op_in [@f]
-| Coq_binary_op_equal [@f]
-| Coq_binary_op_disequal [@f]
-| Coq_binary_op_strict_equal [@f]
-| Coq_binary_op_strict_disequal [@f]
-| Coq_binary_op_bitwise_and [@f]
-| Coq_binary_op_bitwise_or [@f]
-| Coq_binary_op_bitwise_xor [@f]
-| Coq_binary_op_and [@f]
-| Coq_binary_op_or [@f]
-| Coq_binary_op_coma [@f]
+| Coq_binary_op_mult
+| Coq_binary_op_div
+| Coq_binary_op_mod
+| Coq_binary_op_add
+| Coq_binary_op_sub
+| Coq_binary_op_left_shift
+| Coq_binary_op_right_shift
+| Coq_binary_op_unsigned_right_shift
+| Coq_binary_op_lt
+| Coq_binary_op_gt
+| Coq_binary_op_le
+| Coq_binary_op_ge
+| Coq_binary_op_instanceof
+| Coq_binary_op_in
+| Coq_binary_op_equal
+| Coq_binary_op_disequal
+| Coq_binary_op_strict_equal
+| Coq_binary_op_strict_disequal
+| Coq_binary_op_bitwise_and
+| Coq_binary_op_bitwise_or
+| Coq_binary_op_bitwise_xor
+| Coq_binary_op_and
+| Coq_binary_op_or
+| Coq_binary_op_coma
 
 type literal =
-| Coq_literal_null [@f]
+| Coq_literal_null
 | Coq_literal_bool of bool [@f value]
 | Coq_literal_number of JsNumber.number [@f value]
 | Coq_literal_string of string [@f value]
 
 type label =
-| Coq_label_empty [@f]
+| Coq_label_empty
 | Coq_label_string of string [@f value]
 
 type label_set = label list
@@ -66,7 +66,7 @@ type propname =
 | Coq_propname_number of JsNumber.number [@f value]
 
 type expr =
-| Coq_expr_this [@f]
+| Coq_expr_this
 | Coq_expr_identifier of string [@f name]
 | Coq_expr_literal of literal [@f value]
 | Coq_expr_object of (propname * propbody) list [@f fields]
@@ -104,7 +104,7 @@ and stat =
 | Coq_stat_for_var of label_set * (string * expr option) list * expr option * expr option * stat [@f labels, init, cond, step, body]
 | Coq_stat_for_in of label_set * expr * expr * stat [@f labels, id, obj, body]
 | Coq_stat_for_in_var of label_set * string * expr option * expr * stat [@f labels, id, init, obj, body]
-| Coq_stat_debugger [@f]
+| Coq_stat_debugger
 | Coq_stat_switch of label_set * expr * switchbody [@f labels, arg, body]
 and switchbody =
 | Coq_switchbody_nodefault of switchclause list [@f clauses]
@@ -138,145 +138,145 @@ let funcdecl_parameters x = x.funcdecl_parameters
 let funcdecl_body x = x.funcdecl_body
 
 type mathop =
-| Coq_mathop_abs [@f]
+| Coq_mathop_abs
 
 type native_error =
-| Coq_native_error_eval [@f]
-| Coq_native_error_range [@f]
-| Coq_native_error_ref [@f]
-| Coq_native_error_syntax [@f]
-| Coq_native_error_type [@f]
-| Coq_native_error_uri [@f]
+| Coq_native_error_eval
+| Coq_native_error_range
+| Coq_native_error_ref
+| Coq_native_error_syntax
+| Coq_native_error_type
+| Coq_native_error_uri
 
 type prealloc =
-| Coq_prealloc_global [@f]
-| Coq_prealloc_global_eval [@f]
-| Coq_prealloc_global_parse_int [@f]
-| Coq_prealloc_global_parse_float [@f]
-| Coq_prealloc_global_is_finite [@f]
-| Coq_prealloc_global_is_nan [@f]
-| Coq_prealloc_global_decode_uri [@f]
-| Coq_prealloc_global_decode_uri_component [@f]
-| Coq_prealloc_global_encode_uri [@f]
-| Coq_prealloc_global_encode_uri_component [@f]
-| Coq_prealloc_object [@f]
-| Coq_prealloc_object_get_proto_of [@f]
-| Coq_prealloc_object_get_own_prop_descriptor [@f]
-| Coq_prealloc_object_get_own_prop_name [@f]
-| Coq_prealloc_object_create [@f]
-| Coq_prealloc_object_define_prop [@f]
-| Coq_prealloc_object_define_props [@f]
-| Coq_prealloc_object_seal [@f]
-| Coq_prealloc_object_freeze [@f]
-| Coq_prealloc_object_prevent_extensions [@f]
-| Coq_prealloc_object_is_sealed [@f]
-| Coq_prealloc_object_is_frozen [@f]
-| Coq_prealloc_object_is_extensible [@f]
-| Coq_prealloc_object_keys [@f]
-| Coq_prealloc_object_keys_call [@f]
-| Coq_prealloc_object_proto [@f]
-| Coq_prealloc_object_proto_to_string [@f]
-| Coq_prealloc_object_proto_value_of [@f]
-| Coq_prealloc_object_proto_has_own_prop [@f]
-| Coq_prealloc_object_proto_is_prototype_of [@f]
-| Coq_prealloc_object_proto_prop_is_enumerable [@f]
-| Coq_prealloc_function [@f]
-| Coq_prealloc_function_proto [@f]
-| Coq_prealloc_function_proto_to_string [@f]
-| Coq_prealloc_function_proto_apply [@f]
-| Coq_prealloc_function_proto_call [@f]
-| Coq_prealloc_function_proto_bind [@f]
-| Coq_prealloc_bool [@f]
-| Coq_prealloc_bool_proto [@f]
-| Coq_prealloc_bool_proto_to_string [@f]
-| Coq_prealloc_bool_proto_value_of [@f]
-| Coq_prealloc_number [@f]
-| Coq_prealloc_number_proto [@f]
-| Coq_prealloc_number_proto_to_string [@f]
-| Coq_prealloc_number_proto_value_of [@f]
-| Coq_prealloc_number_proto_to_fixed [@f]
-| Coq_prealloc_number_proto_to_exponential [@f]
-| Coq_prealloc_number_proto_to_precision [@f]
-| Coq_prealloc_array [@f]
-| Coq_prealloc_array_is_array [@f]
-| Coq_prealloc_array_proto [@f]
-| Coq_prealloc_array_proto_to_string [@f]
-| Coq_prealloc_array_proto_join [@f]
-| Coq_prealloc_array_proto_pop [@f]
-| Coq_prealloc_array_proto_push [@f]
-| Coq_prealloc_string [@f]
-| Coq_prealloc_string_proto [@f]
-| Coq_prealloc_string_proto_to_string [@f]
-| Coq_prealloc_string_proto_value_of [@f]
-| Coq_prealloc_string_proto_char_at [@f]
-| Coq_prealloc_string_proto_char_code_at [@f]
-| Coq_prealloc_math [@f]
-| Coq_prealloc_date [@f]
-| Coq_prealloc_regexp [@f]
-| Coq_prealloc_error [@f]
-| Coq_prealloc_error_proto [@f]
-| Coq_prealloc_error_proto_to_string [@f]
-| Coq_prealloc_throw_type_error [@f]
-| Coq_prealloc_json [@f]
+| Coq_prealloc_global
+| Coq_prealloc_global_eval
+| Coq_prealloc_global_parse_int
+| Coq_prealloc_global_parse_float
+| Coq_prealloc_global_is_finite
+| Coq_prealloc_global_is_nan
+| Coq_prealloc_global_decode_uri
+| Coq_prealloc_global_decode_uri_component
+| Coq_prealloc_global_encode_uri
+| Coq_prealloc_global_encode_uri_component
+| Coq_prealloc_object
+| Coq_prealloc_object_get_proto_of
+| Coq_prealloc_object_get_own_prop_descriptor
+| Coq_prealloc_object_get_own_prop_name
+| Coq_prealloc_object_create
+| Coq_prealloc_object_define_prop
+| Coq_prealloc_object_define_props
+| Coq_prealloc_object_seal
+| Coq_prealloc_object_freeze
+| Coq_prealloc_object_prevent_extensions
+| Coq_prealloc_object_is_sealed
+| Coq_prealloc_object_is_frozen
+| Coq_prealloc_object_is_extensible
+| Coq_prealloc_object_keys
+| Coq_prealloc_object_keys_call
+| Coq_prealloc_object_proto
+| Coq_prealloc_object_proto_to_string
+| Coq_prealloc_object_proto_value_of
+| Coq_prealloc_object_proto_has_own_prop
+| Coq_prealloc_object_proto_is_prototype_of
+| Coq_prealloc_object_proto_prop_is_enumerable
+| Coq_prealloc_function
+| Coq_prealloc_function_proto
+| Coq_prealloc_function_proto_to_string
+| Coq_prealloc_function_proto_apply
+| Coq_prealloc_function_proto_call
+| Coq_prealloc_function_proto_bind
+| Coq_prealloc_bool
+| Coq_prealloc_bool_proto
+| Coq_prealloc_bool_proto_to_string
+| Coq_prealloc_bool_proto_value_of
+| Coq_prealloc_number
+| Coq_prealloc_number_proto
+| Coq_prealloc_number_proto_to_string
+| Coq_prealloc_number_proto_value_of
+| Coq_prealloc_number_proto_to_fixed
+| Coq_prealloc_number_proto_to_exponential
+| Coq_prealloc_number_proto_to_precision
+| Coq_prealloc_array
+| Coq_prealloc_array_is_array
+| Coq_prealloc_array_proto
+| Coq_prealloc_array_proto_to_string
+| Coq_prealloc_array_proto_join
+| Coq_prealloc_array_proto_pop
+| Coq_prealloc_array_proto_push
+| Coq_prealloc_string
+| Coq_prealloc_string_proto
+| Coq_prealloc_string_proto_to_string
+| Coq_prealloc_string_proto_value_of
+| Coq_prealloc_string_proto_char_at
+| Coq_prealloc_string_proto_char_code_at
+| Coq_prealloc_math
+| Coq_prealloc_date
+| Coq_prealloc_regexp
+| Coq_prealloc_error
+| Coq_prealloc_error_proto
+| Coq_prealloc_error_proto_to_string
+| Coq_prealloc_throw_type_error
+| Coq_prealloc_json
 | Coq_prealloc_mathop of mathop [@f mathop]
 | Coq_prealloc_native_error of native_error [@f error]
 | Coq_prealloc_native_error_proto of native_error [@f error]
 
 type call =
-| Coq_call_default [@f]
-| Coq_call_after_bind [@f]
+| Coq_call_default
+| Coq_call_after_bind
 | Coq_call_prealloc of prealloc [@f prealloc]
 
 type construct =
-| Coq_construct_default [@f]
-| Coq_construct_after_bind [@f]
+| Coq_construct_default
+| Coq_construct_after_bind
 | Coq_construct_prealloc of prealloc [@f prealloc]
 
 type builtin_has_instance =
-| Coq_builtin_has_instance_function [@f]
-| Coq_builtin_has_instance_after_bind [@f]
+| Coq_builtin_has_instance_function
+| Coq_builtin_has_instance_after_bind
 
 type builtin_get =
-| Coq_builtin_get_default [@f]
-| Coq_builtin_get_function [@f]
-| Coq_builtin_get_args_obj [@f]
+| Coq_builtin_get_default
+| Coq_builtin_get_function
+| Coq_builtin_get_args_obj
 
 type builtin_get_own_prop =
-| Coq_builtin_get_own_prop_default [@f]
-| Coq_builtin_get_own_prop_args_obj [@f]
-| Coq_builtin_get_own_prop_string [@f]
+| Coq_builtin_get_own_prop_default
+| Coq_builtin_get_own_prop_args_obj
+| Coq_builtin_get_own_prop_string
 
 type builtin_get_prop =
-| Coq_builtin_get_prop_default [@f]
+| Coq_builtin_get_prop_default
 
 type builtin_put =
-| Coq_builtin_put_default [@f]
+| Coq_builtin_put_default
 
 type builtin_can_put =
-| Coq_builtin_can_put_default [@f]
+| Coq_builtin_can_put_default
 
 type builtin_has_prop =
-| Coq_builtin_has_prop_default [@f]
+| Coq_builtin_has_prop_default
 
 type builtin_delete =
-| Coq_builtin_delete_default [@f]
-| Coq_builtin_delete_args_obj [@f]
+| Coq_builtin_delete_default
+| Coq_builtin_delete_args_obj
 
 type builtin_default_value =
-| Coq_builtin_default_value_default [@f]
+| Coq_builtin_default_value_default
 
 type builtin_define_own_prop =
-| Coq_builtin_define_own_prop_default [@f]
-| Coq_builtin_define_own_prop_array [@f]
-| Coq_builtin_define_own_prop_args_obj [@f]
+| Coq_builtin_define_own_prop_default
+| Coq_builtin_define_own_prop_array
+| Coq_builtin_define_own_prop_args_obj
 
 type object_loc =
 | Coq_object_loc_normal of int [@f address]
 | Coq_object_loc_prealloc of prealloc [@f prealloc]
 
 type prim =
-| Coq_prim_undef [@f]
-| Coq_prim_null [@f]
+| Coq_prim_undef
+| Coq_prim_null
 | Coq_prim_bool of bool [@f value]
 | Coq_prim_number of JsNumber.number [@f value]
 | Coq_prim_string of string [@f value]
@@ -286,12 +286,12 @@ type value =
 | Coq_value_object of object_loc [@f value]
 
 type coq_type =
-| Coq_type_undef [@f]
-| Coq_type_null [@f]
-| Coq_type_bool [@f]
-| Coq_type_number [@f]
-| Coq_type_string [@f]
-| Coq_type_object [@f]
+| Coq_type_undef
+| Coq_type_null
+| Coq_type_bool
+| Coq_type_number
+| Coq_type_string
+| Coq_type_object
 
 type attributes_data = { attributes_data_value : value;
                          attributes_data_writable : bool;
@@ -371,14 +371,14 @@ let descriptor_enumerable x = x.descriptor_enumerable
 let descriptor_configurable x = x.descriptor_configurable
 
 type full_descriptor =
-| Coq_full_descriptor_undef [@f]
+| Coq_full_descriptor_undef
 | Coq_full_descriptor_some of attributes [@f value]
 
 type mutability =
-| Coq_mutability_uninitialized_immutable [@f]
-| Coq_mutability_immutable [@f]
-| Coq_mutability_nondeletable [@f]
-| Coq_mutability_deletable [@f]
+| Coq_mutability_uninitialized_immutable
+| Coq_mutability_immutable
+| Coq_mutability_nondeletable
+| Coq_mutability_deletable
 
 type decl_env_record = (string, mutability * value) Heap.heap
 
@@ -580,14 +580,14 @@ let state_object_heap x = x.state_object_heap
 let state_env_record_heap x = x.state_env_record_heap
 
 type restype =
-| Coq_restype_normal [@f]
-| Coq_restype_break [@f]
-| Coq_restype_continue [@f]
-| Coq_restype_return [@f]
-| Coq_restype_throw [@f]
+| Coq_restype_normal
+| Coq_restype_break
+| Coq_restype_continue
+| Coq_restype_return
+| Coq_restype_throw
 
 type resvalue =
-| Coq_resvalue_empty [@f]
+| Coq_resvalue_empty
 | Coq_resvalue_value of value [@f value]
 | Coq_resvalue_ref of ref [@f ref]
 
@@ -654,7 +654,7 @@ let res_throw v =
     Coq_label_empty }
 
 type out =
-| Coq_out_div [@f]
+| Coq_out_div
 | Coq_out_ter of state * res [@f state, res]
 
 (** val out_void : state -> out **)
@@ -667,9 +667,9 @@ type 't specret =
 | Coq_specret_out of out [@f out]
 
 type codetype =
-| Coq_codetype_func [@f]
-| Coq_codetype_global [@f]
-| Coq_codetype_eval [@f]
+| Coq_codetype_func
+| Coq_codetype_global
+| Coq_codetype_eval
 
 (*
 let thebound = 
