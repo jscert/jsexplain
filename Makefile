@@ -36,7 +36,7 @@ PUB_FILES=driver.html libraries jquery-ui-1.11.4.custom jquery_scroll \
 
 dist: jsjsref $(PUB_FILES)
 	mkdir -p $@
-	cp -rv --parents $(PUB_FILES) $@
+	rsync -Rrv $(PUB_FILES) $@
 
 publish: dist
 	# /./ syntax tells rsync where to start relative paths from
