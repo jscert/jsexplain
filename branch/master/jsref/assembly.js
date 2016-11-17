@@ -10,16 +10,6 @@
 //----------------------------------------------------------------------------
 // Js_of_ocaml bis Generator Requirements
 
-// Implementation for the OCaml syntax `{ einit with lbl = exp }`
-function record_with(einit, lbl, exp) {
-  var res = {};
-  for (var i in einit) {
-    res[i] = einit[i];
-  }
-  res[lbl] = exp;
-  return res;
-}
-
 // type option 'a = None | Some of 'a
 var None = function() {
    return { /*type: "option",*/ tag: "None" };
@@ -1127,13 +1117,18 @@ return {
  * generated code in place of ===
  */
 
-var _compare_JsSyntax_mathop = function(x, y) {
-   return (x.tag == y.tag);
+var _compare_basic_types = function(x, y) {
+   return (x.tag === y.tag);
 };
 
-var _compare_JsSyntax_native_error = function(x, y) {
-   return (x.tag == y.tag);
-};
+var _compare_JsSyntax_mathop = _compare_basic_types;
+var _compare_JsSyntax_native_error = _compare_basic_types;
+var _compare_JsSyntax_binary_op = _compare_basic_types;
+var _compare_JsSyntax_restype = _compare_basic_types;
+var _compare_JsSyntax_codetype = _compare_basic_types;
+var _compare_JsSyntax_coq_type = _compare_basic_types;
+var _compare_JsSyntax_mutability = _compare_basic_types;
+var _compare_JsSyntax_mathop = _compare_basic_types;
 
 var _compare_JsSyntax_prealloc = function(x, y) {
    return (x.tag == y.tag) 
@@ -2714,617 +2709,110 @@ var object_create = function (vproto, sclass, bextens, p) {
 
 
 var object_set_proto = function (o, v) {
-  var x1 = o.object_proto_, x2 = o.object_class_, x3 = o.object_extensible_,
-    x4 = o.object_prim_value_, x5 = o.object_properties_, x6 = o.object_get_,
-    x7 = o.object_get_own_prop_, x8 = o.object_get_prop_, x9 = o.object_put_,
-    x10 = o.object_can_put_, x11 = o.object_has_prop_,
-    x12 = o.object_delete_, x13 = o.object_default_value_,
-    x14 = o.object_define_own_prop_, x15 = o.object_construct_,
-    x16 = o.object_call_, x17 = o.object_has_instance_,
-    x18 = o.object_scope_, x19 = o.object_formal_parameters_,
-    x20 = o.object_code_, x21 = o.object_target_function_,
-    x22 = o.object_bound_this_, x23 = o.object_bound_args_,
-    x24 = o.object_parameter_map_;
-  return (
-    {
-      object_proto_: v,
-      object_class_: x2,
-      object_extensible_: x3,
-      object_prim_value_: x4,
-      object_properties_: x5,
-      object_get_: x6,
-      object_get_own_prop_: x7,
-      object_get_prop_: x8,
-      object_put_: x9,
-      object_can_put_: x10,
-      object_has_prop_: x11,
-      object_delete_: x12,
-      object_default_value_: x13,
-      object_define_own_prop_: x14,
-      object_construct_: x15,
-      object_call_: x16,
-      object_has_instance_: x17,
-      object_scope_: x18,
-      object_formal_parameters_: x19,
-      object_code_: x20,
-      object_target_function_: x21,
-      object_bound_this_: x22,
-      object_bound_args_: x23,
-      object_parameter_map_: x24
-    });
+  return (Object.assign({}, o, { object_proto_: v}));
 };
 
 
 
 var object_set_class = function (o, s) {
-  var x1 = o.object_proto_, x2 = o.object_class_, x3 = o.object_extensible_,
-    x4 = o.object_prim_value_, x5 = o.object_properties_, x6 = o.object_get_,
-    x7 = o.object_get_own_prop_, x8 = o.object_get_prop_, x9 = o.object_put_,
-    x10 = o.object_can_put_, x11 = o.object_has_prop_,
-    x12 = o.object_delete_, x13 = o.object_default_value_,
-    x14 = o.object_define_own_prop_, x15 = o.object_construct_,
-    x16 = o.object_call_, x17 = o.object_has_instance_,
-    x18 = o.object_scope_, x19 = o.object_formal_parameters_,
-    x20 = o.object_code_, x21 = o.object_target_function_,
-    x22 = o.object_bound_this_, x23 = o.object_bound_args_,
-    x24 = o.object_parameter_map_;
-  return (
-    {
-      object_proto_: x1,
-      object_class_: s,
-      object_extensible_: x3,
-      object_prim_value_: x4,
-      object_properties_: x5,
-      object_get_: x6,
-      object_get_own_prop_: x7,
-      object_get_prop_: x8,
-      object_put_: x9,
-      object_can_put_: x10,
-      object_has_prop_: x11,
-      object_delete_: x12,
-      object_default_value_: x13,
-      object_define_own_prop_: x14,
-      object_construct_: x15,
-      object_call_: x16,
-      object_has_instance_: x17,
-      object_scope_: x18,
-      object_formal_parameters_: x19,
-      object_code_: x20,
-      object_target_function_: x21,
-      object_bound_this_: x22,
-      object_bound_args_: x23,
-      object_parameter_map_: x24
-    });
+  return (Object.assign({}, o, { object_class_: s}));
 };
 
 
 
 var object_set_extensible = function (o, b) {
-  var x1 = o.object_proto_, x2 = o.object_class_, x3 = o.object_extensible_,
-    x4 = o.object_prim_value_, x5 = o.object_properties_, x6 = o.object_get_,
-    x7 = o.object_get_own_prop_, x8 = o.object_get_prop_, x9 = o.object_put_,
-    x10 = o.object_can_put_, x11 = o.object_has_prop_,
-    x12 = o.object_delete_, x13 = o.object_default_value_,
-    x14 = o.object_define_own_prop_, x15 = o.object_construct_,
-    x16 = o.object_call_, x17 = o.object_has_instance_,
-    x18 = o.object_scope_, x19 = o.object_formal_parameters_,
-    x20 = o.object_code_, x21 = o.object_target_function_,
-    x22 = o.object_bound_this_, x23 = o.object_bound_args_,
-    x24 = o.object_parameter_map_;
-  return (
-    {
-      object_proto_: x1,
-      object_class_: x2,
-      object_extensible_: b,
-      object_prim_value_: x4,
-      object_properties_: x5,
-      object_get_: x6,
-      object_get_own_prop_: x7,
-      object_get_prop_: x8,
-      object_put_: x9,
-      object_can_put_: x10,
-      object_has_prop_: x11,
-      object_delete_: x12,
-      object_default_value_: x13,
-      object_define_own_prop_: x14,
-      object_construct_: x15,
-      object_call_: x16,
-      object_has_instance_: x17,
-      object_scope_: x18,
-      object_formal_parameters_: x19,
-      object_code_: x20,
-      object_target_function_: x21,
-      object_bound_this_: x22,
-      object_bound_args_: x23,
-      object_parameter_map_: x24
-    });
+  return (Object.assign({}, o, { object_extensible_: b}));
 };
 
 
 
 var object_with_primitive_value = function (o, v) {
-  var x1 = o.object_proto_, x2 = o.object_class_, x3 = o.object_extensible_,
-    x4 = o.object_prim_value_, x5 = o.object_properties_, x6 = o.object_get_,
-    x7 = o.object_get_own_prop_, x8 = o.object_get_prop_, x9 = o.object_put_,
-    x10 = o.object_can_put_, x11 = o.object_has_prop_,
-    x12 = o.object_delete_, x13 = o.object_default_value_,
-    x14 = o.object_define_own_prop_, x15 = o.object_construct_,
-    x16 = o.object_call_, x17 = o.object_has_instance_,
-    x18 = o.object_scope_, x19 = o.object_formal_parameters_,
-    x20 = o.object_code_, x21 = o.object_target_function_,
-    x22 = o.object_bound_this_, x23 = o.object_bound_args_,
-    x24 = o.object_parameter_map_;
-  return (
-    {
-      object_proto_: x1,
-      object_class_: x2,
-      object_extensible_: x3,
-      object_prim_value_: Some(v),
-      object_properties_: x5,
-      object_get_: x6,
-      object_get_own_prop_: x7,
-      object_get_prop_: x8,
-      object_put_: x9,
-      object_can_put_: x10,
-      object_has_prop_: x11,
-      object_delete_: x12,
-      object_default_value_: x13,
-      object_define_own_prop_: x14,
-      object_construct_: x15,
-      object_call_: x16,
-      object_has_instance_: x17,
-      object_scope_: x18,
-      object_formal_parameters_: x19,
-      object_code_: x20,
-      object_target_function_: x21,
-      object_bound_this_: x22,
-      object_bound_args_: x23,
-      object_parameter_map_: x24
-    });
+  return (Object.assign({}, o, { object_prim_value_: Some(v)}));
 };
 
 
 
 var object_with_extension = function (o, b) {
-  var x1 = o.object_proto_, x2 = o.object_class_, x3 = o.object_extensible_,
-    x4 = o.object_prim_value_, x5 = o.object_properties_, x6 = o.object_get_,
-    x7 = o.object_get_own_prop_, x8 = o.object_get_prop_, x9 = o.object_put_,
-    x10 = o.object_can_put_, x11 = o.object_has_prop_,
-    x12 = o.object_delete_, x13 = o.object_default_value_,
-    x14 = o.object_define_own_prop_, x15 = o.object_construct_,
-    x16 = o.object_call_, x17 = o.object_has_instance_,
-    x18 = o.object_scope_, x19 = o.object_formal_parameters_,
-    x20 = o.object_code_, x21 = o.object_target_function_,
-    x22 = o.object_bound_this_, x23 = o.object_bound_args_,
-    x24 = o.object_parameter_map_;
-  return (
-    {
-      object_proto_: x1,
-      object_class_: x2,
-      object_extensible_: b,
-      object_prim_value_: x4,
-      object_properties_: x5,
-      object_get_: x6,
-      object_get_own_prop_: x7,
-      object_get_prop_: x8,
-      object_put_: x9,
-      object_can_put_: x10,
-      object_has_prop_: x11,
-      object_delete_: x12,
-      object_default_value_: x13,
-      object_define_own_prop_: x14,
-      object_construct_: x15,
-      object_call_: x16,
-      object_has_instance_: x17,
-      object_scope_: x18,
-      object_formal_parameters_: x19,
-      object_code_: x20,
-      object_target_function_: x21,
-      object_bound_this_: x22,
-      object_bound_args_: x23,
-      object_parameter_map_: x24
-    });
+  return (Object.assign({}, o, { object_extensible_: b}));
 };
 
 
 
 var object_with_properties = function (o, properties) {
-  var x1 = o.object_proto_, x2 = o.object_class_, x3 = o.object_extensible_,
-    x4 = o.object_prim_value_, x5 = o.object_properties_, x6 = o.object_get_,
-    x7 = o.object_get_own_prop_, x8 = o.object_get_prop_, x9 = o.object_put_,
-    x10 = o.object_can_put_, x11 = o.object_has_prop_,
-    x12 = o.object_delete_, x13 = o.object_default_value_,
-    x14 = o.object_define_own_prop_, x15 = o.object_construct_,
-    x16 = o.object_call_, x17 = o.object_has_instance_,
-    x18 = o.object_scope_, x19 = o.object_formal_parameters_,
-    x20 = o.object_code_, x21 = o.object_target_function_,
-    x22 = o.object_bound_this_, x23 = o.object_bound_args_,
-    x24 = o.object_parameter_map_;
-  return (
-    {
-      object_proto_: x1,
-      object_class_: x2,
-      object_extensible_: x3,
-      object_prim_value_: x4,
-      object_properties_: properties,
-      object_get_: x6,
-      object_get_own_prop_: x7,
-      object_get_prop_: x8,
-      object_put_: x9,
-      object_can_put_: x10,
-      object_has_prop_: x11,
-      object_delete_: x12,
-      object_default_value_: x13,
-      object_define_own_prop_: x14,
-      object_construct_: x15,
-      object_call_: x16,
-      object_has_instance_: x17,
-      object_scope_: x18,
-      object_formal_parameters_: x19,
-      object_code_: x20,
-      object_target_function_: x21,
-      object_bound_this_: x22,
-      object_bound_args_: x23,
-      object_parameter_map_: x24
-    });
+  return (Object.assign({}, o, { object_properties_: properties}));
 };
 
 
 
 var object_with_get = function (o, g) {
-  var x1 = o.object_proto_, x2 = o.object_class_, x3 = o.object_extensible_,
-    x4 = o.object_prim_value_, x5 = o.object_properties_, x6 = o.object_get_,
-    x7 = o.object_get_own_prop_, x8 = o.object_get_prop_, x9 = o.object_put_,
-    x10 = o.object_can_put_, x11 = o.object_has_prop_,
-    x12 = o.object_delete_, x13 = o.object_default_value_,
-    x14 = o.object_define_own_prop_, x15 = o.object_construct_,
-    x16 = o.object_call_, x17 = o.object_has_instance_,
-    x18 = o.object_scope_, x19 = o.object_formal_parameters_,
-    x20 = o.object_code_, x21 = o.object_target_function_,
-    x22 = o.object_bound_this_, x23 = o.object_bound_args_,
-    x24 = o.object_parameter_map_;
-  return (
-    {
-      object_proto_: x1,
-      object_class_: x2,
-      object_extensible_: x3,
-      object_prim_value_: x4,
-      object_properties_: x5,
-      object_get_: g,
-      object_get_own_prop_: x7,
-      object_get_prop_: x8,
-      object_put_: x9,
-      object_can_put_: x10,
-      object_has_prop_: x11,
-      object_delete_: x12,
-      object_default_value_: x13,
-      object_define_own_prop_: x14,
-      object_construct_: x15,
-      object_call_: x16,
-      object_has_instance_: x17,
-      object_scope_: x18,
-      object_formal_parameters_: x19,
-      object_code_: x20,
-      object_target_function_: x21,
-      object_bound_this_: x22,
-      object_bound_args_: x23,
-      object_parameter_map_: x24
-    });
+  return (Object.assign({}, o, { object_get_: g}));
 };
 
 
 
 var object_with_get_own_property = function (o, gop) {
-  var x1 = o.object_proto_, x2 = o.object_class_, x3 = o.object_extensible_,
-    x4 = o.object_prim_value_, x5 = o.object_properties_, x6 = o.object_get_,
-    x7 = o.object_get_own_prop_, x8 = o.object_get_prop_, x9 = o.object_put_,
-    x10 = o.object_can_put_, x11 = o.object_has_prop_,
-    x12 = o.object_delete_, x13 = o.object_default_value_,
-    x14 = o.object_define_own_prop_, x15 = o.object_construct_,
-    x16 = o.object_call_, x17 = o.object_has_instance_,
-    x18 = o.object_scope_, x19 = o.object_formal_parameters_,
-    x20 = o.object_code_, x21 = o.object_target_function_,
-    x22 = o.object_bound_this_, x23 = o.object_bound_args_,
-    x24 = o.object_parameter_map_;
-  return (
-    {
-      object_proto_: x1,
-      object_class_: x2,
-      object_extensible_: x3,
-      object_prim_value_: x4,
-      object_properties_: x5,
-      object_get_: x6,
-      object_get_own_prop_: gop,
-      object_get_prop_: x8,
-      object_put_: x9,
-      object_can_put_: x10,
-      object_has_prop_: x11,
-      object_delete_: x12,
-      object_default_value_: x13,
-      object_define_own_prop_: x14,
-      object_construct_: x15,
-      object_call_: x16,
-      object_has_instance_: x17,
-      object_scope_: x18,
-      object_formal_parameters_: x19,
-      object_code_: x20,
-      object_target_function_: x21,
-      object_bound_this_: x22,
-      object_bound_args_: x23,
-      object_parameter_map_: x24
-    });
+  return (Object.assign({}, o, { object_get_own_prop_: gop}));
 };
 
 
 
 var object_with_invokation = function (o, constr, call0, has_instance) {
-  var x1 = o.object_proto_, x2 = o.object_class_, x3 = o.object_extensible_,
-    x4 = o.object_prim_value_, x5 = o.object_properties_, x6 = o.object_get_,
-    x7 = o.object_get_own_prop_, x8 = o.object_get_prop_, x9 = o.object_put_,
-    x10 = o.object_can_put_, x11 = o.object_has_prop_,
-    x12 = o.object_delete_, x13 = o.object_default_value_,
-    x14 = o.object_define_own_prop_, x15 = o.object_construct_,
-    x16 = o.object_call_, x17 = o.object_has_instance_,
-    x18 = o.object_scope_, x19 = o.object_formal_parameters_,
-    x20 = o.object_code_, x21 = o.object_target_function_,
-    x22 = o.object_bound_this_, x23 = o.object_bound_args_,
-    x24 = o.object_parameter_map_;
   return (
-    {
-      object_proto_: x1,
-      object_class_: x2,
-      object_extensible_: x3,
-      object_prim_value_: x4,
-      object_properties_: x5,
-      object_get_: x6,
-      object_get_own_prop_: x7,
-      object_get_prop_: x8,
-      object_put_: x9,
-      object_can_put_: x10,
-      object_has_prop_: x11,
-      object_delete_: x12,
-      object_default_value_: x13,
-      object_define_own_prop_: x14,
-      object_construct_: constr,
-      object_call_: call0,
-      object_has_instance_: has_instance,
-      object_scope_: x18,
-      object_formal_parameters_: x19,
-      object_code_: x20,
-      object_target_function_: x21,
-      object_bound_this_: x22,
-      object_bound_args_: x23,
-      object_parameter_map_: x24
-    });
+    Object.assign({}, o, {
+        object_construct_: constr,
+        object_call_: call0,
+        object_has_instance_: has_instance}));
 };
 
 
 
 var object_with_scope = function (o, scope) {
-  var x1 = o.object_proto_, x2 = o.object_class_, x3 = o.object_extensible_,
-    x4 = o.object_prim_value_, x5 = o.object_properties_, x6 = o.object_get_,
-    x7 = o.object_get_own_prop_, x8 = o.object_get_prop_, x9 = o.object_put_,
-    x10 = o.object_can_put_, x11 = o.object_has_prop_,
-    x12 = o.object_delete_, x13 = o.object_default_value_,
-    x14 = o.object_define_own_prop_, x15 = o.object_construct_,
-    x16 = o.object_call_, x17 = o.object_has_instance_,
-    x18 = o.object_scope_, x19 = o.object_formal_parameters_,
-    x20 = o.object_code_, x21 = o.object_target_function_,
-    x22 = o.object_bound_this_, x23 = o.object_bound_args_,
-    x24 = o.object_parameter_map_;
-  return (
-    {
-      object_proto_: x1,
-      object_class_: x2,
-      object_extensible_: x3,
-      object_prim_value_: x4,
-      object_properties_: x5,
-      object_get_: x6,
-      object_get_own_prop_: x7,
-      object_get_prop_: x8,
-      object_put_: x9,
-      object_can_put_: x10,
-      object_has_prop_: x11,
-      object_delete_: x12,
-      object_default_value_: x13,
-      object_define_own_prop_: x14,
-      object_construct_: x15,
-      object_call_: x16,
-      object_has_instance_: x17,
-      object_scope_: scope,
-      object_formal_parameters_: x19,
-      object_code_: x20,
-      object_target_function_: x21,
-      object_bound_this_: x22,
-      object_bound_args_: x23,
-      object_parameter_map_: x24
-    });
+  return (Object.assign({}, o, { object_scope_: scope}));
 };
 
 
 
 var object_with_formal_params = function (o, params) {
-  var x1 = o.object_proto_, x2 = o.object_class_, x3 = o.object_extensible_,
-    x4 = o.object_prim_value_, x5 = o.object_properties_, x6 = o.object_get_,
-    x7 = o.object_get_own_prop_, x8 = o.object_get_prop_, x9 = o.object_put_,
-    x10 = o.object_can_put_, x11 = o.object_has_prop_,
-    x12 = o.object_delete_, x13 = o.object_default_value_,
-    x14 = o.object_define_own_prop_, x15 = o.object_construct_,
-    x16 = o.object_call_, x17 = o.object_has_instance_,
-    x18 = o.object_scope_, x19 = o.object_formal_parameters_,
-    x20 = o.object_code_, x21 = o.object_target_function_,
-    x22 = o.object_bound_this_, x23 = o.object_bound_args_,
-    x24 = o.object_parameter_map_;
-  return (
-    {
-      object_proto_: x1,
-      object_class_: x2,
-      object_extensible_: x3,
-      object_prim_value_: x4,
-      object_properties_: x5,
-      object_get_: x6,
-      object_get_own_prop_: x7,
-      object_get_prop_: x8,
-      object_put_: x9,
-      object_can_put_: x10,
-      object_has_prop_: x11,
-      object_delete_: x12,
-      object_default_value_: x13,
-      object_define_own_prop_: x14,
-      object_construct_: x15,
-      object_call_: x16,
-      object_has_instance_: x17,
-      object_scope_: x18,
-      object_formal_parameters_: params,
-      object_code_: x20,
-      object_target_function_: x21,
-      object_bound_this_: x22,
-      object_bound_args_: x23,
-      object_parameter_map_: x24
-    });
+  return (Object.assign({}, o, { object_formal_parameters_: params}));
 };
 
 
 
 var object_with_details = function (o, scope, params, code, target, boundthis, boundargs, paramsmap) {
-  var x1 = o.object_proto_, x2 = o.object_class_, x3 = o.object_extensible_,
-    x4 = o.object_prim_value_, x5 = o.object_properties_, x6 = o.object_get_,
-    x7 = o.object_get_own_prop_, x8 = o.object_get_prop_, x9 = o.object_put_,
-    x10 = o.object_can_put_, x11 = o.object_has_prop_,
-    x12 = o.object_delete_, x13 = o.object_default_value_,
-    x14 = o.object_define_own_prop_, x15 = o.object_construct_,
-    x16 = o.object_call_, x17 = o.object_has_instance_,
-    x18 = o.object_scope_, x19 = o.object_formal_parameters_,
-    x20 = o.object_code_, x21 = o.object_target_function_,
-    x22 = o.object_bound_this_, x23 = o.object_bound_args_,
-    x24 = o.object_parameter_map_;
   return (
-    {
-      object_proto_: x1,
-      object_class_: x2,
-      object_extensible_: x3,
-      object_prim_value_: x4,
-      object_properties_: x5,
-      object_get_: x6,
-      object_get_own_prop_: x7,
-      object_get_prop_: x8,
-      object_put_: x9,
-      object_can_put_: x10,
-      object_has_prop_: x11,
-      object_delete_: x12,
-      object_default_value_: x13,
-      object_define_own_prop_: x14,
-      object_construct_: x15,
-      object_call_: x16,
-      object_has_instance_: x17,
-      object_scope_: scope,
-      object_formal_parameters_: params,
-      object_code_: code,
-      object_target_function_: target,
-      object_bound_this_: boundthis,
-      object_bound_args_: boundargs,
-      object_parameter_map_: paramsmap
-    });
+    Object.assign({}, o, {
+        object_scope_: scope,
+        object_formal_parameters_: params,
+        object_code_: code,
+        object_target_function_: target,
+        object_bound_this_: boundthis,
+        object_bound_args_: boundargs,
+        object_parameter_map_: paramsmap}));
 };
 
 
 
 var object_for_array = function (o, defineownproperty) {
-  var x1 = o.object_proto_, x2 = o.object_class_, x3 = o.object_extensible_,
-    x4 = o.object_prim_value_, x5 = o.object_properties_, x6 = o.object_get_,
-    x7 = o.object_get_own_prop_, x8 = o.object_get_prop_, x9 = o.object_put_,
-    x10 = o.object_can_put_, x11 = o.object_has_prop_,
-    x12 = o.object_delete_, x13 = o.object_default_value_,
-    x14 = o.object_define_own_prop_, x15 = o.object_construct_,
-    x16 = o.object_call_, x17 = o.object_has_instance_,
-    x18 = o.object_scope_, x19 = o.object_formal_parameters_,
-    x20 = o.object_code_, x21 = o.object_target_function_,
-    x22 = o.object_bound_this_, x23 = o.object_bound_args_,
-    x24 = o.object_parameter_map_;
   return (
-    {
-      object_proto_: x1,
-      object_class_: x2,
-      object_extensible_: x3,
-      object_prim_value_: x4,
-      object_properties_: x5,
-      object_get_: x6,
-      object_get_own_prop_: x7,
-      object_get_prop_: x8,
-      object_put_: x9,
-      object_can_put_: x10,
-      object_has_prop_: x11,
-      object_delete_: x12,
-      object_default_value_: x13,
-      object_define_own_prop_: defineownproperty,
-      object_construct_: x15,
-      object_call_: x16,
-      object_has_instance_: x17,
-      object_scope_: x18,
-      object_formal_parameters_: x19,
-      object_code_: x20,
-      object_target_function_: x21,
-      object_bound_this_: x22,
-      object_bound_args_: x23,
-      object_parameter_map_: x24
-    });
+    Object.assign({}, o, { object_define_own_prop_: defineownproperty}));
 };
 
 
 
 var object_for_args_object = function (o, paramsmap, get, getownproperty, defineownproperty, delete_prop) {
-  var x1 = o.object_proto_, x2 = o.object_class_, x3 = o.object_extensible_,
-    x4 = o.object_prim_value_, x5 = o.object_properties_, x6 = o.object_get_,
-    x7 = o.object_get_own_prop_, x8 = o.object_get_prop_, x9 = o.object_put_,
-    x10 = o.object_can_put_, x11 = o.object_has_prop_,
-    x12 = o.object_delete_, x13 = o.object_default_value_,
-    x14 = o.object_define_own_prop_, x15 = o.object_construct_,
-    x16 = o.object_call_, x17 = o.object_has_instance_,
-    x18 = o.object_scope_, x19 = o.object_formal_parameters_,
-    x20 = o.object_code_, x21 = o.object_target_function_,
-    x22 = o.object_bound_this_, x23 = o.object_bound_args_,
-    x24 = o.object_parameter_map_;
   return (
-    {
-      object_proto_: x1,
-      object_class_: x2,
-      object_extensible_: x3,
-      object_prim_value_: x4,
-      object_properties_: x5,
-      object_get_: get,
-      object_get_own_prop_: getownproperty,
-      object_get_prop_: x8,
-      object_put_: x9,
-      object_can_put_: x10,
-      object_has_prop_: x11,
-      object_delete_: delete_prop,
-      object_default_value_: x13,
-      object_define_own_prop_: defineownproperty,
-      object_construct_: x15,
-      object_call_: x16,
-      object_has_instance_: x17,
-      object_scope_: x18,
-      object_formal_parameters_: x19,
-      object_code_: x20,
-      object_target_function_: x21,
-      object_bound_this_: x22,
-      object_bound_args_: x23,
-      object_parameter_map_: Some(paramsmap)
-    });
+    Object.assign({}, o, {
+        object_get_: get,
+        object_get_own_prop_: getownproperty,
+        object_delete_: delete_prop,
+        object_define_own_prop_: defineownproperty,
+        object_parameter_map_: Some(paramsmap)}));
 };
 
 
 
 var mathop_compare = function (m1, m2) {
-  switch (m1.tag) {
-    case "Coq_mathop_abs":
-      switch (m2.tag) {
-        case "Coq_mathop_abs":
-          return (true);
-      }
-      
-  }
-  
+  return (_compare_JsSyntax_mathop(m1, m2));
 };
 
 
@@ -3371,88 +2859,46 @@ var prim_compare = function (w1, w2) {
       switch (w2.tag) {
         case "Coq_prim_undef":
           return (true);
-        case "Coq_prim_null":
-          return (false);
-        case "Coq_prim_bool":
-          var b = w2.value;
-          return (false);
-        case "Coq_prim_number":
-          var n = w2.value;
-          return (false);
-        case "Coq_prim_string":
-          var s = w2.value;
+        default:
           return (false);
       }
       
     case "Coq_prim_null":
       switch (w2.tag) {
-        case "Coq_prim_undef":
-          return (false);
         case "Coq_prim_null":
           return (true);
-        case "Coq_prim_bool":
-          var b = w2.value;
-          return (false);
-        case "Coq_prim_number":
-          var n = w2.value;
-          return (false);
-        case "Coq_prim_string":
-          var s = w2.value;
+        default:
           return (false);
       }
       
     case "Coq_prim_bool":
       var b1 = w1.value;
       switch (w2.tag) {
-        case "Coq_prim_undef":
-          return (false);
-        case "Coq_prim_null":
-          return (false);
         case "Coq_prim_bool":
           var b2 = w2.value;
           return (bool_eq(b1, b2));
-        case "Coq_prim_number":
-          var n = w2.value;
-          return (false);
-        case "Coq_prim_string":
-          var s = w2.value;
+        default:
           return (false);
       }
       
     case "Coq_prim_number":
       var n1 = w1.value;
       switch (w2.tag) {
-        case "Coq_prim_undef":
-          return (false);
-        case "Coq_prim_null":
-          return (false);
-        case "Coq_prim_bool":
-          var b = w2.value;
-          return (false);
         case "Coq_prim_number":
           var n2 = w2.value;
           return ((n1 === n2));
-        case "Coq_prim_string":
-          var s = w2.value;
+        default:
           return (false);
       }
       
     case "Coq_prim_string":
       var s1 = w1.value;
       switch (w2.tag) {
-        case "Coq_prim_undef":
-          return (false);
-        case "Coq_prim_null":
-          return (false);
-        case "Coq_prim_bool":
-          var b = w2.value;
-          return (false);
-        case "Coq_prim_number":
-          var n = w2.value;
-          return (false);
         case "Coq_prim_string":
           var s2 = w2.value;
           return (string_eq(s1, s2));
+        default:
+          return (false);
       }
       
   }
@@ -3492,57 +2938,7 @@ var value_compare = function (v1, v2) {
 
 
 var mutability_compare = function (m1, m2) {
-  switch (m1.tag) {
-    case "Coq_mutability_uninitialized_immutable":
-      switch (m2.tag) {
-        case "Coq_mutability_uninitialized_immutable":
-          return (true);
-        case "Coq_mutability_immutable":
-          return (false);
-        case "Coq_mutability_nondeletable":
-          return (false);
-        case "Coq_mutability_deletable":
-          return (false);
-      }
-      
-    case "Coq_mutability_immutable":
-      switch (m2.tag) {
-        case "Coq_mutability_uninitialized_immutable":
-          return (false);
-        case "Coq_mutability_immutable":
-          return (true);
-        case "Coq_mutability_nondeletable":
-          return (false);
-        case "Coq_mutability_deletable":
-          return (false);
-      }
-      
-    case "Coq_mutability_nondeletable":
-      switch (m2.tag) {
-        case "Coq_mutability_uninitialized_immutable":
-          return (false);
-        case "Coq_mutability_immutable":
-          return (false);
-        case "Coq_mutability_nondeletable":
-          return (true);
-        case "Coq_mutability_deletable":
-          return (false);
-      }
-      
-    case "Coq_mutability_deletable":
-      switch (m2.tag) {
-        case "Coq_mutability_uninitialized_immutable":
-          return (false);
-        case "Coq_mutability_immutable":
-          return (false);
-        case "Coq_mutability_nondeletable":
-          return (false);
-        case "Coq_mutability_deletable":
-          return (true);
-      }
-      
-  }
-  
+  return (_compare_JsSyntax_mutability(m1, m2));
 };
 
 
@@ -3587,114 +2983,13 @@ var ref_compare = function (r1, r2) {
 
 
 var type_compare = function (t1, t2) {
-  switch (t1.tag) {
-    case "Coq_type_undef":
-      switch (t2.tag) {
-        case "Coq_type_undef":
-          return (true);
-        case "Coq_type_null":
-          return (false);
-        case "Coq_type_bool":
-          return (false);
-        case "Coq_type_number":
-          return (false);
-        case "Coq_type_string":
-          return (false);
-        case "Coq_type_object":
-          return (false);
-      }
-      
-    case "Coq_type_null":
-      switch (t2.tag) {
-        case "Coq_type_undef":
-          return (false);
-        case "Coq_type_null":
-          return (true);
-        case "Coq_type_bool":
-          return (false);
-        case "Coq_type_number":
-          return (false);
-        case "Coq_type_string":
-          return (false);
-        case "Coq_type_object":
-          return (false);
-      }
-      
-    case "Coq_type_bool":
-      switch (t2.tag) {
-        case "Coq_type_undef":
-          return (false);
-        case "Coq_type_null":
-          return (false);
-        case "Coq_type_bool":
-          return (true);
-        case "Coq_type_number":
-          return (false);
-        case "Coq_type_string":
-          return (false);
-        case "Coq_type_object":
-          return (false);
-      }
-      
-    case "Coq_type_number":
-      switch (t2.tag) {
-        case "Coq_type_undef":
-          return (false);
-        case "Coq_type_null":
-          return (false);
-        case "Coq_type_bool":
-          return (false);
-        case "Coq_type_number":
-          return (true);
-        case "Coq_type_string":
-          return (false);
-        case "Coq_type_object":
-          return (false);
-      }
-      
-    case "Coq_type_string":
-      switch (t2.tag) {
-        case "Coq_type_undef":
-          return (false);
-        case "Coq_type_null":
-          return (false);
-        case "Coq_type_bool":
-          return (false);
-        case "Coq_type_number":
-          return (false);
-        case "Coq_type_string":
-          return (true);
-        case "Coq_type_object":
-          return (false);
-      }
-      
-    case "Coq_type_object":
-      switch (t2.tag) {
-        case "Coq_type_undef":
-          return (false);
-        case "Coq_type_null":
-          return (false);
-        case "Coq_type_bool":
-          return (false);
-        case "Coq_type_number":
-          return (false);
-        case "Coq_type_string":
-          return (false);
-        case "Coq_type_object":
-          return (true);
-      }
-      
-  }
-  
+  return (_compare_JsSyntax_coq_type(t1, t2));
 };
 
 
 
 var res_with_value = function (r, rv) {
-  var rt = r.res_type, old_rv = r.res_value, labopt = r.res_label;
-  return ({ res_type: rt,
-            res_value: rv,
-            res_label: labopt});
+  return (Object.assign({}, r, { res_value: rv}));
 };
 
 
@@ -3746,1257 +3041,7 @@ var resvalue_compare = function (rv1, rv2) {
 
 
 var binary_op_compare = function (op1, op2) {
-  switch (op1.tag) {
-    case "Coq_binary_op_mult":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (true);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_div":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (true);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_mod":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (true);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_add":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (true);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_sub":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (true);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_left_shift":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (true);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_right_shift":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (true);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_unsigned_right_shift":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (true);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_lt":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (true);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_gt":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (true);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_le":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (true);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_ge":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (true);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_instanceof":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (true);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_in":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (true);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_equal":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (true);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_disequal":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (true);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_strict_equal":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (true);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_strict_disequal":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (true);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_bitwise_and":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (true);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_bitwise_or":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (true);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_bitwise_xor":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (true);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_and":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (true);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_or":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (true);
-        case "Coq_binary_op_coma":
-          return (false);
-      }
-      
-    case "Coq_binary_op_coma":
-      switch (op2.tag) {
-        case "Coq_binary_op_mult":
-          return (false);
-        case "Coq_binary_op_div":
-          return (false);
-        case "Coq_binary_op_mod":
-          return (false);
-        case "Coq_binary_op_add":
-          return (false);
-        case "Coq_binary_op_sub":
-          return (false);
-        case "Coq_binary_op_left_shift":
-          return (false);
-        case "Coq_binary_op_right_shift":
-          return (false);
-        case "Coq_binary_op_unsigned_right_shift":
-          return (false);
-        case "Coq_binary_op_lt":
-          return (false);
-        case "Coq_binary_op_gt":
-          return (false);
-        case "Coq_binary_op_le":
-          return (false);
-        case "Coq_binary_op_ge":
-          return (false);
-        case "Coq_binary_op_instanceof":
-          return (false);
-        case "Coq_binary_op_in":
-          return (false);
-        case "Coq_binary_op_equal":
-          return (false);
-        case "Coq_binary_op_disequal":
-          return (false);
-        case "Coq_binary_op_strict_equal":
-          return (false);
-        case "Coq_binary_op_strict_disequal":
-          return (false);
-        case "Coq_binary_op_bitwise_and":
-          return (false);
-        case "Coq_binary_op_bitwise_or":
-          return (false);
-        case "Coq_binary_op_bitwise_xor":
-          return (false);
-        case "Coq_binary_op_and":
-          return (false);
-        case "Coq_binary_op_or":
-          return (false);
-        case "Coq_binary_op_coma":
-          return (true);
-      }
-      
-  }
-  
+  return (_compare_JsSyntax_binary_op(op1, op2));
 };
 
 
@@ -5051,79 +3096,7 @@ var funcbody_is_strict = function (fb) {
 
 
 var restype_compare = function (rt1, rt2) {
-  switch (rt1.tag) {
-    case "Coq_restype_normal":
-      switch (rt2.tag) {
-        case "Coq_restype_normal":
-          return (true);
-        case "Coq_restype_break":
-          return (false);
-        case "Coq_restype_continue":
-          return (false);
-        case "Coq_restype_return":
-          return (false);
-        case "Coq_restype_throw":
-          return (false);
-      }
-      
-    case "Coq_restype_break":
-      switch (rt2.tag) {
-        case "Coq_restype_normal":
-          return (false);
-        case "Coq_restype_break":
-          return (true);
-        case "Coq_restype_continue":
-          return (false);
-        case "Coq_restype_return":
-          return (false);
-        case "Coq_restype_throw":
-          return (false);
-      }
-      
-    case "Coq_restype_continue":
-      switch (rt2.tag) {
-        case "Coq_restype_normal":
-          return (false);
-        case "Coq_restype_break":
-          return (false);
-        case "Coq_restype_continue":
-          return (true);
-        case "Coq_restype_return":
-          return (false);
-        case "Coq_restype_throw":
-          return (false);
-      }
-      
-    case "Coq_restype_return":
-      switch (rt2.tag) {
-        case "Coq_restype_normal":
-          return (false);
-        case "Coq_restype_break":
-          return (false);
-        case "Coq_restype_continue":
-          return (false);
-        case "Coq_restype_return":
-          return (true);
-        case "Coq_restype_throw":
-          return (false);
-      }
-      
-    case "Coq_restype_throw":
-      switch (rt2.tag) {
-        case "Coq_restype_normal":
-          return (false);
-        case "Coq_restype_break":
-          return (false);
-        case "Coq_restype_continue":
-          return (false);
-        case "Coq_restype_return":
-          return (false);
-        case "Coq_restype_throw":
-          return (true);
-      }
-      
-  }
-  
+  return (_compare_JsSyntax_restype(rt1, rt2));
 };
 
 
@@ -5178,155 +3151,49 @@ var label_set_mem = function (lab, labs) {
 
 
 var attributes_data_with_value = function (ad, v$) {
-  var v = ad.attributes_data_value, bw = ad.attributes_data_writable,
-    be = ad.attributes_data_enumerable, bc = ad.attributes_data_configurable;
-  return (
-    {
-      attributes_data_value: v$,
-      attributes_data_writable: bw,
-      attributes_data_enumerable: be,
-      attributes_data_configurable: bc
-    });
+  return (Object.assign({}, ad, { attributes_data_value: v$}));
 };
 
 
 
 var descriptor_with_value = function (desc, v$) {
-  var v = desc.descriptor_value, bw = desc.descriptor_writable,
-    vg = desc.descriptor_get, vs = desc.descriptor_set,
-    be = desc.descriptor_enumerable, bc = desc.descriptor_configurable;
-  return (
-    {
-      descriptor_value: v$,
-      descriptor_writable: bw,
-      descriptor_get: vg,
-      descriptor_set: vs,
-      descriptor_enumerable: be,
-      descriptor_configurable: bc
-    });
+  return (Object.assign({}, desc, { descriptor_value: v$}));
 };
 
 
 
 var descriptor_with_writable = function (desc, bw$) {
-  var v = desc.descriptor_value, bw = desc.descriptor_writable,
-    vg = desc.descriptor_get, vs = desc.descriptor_set,
-    be = desc.descriptor_enumerable, bc = desc.descriptor_configurable;
-  return (
-    {
-      descriptor_value: v,
-      descriptor_writable: bw$,
-      descriptor_get: vg,
-      descriptor_set: vs,
-      descriptor_enumerable: be,
-      descriptor_configurable: bc
-    });
+  return (Object.assign({}, desc, { descriptor_writable: bw$}));
 };
 
 
 
 var descriptor_with_get = function (desc, vg$) {
-  var v = desc.descriptor_value, bw = desc.descriptor_writable,
-    vg = desc.descriptor_get, vs = desc.descriptor_set,
-    be = desc.descriptor_enumerable, bc = desc.descriptor_configurable;
-  return (
-    {
-      descriptor_value: v,
-      descriptor_writable: bw,
-      descriptor_get: vg$,
-      descriptor_set: vs,
-      descriptor_enumerable: be,
-      descriptor_configurable: bc
-    });
+  return (Object.assign({}, desc, { descriptor_get: vg$}));
 };
 
 
 
 var descriptor_with_set = function (desc, vs$) {
-  var v = desc.descriptor_value, bw = desc.descriptor_writable,
-    vg = desc.descriptor_get, vs = desc.descriptor_set,
-    be = desc.descriptor_enumerable, bc = desc.descriptor_configurable;
-  return (
-    {
-      descriptor_value: v,
-      descriptor_writable: bw,
-      descriptor_get: vg,
-      descriptor_set: vs$,
-      descriptor_enumerable: be,
-      descriptor_configurable: bc
-    });
+  return (Object.assign({}, desc, { descriptor_set: vs$}));
 };
 
 
 
 var descriptor_with_enumerable = function (desc, be$) {
-  var v = desc.descriptor_value, bw = desc.descriptor_writable,
-    vg = desc.descriptor_get, vs = desc.descriptor_set,
-    be = desc.descriptor_enumerable, bc = desc.descriptor_configurable;
-  return (
-    {
-      descriptor_value: v,
-      descriptor_writable: bw,
-      descriptor_get: vg,
-      descriptor_set: vs,
-      descriptor_enumerable: be$,
-      descriptor_configurable: bc
-    });
+  return (Object.assign({}, desc, { descriptor_enumerable: be$}));
 };
 
 
 
 var descriptor_with_configurable = function (desc, bc$) {
-  var v = desc.descriptor_value, bw = desc.descriptor_writable,
-    vg = desc.descriptor_get, vs = desc.descriptor_set,
-    be = desc.descriptor_enumerable, bc = desc.descriptor_configurable;
-  return (
-    {
-      descriptor_value: v,
-      descriptor_writable: bw,
-      descriptor_get: vg,
-      descriptor_set: vs,
-      descriptor_enumerable: be,
-      descriptor_configurable: bc$
-    });
+  return (Object.assign({}, desc, { descriptor_configurable: bc$}));
 };
 
 
 
 var codetype_compare = function (ct1, ct2) {
-  switch (ct1.tag) {
-    case "Coq_codetype_func":
-      switch (ct2.tag) {
-        case "Coq_codetype_func":
-          return (true);
-        case "Coq_codetype_global":
-          return (false);
-        case "Coq_codetype_eval":
-          return (false);
-      }
-      
-    case "Coq_codetype_global":
-      switch (ct2.tag) {
-        case "Coq_codetype_func":
-          return (false);
-        case "Coq_codetype_global":
-          return (true);
-        case "Coq_codetype_eval":
-          return (false);
-      }
-      
-    case "Coq_codetype_eval":
-      switch (ct2.tag) {
-        case "Coq_codetype_func":
-          return (false);
-        case "Coq_codetype_global":
-          return (false);
-        case "Coq_codetype_eval":
-          return (true);
-      }
-      
-  }
-  
+  return (_compare_JsSyntax_codetype(ct1, ct2));
 };
 }// end of with JsSyntax
 }// end of with LibList
@@ -5683,7 +3550,7 @@ var attributes_enumerable = function (_foo_) {
 
 
 var state_with_object_heap = function (s, new_object_heap) {
-  return (record_with(s, "state_object_heap", new_object_heap));
+  return (Object.assign({}, s, { state_object_heap: new_object_heap}));
 };
 
 
