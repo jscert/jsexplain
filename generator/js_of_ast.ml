@@ -368,8 +368,8 @@ let ppf_record llde =
     | (lbl, exp) :: xs -> aux (acc ^ Printf.sprintf "%s: %s,@," lbl exp) xs
   in aux "" llde
 
-let ppf_record_with seinit slbl sexp =
-   ppf_apply "record_with" (show_list ",@ " [ seinit; Printf.sprintf "\"%s\"" slbl; sexp ])
+let ppf_record_with seinit assign_exp =
+  ppf_apply "Object.assign" (show_list ",@ " [ "{}"; seinit; assign_exp ])
 
 let ppf_decl id expr = Printf.sprintf "@[<v 0>%s: %s,@,@]" id expr
 
@@ -1191,18 +1191,21 @@ and js_of_expression ctx dest e =
     (* ppf_while (js_of_expression cd) (js_of_expression body) *)
   | Texp_for        (id, _, st, ed, fl, body) -> out_of_scope loc "for"
     (* ppf_for (ppf_ident id) (js_of_expression st) (js_of_expression ed) fl (js_of_expression body) *)
+
   | Texp_record     (llde,None)          -> 
       let sexp = ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, inline_of_wrap exp)) llde) in
       apply_dest' ctx dest sexp
-  | Texp_record  ([(_,lbl, exp)], Some einit) -> (* record_with(einit, lbl, exp) *)
-      let sexp = ppf_record_with (inline_of_wrap einit) (lbl.lbl_name) (inline_of_wrap exp) in
+
+  | Texp_record (assigns ,Some einit)  ->
+      let assigns_exp = ppf_record
+        (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, inline_of_wrap exp)) assigns) in
+      let sexp = ppf_record_with (inline_of_wrap einit) assigns_exp in
       apply_dest' ctx dest sexp
 
-  | Texp_record (_,Some e0)  -> out_of_scope loc "record with multiple fields assigned"
   | Texp_field      (exp, _, lbl)     ->
       let sexp = ppf_field_access (inline_of_wrap exp) lbl.lbl_name in
       apply_dest' ctx dest sexp
-      
+
   | Texp_assert      e                -> 
       let sexp = inline_of_wrap e in
       Printf.sprintf "throw %s;" sexp

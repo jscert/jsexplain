@@ -12,8 +12,9 @@ let boss =
 
 let ab = boss.age
 
-(* We do not support with syntax
- * let newboss = { boss with name = "john" } *)
+let newboss = { boss with name = "john" }
+
+let newboss = { boss with name = "john"; status = "newboss" }
 
 (* Field punning *)
 let newboss =

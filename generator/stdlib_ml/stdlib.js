@@ -7,16 +7,6 @@
 //----------------------------------------------------------------------------
 // Js_of_ocaml bis Generator Requirements
 
-// Implementation for the OCaml syntax `{ einit with lbl = exp }`
-function record_with(einit, lbl, exp) {
-  var res = {};
-  for (var i in einit) {
-    res[i] = einit[i];
-  }
-  res[lbl] = exp;
-  return res;
-}
-
 // type option 'a = None | Some of 'a
 var None = function() {
    return { /*type: "option",*/ tag: "None" };
