@@ -239,8 +239,10 @@ let object_prealloc_global_properties =
       (Coq_value_object (Coq_object_loc_prealloc (Coq_prealloc_native_error
       Coq_native_error_uri)))
   in
-  write_native p26 ("JSON") (Coq_value_object
+  let p27 = write_native p26 ("JSON") (Coq_value_object
     (Coq_object_loc_prealloc Coq_prealloc_json))
+  in
+  write_native p27 ("Proxy") (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_proxy))
 
 (** val object_prealloc_global : coq_object **)
 
@@ -982,6 +984,16 @@ let throw_type_error_object =
   let o1 = object_with_formal_params o0 (Some []) in
   object_set_extensible o1 false
 
+let object_prealloc_proxy =
+  let p = write_constant Heap.empty
+    "revocable"
+    (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_proxy_revocable))
+  in
+  object_create_prealloc_constructor Coq_prealloc_proxy (Coq_value_prim (Coq_prim_number 2.)) p
+
+let object_prealloc_proxy_revocable =
+  object_create_prealloc_call Coq_prealloc_proxy_revocable (Coq_value_prim (Coq_prim_number 2.)) Heap.empty
+
 (** val object_heap_initial_function_objects_1 :
     (object_loc, coq_object) Heap.heap -> (object_loc, coq_object) Heap.heap **)
 
@@ -1186,8 +1198,12 @@ let object_heap_initial_function_objects h =
       Coq_prealloc_number_proto_value_of)
       number_proto_value_of_function_object
   in
-  HeapObj.write h2 (Coq_object_loc_prealloc Coq_prealloc_error_proto_to_string)
-    error_proto_to_string_function_object
+  let h3 =
+    HeapObj.write h2 (Coq_object_loc_prealloc Coq_prealloc_error_proto_to_string)
+      error_proto_to_string_function_object
+  in
+  HeapObj.write h3 (Coq_object_loc_prealloc Coq_prealloc_proxy_revocable)
+    object_prealloc_proxy_revocable
 
 (** val object_heap_initial : (object_loc, coq_object) HeapObj.heap **)
 
@@ -1328,7 +1344,11 @@ let object_heap_initial =
     HeapObj.write h28 (Coq_object_loc_prealloc Coq_prealloc_json)
       object_prealloc_json
   in
-  object_heap_initial_function_objects h29
+  let h30 =
+    HeapObj.write h29 (Coq_object_loc_prealloc Coq_prealloc_proxy)
+      object_prealloc_proxy
+  in
+  object_heap_initial_function_objects h30
 
 (** val env_record_heap_initial : (env_loc, env_record) Heap.heap **)
 

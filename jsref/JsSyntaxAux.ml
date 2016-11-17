@@ -87,6 +87,7 @@ let int_of_prealloc p =
   | Coq_prealloc_throw_type_error -> 68
   | Coq_prealloc_json -> 69
   | Coq_prealloc_proxy -> 70
+  | Coq_prealloc_proxy_revocable -> 71
   | Coq_prealloc_mathop o -> 100 + int_of_mathop o
   | Coq_prealloc_native_error e -> 200 + int_of_native_error e
   | Coq_prealloc_native_error_proto e -> 300 + int_of_native_error e

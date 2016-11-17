@@ -58,10 +58,6 @@
 
 *) find out how to have syntax highlighting
 
-*) make sure to document that if doing "make" before "make init", 
-   then it is needed to do a "make clean" before compilation may work.
-
-
 *) in pseudo_code
   - hide or change these:
     - var%void _ = // hide
