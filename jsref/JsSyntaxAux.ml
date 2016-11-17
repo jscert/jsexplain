@@ -128,261 +128,64 @@ let object_create vproto sclass bextens p =
 (** val object_set_proto : coq_object -> value -> coq_object **)
 
 let object_set_proto o v =
-  let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-    object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-    object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-    object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-    object_default_value_ = x13; object_define_own_prop_ = x14;
-    object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-    object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-    object_target_function_ = x21; object_bound_this_ = x22;
-    object_bound_args_ = x23; object_parameter_map_ = x24 } = o
-  in
-  { object_proto_ = v; object_class_ = x2; object_extensible_ = x3;
-  object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-  object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-  object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-  object_default_value_ = x13; object_define_own_prop_ = x14;
-  object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-  object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-  object_target_function_ = x21; object_bound_this_ = x22;
-  object_bound_args_ = x23; object_parameter_map_ = x24 }
+  { o with object_proto_ = v }
 
 (** val object_set_class : coq_object -> class_name -> coq_object **)
 
 let object_set_class o s =
-  let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-    object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-    object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-    object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-    object_default_value_ = x13; object_define_own_prop_ = x14;
-    object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-    object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-    object_target_function_ = x21; object_bound_this_ = x22;
-    object_bound_args_ = x23; object_parameter_map_ = x24 } = o
-  in
-  { object_proto_ = x1; object_class_ = s; object_extensible_ = x3;
-  object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-  object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-  object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-  object_default_value_ = x13; object_define_own_prop_ = x14;
-  object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-  object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-  object_target_function_ = x21; object_bound_this_ = x22;
-  object_bound_args_ = x23; object_parameter_map_ = x24 }
+  { o with object_class_ = s }
 
 (** val object_set_extensible : coq_object -> bool -> coq_object **)
 
 let object_set_extensible o b =
-  let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-    object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-    object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-    object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-    object_default_value_ = x13; object_define_own_prop_ = x14;
-    object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-    object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-    object_target_function_ = x21; object_bound_this_ = x22;
-    object_bound_args_ = x23; object_parameter_map_ = x24 } = o
-  in
-  { object_proto_ = x1; object_class_ = x2; object_extensible_ = b;
-  object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-  object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-  object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-  object_default_value_ = x13; object_define_own_prop_ = x14;
-  object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-  object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-  object_target_function_ = x21; object_bound_this_ = x22;
-  object_bound_args_ = x23; object_parameter_map_ = x24 }
+  { o with object_extensible_ = b }
 
 (** val object_with_primitive_value : coq_object -> value -> coq_object **)
 
 let object_with_primitive_value o v =
-  let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-    object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-    object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-    object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-    object_default_value_ = x13; object_define_own_prop_ = x14;
-    object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-    object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-    object_target_function_ = x21; object_bound_this_ = x22;
-    object_bound_args_ = x23; object_parameter_map_ = x24 } = o
-  in
-  { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-  object_prim_value_ = (Some v); object_properties_ = x5; object_get_ = x6;
-  object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-  object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-  object_default_value_ = x13; object_define_own_prop_ = x14;
-  object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-  object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-  object_target_function_ = x21; object_bound_this_ = x22;
-  object_bound_args_ = x23; object_parameter_map_ = x24 }
+  { o with object_prim_value_ = (Some v) }
 
 (** val object_with_extension : coq_object -> bool -> coq_object **)
 
 let object_with_extension o b =
-  let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-    object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-    object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-    object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-    object_default_value_ = x13; object_define_own_prop_ = x14;
-    object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-    object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-    object_target_function_ = x21; object_bound_this_ = x22;
-    object_bound_args_ = x23; object_parameter_map_ = x24 } = o
-  in
-  { object_proto_ = x1; object_class_ = x2; object_extensible_ = b;
-  object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-  object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-  object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-  object_default_value_ = x13; object_define_own_prop_ = x14;
-  object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-  object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-  object_target_function_ = x21; object_bound_this_ = x22;
-  object_bound_args_ = x23; object_parameter_map_ = x24 }
+  { o with object_extensible_ = b }
 
 (** val object_with_properties :
     coq_object -> object_properties_type -> coq_object **)
 
 let object_with_properties o properties =
-  let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-    object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-    object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-    object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-    object_default_value_ = x13; object_define_own_prop_ = x14;
-    object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-    object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-    object_target_function_ = x21; object_bound_this_ = x22;
-    object_bound_args_ = x23; object_parameter_map_ = x24 } = o
-  in
-  { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-  object_prim_value_ = x4; object_properties_ = properties; object_get_ = x6;
-  object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-  object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-  object_default_value_ = x13; object_define_own_prop_ = x14;
-  object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-  object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-  object_target_function_ = x21; object_bound_this_ = x22;
-  object_bound_args_ = x23; object_parameter_map_ = x24 }
+  { o with object_properties_ = properties }
 
 (** val object_with_get : coq_object -> builtin_get -> coq_object **)
 
 let object_with_get o g =
-  let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-    object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-    object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-    object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-    object_default_value_ = x13; object_define_own_prop_ = x14;
-    object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-    object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-    object_target_function_ = x21; object_bound_this_ = x22;
-    object_bound_args_ = x23; object_parameter_map_ = x24 } = o
-  in
-  { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-  object_prim_value_ = x4; object_properties_ = x5; object_get_ = g;
-  object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-  object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-  object_default_value_ = x13; object_define_own_prop_ = x14;
-  object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-  object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-  object_target_function_ = x21; object_bound_this_ = x22;
-  object_bound_args_ = x23; object_parameter_map_ = x24 }
+  { o with object_get_ = g }
 
 (** val object_with_get_own_property :
     coq_object -> builtin_get_own_prop -> coq_object **)
 
 let object_with_get_own_property o gop =
-  let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-    object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-    object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-    object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-    object_default_value_ = x13; object_define_own_prop_ = x14;
-    object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-    object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-    object_target_function_ = x21; object_bound_this_ = x22;
-    object_bound_args_ = x23; object_parameter_map_ = x24 } = o
-  in
-  { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-  object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-  object_get_own_prop_ = gop; object_get_prop_ = x8; object_put_ = x9;
-  object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-  object_default_value_ = x13; object_define_own_prop_ = x14;
-  object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-  object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-  object_target_function_ = x21; object_bound_this_ = x22;
-  object_bound_args_ = x23; object_parameter_map_ = x24 }
+  { o with object_get_own_prop_ = gop }
 
 (** val object_with_invokation :
     coq_object -> construct option -> call option -> builtin_has_instance
     option -> coq_object **)
 
 let object_with_invokation o constr call0 has_instance =
-  let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-    object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-    object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-    object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-    object_default_value_ = x13; object_define_own_prop_ = x14;
-    object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-    object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-    object_target_function_ = x21; object_bound_this_ = x22;
-    object_bound_args_ = x23; object_parameter_map_ = x24 } = o
-  in
-  { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-  object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-  object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-  object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-  object_default_value_ = x13; object_define_own_prop_ = x14;
-  object_construct_ = constr; object_call_ = call0; object_has_instance_ =
-  has_instance; object_scope_ = x18; object_formal_parameters_ = x19;
-  object_code_ = x20; object_target_function_ = x21; object_bound_this_ =
-  x22; object_bound_args_ = x23; object_parameter_map_ = x24 }
+  { o with object_construct_ = constr; object_call_ = call0;
+    object_has_instance_ = has_instance }
 
 (** val object_with_scope :
     coq_object -> lexical_env option -> coq_object **)
 
 let object_with_scope o scope =
-  let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-    object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-    object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-    object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-    object_default_value_ = x13; object_define_own_prop_ = x14;
-    object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-    object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-    object_target_function_ = x21; object_bound_this_ = x22;
-    object_bound_args_ = x23; object_parameter_map_ = x24 } = o
-  in
-  { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-  object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-  object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-  object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-  object_default_value_ = x13; object_define_own_prop_ = x14;
-  object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-  object_scope_ = scope; object_formal_parameters_ = x19; object_code_ = x20;
-  object_target_function_ = x21; object_bound_this_ = x22;
-  object_bound_args_ = x23; object_parameter_map_ = x24 }
+  { o with object_scope_ = scope }
 
 (** val object_with_formal_params :
     coq_object -> string list option -> coq_object **)
 
 let object_with_formal_params o params =
-  let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-    object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-    object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-    object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-    object_default_value_ = x13; object_define_own_prop_ = x14;
-    object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-    object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-    object_target_function_ = x21; object_bound_this_ = x22;
-    object_bound_args_ = x23; object_parameter_map_ = x24 } = o
-  in
-  { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-  object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-  object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-  object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-  object_default_value_ = x13; object_define_own_prop_ = x14;
-  object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-  object_scope_ = x18; object_formal_parameters_ = params; object_code_ =
-  x20; object_target_function_ = x21; object_bound_this_ = x22;
-  object_bound_args_ = x23; object_parameter_map_ = x24 }
+  { o with object_formal_parameters_ = params }
 
 (** val object_with_details :
     coq_object -> lexical_env option -> string list option -> funcbody
@@ -390,83 +193,29 @@ let object_with_formal_params o params =
     object_loc option -> coq_object **)
 
 let object_with_details o scope params code target boundthis boundargs paramsmap =
-  let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-    object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-    object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-    object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-    object_default_value_ = x13; object_define_own_prop_ = x14;
-    object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-    object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-    object_target_function_ = x21; object_bound_this_ = x22;
-    object_bound_args_ = x23; object_parameter_map_ = x24 } = o
-  in
-  { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-  object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-  object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-  object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-  object_default_value_ = x13; object_define_own_prop_ = x14;
-  object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-  object_scope_ = scope; object_formal_parameters_ = params; object_code_ =
-  code; object_target_function_ = target; object_bound_this_ = boundthis;
-  object_bound_args_ = boundargs; object_parameter_map_ = paramsmap }
+  { o with object_scope_ = scope; object_formal_parameters_ = params;
+    object_code_ = code; object_target_function_ = target;
+    object_bound_this_ = boundthis; object_bound_args_ = boundargs;
+    object_parameter_map_ = paramsmap }
 
 (** val object_for_array :
     coq_object -> builtin_define_own_prop -> coq_object **)
 
 let object_for_array o defineownproperty =
-  let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-    object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-    object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-    object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-    object_default_value_ = x13; object_define_own_prop_ = x14;
-    object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-    object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-    object_target_function_ = x21; object_bound_this_ = x22;
-    object_bound_args_ = x23; object_parameter_map_ = x24 } = o
-  in
-  { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-  object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-  object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-  object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-  object_default_value_ = x13; object_define_own_prop_ = defineownproperty;
-  object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-  object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-  object_target_function_ = x21; object_bound_this_ = x22;
-  object_bound_args_ = x23; object_parameter_map_ = x24 }
+  { o with object_define_own_prop_ = defineownproperty }
 
 (** val object_for_args_object :
     coq_object -> object_loc -> builtin_get -> builtin_get_own_prop ->
     builtin_define_own_prop -> builtin_delete -> coq_object **)
 
 let object_for_args_object o paramsmap get getownproperty defineownproperty delete_prop =
-  let { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-    object_prim_value_ = x4; object_properties_ = x5; object_get_ = x6;
-    object_get_own_prop_ = x7; object_get_prop_ = x8; object_put_ = x9;
-    object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = x12;
-    object_default_value_ = x13; object_define_own_prop_ = x14;
-    object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-    object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-    object_target_function_ = x21; object_bound_this_ = x22;
-    object_bound_args_ = x23; object_parameter_map_ = x24 } = o
-  in
-  { object_proto_ = x1; object_class_ = x2; object_extensible_ = x3;
-  object_prim_value_ = x4; object_properties_ = x5; object_get_ = get;
-  object_get_own_prop_ = getownproperty; object_get_prop_ = x8; object_put_ =
-  x9; object_can_put_ = x10; object_has_prop_ = x11; object_delete_ = delete_prop;
-  object_default_value_ = x13; object_define_own_prop_ = defineownproperty;
-  object_construct_ = x15; object_call_ = x16; object_has_instance_ = x17;
-  object_scope_ = x18; object_formal_parameters_ = x19; object_code_ = x20;
-  object_target_function_ = x21; object_bound_this_ = x22;
-  object_bound_args_ = x23; object_parameter_map_ = (Some paramsmap) }
+  { o with object_get_ = get; object_get_own_prop_ = getownproperty;
+    object_delete_ = delete_prop; object_define_own_prop_ = defineownproperty;
+    object_parameter_map_ = (Some paramsmap) }
 
 (** val mathop_compare : mathop -> mathop -> bool **)
 
-let mathop_compare m1 m2 =
-  match m1 with
-  | Coq_mathop_abs ->
-    match m2 with
-    | Coq_mathop_abs -> true
-
+let mathop_compare m1 m2 = (m1:mathop) === m2
 
 (* NEVER USED
     (** val native_error_compare : native_error -> native_error -> bool **)
@@ -500,38 +249,23 @@ let prim_compare w1 w2 =
   | Coq_prim_undef ->
     (match w2 with
      | Coq_prim_undef -> true
-     | Coq_prim_null -> false
-     | Coq_prim_bool b -> false
-     | Coq_prim_number n -> false
-     | Coq_prim_string s -> false)
+     | _ -> false)
   | Coq_prim_null ->
     (match w2 with
-     | Coq_prim_undef -> false
      | Coq_prim_null -> true
-     | Coq_prim_bool b -> false
-     | Coq_prim_number n -> false
-     | Coq_prim_string s -> false)
+     | _ -> false)
   | Coq_prim_bool b1 ->
     (match w2 with
-     | Coq_prim_undef -> false
-     | Coq_prim_null -> false
      | Coq_prim_bool b2 -> bool_eq b1 b2
-     | Coq_prim_number n -> false
-     | Coq_prim_string s -> false)
+     | _ -> false)
   | Coq_prim_number n1 ->
     (match w2 with
-     | Coq_prim_undef -> false
-     | Coq_prim_null -> false
-     | Coq_prim_bool b -> false
      | Coq_prim_number n2 -> n1 === n2
-     | Coq_prim_string s -> false)
+     | _ -> false)
   | Coq_prim_string s1 ->
     (match w2 with
-     | Coq_prim_undef -> false
-     | Coq_prim_null -> false
-     | Coq_prim_bool b -> false
-     | Coq_prim_number n -> false
-     | Coq_prim_string s2 -> string_eq s1 s2)
+     | Coq_prim_string s2 -> string_eq s1 s2
+     | _ -> false)
 
 (** val value_compare : value -> value -> bool **)
 
@@ -548,32 +282,7 @@ let value_compare v1 v2 =
 
 (** val mutability_compare : mutability -> mutability -> bool **)
 
-let mutability_compare m1 m2 =
-  match m1 with
-  | Coq_mutability_uninitialized_immutable ->
-    (match m2 with
-     | Coq_mutability_uninitialized_immutable -> true
-     | Coq_mutability_immutable -> false
-     | Coq_mutability_nondeletable -> false
-     | Coq_mutability_deletable -> false)
-  | Coq_mutability_immutable ->
-    (match m2 with
-     | Coq_mutability_uninitialized_immutable -> false
-     | Coq_mutability_immutable -> true
-     | Coq_mutability_nondeletable -> false
-     | Coq_mutability_deletable -> false)
-  | Coq_mutability_nondeletable ->
-    (match m2 with
-     | Coq_mutability_uninitialized_immutable -> false
-     | Coq_mutability_immutable -> false
-     | Coq_mutability_nondeletable -> true
-     | Coq_mutability_deletable -> false)
-  | Coq_mutability_deletable ->
-    (match m2 with
-     | Coq_mutability_uninitialized_immutable -> false
-     | Coq_mutability_immutable -> false
-     | Coq_mutability_nondeletable -> false
-     | Coq_mutability_deletable -> true)
+let mutability_compare m1 m2 = (m1:mutability) === m2
 
 (** val ref_base_type_compare : ref_base_type -> ref_base_type -> bool **)
 
@@ -597,63 +306,12 @@ let ref_compare r1 r2 =
 
 (** val type_compare : coq_type -> coq_type -> bool **)
 
-let type_compare t1 t2 = 
-  (* TODO: implement as t1 = t2, extract in JS as tag comparison *)
-  match t1 with
-  | Coq_type_undef ->
-    (match t2 with
-     | Coq_type_undef -> true
-     | Coq_type_null -> false
-     | Coq_type_bool -> false
-     | Coq_type_number -> false
-     | Coq_type_string -> false
-     | Coq_type_object -> false)
-  | Coq_type_null ->
-    (match t2 with
-     | Coq_type_undef -> false
-     | Coq_type_null -> true
-     | Coq_type_bool -> false
-     | Coq_type_number -> false
-     | Coq_type_string -> false
-     | Coq_type_object -> false)
-  | Coq_type_bool ->
-    (match t2 with
-     | Coq_type_undef -> false
-     | Coq_type_null -> false
-     | Coq_type_bool -> true
-     | Coq_type_number -> false
-     | Coq_type_string -> false
-     | Coq_type_object -> false)
-  | Coq_type_number ->
-    (match t2 with
-     | Coq_type_undef -> false
-     | Coq_type_null -> false
-     | Coq_type_bool -> false
-     | Coq_type_number -> true
-     | Coq_type_string -> false
-     | Coq_type_object -> false)
-  | Coq_type_string ->
-    (match t2 with
-     | Coq_type_undef -> false
-     | Coq_type_null -> false
-     | Coq_type_bool -> false
-     | Coq_type_number -> false
-     | Coq_type_string -> true
-     | Coq_type_object -> false)
-  | Coq_type_object ->
-    (match t2 with
-     | Coq_type_undef -> false
-     | Coq_type_null -> false
-     | Coq_type_bool -> false
-     | Coq_type_number -> false
-     | Coq_type_string -> false
-     | Coq_type_object -> true)
+let type_compare t1 t2 = (t1:coq_type) === t2
 
 (** val res_with_value : res -> resvalue -> res **)
 
 let res_with_value r rv =
-  let { res_type = rt; res_value = old_rv; res_label = labopt } = r in
-  { res_type = rt; res_value = rv; res_label = labopt }
+  { r with res_value = rv }
 
 (** val resvalue_compare : resvalue -> resvalue -> bool **)
 
@@ -677,633 +335,7 @@ let resvalue_compare rv1 rv2 =
 
 (** val binary_op_compare : binary_op -> binary_op -> bool **)
 
-let rec binary_op_compare op1 op2 =
-  match op1 with
-  | Coq_binary_op_mult ->
-    (match op2 with
-     | Coq_binary_op_mult -> true
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_div ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> true
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_mod ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> true
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_add ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> true
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_sub ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> true
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_left_shift ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> true
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_right_shift ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> true
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_unsigned_right_shift ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> true
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_lt ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> true
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_gt ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> true
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_le ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> true
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_ge ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> true
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_instanceof ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> true
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_in ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> true
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_equal ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> true
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_disequal ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> true
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_strict_equal ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> true
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_strict_disequal ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> true
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_bitwise_and ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> true
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_bitwise_or ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> true
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_bitwise_xor ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> true
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_and ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> true
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_or ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> true
-     | Coq_binary_op_coma -> false)
-  | Coq_binary_op_coma ->
-    (match op2 with
-     | Coq_binary_op_mult -> false
-     | Coq_binary_op_div -> false
-     | Coq_binary_op_mod -> false
-     | Coq_binary_op_add -> false
-     | Coq_binary_op_sub -> false
-     | Coq_binary_op_left_shift -> false
-     | Coq_binary_op_right_shift -> false
-     | Coq_binary_op_unsigned_right_shift -> false
-     | Coq_binary_op_lt -> false
-     | Coq_binary_op_gt -> false
-     | Coq_binary_op_le -> false
-     | Coq_binary_op_ge -> false
-     | Coq_binary_op_instanceof -> false
-     | Coq_binary_op_in -> false
-     | Coq_binary_op_equal -> false
-     | Coq_binary_op_disequal -> false
-     | Coq_binary_op_strict_equal -> false
-     | Coq_binary_op_strict_disequal -> false
-     | Coq_binary_op_bitwise_and -> false
-     | Coq_binary_op_bitwise_or -> false
-     | Coq_binary_op_bitwise_xor -> false
-     | Coq_binary_op_and -> false
-     | Coq_binary_op_or -> false
-     | Coq_binary_op_coma -> true)
-     (* TODO: cleanup! *)
+let rec binary_op_compare op1 op2 = (op1:binary_op) === op2
 
 (** val prog_intro_strictness : prog -> strictness_flag **)
 
@@ -1329,43 +361,7 @@ let funcbody_is_strict fb = match fb with
 
 (** val restype_compare : restype -> restype -> bool **)
 
-let restype_compare rt1 rt2 =
-  match rt1 with
-  | Coq_restype_normal ->
-    (match rt2 with
-     | Coq_restype_normal -> true
-     | Coq_restype_break -> false
-     | Coq_restype_continue -> false
-     | Coq_restype_return -> false
-     | Coq_restype_throw -> false)
-  | Coq_restype_break ->
-    (match rt2 with
-     | Coq_restype_normal -> false
-     | Coq_restype_break -> true
-     | Coq_restype_continue -> false
-     | Coq_restype_return -> false
-     | Coq_restype_throw -> false)
-  | Coq_restype_continue ->
-    (match rt2 with
-     | Coq_restype_normal -> false
-     | Coq_restype_break -> false
-     | Coq_restype_continue -> true
-     | Coq_restype_return -> false
-     | Coq_restype_throw -> false)
-  | Coq_restype_return ->
-    (match rt2 with
-     | Coq_restype_normal -> false
-     | Coq_restype_break -> false
-     | Coq_restype_continue -> false
-     | Coq_restype_return -> true
-     | Coq_restype_throw -> false)
-  | Coq_restype_throw ->
-    (match rt2 with
-     | Coq_restype_normal -> false
-     | Coq_restype_break -> false
-     | Coq_restype_continue -> false
-     | Coq_restype_return -> false
-     | Coq_restype_throw -> true)
+let restype_compare rt1 rt2 = (rt1:restype) === rt2
 
 (** val label_compare : label -> label -> bool **)
 
@@ -1404,98 +400,41 @@ let label_set_mem lab labs =
     attributes_data -> value -> attributes_data **)
 
 let attributes_data_with_value ad v' =
-  let { attributes_data_value = v; attributes_data_writable = bw;
-    attributes_data_enumerable = be; attributes_data_configurable = bc } = ad
-  in
-  { attributes_data_value = v'; attributes_data_writable = bw;
-  attributes_data_enumerable = be; attributes_data_configurable = bc }
+  { ad with attributes_data_value = v' }
 
 (** val descriptor_with_value : descriptor -> value option -> descriptor **)
 
 let descriptor_with_value desc v' =
-  let { descriptor_value = v; descriptor_writable = bw; descriptor_get = vg;
-    descriptor_set = vs; descriptor_enumerable = be;
-    descriptor_configurable = bc } = desc
-  in
-  { descriptor_value = v'; descriptor_writable = bw; descriptor_get = vg;
-  descriptor_set = vs; descriptor_enumerable = be; descriptor_configurable =
-  bc }
+  { desc with descriptor_value = v' }
 
 (** val descriptor_with_writable :
     descriptor -> bool option -> descriptor **)
 
 let descriptor_with_writable desc bw' =
-  let { descriptor_value = v; descriptor_writable = bw; descriptor_get = vg;
-    descriptor_set = vs; descriptor_enumerable = be;
-    descriptor_configurable = bc } = desc
-  in
-  { descriptor_value = v; descriptor_writable = bw'; descriptor_get = vg;
-  descriptor_set = vs; descriptor_enumerable = be; descriptor_configurable =
-  bc }
+  { desc with descriptor_writable = bw' }
 
 (** val descriptor_with_get : descriptor -> value option -> descriptor **)
 
 let descriptor_with_get desc vg' =
-  let { descriptor_value = v; descriptor_writable = bw; descriptor_get = vg;
-    descriptor_set = vs; descriptor_enumerable = be;
-    descriptor_configurable = bc } = desc
-  in
-  { descriptor_value = v; descriptor_writable = bw; descriptor_get = vg';
-  descriptor_set = vs; descriptor_enumerable = be; descriptor_configurable =
-  bc }
+  { desc with descriptor_get = vg' }
 
 (** val descriptor_with_set : descriptor -> value option -> descriptor **)
 
 let descriptor_with_set desc vs' =
-  let { descriptor_value = v; descriptor_writable = bw; descriptor_get = vg;
-    descriptor_set = vs; descriptor_enumerable = be;
-    descriptor_configurable = bc } = desc
-  in
-  { descriptor_value = v; descriptor_writable = bw; descriptor_get = vg;
-  descriptor_set = vs'; descriptor_enumerable = be; descriptor_configurable =
-  bc }
+  { desc with descriptor_set = vs' }
 
 (** val descriptor_with_enumerable :
     descriptor -> bool option -> descriptor **)
 
 let descriptor_with_enumerable desc be' =
-  let { descriptor_value = v; descriptor_writable = bw; descriptor_get = vg;
-    descriptor_set = vs; descriptor_enumerable = be;
-    descriptor_configurable = bc } = desc
-  in
-  { descriptor_value = v; descriptor_writable = bw; descriptor_get = vg;
-  descriptor_set = vs; descriptor_enumerable = be'; descriptor_configurable =
-  bc }
+  { desc with descriptor_enumerable = be' }
 
 (** val descriptor_with_configurable :
     descriptor -> bool option -> descriptor **)
 
 let descriptor_with_configurable desc bc' =
-  let { descriptor_value = v; descriptor_writable = bw; descriptor_get = vg;
-    descriptor_set = vs; descriptor_enumerable = be;
-    descriptor_configurable = bc } = desc
-  in
-  { descriptor_value = v; descriptor_writable = bw; descriptor_get = vg;
-  descriptor_set = vs; descriptor_enumerable = be; descriptor_configurable =
-  bc' }
+  { desc with descriptor_configurable = bc' }
 
 (** val codetype_compare : codetype -> codetype -> bool **)
 
-let codetype_compare ct1 ct2 =
-  match ct1 with
-  | Coq_codetype_func ->
-    (match ct2 with
-     | Coq_codetype_func -> true
-     | Coq_codetype_global -> false
-     | Coq_codetype_eval -> false)
-  | Coq_codetype_global ->
-    (match ct2 with
-     | Coq_codetype_func -> false
-     | Coq_codetype_global -> true
-     | Coq_codetype_eval -> false)
-  | Coq_codetype_eval ->
-    (match ct2 with
-     | Coq_codetype_func -> false
-     | Coq_codetype_global -> false
-     | Coq_codetype_eval -> true)
-
+let codetype_compare ct1 ct2 = (ct1:codetype) === ct2
