@@ -13,7 +13,7 @@
 
    - `node.js` and the `esprima` package. In order to get the esprima
      package the more convenient way is to get `npm` (/node package
-     manager/) and run `npm install esprima`.
+     manager/) and run ~npm install esprima~.
    - ocaml 4.03.0
 
 ** How to run it
@@ -47,8 +47,8 @@ make cleanall
 
 ** About the subset of OCaml supported
 
-   * *Let (rec)* declarations, except `let () = ` and `let _ =`.
-   * *If then else* statements, as excepted `if then else`
+   * *Let (rec)* declarations, except ~let () = ~ and ~let _ =~.
+   * *If then else* statements, as excepted ~if then else~
      statements return a value.
    * *Pattern matching*, only one level of pattern matching over
      arbitrary types.
@@ -65,7 +65,7 @@ type 'a tree =
 #+END_src
 
     * *Records* Records are translated to objects. Record copying
-      `with` syntax is supported with any number of field updates.
+      ~with~ syntax is supported with any number of field updates.
 
 ** About the Subset of JavaScript Used
 - Object.assign (ES6)
@@ -86,13 +86,13 @@ type 'a tree =
    archived in the private jscert_dev repository.
 
 ** About the Monadic Rewriter PPX
-   This is a OCaml AST preprocessor that converts `let%x` syntax into the
-   monadic binder `if_x` with the continuation as the bound expression of the
+   This is a OCaml AST preprocessor that converts ~let%x~ syntax into the
+   monadic binder ~if_x~ with the continuation as the bound expression of the
    let term.
 
    For example:
-   - `let%some x = expr in cont` becomes `if_some expr (fun x -> cont)`
-   - `let%if_spec (s,x) = expr in cont` becomes `if_spec expr (fun s x -> cont)`
+   - ~let%some x = expr in cont~ becomes ~if_some expr (fun x -> cont)~
+   - ~let%if_spec (s,x) = expr in cont~ becomes ~if_spec expr (fun s x -> cont)~
 
    The full list of available moands is provided in `monad_mapping` of
    monad_ppx.ml, but is reproduced below for convenience:
