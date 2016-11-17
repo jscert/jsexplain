@@ -169,24 +169,24 @@ let ref_kind_comparable x y =
      | Coq_ref_kind_object -> false
      | Coq_ref_kind_env_record -> true)
 
-(** val object_binds_pickable_option :
-    state -> object_loc -> coq_object coq_Pickable_option **)
+(** val object_binds_option :
+    state -> object_loc -> coq_object option **)
 
 (* STATEFUL-RO *)
-let object_binds_pickable_option s l =
+let object_binds_option s l =
   HeapObj.read_option s.state_object_heap l
 
-(** val env_record_binds_pickable_option :
-    state -> env_loc -> env_record coq_Pickable_option **)
+(** val env_record_binds_option :
+    state -> env_loc -> env_record option **)
 
 (* STATEFUL-RO *)
-let env_record_binds_pickable_option s l =
+let env_record_binds_option s l =
   HeapInt.read_option s.state_env_record_heap l
 
-(** val decl_env_record_pickable_option :
-    decl_env_record -> prop_name -> (mutability * value) coq_Pickable_option **)
+(** val decl_env_record_option :
+    decl_env_record -> prop_name -> (mutability * value) option **)
 
-let decl_env_record_pickable_option ed x =
+let decl_env_record_option ed x =
   HeapStr.read_option ed x
 
 (** val descriptor_is_data_dec : descriptor -> bool **)
@@ -237,14 +237,14 @@ let attributes_is_data_dec a = match a with
 (* STATEFUL -- idea is to have this one imperative *)
 let run_object_heap_map_properties s l f =
   map (fun o -> object_write s l (object_map_properties o f))
-    (object_binds_pickable_option s l)
+    (object_binds_option s l)
 
-(** val object_heap_map_properties_pickable_option :
+(** val object_heap_map_properties_option :
     state -> object_loc -> (object_properties_type -> object_properties_type)
-    -> state coq_Pickable_option **)
+    -> state option **)
 
 (* STATEFUL -- eliminate by inlining *)
-let object_heap_map_properties_pickable_option s l f =
+let object_heap_map_properties_option s l f =
   run_object_heap_map_properties s l f
 
 (** val descriptor_contains_dec :
@@ -346,7 +346,7 @@ match v with
   &&
     (option_case false (fun o ->
       option_case false (fun bd -> funcbody_is_strict bd) o.object_code_)
-      (object_binds_pickable_option s l))
+      (object_binds_option s l))
 
 (** val spec_function_get_error_case_dec :
     state -> prop_name -> value -> bool **)
@@ -363,7 +363,7 @@ match v with
 | Coq_value_prim w -> Some None
 | Coq_value_object l ->
   option_case None (fun o -> Some o.object_call_)
-    (object_binds_pickable_option s l)
+    (object_binds_option s l)
 
 (** val is_callable_dec : state -> value -> bool **)
 
@@ -371,11 +371,11 @@ match v with
 let is_callable_dec s v =
   option_case false (fun o -> option_case false (fun x -> true) o) (run_callable s v)
 
-(** val object_properties_keys_as_list_pickable_option :
-    state -> object_loc -> prop_name list coq_Pickable_option **)
+(** val object_properties_keys_as_list_option :
+    state -> object_loc -> prop_name list option **)
 
 (* STATEFUL-RO *)
-let object_properties_keys_as_list_pickable_option s l =
+let object_properties_keys_as_list_option s l =
   map (fun props -> LibList.map fst (HeapStr.to_list props))
-    (map object_properties_ (object_binds_pickable_option s l))
+    (map object_properties_ (object_binds_option s l))
 

@@ -4,8 +4,6 @@
 	let if_any_or_throw w k1 k2 =
 	let if_success_or_return w k1 k2 =
 
-*) rename "decl_env_record_pickable_option" into "decl_env_record_option"
-
 *) let if_success_state rv w k 
 	=> inline the definition of "if_ter" inside its body
 	  and assign an explicit name to the local function there

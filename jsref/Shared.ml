@@ -32,9 +32,3 @@ let le_int_decidable x y =  x <= y
 
 let ge_nat_decidable x y = int_ge x y
 
-type 'a coq_Pickable_option =
-  'a option
-  (* singleton inductive, whose constructor was pickable_option_make *)
-
-
-
