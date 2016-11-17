@@ -47,7 +47,7 @@ make cleanall
 
 ** About the subset of OCaml supported
 
-   * *Let (rec)* declarations, except ~let () = ~ and ~let _ =~.
+   * *Let (rec)* declarations, except ~let () =~ and ~let _ =~.
    * *If then else* statements, as excepted ~if then else~
      statements return a value.
    * *Pattern matching*, only one level of pattern matching over
