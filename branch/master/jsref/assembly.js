@@ -1098,8 +1098,6 @@ var le_int_decidable = function (x, y) {
 var ge_nat_decidable = function (x, y) {
   return (int_ge(x, y));
 };
-
-
 }// end of with Datatypes
 }// end of with Heap
 
@@ -4631,19 +4629,19 @@ var ref_kind_comparable = function (x, y) {
 
 
 
-var object_binds_pickable_option = function (s, l) {
+var object_binds_option = function (s, l) {
   return (HeapObj.read_option(s.state_object_heap, l));
 };
 
 
 
-var env_record_binds_pickable_option = function (s, l) {
+var env_record_binds_option = function (s, l) {
   return (HeapInt.read_option(s.state_env_record_heap, l));
 };
 
 
 
-var decl_env_record_pickable_option = function (ed, x) {
+var decl_env_record_option = function (ed, x) {
   return (HeapStr.read_option(ed, x));
 };
 
@@ -4722,12 +4720,12 @@ var run_object_heap_map_properties = function (s, l, f) {
   return (
     map(function (o) {
         return (object_write(s, l, object_map_properties(o, f)));},
-      object_binds_pickable_option(s, l)));
+      object_binds_option(s, l)));
 };
 
 
 
-var object_heap_map_properties_pickable_option = function (s, l, f) {
+var object_heap_map_properties_option = function (s, l, f) {
   return (run_object_heap_map_properties(s, l, f));
 };
 
@@ -4867,7 +4865,7 @@ var run_function_get_error_case = function (s, x, v) {
                return (
                  option_case(false, function (bd) {
                      return (funcbody_is_strict(bd));}, o.object_code_));},
-             object_binds_pickable_option(s, l))));
+             object_binds_option(s, l))));
   }
   
 };
@@ -4889,7 +4887,7 @@ var run_callable = function (s, v) {
       var l = v.value;
       return (
         option_case(None(), function (o) { return (Some(o.object_call_));},
-          object_binds_pickable_option(s, l)));
+          object_binds_option(s, l)));
   }
   
 };
@@ -4905,10 +4903,10 @@ var is_callable_dec = function (s, v) {
 
 
 
-var object_properties_keys_as_list_pickable_option = function (s, l) {
+var object_properties_keys_as_list_option = function (s, l) {
   return (
     map(function (props) { return (LibList.map(fst, HeapStr.to_list(props)));
-      }, map(object_properties_, object_binds_pickable_option(s, l))));
+      }, map(object_properties_, object_binds_option(s, l))));
 };
 }// end of with Datatypes
 }// end of with JsCommon
@@ -4927,16 +4925,16 @@ return {
   attributes_compare: attributes_compare, 
   full_descriptor_compare: full_descriptor_compare, 
   ref_kind_comparable: ref_kind_comparable, 
-  object_binds_pickable_option: object_binds_pickable_option, 
-  env_record_binds_pickable_option: env_record_binds_pickable_option, 
-  decl_env_record_pickable_option: decl_env_record_pickable_option, 
+  object_binds_option: object_binds_option, 
+  env_record_binds_option: env_record_binds_option, 
+  decl_env_record_option: decl_env_record_option, 
   descriptor_is_data_dec: descriptor_is_data_dec, 
   descriptor_is_accessor_dec: descriptor_is_accessor_dec, 
   descriptor_is_generic_dec: descriptor_is_generic_dec, 
   prepost_unary_op_dec: prepost_unary_op_dec, 
   attributes_is_data_dec: attributes_is_data_dec, 
   run_object_heap_map_properties: run_object_heap_map_properties, 
-  object_heap_map_properties_pickable_option: object_heap_map_properties_pickable_option, 
+  object_heap_map_properties_option: object_heap_map_properties_option, 
   descriptor_contains_dec: descriptor_contains_dec, 
   descriptor_enumerable_not_same_dec: descriptor_enumerable_not_same_dec, 
   descriptor_value_not_same_dec: descriptor_value_not_same_dec, 
@@ -4949,7 +4947,7 @@ return {
   spec_function_get_error_case_dec: spec_function_get_error_case_dec, 
   run_callable: run_callable, 
   is_callable_dec: is_callable_dec, 
-  object_properties_keys_as_list_pickable_option: object_properties_keys_as_list_pickable_option};
+  object_properties_keys_as_list_option: object_properties_keys_as_list_option};
 })();
 
 /* --------------------- JsPreliminary.unlog.js --------------------- */
@@ -8070,8 +8068,7 @@ var run_object_method = function (proj, s, l) {
     log_event("JsInterpreter.js", 342, ctx_51, "call");
     var _return_173 = LibOption.map(proj, (function () {
                           log_event("JsInterpreter.js", 340, ctx_51, "call");
-                          var _return_172 = object_binds_pickable_option(s,
-                                              l);
+                          var _return_172 = object_binds_option(s, l);
                           log_event("JsInterpreter.js", 339, ctx_push(ctx_51, [{key: "#RETURN_VALUE#", val: _return_172}]), "return");
                           return (_return_172); }()));
     log_event("JsInterpreter.js", 341, ctx_push(ctx_51, [{key: "#RETURN_VALUE#", val: _return_173}]), "return");
@@ -8103,8 +8100,7 @@ var run_object_heap_set_extensible = function (b, s, l) {
                           log_event("JsInterpreter.js", 347, ctx_push(ctx_53, [{key: "#RETURN_VALUE#", val: _return_176}]), "return");
                           return (_return_176); }, (function () {
                           log_event("JsInterpreter.js", 350, ctx_52, "call");
-                          var _return_177 = object_binds_pickable_option(s,
-                                              l);
+                          var _return_177 = object_binds_option(s, l);
                           log_event("JsInterpreter.js", 349, ctx_push(ctx_52, [{key: "#RETURN_VALUE#", val: _return_177}]), "return");
                           return (_return_177); }()));
     log_event("JsInterpreter.js", 351, ctx_push(ctx_52, [{key: "#RETURN_VALUE#", val: _return_178}]), "return");
@@ -9906,7 +9902,7 @@ var object_define_own_prop = function (s, c, l, x, desc, throwcont) {
                                                       if_some((function () {
                                                           log_event("JsInterpreter.js", 883, ctx_165, "call");
                                                           var _return_387 = 
-                                                          object_heap_map_properties_pickable_option(
+                                                          object_heap_map_properties_option(
                                                             s1, l,
                                                             function (p) {
                                                               var ctx_166 = ctx_push(ctx_165, [{key: "p", val: p}]);
@@ -9976,7 +9972,7 @@ var object_define_own_prop = function (s, c, l, x, desc, throwcont) {
                                                       if_some((function () {
                                                           log_event("JsInterpreter.js", 899, ctx_170, "call");
                                                           var _return_393 = 
-                                                          object_heap_map_properties_pickable_option(
+                                                          object_heap_map_properties_option(
                                                             s2, l,
                                                             function (p) {
                                                               var ctx_171 = ctx_push(ctx_170, [{key: "p", val: p}]);
@@ -10171,7 +10167,7 @@ var object_define_own_prop = function (s, c, l, x, desc, throwcont) {
                                                                 (function () {
                                                                   log_event("JsInterpreter.js", 1001, ctx_183, "call");
                                                                   var _return_449 = 
-                                                                  object_heap_map_properties_pickable_option(
+                                                                  object_heap_map_properties_option(
                                                                     s1, l,
                                                                     function (p) {
                                                                     var ctx_184 = ctx_push(ctx_183, [{key: "p", val: p}]);
@@ -12137,7 +12133,7 @@ var prim_new_object = function (s, _foo_) {
       log_event("JsInterpreter.js", 1479, ctx_262, "let");
       var _return_663 = if_some((function () {
                             log_event("JsInterpreter.js", 1473, ctx_262, "call");
-                            var _return_661 = object_heap_map_properties_pickable_option(
+                            var _return_661 = object_heap_map_properties_option(
                                                 s1, l, function (p) {
                                                   var ctx_263 = ctx_push(ctx_262, [{key: "p", val: p}]);
                                                   log_event("JsInterpreter.js", 1471, ctx_263, "enter");
@@ -12362,8 +12358,7 @@ var env_record_has_binding = function (s, c, l, x) {
   log_event("JsInterpreter.js", 1557, ctx_277, "enter");
   var _return_692 = if_some((function () {
                         log_event("JsInterpreter.js", 1543, ctx_277, "call");
-                        var _return_687 = env_record_binds_pickable_option(s,
-                                            l);
+                        var _return_687 = env_record_binds_option(s, l);
                         log_event("JsInterpreter.js", 1542, ctx_push(ctx_277, [{key: "#RETURN_VALUE#", val: _return_687}]), "return");
                         return (_return_687); }()), function(e) {
                         
@@ -12507,7 +12502,7 @@ var object_delete_default = function (s, c, l, x, str) {
                               var _return_711 = if_some((function () {
                                                     log_event("JsInterpreter.js", 1592, ctx_286, "call");
                                                     var _return_709 = 
-                                                    object_heap_map_properties_pickable_option(
+                                                    object_heap_map_properties_option(
                                                       s1, l, function (p) {
                                                         var ctx_287 = ctx_push(ctx_286, [{key: "p", val: p}]);
                                                         log_event("JsInterpreter.js", 1590, ctx_287, "enter");
@@ -12721,8 +12716,7 @@ var env_record_delete_binding = function (s, c, l, x) {
   log_event("JsInterpreter.js", 1687, ctx_297, "enter");
   var _return_741 = if_some((function () {
                         log_event("JsInterpreter.js", 1655, ctx_297, "call");
-                        var _return_729 = env_record_binds_pickable_option(s,
-                                            l);
+                        var _return_729 = env_record_binds_option(s, l);
                         log_event("JsInterpreter.js", 1654, ctx_push(ctx_297, [{key: "#RETURN_VALUE#", val: _return_729}]), "return");
                         return (_return_729); }()), function(e) {
                         
@@ -12854,8 +12848,7 @@ var env_record_implicit_this_value = function (s, l) {
     log_event("JsInterpreter.js", 1700, ctx_304, "call");
     var _return_747 = ifx_some_or_default((function () {
                           log_event("JsInterpreter.js", 1689, ctx_304, "call");
-                          var _return_742 = env_record_binds_pickable_option(
-                                              s, l);
+                          var _return_742 = env_record_binds_option(s, l);
                           log_event("JsInterpreter.js", 1688, ctx_push(ctx_304, [{key: "#RETURN_VALUE#", val: _return_742}]), "return");
                           return (_return_742); }()), None(), function (e) {
                           var ctx_305 = ctx_push(ctx_304, [{key: "e", val: e}]);
@@ -12929,8 +12922,7 @@ var env_record_get_binding_value = function (s, c, l, x, str) {
   log_event("JsInterpreter.js", 1743, ctx_311, "enter");
   var _return_764 = if_some((function () {
                         log_event("JsInterpreter.js", 1710, ctx_311, "call");
-                        var _return_751 = env_record_binds_pickable_option(s,
-                                            l);
+                        var _return_751 = env_record_binds_option(s, l);
                         log_event("JsInterpreter.js", 1709, ctx_push(ctx_311, [{key: "#RETURN_VALUE#", val: _return_751}]), "return");
                         return (_return_751); }()), function(e) {
                         
@@ -13789,8 +13781,7 @@ var env_record_set_mutable_binding = function (s, c, l, x, v, str) {
   log_event("JsInterpreter.js", 1997, ctx_367, "enter");
   var _return_867 = if_some((function () {
                         log_event("JsInterpreter.js", 1968, ctx_367, "call");
-                        var _return_855 = env_record_binds_pickable_option(s,
-                                            l);
+                        var _return_855 = env_record_binds_option(s, l);
                         log_event("JsInterpreter.js", 1967, ctx_push(ctx_367, [{key: "#RETURN_VALUE#", val: _return_855}]), "return");
                         return (_return_855); }()), function(e) {
                         
@@ -14272,8 +14263,7 @@ var env_record_create_mutable_binding = function (s, c, l, x, deletable_opt) {
   log_event("JsInterpreter.js", 2161, ctx_392, "let");
   var _return_945 = if_some((function () {
                         log_event("JsInterpreter.js", 2109, ctx_392, "call");
-                        var _return_923 = env_record_binds_pickable_option(s,
-                                            l);
+                        var _return_923 = env_record_binds_option(s, l);
                         log_event("JsInterpreter.js", 2108, ctx_push(ctx_392, [{key: "#RETURN_VALUE#", val: _return_923}]), "return");
                         return (_return_923); }()), function(e) {
                         
@@ -14487,8 +14477,7 @@ var env_record_create_immutable_binding = function (s, l, x) {
   log_event("JsInterpreter.js", 2204, ctx_404, "enter");
   var _return_964 = if_some((function () {
                         log_event("JsInterpreter.js", 2174, ctx_404, "call");
-                        var _return_950 = env_record_binds_pickable_option(s,
-                                            l);
+                        var _return_950 = env_record_binds_option(s, l);
                         log_event("JsInterpreter.js", 2173, ctx_push(ctx_404, [{key: "#RETURN_VALUE#", val: _return_950}]), "return");
                         return (_return_950); }()), function(e) {
                         
@@ -14599,8 +14588,7 @@ var env_record_initialize_immutable_binding = function (s, l, x, v) {
   log_event("JsInterpreter.js", 2243, ctx_410, "enter");
   var _return_981 = if_some((function () {
                         log_event("JsInterpreter.js", 2206, ctx_410, "call");
-                        var _return_965 = env_record_binds_pickable_option(s,
-                                            l);
+                        var _return_965 = env_record_binds_option(s, l);
                         log_event("JsInterpreter.js", 2205, ctx_push(ctx_410, [{key: "#RETURN_VALUE#", val: _return_965}]), "return");
                         return (_return_965); }()), function(e) {
                         
@@ -14614,7 +14602,7 @@ var env_record_initialize_immutable_binding = function (s, l, x, v) {
                           
                             var _return_976 = if_some((function () {
                                                   log_event("JsInterpreter.js", 2208, ctx_412, "call");
-                                                  var _return_966 = decl_env_record_pickable_option(
+                                                  var _return_966 = decl_env_record_option(
                                                                     ed, x);
                                                   log_event("JsInterpreter.js", 2207, ctx_push(ctx_412, [{key: "#RETURN_VALUE#", val: _return_966}]), "return");
                                                   return (_return_966); }()),
@@ -14882,7 +14870,7 @@ var array_args_map_loop = function (s, c, l, args, ind) {
     
       var _return_1009 = if_some((function () {
                              log_event("JsInterpreter.js", 2295, ctx_426, "call");
-                             var _return_1005 = object_heap_map_properties_pickable_option(
+                             var _return_1005 = object_heap_map_properties_option(
                                                   s, l, function (p) {
                                                     var ctx_427 = ctx_push(ctx_426, [{key: "p", val: p}]);
                                                     log_event("JsInterpreter.js", 2293, ctx_427, "enter");
@@ -15533,7 +15521,7 @@ var run_construct_prealloc = function (s, c, b, args) {
         log_event("JsInterpreter.js", 2522, ctx_452, "enter");
         var _return_1110 = if_some((function () {
                                log_event("JsInterpreter.js", 2516, ctx_452, "call");
-                               var _return_1108 = object_heap_map_properties_pickable_option(
+                               var _return_1108 = object_heap_map_properties_option(
                                                     s_3, l, function (p0) {
                                                       var ctx_453 = ctx_push(ctx_452, [{key: "p0", val: p0}]);
                                                       log_event("JsInterpreter.js", 2514, ctx_453, "enter");
@@ -15614,7 +15602,7 @@ var run_construct_prealloc = function (s, c, b, args) {
               
                 var _return_1128 = if_some((function () {
                                        log_event("JsInterpreter.js", 2553, ctx_461, "call");
-                                       var _return_1125 = object_heap_map_properties_pickable_option(
+                                       var _return_1125 = object_heap_map_properties_option(
                                                             s_2, l,
                                                             function (p1) {
                                                               var ctx_462 = ctx_push(ctx_461, [{key: "p1", val: p1}]);
@@ -15662,7 +15650,7 @@ var run_construct_prealloc = function (s, c, b, args) {
               
                 var _return_1135 = if_some((function () {
                                        log_event("JsInterpreter.js", 2569, ctx_461, "call");
-                                       var _return_1132 = object_heap_map_properties_pickable_option(
+                                       var _return_1132 = object_heap_map_properties_option(
                                                             s_2, l,
                                                             function (p1) {
                                                               var ctx_464 = ctx_push(ctx_461, [{key: "p1", val: p1}]);
@@ -15712,7 +15700,7 @@ var run_construct_prealloc = function (s, c, b, args) {
               
                 var _return_1142 = if_some((function () {
                                        log_event("JsInterpreter.js", 2585, ctx_466, "call");
-                                       var _return_1139 = object_heap_map_properties_pickable_option(
+                                       var _return_1139 = object_heap_map_properties_option(
                                                             s_2, l,
                                                             function (p1) {
                                                               var ctx_467 = ctx_push(ctx_466, [{key: "p1", val: p1}]);
@@ -15814,7 +15802,7 @@ var run_construct_prealloc = function (s, c, b, args) {
               
                 var _return_1157 = if_some((function () {
                                        log_event("JsInterpreter.js", 2617, ctx_471, "call");
-                                       var _return_1154 = object_heap_map_properties_pickable_option(
+                                       var _return_1154 = object_heap_map_properties_option(
                                                             s_2, l,
                                                             function (p1) {
                                                               var ctx_472 = ctx_push(ctx_471, [{key: "p1", val: p1}]);
@@ -15866,7 +15854,7 @@ var run_construct_prealloc = function (s, c, b, args) {
           
             var _return_1164 = if_some((function () {
                                    log_event("JsInterpreter.js", 2635, ctx_474, "call");
-                                   var _return_1161 = object_heap_map_properties_pickable_option(
+                                   var _return_1161 = object_heap_map_properties_option(
                                                         s_2, l,
                                                         function (p0) {
                                                           var ctx_475 = ctx_push(ctx_474, [{key: "p0", val: p0}]);
@@ -15916,7 +15904,7 @@ var run_construct_prealloc = function (s, c, b, args) {
       } else {
         var _return_1120 = if_some((function () {
                                log_event("JsInterpreter.js", 2532, ctx_456, "call");
-                               var _return_1116 = object_heap_map_properties_pickable_option(
+                               var _return_1116 = object_heap_map_properties_option(
                                                     s_2, l, function (p0) {
                                                       var ctx_457 = ctx_push(ctx_456, [{key: "p0", val: p0}]);
                                                       log_event("JsInterpreter.js", 2530, ctx_457, "enter");
@@ -16031,7 +16019,7 @@ var run_construct_prealloc = function (s, c, b, args) {
         log_event("JsInterpreter.js", 2673, ctx_482, "let");
         var _return_1174 = if_some((function () {
                                log_event("JsInterpreter.js", 2667, ctx_482, "call");
-                               var _return_1172 = object_heap_map_properties_pickable_option(
+                               var _return_1172 = object_heap_map_properties_option(
                                                     s2, l, function (p) {
                                                       var ctx_483 = ctx_push(ctx_482, [{key: "p", val: p}]);
                                                       log_event("JsInterpreter.js", 2665, ctx_483, "enter");
@@ -17493,8 +17481,7 @@ var arguments_object_map_loop = function (s, c, l, xs, len, args, x, str, lmap, 
                              var _return_1340 = if_some((function () {
                                                     log_event("JsInterpreter.js", 3083, ctx_569, "call");
                                                     var _return_1336 = 
-                                                    object_binds_pickable_option(
-                                                      s, l);
+                                                    object_binds_option(s, l);
                                                     log_event("JsInterpreter.js", 3082, ctx_push(ctx_569, [{key: "#RETURN_VALUE#", val: _return_1336}]), "return");
                                                     return (_return_1336); 
                                                   }()), function(o) {
@@ -23220,7 +23207,7 @@ var run_expr_function = function (s, c, fo, args, bd) {
         log_event("JsInterpreter.js", 4867, ctx_897, "enter");
         var _return_2058 = if_some((function () {
                                log_event("JsInterpreter.js", 4843, ctx_897, "call");
-                               var _return_2050 = env_record_binds_pickable_option(
+                               var _return_2050 = env_record_binds_option(
                                                     s_2, l);
                                log_event("JsInterpreter.js", 4842, ctx_push(ctx_897, [{key: "#RETURN_VALUE#", val: _return_2050}]), "return");
                                return (_return_2050); }()), function(e) {
@@ -27978,7 +27965,7 @@ var run_call_prealloc = function (s, c, b, vthis, args) {
         
           var _return_2650 = if_some((function () {
                                  log_event("JsInterpreter.js", 6309, ctx_1201, "call");
-                                 var _return_2647 = object_properties_keys_as_list_pickable_option(
+                                 var _return_2647 = object_properties_keys_as_list_option(
                                                       s, l);
                                  log_event("JsInterpreter.js", 6308, ctx_push(ctx_1201, [{key: "#RETURN_VALUE#", val: _return_2647}]), "return");
                                  return (_return_2647); }()), function(_x_) {
@@ -28033,7 +28020,7 @@ var run_call_prealloc = function (s, c, b, vthis, args) {
         
           var _return_2657 = if_some((function () {
                                  log_event("JsInterpreter.js", 6328, ctx_1205, "call");
-                                 var _return_2654 = object_properties_keys_as_list_pickable_option(
+                                 var _return_2654 = object_properties_keys_as_list_option(
                                                       s, l);
                                  log_event("JsInterpreter.js", 6327, ctx_push(ctx_1205, [{key: "#RETURN_VALUE#", val: _return_2654}]), "return");
                                  return (_return_2654); }()), function(_x_) {
@@ -28088,8 +28075,7 @@ var run_call_prealloc = function (s, c, b, vthis, args) {
         
           var _return_2664 = if_some((function () {
                                  log_event("JsInterpreter.js", 6347, ctx_1209, "call");
-                                 var _return_2661 = object_binds_pickable_option(
-                                                      s, l);
+                                 var _return_2661 = object_binds_option(s, l);
                                  log_event("JsInterpreter.js", 6346, ctx_push(ctx_1209, [{key: "#RETURN_VALUE#", val: _return_2661}]), "return");
                                  return (_return_2661); }()), function(o) {
                                  
@@ -28152,7 +28138,7 @@ var run_call_prealloc = function (s, c, b, vthis, args) {
         
           var _return_2671 = if_some((function () {
                                  log_event("JsInterpreter.js", 6368, ctx_1215, "call");
-                                 var _return_2668 = object_properties_keys_as_list_pickable_option(
+                                 var _return_2668 = object_properties_keys_as_list_option(
                                                       s, l);
                                  log_event("JsInterpreter.js", 6367, ctx_push(ctx_1215, [{key: "#RETURN_VALUE#", val: _return_2668}]), "return");
                                  return (_return_2668); }()), function(_x_) {
@@ -28207,7 +28193,7 @@ var run_call_prealloc = function (s, c, b, vthis, args) {
         
           var _return_2678 = if_some((function () {
                                  log_event("JsInterpreter.js", 6387, ctx_1219, "call");
-                                 var _return_2675 = object_properties_keys_as_list_pickable_option(
+                                 var _return_2675 = object_properties_keys_as_list_option(
                                                       s, l);
                                  log_event("JsInterpreter.js", 6386, ctx_push(ctx_1219, [{key: "#RETURN_VALUE#", val: _return_2675}]), "return");
                                  return (_return_2675); }()), function(_x_) {
@@ -29346,7 +29332,7 @@ var run_call_prealloc = function (s, c, b, vthis, args) {
                                    var _return_2829 = if_some((function () {
                                                           log_event("JsInterpreter.js", 6736, ctx_1287, "call");
                                                           var _return_2821 = 
-                                                          object_heap_map_properties_pickable_option(
+                                                          object_heap_map_properties_option(
                                                             s10, l,
                                                             function (p) {
                                                               var ctx_1288 = ctx_push(ctx_1287, [{key: "p", val: p}]);
