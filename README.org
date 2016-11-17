@@ -20,3 +20,11 @@ https://jscert.github.io/jsexplain/branch/master/driver.html
 
 mljsref results are tested online and results published to:
 https://psvg.doc.ic.ac.uk/ci/jscert-testing/
+
+* JavaScript features used
+- Object.assign
+- No type casting
+- No prototypes
+- Arrays (for tuples)
+- Switch on strings
+- ...
