@@ -18,8 +18,8 @@ type 't specres = 't specret resultof
 
 (** val res_out : out -> 'a1 specres **)
 
-let res_out o =
-  Coq_result_some (Coq_specret_out o)
+let res_out s r =
+  Coq_result_some (Coq_specret_out (s, r))
 
 (** val res_spec : state -> 'a1 -> 'a1 specres **)
 
@@ -28,30 +28,19 @@ let res_spec s a =
 
 type retn = __ specret
 
-type result = retn resultof
+type result = retn resultof    (* __ specret resultof *)
 
 (** val res_ter : state -> res -> result **)
 
 let res_ter s r =
-  res_out (Coq_out_ter (s, r))
+  res_out s r
 
 type result_void = result
 
 (** val res_void : state -> result_void **)
 
 let res_void s =
-  res_out (out_void s)
-
-(** val out_from_retn : retn -> out **)
-
-let out_from_retn _foo_ = match _foo_ with
-| Coq_specret_val (s, _) -> assert false (* absurd case *)
-| Coq_specret_out o -> o
-
-(** val result_out : out -> result **)
-
-let result_out o =
-  res_out o
+  res_out s res_empty
 
 (** val get_arg : int -> value list -> value **)
 
@@ -107,23 +96,22 @@ let if_result_some w k =
   | Coq_result_impossible -> Coq_result_impossible
   | Coq_result_bottom s0 -> Coq_result_bottom s0
 
-(** val if_out_some : result -> (out -> 'a1 resultof) -> 'a1 resultof **)
-
-let if_out_some w k =
-  if_result_some w (fun sp -> k (out_from_retn sp))
-
-(** val throw_result : result -> 'a1 specres **)
-
-let throw_result w =
-  if_out_some w (fun o -> res_out o)
-
 (** val if_ter : result -> (state -> res -> 'a1 specres) -> 'a1 specres **)
+(** Unpack a result assuming it contains a Coq_specret_out *)
 
 let if_ter w k =
-  if_out_some w (fun o ->
-    match o with
-    | Coq_out_div -> res_out o
-    | Coq_out_ter (s0, r) -> k s0 r)
+  if_result_some w (fun sp ->
+    match sp with
+    | Coq_specret_out (s, r) -> k s r
+    | _ -> assert false
+  )
+
+(** val throw_result : result -> 'a1 specres **)
+(** This appears to be the identity function (with input checking, this matches
+    the behaviour of the original, with the out type flattened. *)
+
+let throw_result w =
+  if_ter w (fun s r -> res_out s r)
 
 (** val if_success_state :
     resvalue -> result -> (state -> resvalue -> result) -> result **)
@@ -148,10 +136,10 @@ let if_success w k =
   if_ter w (fun s0 r ->
     match r.res_type with
     | Coq_restype_normal -> if_empty_label s0 r (fun x -> k s0 r.res_value)
-    | Coq_restype_break -> res_out (Coq_out_ter (s0, r))
-    | Coq_restype_continue -> res_out (Coq_out_ter (s0, r))
-    | Coq_restype_return -> res_out (Coq_out_ter (s0, r))
-    | Coq_restype_throw -> res_out (Coq_out_ter (s0, r)))
+    | Coq_restype_break -> res_out s0 r
+    | Coq_restype_continue -> res_out s0 r
+    | Coq_restype_return -> res_out s0 r
+    | Coq_restype_throw -> res_out s0 r)
 
 (** val if_void : result_void -> (state -> result) -> result **)
 
@@ -335,14 +323,9 @@ let convert_option_attributes o =
 
 (** val if_abort : out -> (unit -> 'a1 resultof) -> 'a1 resultof **)
 
-let if_abort o k =
-  match o with
-  | Coq_out_div -> k ()
-  | Coq_out_ter (s0, r) ->
+let if_abort r k =
     if restype_compare r.res_type Coq_restype_normal
-    then (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s0
-           ("[if_abort] received a normal result!")
+    then (Debug.impossible_because __LOC__ "[if_abort] received a normal result!"; Coq_result_impossible)
     else k ()
 
 (** val if_spec :
@@ -352,7 +335,7 @@ let if_spec w k =
   if_result_some w (fun sp ->
     match sp with
     | Coq_specret_val (s0, a) -> k s0 a
-    | Coq_specret_out o -> if_abort o (fun x -> res_out o))
+    | Coq_specret_out (s0, r) -> if_abort r (fun _ -> res_out s0 r))
 
 
 let if_run w k = if_spec w k

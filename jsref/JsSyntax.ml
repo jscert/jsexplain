@@ -718,18 +718,10 @@ let res_throw v =
   { res_type = Coq_restype_throw; res_value = v; res_label =
     Coq_label_empty }
 
-type out =
-| Coq_out_div
-| Coq_out_ter of state * res [@f state, res]
-
-(** val out_void : state -> out **)
-
-let out_void s =
-  Coq_out_ter (s, res_empty)
-
+(** Return types from specification functions *)
 type 't specret =
-| Coq_specret_val of state * 't [@f state, res]
-| Coq_specret_out of out [@f out]
+| Coq_specret_val of state * 't [@f state, value] (** A pure/specification value *)
+| Coq_specret_out of state * res [@f state, res]  (** A completion record (possibly abrupt) *)
 
 type codetype =
 | Coq_codetype_func
