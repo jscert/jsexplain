@@ -82,7 +82,6 @@ ASSEMBLY_JS_FILES := \
 	Translate_syntax.js \
 	JsCommon.unlog.js \
 	JsCommonAux.unlog.js \
-	JsPreliminary.unlog.js \
 	JsInit.unlog.js \
 	Prheap.js \
 	Debug.js \
