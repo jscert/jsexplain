@@ -1248,6 +1248,7 @@ function updateSelection() {
 
    // navig panel
    $("#navigation_step").val(tracer_pos);
+   $("#event_type").html(item.type);
  }
  updateFileList();
  interpreter.focus();
