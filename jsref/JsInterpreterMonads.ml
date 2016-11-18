@@ -340,6 +340,9 @@ let if_spec w k =
 
 let if_run w k = if_spec w k
 
+let check_assert b k =
+  if b then k () else (Debug.impossible_because __LOC__ "spec assertion failed"; Coq_result_impossible)
+
 
 let ifx_prim w k = if_prim w k
 let ifx_number w k = if_number w k
