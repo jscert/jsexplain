@@ -1,0 +1,42 @@
+#+TITLE: Using JSExplain
+
+*** TODO Generic explanatory text here
+
+* Overview
+
+The JSExplain graphical user interface is presented in Figure
+[[fig:000_Overall]]. It allows the users to load JavaScript programs and
+execute them in our JavaScript interpreter. The users have at their
+disposal a mechanism for step-by-step execution with various levels of
+granularity, exposing all of the underlying details of the execution,
+as described in the official ECMAScript standard.
+
+#+CAPTION: JSExplain User Interface
+#+NAME: fig:000_Overall
+#+ATTR_HTML: :width 1024px :border 1 :rules all :frame border
+[[./screenshots/000_Overview.png]]
+
+The user interface consists of six components, as shown in Figure [[fig:001_Breakdown]]. These components are:
+1. *Program selection*, where users can choose the program that they wish to execute
+2. *Current program*, where the program that is currently being executed is displayed
+3. *State of the program heap*, where the contents of the program heap at the current point in the execution of the program are displayed
+4. *Navigation panel*, which allows the users to step through the program
+5. *Interpreter*, displaying the part of the interpreter code that is active at the current point in the execution of the program
+6. *State of the interpreter*, where the state of the interpreter at the current point in the execution of the program is displayed 
+
+#+CAPTION: JSExplain User Interface Breakdown
+#+NAME: fig:001_Breakdown
+#+ATTR_HTML: :width 1024px :border 1 :rules all :frame border
+[[./screenshots/001_Breakdown.png]]
+
+* TODO Program selection
+
+* TODO Current program
+
+* TODO State of the program heap
+
+* TODO Navigation panel
+
+* TODO Interpreter
+
+* TODO State of the interpreter
