@@ -245,7 +245,7 @@ function lookup_var_in_record_decl(name, env_record_decl) {
   */
 
 function lookup_var_in_object(state, name, loc) {
-   var obj_opt = JsCommonAux.object_binds_pickable_option(state, loc);
+   var obj_opt = JsCommonAux.object_binds_option(state, loc);
    if (obj_opt.tag != "Some") throw "show_object: unbound object";
    var obj = obj_opt.value;
    var props = obj.object_properties_;
@@ -296,7 +296,7 @@ function lookup_var_in_lexical_env(state, name, lexical_env) {
   while (list.tag == "::") {
     var env_loc = list.head;
     list = list.tail;
-    var env_record_opt = JsCommonAux.env_record_binds_pickable_option(state, env_loc);
+    var env_record_opt = JsCommonAux.env_record_binds_option(state, env_loc);
     if (env_record_opt.tag != "Some") throw "show_object: unbound object";
     var env_record = env_record_opt.value;
 
@@ -810,7 +810,7 @@ function show_object(state, loc, target, depth) {
      t.append("&lt;hidden&gt;");
      return;
    }
-   var obj_opt = JsCommonAux.object_binds_pickable_option(state, loc);
+   var obj_opt = JsCommonAux.object_binds_option(state, loc);
    if (obj_opt.tag != "Some") throw "show_object: unbound object";
    var obj = obj_opt.value;
    var props = obj.object_properties_;
@@ -927,7 +927,7 @@ function show_lexical_env(state, lexical_env, target) {
    var env_loc_array = encoded_list_to_array(lexical_env);
    for (var i = 0; i < env_loc_array.length; i++) {
       var env_loc = env_loc_array[i];
-      var env_record_opt = JsCommonAux.env_record_binds_pickable_option(state, env_loc);
+      var env_record_opt = JsCommonAux.env_record_binds_option(state, env_loc);
       if (env_record_opt.tag != "Some") throw "show_object: unbound object";
       var env_record = env_record_opt.value;
 
