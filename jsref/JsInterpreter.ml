@@ -10,6 +10,8 @@ open LibOption
 open LibProd
 open Shared
 
+(* Basically, the ordering of the functions in this file are random. They need to be sorted. *)
+
 (*------------JS preliminary -----------*)
 
 (** val convert_number_to_bool : number -> bool **)
@@ -263,10 +265,60 @@ let run_object_heap_set_extensible b s l =
      LibOption.map (fun o -> object_write s l (object_set_extensible o b)) opt
 *)
 
+
+
+
+(*****************************************************************************)
+(*****************************************************************************)
+(************* START OF THE BIG RECURSIVE INTERPRETER FUNCTION ***************)
+(*****************************************************************************)
+(*****************************************************************************)
+
+(** New ES6 Spec functions here, writting in the specification in CamelCase()
+    will all be prefixed with spec_ *)
+
+(** @esid sec-ordinarygetprototypeof *)
+let rec spec_ordinary_get_prototype_of s c l =
+  let%some v = run_object_method object_proto_ s l in
+  res_spec s (res_val v)
+
+(** @esid sec-ordinarysetprototypeof *)
+and spec_ordinary_set_prototype_of s c l v =
+  let%assert a = (match type_of v with Coq_type_object -> true | Coq_type_null -> true | _ -> false) in
+  let%some extensible = run_object_method object_extensible_ s l in
+  let%some current = run_object_method object_prototype_ s l in
+  if same_value_dec v current then res_spec s (res_val (Coq_value_prim (Coq_prim_bool true)))
+  else if not extensible then res_spec s (res_val (Coq_value_prim (Coq_prim_bool false)))
+  else
+    let rec repeat p done_ = begin
+      if not done_ then
+        (match p with
+        | Coq_value_prim prim -> (match prim with
+          | Coq_prim_null -> repeat p true
+          | _ -> assert false)
+        | Coq_value_object p_l ->
+          if same_value_dec p (Coq_value_object l) then res_spec s (res_val (Coq_value_prim (Coq_prim_bool false)))
+          else
+            let%some gpo = run_object_method object_get_prototype_of_ s p_l in
+            (match gpo with
+            | Coq_builtin_get_prototype_of_default -> (
+              let%some prototype = run_object_method object_prototype_ s p_l in
+              repeat prototype false)
+            | _ -> repeat p true))
+      else
+        (* Set the value of the [[Prototype]] internal slot of O to V *)
+        let%some s' = run_object_set_internal object_set_proto s l v in
+        res_spec s' (res_val (Coq_value_prim (Coq_prim_bool true)))
+    end
+    in repeat v false
+
+
+
+
 (** val object_has_prop :
     state -> execution_ctx -> object_loc -> prop_name -> result **)
 
-let rec object_has_prop s c l x =
+and object_has_prop s c l x =
   let%some b = (run_object_method object_has_prop_ s l) in
   match b with
   | Coq_builtin_has_prop_default ->

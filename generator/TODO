@@ -23,7 +23,7 @@
 
 *) Flag to force esprima to parse in strict mode
 
-*) put online the tool on the jscert website
+*) put online the tool on the jscert website (DONE, needs below:)
 	  - make sure to describe the supported features 
 	    (ecma5 minus for-in and a few other things)
      - explain that currently JS files are generated
