@@ -1,3 +1,5 @@
 node_modules/*
 !node_modules/esprima
 dist
+.DS_Store
+*~
