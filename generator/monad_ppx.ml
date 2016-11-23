@@ -18,6 +18,7 @@ let monad_mapping =
     ("not_throw", "if_not_throw");
     ("ter", "if_ter");
     ("break", "if_break");
+    ("spec", "if_spec");
     ("assert", "check_assert");
    ]
 
@@ -54,19 +55,6 @@ let generate_mapper namesid = function argv ->
                         Pstr_eval ({ pexp_loc  = loc;
                                      pexp_desc = Pexp_let
                                          (rf,
-                                          [{pvb_pat = {ppat_desc = Ppat_var _} as p;
-                                            pvb_expr = e}],
-                                          cont)
-                                   }, _)}] ->
-              Exp.apply ~loc (Exp.ident
-                                (Location.mkloc
-                                   (Longident.Lident ident) Location.none))
-                [(Nolabel, aux e);
-                 (Nolabel, Exp.fun_ Nolabel None p (aux cont))]
-            | PStr [{ pstr_desc =
-                        Pstr_eval ({ pexp_loc  = loc;
-                                     pexp_desc = Pexp_let
-                                         (rf,
                                           [{pvb_pat =
                                               {ppat_desc =
                                                  Ppat_tuple [p1;p2]};
@@ -78,6 +66,21 @@ let generate_mapper namesid = function argv ->
                                    (Longident.Lident ident) Location.none))
                 [(Nolabel, aux e);
                  (Nolabel, Exp.fun_ Nolabel None p1 (Exp.fun_ Nolabel None p2 (aux cont)))]
+            | PStr [{ pstr_desc =
+                        Pstr_eval ({ pexp_loc  = loc;
+                                     pexp_desc = Pexp_let (rf, [{pvb_pat = p; pvb_expr = e}], cont)
+                                   }, _)}] ->
+              begin
+                match p.ppat_desc with
+                | Ppat_var _
+                | Ppat_any ->
+                  Exp.apply ~loc (Exp.ident
+                                    (Location.mkloc
+                                       (Longident.Lident ident) Location.none))
+                    [(Nolabel, aux e);
+                     (Nolabel, Exp.fun_ Nolabel None p (aux cont))]
+                | _ -> raise (Location.Error (Location.error ~loc:p.ppat_loc ("unknown pattern type with let%"^name)))
+              end
             | _ ->
               raise (Location.Error (
                   Location.error ~loc ("error with let%"^name)))
