@@ -4,3 +4,9 @@ dist
 .DS_Store
 *~
 doc/jsref
+*.cmi
+*.cmo
+*.byte
+*.native
+*.cmx
+*.cmxs

@@ -10,6 +10,12 @@ open LibOption
 open LibProd
 open Shared
 
+(** ECMAScript Reference Interpreter Implementation
+
+    @esurl     https://tc39.github.io/ecma262/
+    @esversion 2016
+*)
+
 (* Basically, the ordering of the functions in this file are random. They need to be sorted. *)
 
 (*------------JS preliminary -----------*)
@@ -309,14 +315,14 @@ let rec object_internal_get s c l p receiver =
     will all be prefixed with spec_ *)
 
 (** {1 Abstract Operations }
-    @es7id 7
+    @essec 7
     @esid sec-abstract-operations *)
 
 (** {2 Testing and Comparison Operations }
-    @es7id 7.2
+    @essec 7.2
     @esid sec-testing-and-comparison-operations *)
 
-(** @es7id 7.2.3
+(** @essec 7.2.3
     @esid sec-iscallable *)
 and is_callable s argument =
   match argument with
@@ -326,7 +332,7 @@ and is_callable s argument =
   | _ ->
     res_spec s (Coq_value_prim (Coq_prim_bool false))
 
-(** @es7id 7.2.7
+(** @essec 7.2.7
     @esid sec-ispropertykey *)
 and is_property_key argument =
   match type_of argument with
@@ -335,18 +341,18 @@ and is_property_key argument =
   | _ -> false
 
 (** {2 Operations on Objects }
-    @es7id 7.3
+    @essec 7.3
     @esid sec-operations-on-objects *)
 
-(** @es7id 7.3.2
+(** @essec 7.3.2
     @esid sec-getv *)
 and get_v s c v p =
   let%assert _ = is_property_key p in
   let%object (s1, l) = to_object s c v in
   object_internal_get s1 c l p v
 
-(** @es7id 7.3.9
- *  @esid sec-getmethod *)
+(** @essec 7.3.9
+    @esid sec-getmethod *)
 and get_method s c v p =
   let%assert _ = (is_property_key p) in
   let%value (s1, func) = get_v s c v p in
@@ -359,14 +365,14 @@ and get_method s c v p =
     then run_error s2 c Coq_native_error_type
     else res_spec s2 (res_val func)
 
-(** @es7id 9.1.1.1
- *  @esid sec-ordinarygetprototypeof *)
+(** @essec 9.1.1.1
+    @esid sec-ordinarygetprototypeof *)
 and ordinary_get_prototype_of s c l =
   let%some v = run_object_method object_proto_ s l in
   res_spec s (res_val v)
 
-(** @es7id 9.1.2.1
- *  @esid sec-ordinarysetprototypeof *)
+(** @essec 9.1.2.1
+    @esid sec-ordinarysetprototypeof *)
 and ordinary_set_prototype_of s c l v =
   let%assert _ = (match type_of v with Coq_type_object -> true | Coq_type_null -> true | _ -> false) in
   let%some extensible = run_object_method object_extensible_ s l in
@@ -396,20 +402,20 @@ and ordinary_set_prototype_of s c l v =
     end
     in repeat v false
 
-(** @es7id 9.1.3.1
- *  @esid sec-ordinaryisextensible *)
+(** @essec 9.1.3.1
+    @esid sec-ordinaryisextensible *)
 and ordinary_is_extensible s c l =
   let%some b = run_object_method object_extensible_ s l in
   res_spec s (res_val (Coq_value_prim (Coq_prim_bool b)))
 
-(** @es7id 9.1.4.1
- *  @esid sec-ordinarypreventextensions *)
+(** @essec 9.1.4.1
+    @esid sec-ordinarypreventextensions *)
 and ordinary_prevent_extensions s c l =
   let%some s' = run_object_set_internal object_set_extensible s l false in
   res_spec s (res_val (Coq_value_prim (Coq_prim_bool true)))
 
-(** @es7id 9.1.11.1
- *  @esid sec-ordinaryownpropertykeys *)
+(** @essec 9.1.11.1
+    @esid sec-ordinaryownpropertykeys *)
 and ordinary_own_property_keys s c l =
   let%some keys = object_properties_keys_as_list_option s l in
   (* FIXME: Precise key ordering is to be implemented here! *)

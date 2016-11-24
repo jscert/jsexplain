@@ -33,8 +33,10 @@ ASSEMBLY     := $(ASSEMBLY_BIN)
 DISPLAYGEN_BIN := $(GENERATOR_DIR)/displayed_sources.byte
 DISPLAYGEN     := $(OCAMLPAR) $(DISPLAYGEN_BIN)
 
+ESDOCGEN := ../tools/esdocgen/esdocgen.cmo
+
 # Warn if buildtools are missing
-$(MLTOJS_BIN) $(LINEOF_BIN) $(PPX_BIN) $(ASSEMBLY_BIN) $(DISPLAYGEN_BIN):
+$(MLTOJS_BIN) $(LINEOF_BIN) $(PPX_BIN) $(ASSEMBLY_BIN) $(DISPLAYGEN_BIN) $(ESDOCGEN):
 	$(error Missing generator tools, build from project root, or set paths.)
 
 ###############################################################
@@ -229,7 +231,7 @@ DOC_DIR = doc_build
 DUMP_FILE = $(DOC_DIR)/odoc.dump
 DUMP = -dump $(DUMP_FILE) -load $(DUMP_FILE)
 
-ODOC_FLAGS = -html -d $(DOC_DIR) $(DUMP) $(PPX_FLAG)
+ODOC_FLAGS = -html -d $(DOC_DIR) $(DUMP) $(PPX_FLAG) -g $(ESDOCGEN)
 
 doc: $(addprefix doc_build/,$(addsuffix .html,$(basename $(ASSEMBLY_ML_FILES))))
 	sh -c "rm -f $(DUMP_FILE)"
@@ -241,10 +243,10 @@ $(DOC_DIR):
 $(DUMP_FILE): $(DOC_DIR)
 	ocamldoc -html -d $(DOC_DIR) -dump $(DUMP_FILE)
 
-$(DOC_DIR)/%.html $(DOC_DIR)/type_%.html: %.ml %.mli %.cmi $(PPX_BIN) $(DUMP_FILE)
+$(DOC_DIR)/%.html $(DOC_DIR)/type_%.html: %.ml %.mli %.cmi $(PPX_BIN) $(ESDOCGEN) $(DUMP_FILE)
 	ocamlfind ocamldoc $(ODOC_FLAGS) -package JS_Parser $(*F).ml $(*F).mli
 
-$(DOC_DIR)/%.html $(DOC_DIR)/type_%.html: %.ml %.cmi $(PPX_BIN) $(DUMP_FILE)
+$(DOC_DIR)/%.html $(DOC_DIR)/type_%.html: %.ml %.cmi $(PPX_BIN) $(ESDOCGEN) $(DUMP_FILE)
 	ocamldoc $(ODOC_FLAGS) $(STDLIB_FLAG) $<
 
 .PHONY: doc

@@ -31,9 +31,13 @@ test: jsjsref
 # Documentation
 doc: doc/jsref
 
-doc/jsref: generator
+esdocgen:
+	$(MAKE) -C tools/esdocgen
+
+doc/jsref: generator esdocgen
 	$(MAKE) -C jsref doc
-	mv jsref/doc_build doc/jsref
+	rm -rf $@ || true
+	mv jsref/doc_build $@
 
 # Publication Stages
 PUB_FILES=driver.html libraries jquery-ui-1.11.4.custom jquery_scroll \
@@ -56,7 +60,8 @@ publish-github: dist
 clean:
 	$(MAKE) -C generator clean
 	$(MAKE) -C jsref clean
+	$(MAKE) -C tools/esdocgen clean
 	rm -Rf doc/jsref || true
 	rm -Rf dist || true
 
-.PHONY: jsjsref mljsref generator generator-stdlib test_init test doc publish publish-github clean
+.PHONY: jsjsref mljsref generator generator-stdlib test_init test doc esdocgen publish publish-github clean
