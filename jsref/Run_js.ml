@@ -150,7 +150,7 @@ let run_prog_with_state state prog =
     (JsInterpreter.execution_ctx_binding_inst state ctx JsSyntax.Coq_codetype_global None prog [])
     (fun s' -> JsInterpreter.run_prog s' ctx prog))
 
-let run_prog_incremental prog_res prog =
+let run_prog_incremental (prog_res:JsInterpreterMonads.result) prog =
   match prog_res with
   | JsInterpreterMonads.Coq_result_some (JsSyntax.Coq_specret_out (state, res)) ->
     begin

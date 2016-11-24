@@ -266,6 +266,37 @@ let run_object_heap_set_extensible b s l =
 *)
 
 
+(** Function to implement the specification text "O has a [[X]] internal slot"
+ *  @param l    The location of O
+ *  @param prj  The object projection function corresponding to [[X]] *)
+let object_has_internal_slot s l prj =
+  let%some slot_value = run_object_method prj s l in
+  match slot_value with
+  | Some _ -> res_spec s true
+  | None -> res_spec s false
+
+(** Function to implement the specification text of "O has a [[X]] internal method" *)
+let object_has_internal_method = object_has_internal_slot
+
+(** Function to dispatch calls to O.[[Get]](P, receiver)
+    @param l  The location of O *)
+let rec object_internal_get s c l p receiver =
+  (* TODO: Check if c can be dropped. (ES5 compat) *)
+  let%some internal_method = (run_object_method object_get_ s l) in
+  let dispatch_es5 _ =
+    match p with
+    | Coq_value_prim p ->
+      (match p with
+      | Coq_prim_string x ->
+          object_get_builtin s c internal_method (Coq_value_object l) l x
+      | _ -> assert false)
+    | _ -> assert false
+  in match internal_method with
+  (* FIXME: Dispatch to new versions of functions *)
+  | Coq_builtin_get_default  -> dispatch_es5 ()
+  | Coq_builtin_get_function -> dispatch_es5 ()
+  | Coq_builtin_get_args_obj -> dispatch_es5 ()
+  | Coq_builtin_get_proxy    -> Coq_result_not_yet_implemented
 
 
 (*****************************************************************************)
@@ -277,14 +308,67 @@ let run_object_heap_set_extensible b s l =
 (** New ES6 Spec functions here, writting in the specification in CamelCase()
     will all be prefixed with spec_ *)
 
-(** @esid sec-ordinarygetprototypeof *)
-let rec spec_ordinary_get_prototype_of s c l =
+(** {1 Abstract Operations }
+    @es7id 7
+    @esid sec-abstract-operations *)
+
+(** {2 Testing and Comparison Operations }
+    @es7id 7.2
+    @esid sec-testing-and-comparison-operations *)
+
+(** @es7id 7.2.3
+    @esid sec-iscallable *)
+and is_callable s argument =
+  match argument with
+  | Coq_value_object l ->
+    let%spec (s1, b) = object_has_internal_method s l object_call_ in
+    res_spec s1 (Coq_value_prim (Coq_prim_bool b))
+  | _ ->
+    res_spec s (Coq_value_prim (Coq_prim_bool false))
+
+(** @es7id 7.2.7
+    @esid sec-ispropertykey *)
+and is_property_key argument =
+  match type_of argument with
+  | Coq_type_string -> true
+  (* FIXME: | Coq_type_symbol -> true *)
+  | _ -> false
+
+(** {2 Operations on Objects }
+    @es7id 7.3
+    @esid sec-operations-on-objects *)
+
+(** @es7id 7.3.2
+    @esid sec-getv *)
+and get_v s c v p =
+  let%assert _ = is_property_key p in
+  let%object (s1, l) = to_object s c v in
+  object_internal_get s1 c l p v
+
+(** @es7id 7.3.9
+ *  @esid sec-getmethod *)
+and get_method s c v p =
+  let%assert _ = (is_property_key p) in
+  let%value (s1, func) = get_v s c v p in
+  match type_of func with
+  | Coq_type_undef -> res_spec s1 (res_val (Coq_value_prim (Coq_prim_undef)))
+  | Coq_type_null  -> res_spec s1 (res_val (Coq_value_prim (Coq_prim_undef)))
+  | _ ->
+    let%bool (s2, callable) = is_callable s1 func in
+    if not callable
+    then run_error s2 c Coq_native_error_type
+    else res_spec s2 (res_val func)
+
+(** @es7id 9.1.1.1
+ *  @esid sec-ordinarygetprototypeof *)
+and ordinary_get_prototype_of s c l =
   let%some v = run_object_method object_proto_ s l in
   res_spec s (res_val v)
 
-(** @esid sec-ordinarysetprototypeof *)
-and spec_ordinary_set_prototype_of s c l v =
-  let%assert a = (match type_of v with Coq_type_object -> true | Coq_type_null -> true | _ -> false) in
+(** @es7id 9.1.2.1
+ *  @esid sec-ordinarysetprototypeof *)
+and ordinary_set_prototype_of s c l v =
+  let%assert _ = (match type_of v with Coq_type_object -> true | Coq_type_null -> true | _ -> false) in
   let%some extensible = run_object_method object_extensible_ s l in
   let%some current = run_object_method object_prototype_ s l in
   if same_value_dec v current then res_spec s (res_val (Coq_value_prim (Coq_prim_bool true)))
@@ -312,8 +396,24 @@ and spec_ordinary_set_prototype_of s c l v =
     end
     in repeat v false
 
+(** @es7id 9.1.3.1
+ *  @esid sec-ordinaryisextensible *)
+and ordinary_is_extensible s c l =
+  let%some b = run_object_method object_extensible_ s l in
+  res_spec s (res_val (Coq_value_prim (Coq_prim_bool b)))
 
+(** @es7id 9.1.4.1
+ *  @esid sec-ordinarypreventextensions *)
+and ordinary_prevent_extensions s c l =
+  let%some s' = run_object_set_internal object_set_extensible s l false in
+  res_spec s (res_val (Coq_value_prim (Coq_prim_bool true)))
 
+(** @es7id 9.1.11.1
+ *  @esid sec-ordinaryownpropertykeys *)
+and ordinary_own_property_keys s c l =
+  let%some keys = object_properties_keys_as_list_option s l in
+  (* FIXME: Precise key ordering is to be implemented here! *)
+  res_spec s keys
 
 (** val object_has_prop :
     state -> execution_ctx -> object_loc -> prop_name -> result **)
@@ -365,8 +465,11 @@ and out_error_or_cst s c str ne v =
 
 (** val object_get_builtin :
     state -> execution_ctx -> builtin_get -> value -> object_loc
-    -> prop_name -> result **)
+    -> prop_name -> result
 
+    @deprecated ES5 version of function. New versions need to be written and
+                dispatched to in {!object_internal_get}.
+**)
 and object_get_builtin s c b vthis l x =
   let def s0 l0 =
     let%run (s1, d) = (run_object_get_prop s0 c l0 x) in
@@ -406,8 +509,10 @@ and object_get_builtin s c b vthis l x =
   | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
 (** val run_object_get :
-    state -> execution_ctx -> object_loc -> prop_name -> result **)
+    state -> execution_ctx -> object_loc -> prop_name -> result
 
+    @deprecated This is the ES5 version, replaced by {!object_internal_get}
+    **)
 and run_object_get s c l x =
   let%some b = (run_object_method object_get_ s l) in
   object_get_builtin s c b (Coq_value_object l) l x

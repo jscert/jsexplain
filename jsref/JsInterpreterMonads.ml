@@ -6,8 +6,6 @@ open LibList
 open LibOption
 open Shared
 
-type __ = unit
-
 type 't resultof =
 | Coq_result_some of 't [@f value]
 | Coq_result_not_yet_implemented
@@ -26,9 +24,7 @@ let res_out s r =
 let res_spec s a =
   Coq_result_some (Coq_specret_val (s, a))
 
-type retn = __ specret
-
-type result = retn resultof    (* __ specret resultof *)
+type result = res specres
 
 (** val res_ter : state -> res -> result **)
 
@@ -330,7 +326,8 @@ let if_abort r k =
 
 (** val if_spec :
     'a1 specres -> (state -> 'a1 -> 'a2 specres) -> 'a2 specres **)
-
+(** Unpacks a Coq_specret_val (specification return value), returns an abrupt Coq_specret_out
+    This function is nearly equivalent to ReturnIfAbrupt in the ES spec *)
 let if_spec w k =
   if_result_some w (fun sp ->
     match sp with
