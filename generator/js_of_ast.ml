@@ -1192,14 +1192,21 @@ and js_of_expression ctx dest e =
   | Texp_for        (id, _, st, ed, fl, body) -> out_of_scope loc "for"
     (* ppf_for (ppf_ident id) (js_of_expression st) (js_of_expression ed) fl (js_of_expression body) *)
 
-  | Texp_record     (llde,None)          -> 
-      let sexp = ppf_record (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, inline_of_wrap exp)) llde) in
+  | Texp_record     {fields=llde; extended_expression=None} ->
+      let sexp = ppf_record (Array.to_list (Array.map
+          (fun (lbl, def) -> match def with
+          | Overridden (_, exp) -> (lbl.lbl_name, inline_of_wrap exp)
+          | _ -> assert false)
+        llde)) in
       apply_dest' ctx dest sexp
 
-  | Texp_record (assigns ,Some einit)  ->
-      let assigns_exp = ppf_record
-        (List.map (fun (_, lbl, exp) -> (lbl.lbl_name, inline_of_wrap exp)) assigns) in
-      let sexp = ppf_record_with (inline_of_wrap einit) assigns_exp in
+  | Texp_record  {fields=af; extended_expression=Some einit} ->
+      let assigns = Array.fold_right
+        (fun (lbl, def) accu -> match def with
+          | Overridden (_, exp) -> (lbl.lbl_name, inline_of_wrap exp) :: accu
+          | _ -> accu)
+        af [] in
+      let sexp = ppf_record_with (inline_of_wrap einit) (ppf_record assigns) in
       apply_dest' ctx dest sexp
 
   | Texp_field      (exp, _, lbl)     ->
