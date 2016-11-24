@@ -1,0 +1,2757 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="Start" href="index.html">
+<link rel="previous" href="JsNumber.html">
+<link rel="next" href="JsSyntaxAux.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="BinNums" rel="Chapter" href="BinNums.html">
+<link title="Datatypes" rel="Chapter" href="Datatypes.html">
+<link title="Fappli_IEEE_bits" rel="Chapter" href="Fappli_IEEE_bits.html">
+<link title="Fappli_IEEE" rel="Chapter" href="Fappli_IEEE.html">
+<link title="LibList" rel="Chapter" href="LibList.html">
+<link title="LibOption" rel="Chapter" href="LibOption.html">
+<link title="LibProd" rel="Chapter" href="LibProd.html">
+<link title="StdMap" rel="Chapter" href="StdMap.html">
+<link title="Heap" rel="Chapter" href="Heap.html">
+<link title="HeapInt" rel="Chapter" href="HeapInt.html">
+<link title="HeapStr" rel="Chapter" href="HeapStr.html">
+<link title="HeapList" rel="Chapter" href="HeapList.html">
+<link title="Shared" rel="Chapter" href="Shared.html">
+<link title="Compare" rel="Chapter" href="Compare.html">
+<link title="JsNumber" rel="Chapter" href="JsNumber.html">
+<link title="JsSyntax" rel="Chapter" href="JsSyntax.html">
+<link title="JsSyntaxAux" rel="Chapter" href="JsSyntaxAux.html">
+<link title="HeapObj" rel="Chapter" href="HeapObj.html">
+<link title="Translate_syntax" rel="Chapter" href="Translate_syntax.html">
+<link title="JsCommon" rel="Chapter" href="JsCommon.html">
+<link title="JsCommonAux" rel="Chapter" href="JsCommonAux.html">
+<link title="JsInit" rel="Chapter" href="JsInit.html">
+<link title="Prheap" rel="Chapter" href="Prheap.html">
+<link title="Debug" rel="Chapter" href="Debug.html">
+<link title="JsInterpreterMonads" rel="Chapter" href="JsInterpreterMonads.html">
+<link title="JsInterpreter" rel="Chapter" href="JsInterpreter.html">
+<link title="JsInterpreterUtils" rel="Chapter" href="JsInterpreterUtils.html">
+<link title="ModuleExport" rel="Chapter" href="ModuleExport.html">
+<link title="Run_js" rel="Chapter" href="Run_js.html"><title>JsSyntax</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="JsNumber.html" title="JsNumber">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="JsSyntaxAux.html" title="JsSyntaxAux">Next</a>
+</div>
+<h1>Module <a href="type_JsSyntax.html">JsSyntax</a></h1>
+
+<pre><span class="keyword">module</span> JsSyntax: <code class="code">sig</code> <a href="JsSyntax.html">..</a> <code class="code">end</code></pre><div class="info module top">
+val strictness_false : strictness_flag *<br>
+</div>
+<hr width="100%">
+
+<pre><code><span id="TYPEunary_op"><span class="keyword">type</span> <code class="type"></code>unary_op</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTunary_op.Coq_unary_op_delete"><span class="constructor">Coq_unary_op_delete</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTunary_op.Coq_unary_op_void"><span class="constructor">Coq_unary_op_void</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTunary_op.Coq_unary_op_typeof"><span class="constructor">Coq_unary_op_typeof</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTunary_op.Coq_unary_op_post_incr"><span class="constructor">Coq_unary_op_post_incr</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTunary_op.Coq_unary_op_post_decr"><span class="constructor">Coq_unary_op_post_decr</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTunary_op.Coq_unary_op_pre_incr"><span class="constructor">Coq_unary_op_pre_incr</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTunary_op.Coq_unary_op_pre_decr"><span class="constructor">Coq_unary_op_pre_decr</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTunary_op.Coq_unary_op_add"><span class="constructor">Coq_unary_op_add</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTunary_op.Coq_unary_op_neg"><span class="constructor">Coq_unary_op_neg</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTunary_op.Coq_unary_op_bitwise_not"><span class="constructor">Coq_unary_op_bitwise_not</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTunary_op.Coq_unary_op_not"><span class="constructor">Coq_unary_op_not</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbinary_op"><span class="keyword">type</span> <code class="type"></code>binary_op</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_mult"><span class="constructor">Coq_binary_op_mult</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_div"><span class="constructor">Coq_binary_op_div</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_mod"><span class="constructor">Coq_binary_op_mod</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_add"><span class="constructor">Coq_binary_op_add</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_sub"><span class="constructor">Coq_binary_op_sub</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_left_shift"><span class="constructor">Coq_binary_op_left_shift</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_right_shift"><span class="constructor">Coq_binary_op_right_shift</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_unsigned_right_shift"><span class="constructor">Coq_binary_op_unsigned_right_shift</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_lt"><span class="constructor">Coq_binary_op_lt</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_gt"><span class="constructor">Coq_binary_op_gt</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_le"><span class="constructor">Coq_binary_op_le</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_ge"><span class="constructor">Coq_binary_op_ge</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_instanceof"><span class="constructor">Coq_binary_op_instanceof</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_in"><span class="constructor">Coq_binary_op_in</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_equal"><span class="constructor">Coq_binary_op_equal</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_disequal"><span class="constructor">Coq_binary_op_disequal</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_strict_equal"><span class="constructor">Coq_binary_op_strict_equal</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_strict_disequal"><span class="constructor">Coq_binary_op_strict_disequal</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_bitwise_and"><span class="constructor">Coq_binary_op_bitwise_and</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_bitwise_or"><span class="constructor">Coq_binary_op_bitwise_or</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_bitwise_xor"><span class="constructor">Coq_binary_op_bitwise_xor</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_and"><span class="constructor">Coq_binary_op_and</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_or"><span class="constructor">Coq_binary_op_or</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbinary_op.Coq_binary_op_coma"><span class="constructor">Coq_binary_op_coma</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEliteral"><span class="keyword">type</span> <code class="type"></code>literal</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTliteral.Coq_literal_null"><span class="constructor">Coq_literal_null</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTliteral.Coq_literal_bool"><span class="constructor">Coq_literal_bool</span></span> <span class="keyword">of</span> <code class="type">bool</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTliteral.Coq_literal_number"><span class="constructor">Coq_literal_number</span></span> <span class="keyword">of</span> <code class="type"><a href="JsNumber.html#TYPEnumber">JsNumber.number</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTliteral.Coq_literal_string"><span class="constructor">Coq_literal_string</span></span> <span class="keyword">of</span> <code class="type">string</code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPElabel"><span class="keyword">type</span> <code class="type"></code>label</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTlabel.Coq_label_empty"><span class="constructor">Coq_label_empty</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTlabel.Coq_label_string"><span class="constructor">Coq_label_string</span></span> <span class="keyword">of</span> <code class="type">string</code></code></td>
+
+</tr></table>
+
+
+
+<pre><span id="TYPElabel_set"><span class="keyword">type</span> <code class="type"></code>label_set</span> = <code class="type"><a href="JsSyntax.html#TYPElabel">label</a> list</code> </pre>
+
+
+<pre><span id="TYPEstrictness_flag"><span class="keyword">type</span> <code class="type"></code>strictness_flag</span> = <code class="type">bool</code> </pre>
+
+<br>
+val strictness_false : strictness_flag *<br>
+
+<pre><span id="VALstrictness_false"><span class="keyword">val</span> strictness_false</span> : <code class="type">bool</code></pre>
+<pre><code><span id="TYPEpropname"><span class="keyword">type</span> <code class="type"></code>propname</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTpropname.Coq_propname_identifier"><span class="constructor">Coq_propname_identifier</span></span> <span class="keyword">of</span> <code class="type">string</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTpropname.Coq_propname_string"><span class="constructor">Coq_propname_string</span></span> <span class="keyword">of</span> <code class="type">string</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTpropname.Coq_propname_number"><span class="constructor">Coq_propname_number</span></span> <span class="keyword">of</span> <code class="type"><a href="JsNumber.html#TYPEnumber">JsNumber.number</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEexpr"><span class="keyword">type</span> <code class="type"></code>expr</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpr.Coq_expr_this"><span class="constructor">Coq_expr_this</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpr.Coq_expr_identifier"><span class="constructor">Coq_expr_identifier</span></span> <span class="keyword">of</span> <code class="type">string</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpr.Coq_expr_literal"><span class="constructor">Coq_expr_literal</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEliteral">literal</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpr.Coq_expr_object"><span class="constructor">Coq_expr_object</span></span> <span class="keyword">of</span> <code class="type">(<a href="JsSyntax.html#TYPEpropname">propname</a> * <a href="JsSyntax.html#TYPEpropbody">propbody</a>) list</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpr.Coq_expr_array"><span class="constructor">Coq_expr_array</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEexpr">expr</a> option list</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpr.Coq_expr_function"><span class="constructor">Coq_expr_function</span></span> <span class="keyword">of</span> <code class="type">string option * string list * <a href="JsSyntax.html#TYPEfuncbody">funcbody</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpr.Coq_expr_access"><span class="constructor">Coq_expr_access</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEexpr">expr</a> * <a href="JsSyntax.html#TYPEexpr">expr</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpr.Coq_expr_member"><span class="constructor">Coq_expr_member</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEexpr">expr</a> * string</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpr.Coq_expr_new"><span class="constructor">Coq_expr_new</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEexpr">expr</a> * <a href="JsSyntax.html#TYPEexpr">expr</a> list</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpr.Coq_expr_call"><span class="constructor">Coq_expr_call</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEexpr">expr</a> * <a href="JsSyntax.html#TYPEexpr">expr</a> list</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpr.Coq_expr_unary_op"><span class="constructor">Coq_expr_unary_op</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEunary_op">unary_op</a> * <a href="JsSyntax.html#TYPEexpr">expr</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpr.Coq_expr_binary_op"><span class="constructor">Coq_expr_binary_op</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEexpr">expr</a> * <a href="JsSyntax.html#TYPEbinary_op">binary_op</a> * <a href="JsSyntax.html#TYPEexpr">expr</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpr.Coq_expr_conditional"><span class="constructor">Coq_expr_conditional</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEexpr">expr</a> * <a href="JsSyntax.html#TYPEexpr">expr</a> * <a href="JsSyntax.html#TYPEexpr">expr</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexpr.Coq_expr_assign"><span class="constructor">Coq_expr_assign</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEexpr">expr</a> * <a href="JsSyntax.html#TYPEbinary_op">binary_op</a> option * <a href="JsSyntax.html#TYPEexpr">expr</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEpropbody"><span class="keyword">type</span> <code class="type"></code>propbody</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTpropbody.Coq_propbody_val"><span class="constructor">Coq_propbody_val</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEexpr">expr</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTpropbody.Coq_propbody_get"><span class="constructor">Coq_propbody_get</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEfuncbody">funcbody</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTpropbody.Coq_propbody_set"><span class="constructor">Coq_propbody_set</span></span> <span class="keyword">of</span> <code class="type">string list * <a href="JsSyntax.html#TYPEfuncbody">funcbody</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEfuncbody"><span class="keyword">type</span> <code class="type"></code>funcbody</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTfuncbody.Coq_funcbody_intro"><span class="constructor">Coq_funcbody_intro</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEprog">prog</a> * string</code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEstat"><span class="keyword">type</span> <code class="type"></code>stat</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_expr"><span class="constructor">Coq_stat_expr</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEexpr">expr</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_label"><span class="constructor">Coq_stat_label</span></span> <span class="keyword">of</span> <code class="type">string * <a href="JsSyntax.html#TYPEstat">stat</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_block"><span class="constructor">Coq_stat_block</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEstat">stat</a> list</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_var_decl"><span class="constructor">Coq_stat_var_decl</span></span> <span class="keyword">of</span> <code class="type">(string * <a href="JsSyntax.html#TYPEexpr">expr</a> option) list</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_if"><span class="constructor">Coq_stat_if</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEexpr">expr</a> * <a href="JsSyntax.html#TYPEstat">stat</a> * <a href="JsSyntax.html#TYPEstat">stat</a> option</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_do_while"><span class="constructor">Coq_stat_do_while</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPElabel_set">label_set</a> * <a href="JsSyntax.html#TYPEstat">stat</a> * <a href="JsSyntax.html#TYPEexpr">expr</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_while"><span class="constructor">Coq_stat_while</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPElabel_set">label_set</a> * <a href="JsSyntax.html#TYPEexpr">expr</a> * <a href="JsSyntax.html#TYPEstat">stat</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_with"><span class="constructor">Coq_stat_with</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEexpr">expr</a> * <a href="JsSyntax.html#TYPEstat">stat</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_throw"><span class="constructor">Coq_stat_throw</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEexpr">expr</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_return"><span class="constructor">Coq_stat_return</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEexpr">expr</a> option</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_break"><span class="constructor">Coq_stat_break</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPElabel">label</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_continue"><span class="constructor">Coq_stat_continue</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPElabel">label</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_try"><span class="constructor">Coq_stat_try</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEstat">stat</a> * (string * <a href="JsSyntax.html#TYPEstat">stat</a>) option * <a href="JsSyntax.html#TYPEstat">stat</a> option</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_for"><span class="constructor">Coq_stat_for</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPElabel_set">label_set</a> * <a href="JsSyntax.html#TYPEexpr">expr</a> option * <a href="JsSyntax.html#TYPEexpr">expr</a> option<br>        * <a href="JsSyntax.html#TYPEexpr">expr</a> option * <a href="JsSyntax.html#TYPEstat">stat</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_for_var"><span class="constructor">Coq_stat_for_var</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPElabel_set">label_set</a> * (string * <a href="JsSyntax.html#TYPEexpr">expr</a> option) list<br>        * <a href="JsSyntax.html#TYPEexpr">expr</a> option * <a href="JsSyntax.html#TYPEexpr">expr</a> option * <a href="JsSyntax.html#TYPEstat">stat</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_for_in"><span class="constructor">Coq_stat_for_in</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPElabel_set">label_set</a> * <a href="JsSyntax.html#TYPEexpr">expr</a> * <a href="JsSyntax.html#TYPEexpr">expr</a> * <a href="JsSyntax.html#TYPEstat">stat</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_for_in_var"><span class="constructor">Coq_stat_for_in_var</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPElabel_set">label_set</a> * string * <a href="JsSyntax.html#TYPEexpr">expr</a> option * <a href="JsSyntax.html#TYPEexpr">expr</a><br>        * <a href="JsSyntax.html#TYPEstat">stat</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_debugger"><span class="constructor">Coq_stat_debugger</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstat.Coq_stat_switch"><span class="constructor">Coq_stat_switch</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPElabel_set">label_set</a> * <a href="JsSyntax.html#TYPEexpr">expr</a> * <a href="JsSyntax.html#TYPEswitchbody">switchbody</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEswitchbody"><span class="keyword">type</span> <code class="type"></code>switchbody</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTswitchbody.Coq_switchbody_nodefault"><span class="constructor">Coq_switchbody_nodefault</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEswitchclause">switchclause</a> list</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTswitchbody.Coq_switchbody_withdefault"><span class="constructor">Coq_switchbody_withdefault</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEswitchclause">switchclause</a> list * <a href="JsSyntax.html#TYPEstat">stat</a> list * <a href="JsSyntax.html#TYPEswitchclause">switchclause</a> list</code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEswitchclause"><span class="keyword">type</span> <code class="type"></code>switchclause</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTswitchclause.Coq_switchclause_intro"><span class="constructor">Coq_switchclause_intro</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEexpr">expr</a> * <a href="JsSyntax.html#TYPEstat">stat</a> list</code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEprog"><span class="keyword">type</span> <code class="type"></code>prog</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprog.Coq_prog_intro"><span class="constructor">Coq_prog_intro</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEstrictness_flag">strictness_flag</a> * <a href="JsSyntax.html#TYPEelement">element</a> list</code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEelement"><span class="keyword">type</span> <code class="type"></code>element</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTelement.Coq_element_stat"><span class="constructor">Coq_element_stat</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEstat">stat</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTelement.Coq_element_func_decl"><span class="constructor">Coq_element_func_decl</span></span> <span class="keyword">of</span> <code class="type">string * string list * <a href="JsSyntax.html#TYPEfuncbody">funcbody</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><span id="TYPEpropdefs"><span class="keyword">type</span> <code class="type"></code>propdefs</span> = <code class="type">(<a href="JsSyntax.html#TYPEpropname">propname</a> * <a href="JsSyntax.html#TYPEpropbody">propbody</a>) list</code> </pre>
+
+
+<pre><span id="TYPEelements"><span class="keyword">type</span> <code class="type"></code>elements</span> = <code class="type"><a href="JsSyntax.html#TYPEelement">element</a> list</code> </pre>
+
+
+<pre><code><span id="TYPEfuncdecl"><span class="keyword">type</span> <code class="type"></code>funcdecl</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTfuncdecl.funcdecl_name">funcdecl_name</span>&nbsp;: <code class="type">string</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTfuncdecl.funcdecl_parameters">funcdecl_parameters</span>&nbsp;: <code class="type">string list</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTfuncdecl.funcdecl_body">funcdecl_body</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEfuncbody">funcbody</a></code>;</code></td>
+
+</tr></table>
+}
+
+
+<br>
+val funcdecl_name : funcdecl -&gt; string *<br>
+
+<pre><span id="VALfuncdecl_name"><span class="keyword">val</span> funcdecl_name</span> : <code class="type"><a href="JsSyntax.html#TYPEfuncdecl">funcdecl</a> -> string</code></pre><br>
+val funcdecl_parameters : funcdecl -&gt; string list *<br>
+
+<pre><span id="VALfuncdecl_parameters"><span class="keyword">val</span> funcdecl_parameters</span> : <code class="type"><a href="JsSyntax.html#TYPEfuncdecl">funcdecl</a> -> string list</code></pre><br>
+val funcdecl_body : funcdecl -&gt; funcbody *<br>
+
+<pre><span id="VALfuncdecl_body"><span class="keyword">val</span> funcdecl_body</span> : <code class="type"><a href="JsSyntax.html#TYPEfuncdecl">funcdecl</a> -> <a href="JsSyntax.html#TYPEfuncbody">funcbody</a></code></pre>
+<pre><code><span id="TYPEmathop"><span class="keyword">type</span> <code class="type"></code>mathop</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmathop.Coq_mathop_abs"><span class="constructor">Coq_mathop_abs</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEnative_error"><span class="keyword">type</span> <code class="type"></code>native_error</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTnative_error.Coq_native_error_eval"><span class="constructor">Coq_native_error_eval</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTnative_error.Coq_native_error_range"><span class="constructor">Coq_native_error_range</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTnative_error.Coq_native_error_ref"><span class="constructor">Coq_native_error_ref</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTnative_error.Coq_native_error_syntax"><span class="constructor">Coq_native_error_syntax</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTnative_error.Coq_native_error_type"><span class="constructor">Coq_native_error_type</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTnative_error.Coq_native_error_uri"><span class="constructor">Coq_native_error_uri</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEprealloc"><span class="keyword">type</span> <code class="type"></code>prealloc</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_global"><span class="constructor">Coq_prealloc_global</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_global_eval"><span class="constructor">Coq_prealloc_global_eval</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_global_parse_int"><span class="constructor">Coq_prealloc_global_parse_int</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_global_parse_float"><span class="constructor">Coq_prealloc_global_parse_float</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_global_is_finite"><span class="constructor">Coq_prealloc_global_is_finite</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_global_is_nan"><span class="constructor">Coq_prealloc_global_is_nan</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_global_decode_uri"><span class="constructor">Coq_prealloc_global_decode_uri</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_global_decode_uri_component"><span class="constructor">Coq_prealloc_global_decode_uri_component</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_global_encode_uri"><span class="constructor">Coq_prealloc_global_encode_uri</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_global_encode_uri_component"><span class="constructor">Coq_prealloc_global_encode_uri_component</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object"><span class="constructor">Coq_prealloc_object</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_get_proto_of"><span class="constructor">Coq_prealloc_object_get_proto_of</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_get_own_prop_descriptor"><span class="constructor">Coq_prealloc_object_get_own_prop_descriptor</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_get_own_prop_name"><span class="constructor">Coq_prealloc_object_get_own_prop_name</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_create"><span class="constructor">Coq_prealloc_object_create</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_define_prop"><span class="constructor">Coq_prealloc_object_define_prop</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_define_props"><span class="constructor">Coq_prealloc_object_define_props</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_seal"><span class="constructor">Coq_prealloc_object_seal</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_freeze"><span class="constructor">Coq_prealloc_object_freeze</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_prevent_extensions"><span class="constructor">Coq_prealloc_object_prevent_extensions</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_is_sealed"><span class="constructor">Coq_prealloc_object_is_sealed</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_is_frozen"><span class="constructor">Coq_prealloc_object_is_frozen</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_is_extensible"><span class="constructor">Coq_prealloc_object_is_extensible</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_keys"><span class="constructor">Coq_prealloc_object_keys</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_keys_call"><span class="constructor">Coq_prealloc_object_keys_call</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_proto"><span class="constructor">Coq_prealloc_object_proto</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+ObjectPrototype<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_proto_to_string"><span class="constructor">Coq_prealloc_object_proto_to_string</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_proto_value_of"><span class="constructor">Coq_prealloc_object_proto_value_of</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_proto_has_own_prop"><span class="constructor">Coq_prealloc_object_proto_has_own_prop</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_proto_is_prototype_of"><span class="constructor">Coq_prealloc_object_proto_is_prototype_of</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_object_proto_prop_is_enumerable"><span class="constructor">Coq_prealloc_object_proto_prop_is_enumerable</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_function"><span class="constructor">Coq_prealloc_function</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_function_proto"><span class="constructor">Coq_prealloc_function_proto</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_function_proto_to_string"><span class="constructor">Coq_prealloc_function_proto_to_string</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_function_proto_apply"><span class="constructor">Coq_prealloc_function_proto_apply</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_function_proto_call"><span class="constructor">Coq_prealloc_function_proto_call</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_function_proto_bind"><span class="constructor">Coq_prealloc_function_proto_bind</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_bool"><span class="constructor">Coq_prealloc_bool</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_bool_proto"><span class="constructor">Coq_prealloc_bool_proto</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_bool_proto_to_string"><span class="constructor">Coq_prealloc_bool_proto_to_string</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_bool_proto_value_of"><span class="constructor">Coq_prealloc_bool_proto_value_of</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_number"><span class="constructor">Coq_prealloc_number</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_number_proto"><span class="constructor">Coq_prealloc_number_proto</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_number_proto_to_string"><span class="constructor">Coq_prealloc_number_proto_to_string</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_number_proto_value_of"><span class="constructor">Coq_prealloc_number_proto_value_of</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_number_proto_to_fixed"><span class="constructor">Coq_prealloc_number_proto_to_fixed</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_number_proto_to_exponential"><span class="constructor">Coq_prealloc_number_proto_to_exponential</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_number_proto_to_precision"><span class="constructor">Coq_prealloc_number_proto_to_precision</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_array"><span class="constructor">Coq_prealloc_array</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_array_is_array"><span class="constructor">Coq_prealloc_array_is_array</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_array_proto"><span class="constructor">Coq_prealloc_array_proto</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_array_proto_to_string"><span class="constructor">Coq_prealloc_array_proto_to_string</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_array_proto_join"><span class="constructor">Coq_prealloc_array_proto_join</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_array_proto_pop"><span class="constructor">Coq_prealloc_array_proto_pop</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_array_proto_push"><span class="constructor">Coq_prealloc_array_proto_push</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_string"><span class="constructor">Coq_prealloc_string</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_string_proto"><span class="constructor">Coq_prealloc_string_proto</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_string_proto_to_string"><span class="constructor">Coq_prealloc_string_proto_to_string</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_string_proto_value_of"><span class="constructor">Coq_prealloc_string_proto_value_of</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_string_proto_char_at"><span class="constructor">Coq_prealloc_string_proto_char_at</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_string_proto_char_code_at"><span class="constructor">Coq_prealloc_string_proto_char_code_at</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_math"><span class="constructor">Coq_prealloc_math</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_date"><span class="constructor">Coq_prealloc_date</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_regexp"><span class="constructor">Coq_prealloc_regexp</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_error"><span class="constructor">Coq_prealloc_error</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_error_proto"><span class="constructor">Coq_prealloc_error_proto</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_error_proto_to_string"><span class="constructor">Coq_prealloc_error_proto_to_string</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_throw_type_error"><span class="constructor">Coq_prealloc_throw_type_error</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_json"><span class="constructor">Coq_prealloc_json</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_proxy"><span class="constructor">Coq_prealloc_proxy</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+Proxy<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_proxy_revocable"><span class="constructor">Coq_prealloc_proxy_revocable</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_mathop"><span class="constructor">Coq_prealloc_mathop</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEmathop">mathop</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_native_error"><span class="constructor">Coq_prealloc_native_error</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEnative_error">native_error</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprealloc.Coq_prealloc_native_error_proto"><span class="constructor">Coq_prealloc_native_error_proto</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEnative_error">native_error</a></code></code></td>
+
+</tr></table>
+
+<div class="info ">
+Intrinsic Objects<br>
+</div>
+
+
+<pre><code><span id="TYPEcall"><span class="keyword">type</span> <code class="type"></code>call</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcall.Coq_call_default"><span class="constructor">Coq_call_default</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcall.Coq_call_after_bind"><span class="constructor">Coq_call_after_bind</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcall.Coq_call_prealloc"><span class="constructor">Coq_call_prealloc</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEprealloc">prealloc</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcall.Coq_call_proxy"><span class="constructor">Coq_call_proxy</span></span></code></td>
+
+</tr></table>
+
+<div class="info ">
+Identities of implementations for Object Internal Methods<br>
+</div>
+
+
+<pre><code><span id="TYPEconstruct"><span class="keyword">type</span> <code class="type"></code>construct</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTconstruct.Coq_construct_default"><span class="constructor">Coq_construct_default</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTconstruct.Coq_construct_after_bind"><span class="constructor">Coq_construct_after_bind</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTconstruct.Coq_construct_prealloc"><span class="constructor">Coq_construct_prealloc</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEprealloc">prealloc</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTconstruct.Coq_construct_proxy"><span class="constructor">Coq_construct_proxy</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_has_instance"><span class="keyword">type</span> <code class="type"></code>builtin_has_instance</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_has_instance.Coq_builtin_has_instance_function"><span class="constructor">Coq_builtin_has_instance_function</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_has_instance.Coq_builtin_has_instance_after_bind"><span class="constructor">Coq_builtin_has_instance_after_bind</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_get"><span class="keyword">type</span> <code class="type"></code>builtin_get</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_get.Coq_builtin_get_default"><span class="constructor">Coq_builtin_get_default</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_get.Coq_builtin_get_function"><span class="constructor">Coq_builtin_get_function</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_get.Coq_builtin_get_args_obj"><span class="constructor">Coq_builtin_get_args_obj</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_get.Coq_builtin_get_proxy"><span class="constructor">Coq_builtin_get_proxy</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_get_own_prop"><span class="keyword">type</span> <code class="type"></code>builtin_get_own_prop</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_get_own_prop.Coq_builtin_get_own_prop_default"><span class="constructor">Coq_builtin_get_own_prop_default</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_get_own_prop.Coq_builtin_get_own_prop_args_obj"><span class="constructor">Coq_builtin_get_own_prop_args_obj</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_get_own_prop.Coq_builtin_get_own_prop_string"><span class="constructor">Coq_builtin_get_own_prop_string</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_get_own_prop.Coq_builtin_get_own_prop_proxy"><span class="constructor">Coq_builtin_get_own_prop_proxy</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_get_prop"><span class="keyword">type</span> <code class="type"></code>builtin_get_prop</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_get_prop.Coq_builtin_get_prop_default"><span class="constructor">Coq_builtin_get_prop_default</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_put"><span class="keyword">type</span> <code class="type"></code>builtin_put</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_put.Coq_builtin_put_default"><span class="constructor">Coq_builtin_put_default</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_can_put"><span class="keyword">type</span> <code class="type"></code>builtin_can_put</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_can_put.Coq_builtin_can_put_default"><span class="constructor">Coq_builtin_can_put_default</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_has_prop"><span class="keyword">type</span> <code class="type"></code>builtin_has_prop</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_has_prop.Coq_builtin_has_prop_default"><span class="constructor">Coq_builtin_has_prop_default</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_has_prop.Coq_builtin_has_prop_proxy"><span class="constructor">Coq_builtin_has_prop_proxy</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_delete"><span class="keyword">type</span> <code class="type"></code>builtin_delete</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_delete.Coq_builtin_delete_default"><span class="constructor">Coq_builtin_delete_default</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_delete.Coq_builtin_delete_args_obj"><span class="constructor">Coq_builtin_delete_args_obj</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_delete.Coq_builtin_delete_proxy"><span class="constructor">Coq_builtin_delete_proxy</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_default_value"><span class="keyword">type</span> <code class="type"></code>builtin_default_value</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_default_value.Coq_builtin_default_value_default"><span class="constructor">Coq_builtin_default_value_default</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_define_own_prop"><span class="keyword">type</span> <code class="type"></code>builtin_define_own_prop</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_define_own_prop.Coq_builtin_define_own_prop_default"><span class="constructor">Coq_builtin_define_own_prop_default</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_define_own_prop.Coq_builtin_define_own_prop_array"><span class="constructor">Coq_builtin_define_own_prop_array</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_define_own_prop.Coq_builtin_define_own_prop_args_obj"><span class="constructor">Coq_builtin_define_own_prop_args_obj</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_define_own_prop.Coq_builtin_define_own_prop_proxy"><span class="constructor">Coq_builtin_define_own_prop_proxy</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_get_prototype_of"><span class="keyword">type</span> <code class="type"></code>builtin_get_prototype_of</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_get_prototype_of.Coq_builtin_get_prototype_of_default"><span class="constructor">Coq_builtin_get_prototype_of_default</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_get_prototype_of.Coq_builtin_get_prototype_of_proxy"><span class="constructor">Coq_builtin_get_prototype_of_proxy</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_set_prototype_of"><span class="keyword">type</span> <code class="type"></code>builtin_set_prototype_of</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_set_prototype_of.Coq_builtin_set_prototype_of_default"><span class="constructor">Coq_builtin_set_prototype_of_default</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_set_prototype_of.Coq_builtin_set_prototype_of_proxy"><span class="constructor">Coq_builtin_set_prototype_of_proxy</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_is_extensible"><span class="keyword">type</span> <code class="type"></code>builtin_is_extensible</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_is_extensible.Coq_builtin_is_extensible_default"><span class="constructor">Coq_builtin_is_extensible_default</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_is_extensible.Coq_builtin_is_extensible_proxy"><span class="constructor">Coq_builtin_is_extensible_proxy</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_prevent_extensions"><span class="keyword">type</span> <code class="type"></code>builtin_prevent_extensions</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_prevent_extensions.Coq_builtin_prevent_extensions_default"><span class="constructor">Coq_builtin_prevent_extensions_default</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_prevent_extensions.Coq_builtin_prevent_extensions_proxy"><span class="constructor">Coq_builtin_prevent_extensions_proxy</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_set"><span class="keyword">type</span> <code class="type"></code>builtin_set</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_set.Coq_builtin_set_default"><span class="constructor">Coq_builtin_set_default</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_set.Coq_builtin_set_proxy"><span class="constructor">Coq_builtin_set_proxy</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbuiltin_own_property_keys"><span class="keyword">type</span> <code class="type"></code>builtin_own_property_keys</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_own_property_keys.Coq_builtin_own_property_keys_default"><span class="constructor">Coq_builtin_own_property_keys_default</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbuiltin_own_property_keys.Coq_builtin_own_property_keys_proxy"><span class="constructor">Coq_builtin_own_property_keys_proxy</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEobject_loc"><span class="keyword">type</span> <code class="type"></code>object_loc</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTobject_loc.Coq_object_loc_normal"><span class="constructor">Coq_object_loc_normal</span></span> <span class="keyword">of</span> <code class="type">int</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTobject_loc.Coq_object_loc_prealloc"><span class="constructor">Coq_object_loc_prealloc</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEprealloc">prealloc</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEprim"><span class="keyword">type</span> <code class="type"></code>prim</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Coq_prim_undef"><span class="constructor">Coq_prim_undef</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Coq_prim_null"><span class="constructor">Coq_prim_null</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Coq_prim_bool"><span class="constructor">Coq_prim_bool</span></span> <span class="keyword">of</span> <code class="type">bool</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Coq_prim_number"><span class="constructor">Coq_prim_number</span></span> <span class="keyword">of</span> <code class="type"><a href="JsNumber.html#TYPEnumber">JsNumber.number</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Coq_prim_string"><span class="constructor">Coq_prim_string</span></span> <span class="keyword">of</span> <code class="type">string</code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEvalue"><span class="keyword">type</span> <code class="type"></code>value</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTvalue.Coq_value_prim"><span class="constructor">Coq_value_prim</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTvalue.Coq_value_object"><span class="constructor">Coq_value_object</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEobject_loc">object_loc</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEcoq_type"><span class="keyword">type</span> <code class="type"></code>coq_type</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_type.Coq_type_undef"><span class="constructor">Coq_type_undef</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_type.Coq_type_null"><span class="constructor">Coq_type_null</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_type.Coq_type_bool"><span class="constructor">Coq_type_bool</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_type.Coq_type_number"><span class="constructor">Coq_type_number</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_type.Coq_type_string"><span class="constructor">Coq_type_string</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_type.Coq_type_object"><span class="constructor">Coq_type_object</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEattributes_data"><span class="keyword">type</span> <code class="type"></code>attributes_data</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTattributes_data.attributes_data_value">attributes_data_value</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTattributes_data.attributes_data_writable">attributes_data_writable</span>&nbsp;: <code class="type">bool</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTattributes_data.attributes_data_enumerable">attributes_data_enumerable</span>&nbsp;: <code class="type">bool</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTattributes_data.attributes_data_configurable">attributes_data_configurable</span>&nbsp;: <code class="type">bool</code>;</code></td>
+
+</tr></table>
+}
+
+
+<br>
+val attributes_data_value : attributes_data -&gt; value *<br>
+
+<pre><span id="VALattributes_data_value"><span class="keyword">val</span> attributes_data_value</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">attributes_data</a> -> <a href="JsSyntax.html#TYPEvalue">value</a></code></pre><br>
+val attributes_data_writable : attributes_data -&gt; bool *<br>
+
+<pre><span id="VALattributes_data_writable"><span class="keyword">val</span> attributes_data_writable</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">attributes_data</a> -> bool</code></pre><br>
+val attributes_data_enumerable : attributes_data -&gt; bool *<br>
+
+<pre><span id="VALattributes_data_enumerable"><span class="keyword">val</span> attributes_data_enumerable</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">attributes_data</a> -> bool</code></pre><br>
+val attributes_data_configurable : attributes_data -&gt; bool *<br>
+
+<pre><span id="VALattributes_data_configurable"><span class="keyword">val</span> attributes_data_configurable</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">attributes_data</a> -> bool</code></pre>
+<pre><code><span id="TYPEattributes_accessor"><span class="keyword">type</span> <code class="type"></code>attributes_accessor</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTattributes_accessor.attributes_accessor_get">attributes_accessor_get</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTattributes_accessor.attributes_accessor_set">attributes_accessor_set</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTattributes_accessor.attributes_accessor_enumerable">attributes_accessor_enumerable</span>&nbsp;: <code class="type">bool</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTattributes_accessor.attributes_accessor_configurable">attributes_accessor_configurable</span>&nbsp;: <code class="type">bool</code>;</code></td>
+
+</tr></table>
+}
+
+
+<br>
+val attributes_accessor_get : attributes_accessor -&gt; value *<br>
+
+<pre><span id="VALattributes_accessor_get"><span class="keyword">val</span> attributes_accessor_get</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">attributes_accessor</a> -> <a href="JsSyntax.html#TYPEvalue">value</a></code></pre><br>
+val attributes_accessor_set : attributes_accessor -&gt; value *<br>
+
+<pre><span id="VALattributes_accessor_set"><span class="keyword">val</span> attributes_accessor_set</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">attributes_accessor</a> -> <a href="JsSyntax.html#TYPEvalue">value</a></code></pre><br>
+val attributes_accessor_enumerable : attributes_accessor -&gt; bool *<br>
+
+<pre><span id="VALattributes_accessor_enumerable"><span class="keyword">val</span> attributes_accessor_enumerable</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">attributes_accessor</a> -> bool</code></pre><br>
+val attributes_accessor_configurable : attributes_accessor -&gt; bool *<br>
+
+<pre><span id="VALattributes_accessor_configurable"><span class="keyword">val</span> attributes_accessor_configurable</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">attributes_accessor</a> -> bool</code></pre>
+<pre><code><span id="TYPEattributes"><span class="keyword">type</span> <code class="type"></code>attributes</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTattributes.Coq_attributes_data_of"><span class="constructor">Coq_attributes_data_of</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEattributes_data">attributes_data</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTattributes.Coq_attributes_accessor_of"><span class="constructor">Coq_attributes_accessor_of</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">attributes_accessor</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEdescriptor"><span class="keyword">type</span> <code class="type"></code>descriptor</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTdescriptor.descriptor_value">descriptor_value</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a> option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTdescriptor.descriptor_writable">descriptor_writable</span>&nbsp;: <code class="type">bool option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTdescriptor.descriptor_get">descriptor_get</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a> option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTdescriptor.descriptor_set">descriptor_set</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a> option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTdescriptor.descriptor_enumerable">descriptor_enumerable</span>&nbsp;: <code class="type">bool option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTdescriptor.descriptor_configurable">descriptor_configurable</span>&nbsp;: <code class="type">bool option</code>;</code></td>
+
+</tr></table>
+}
+
+
+<br>
+val descriptor_value : descriptor -&gt; value option *<br>
+
+<pre><span id="VALdescriptor_value"><span class="keyword">val</span> descriptor_value</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">descriptor</a> -> <a href="JsSyntax.html#TYPEvalue">value</a> option</code></pre><br>
+val descriptor_writable : descriptor -&gt; bool option *<br>
+
+<pre><span id="VALdescriptor_writable"><span class="keyword">val</span> descriptor_writable</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">descriptor</a> -> bool option</code></pre><br>
+val descriptor_get : descriptor -&gt; value option *<br>
+
+<pre><span id="VALdescriptor_get"><span class="keyword">val</span> descriptor_get</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">descriptor</a> -> <a href="JsSyntax.html#TYPEvalue">value</a> option</code></pre><br>
+val descriptor_set : descriptor -&gt; value option *<br>
+
+<pre><span id="VALdescriptor_set"><span class="keyword">val</span> descriptor_set</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">descriptor</a> -> <a href="JsSyntax.html#TYPEvalue">value</a> option</code></pre><br>
+val descriptor_enumerable : descriptor -&gt; bool option *<br>
+
+<pre><span id="VALdescriptor_enumerable"><span class="keyword">val</span> descriptor_enumerable</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">descriptor</a> -> bool option</code></pre><br>
+val descriptor_configurable : descriptor -&gt; bool option *<br>
+
+<pre><span id="VALdescriptor_configurable"><span class="keyword">val</span> descriptor_configurable</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">descriptor</a> -> bool option</code></pre>
+<pre><code><span id="TYPEfull_descriptor"><span class="keyword">type</span> <code class="type"></code>full_descriptor</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTfull_descriptor.Coq_full_descriptor_undef"><span class="constructor">Coq_full_descriptor_undef</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTfull_descriptor.Coq_full_descriptor_some"><span class="constructor">Coq_full_descriptor_some</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEattributes">attributes</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEmutability"><span class="keyword">type</span> <code class="type"></code>mutability</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmutability.Coq_mutability_uninitialized_immutable"><span class="constructor">Coq_mutability_uninitialized_immutable</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmutability.Coq_mutability_immutable"><span class="constructor">Coq_mutability_immutable</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmutability.Coq_mutability_nondeletable"><span class="constructor">Coq_mutability_nondeletable</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTmutability.Coq_mutability_deletable"><span class="constructor">Coq_mutability_deletable</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><span id="TYPEdecl_env_record"><span class="keyword">type</span> <code class="type"></code>decl_env_record</span> = <code class="type">(string, <a href="JsSyntax.html#TYPEmutability">mutability</a> * <a href="JsSyntax.html#TYPEvalue">value</a>) <a href="Heap.html#TYPEheap">Heap.heap</a></code> </pre>
+
+
+<pre><span id="TYPEprovide_this_flag"><span class="keyword">type</span> <code class="type"></code>provide_this_flag</span> = <code class="type">bool</code> </pre>
+
+
+<pre><code><span id="TYPEenv_record"><span class="keyword">type</span> <code class="type"></code>env_record</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTenv_record.Coq_env_record_decl"><span class="constructor">Coq_env_record_decl</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEdecl_env_record">decl_env_record</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTenv_record.Coq_env_record_object"><span class="constructor">Coq_env_record_object</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEobject_loc">object_loc</a> * <a href="JsSyntax.html#TYPEprovide_this_flag">provide_this_flag</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><span id="TYPEenv_loc"><span class="keyword">type</span> <code class="type"></code>env_loc</span> = <code class="type">int</code> </pre>
+
+<br>
+val env_loc_global_env_record : env_loc *<br>
+
+<pre><span id="VALenv_loc_global_env_record"><span class="keyword">val</span> env_loc_global_env_record</span> : <code class="type">int</code></pre>
+<pre><span id="TYPElexical_env"><span class="keyword">type</span> <code class="type"></code>lexical_env</span> = <code class="type"><a href="JsSyntax.html#TYPEenv_loc">env_loc</a> list</code> </pre>
+
+
+<pre><code><span id="TYPEexecution_ctx"><span class="keyword">type</span> <code class="type"></code>execution_ctx</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexecution_ctx.execution_ctx_lexical_env">execution_ctx_lexical_env</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPElexical_env">lexical_env</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexecution_ctx.execution_ctx_variable_env">execution_ctx_variable_env</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPElexical_env">lexical_env</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexecution_ctx.execution_ctx_this_binding">execution_ctx_this_binding</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTexecution_ctx.execution_ctx_strict">execution_ctx_strict</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEstrictness_flag">strictness_flag</a></code>;</code></td>
+
+</tr></table>
+}
+
+
+<br>
+val execution_ctx_lexical_env : execution_ctx -&gt; lexical_env *<br>
+
+<pre><span id="VALexecution_ctx_lexical_env"><span class="keyword">val</span> execution_ctx_lexical_env</span> : <code class="type"><a href="JsSyntax.html#TYPEexecution_ctx">execution_ctx</a> -> <a href="JsSyntax.html#TYPElexical_env">lexical_env</a></code></pre><br>
+val execution_ctx_variable_env : execution_ctx -&gt; lexical_env *<br>
+
+<pre><span id="VALexecution_ctx_variable_env"><span class="keyword">val</span> execution_ctx_variable_env</span> : <code class="type"><a href="JsSyntax.html#TYPEexecution_ctx">execution_ctx</a> -> <a href="JsSyntax.html#TYPElexical_env">lexical_env</a></code></pre><br>
+val execution_ctx_this_binding : execution_ctx -&gt; value *<br>
+
+<pre><span id="VALexecution_ctx_this_binding"><span class="keyword">val</span> execution_ctx_this_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEexecution_ctx">execution_ctx</a> -> <a href="JsSyntax.html#TYPEvalue">value</a></code></pre><br>
+val execution_ctx_strict : execution_ctx -&gt; strictness_flag *<br>
+
+<pre><span id="VALexecution_ctx_strict"><span class="keyword">val</span> execution_ctx_strict</span> : <code class="type"><a href="JsSyntax.html#TYPEexecution_ctx">execution_ctx</a> -> <a href="JsSyntax.html#TYPEstrictness_flag">strictness_flag</a></code></pre>
+<pre><span id="TYPEprop_name"><span class="keyword">type</span> <code class="type"></code>prop_name</span> = <code class="type">string</code> </pre>
+
+
+<pre><code><span id="TYPEref_base_type"><span class="keyword">type</span> <code class="type"></code>ref_base_type</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTref_base_type.Coq_ref_base_type_value"><span class="constructor">Coq_ref_base_type_value</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTref_base_type.Coq_ref_base_type_env_loc"><span class="constructor">Coq_ref_base_type_env_loc</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEenv_loc">env_loc</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEref"><span class="keyword">type</span> <code class="type"></code>ref</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTref.ref_base">ref_base</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEref_base_type">ref_base_type</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTref.ref_name">ref_name</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEprop_name">prop_name</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTref.ref_strict">ref_strict</span>&nbsp;: <code class="type">bool</code>;</code></td>
+
+</tr></table>
+}
+
+
+<br>
+val ref_base : ref -&gt; ref_base_type *<br>
+
+<pre><span id="VALref_base"><span class="keyword">val</span> ref_base</span> : <code class="type"><a href="JsSyntax.html#TYPEref">ref</a> -> <a href="JsSyntax.html#TYPEref_base_type">ref_base_type</a></code></pre><br>
+val ref_name : ref -&gt; prop_name *<br>
+
+<pre><span id="VALref_name"><span class="keyword">val</span> ref_name</span> : <code class="type"><a href="JsSyntax.html#TYPEref">ref</a> -> <a href="JsSyntax.html#TYPEprop_name">prop_name</a></code></pre><br>
+val ref_strict : ref -&gt; bool *<br>
+
+<pre><span id="VALref_strict"><span class="keyword">val</span> ref_strict</span> : <code class="type"><a href="JsSyntax.html#TYPEref">ref</a> -> bool</code></pre>
+<pre><span id="TYPEclass_name"><span class="keyword">type</span> <code class="type"></code>class_name</span> = <code class="type">string</code> </pre>
+
+
+<pre><span id="TYPEobject_properties_type"><span class="keyword">type</span> <code class="type"></code>object_properties_type</span> = <code class="type">(<a href="JsSyntax.html#TYPEprop_name">prop_name</a>, <a href="JsSyntax.html#TYPEattributes">attributes</a>) <a href="Heap.html#TYPEheap">Heap.heap</a></code> </pre>
+
+
+<pre><code><span id="TYPEcoq_object"><span class="keyword">type</span> <code class="type"></code>coq_object</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_proto_">object_proto_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_class_">object_class_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEclass_name">class_name</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_extensible_">object_extensible_</span>&nbsp;: <code class="type">bool</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_prim_value_">object_prim_value_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a> option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_properties_">object_properties_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEobject_properties_type">object_properties_type</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_get_prototype_of_">object_get_prototype_of_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_get_prototype_of">builtin_get_prototype_of</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_set_prototype_of_">object_set_prototype_of_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_set_prototype_of">builtin_set_prototype_of</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_is_extensible_">object_is_extensible_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_is_extensible">builtin_is_extensible</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_prevent_extensions_">object_prevent_extensions_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_prevent_extensions">builtin_prevent_extensions</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_get_own_prop_">object_get_own_prop_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_get_own_prop">builtin_get_own_prop</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_has_prop_">object_has_prop_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_has_prop">builtin_has_prop</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_get_">object_get_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_get">builtin_get</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_get_prop_">object_get_prop_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_get_prop">builtin_get_prop</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_put_">object_put_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_put">builtin_put</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_can_put_">object_can_put_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_can_put">builtin_can_put</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_delete_">object_delete_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_delete">builtin_delete</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_default_value_">object_default_value_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_default_value">builtin_default_value</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_define_own_prop_">object_define_own_prop_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_define_own_prop">builtin_define_own_prop</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_own_property_keys_">object_own_property_keys_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_own_property_keys">builtin_own_property_keys</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_construct_">object_construct_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEconstruct">construct</a> option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_call_">object_call_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEcall">call</a> option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_has_instance_">object_has_instance_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_has_instance">builtin_has_instance</a> option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_scope_">object_scope_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPElexical_env">lexical_env</a> option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_formal_parameters_">object_formal_parameters_</span>&nbsp;: <code class="type">string list option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_code_">object_code_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEfuncbody">funcbody</a> option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_target_function_">object_target_function_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEobject_loc">object_loc</a> option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_bound_this_">object_bound_this_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a> option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_bound_args_">object_bound_args_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a> list option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_parameter_map_">object_parameter_map_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEobject_loc">object_loc</a> option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_revocable_proxy_">object_revocable_proxy_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a> option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_proxy_target_">object_proxy_target_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a> option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_proxy_handler_">object_proxy_handler_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a> option</code>;</code></td>
+
+</tr></table>
+}
+
+<div class="info ">
+Object type definition
+    es-id: sec-object-type<br>
+</div>
+
+<br>
+val object_proto_ : coq_object -&gt; value *<br>
+
+<pre><span id="VALobject_proto_"><span class="keyword">val</span> object_proto_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a></code></pre>
+<pre><span id="VALobject_prototype_"><span class="keyword">val</span> object_prototype_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a></code></pre><br>
+val object_class_ : coq_object -&gt; class_name *<br>
+
+<pre><span id="VALobject_class_"><span class="keyword">val</span> object_class_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEclass_name">class_name</a></code></pre><br>
+val object_extensible_ : coq_object -&gt; bool *<br>
+
+<pre><span id="VALobject_extensible_"><span class="keyword">val</span> object_extensible_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> bool</code></pre><br>
+val object_prim_value_ : coq_object -&gt; value option *<br>
+
+<pre><span id="VALobject_prim_value_"><span class="keyword">val</span> object_prim_value_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a> option</code></pre><br>
+val object_properties_ : coq_object -&gt; object_properties_type *<br>
+
+<pre><span id="VALobject_properties_"><span class="keyword">val</span> object_properties_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEobject_properties_type">object_properties_type</a></code></pre>
+<pre><span id="VALobject_get_prototype_of_"><span class="keyword">val</span> object_get_prototype_of_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_get_prototype_of">builtin_get_prototype_of</a></code></pre>
+<pre><span id="VALobject_set_prototype_of_"><span class="keyword">val</span> object_set_prototype_of_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_set_prototype_of">builtin_set_prototype_of</a></code></pre>
+<pre><span id="VALobject_is_extensible_"><span class="keyword">val</span> object_is_extensible_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_is_extensible">builtin_is_extensible</a></code></pre>
+<pre><span id="VALobject_prevent_extensions_"><span class="keyword">val</span> object_prevent_extensions_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_prevent_extensions">builtin_prevent_extensions</a></code></pre><br>
+val object_get_ : coq_object -&gt; builtin_get *<br>
+
+<pre><span id="VALobject_get_"><span class="keyword">val</span> object_get_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_get">builtin_get</a></code></pre><br>
+val object_get_own_prop_ : coq_object -&gt; builtin_get_own_prop *<br>
+
+<pre><span id="VALobject_get_own_prop_"><span class="keyword">val</span> object_get_own_prop_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_get_own_prop">builtin_get_own_prop</a></code></pre><br>
+val object_get_prop_ : coq_object -&gt; builtin_get_prop *<br>
+
+<pre><span id="VALobject_get_prop_"><span class="keyword">val</span> object_get_prop_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_get_prop">builtin_get_prop</a></code></pre><br>
+val object_put_ : coq_object -&gt; builtin_put *<br>
+
+<pre><span id="VALobject_put_"><span class="keyword">val</span> object_put_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_put">builtin_put</a></code></pre><br>
+val object_can_put_ : coq_object -&gt; builtin_can_put *<br>
+
+<pre><span id="VALobject_can_put_"><span class="keyword">val</span> object_can_put_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_can_put">builtin_can_put</a></code></pre><br>
+val object_has_prop_ : coq_object -&gt; builtin_has_prop *<br>
+
+<pre><span id="VALobject_has_prop_"><span class="keyword">val</span> object_has_prop_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_has_prop">builtin_has_prop</a></code></pre><br>
+val object_delete_ : coq_object -&gt; builtin_delete *<br>
+
+<pre><span id="VALobject_delete_"><span class="keyword">val</span> object_delete_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_delete">builtin_delete</a></code></pre><br>
+val object_default_value_ : coq_object -&gt; builtin_default_value *<br>
+
+<pre><span id="VALobject_default_value_"><span class="keyword">val</span> object_default_value_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_default_value">builtin_default_value</a></code></pre><br>
+val object_define_own_prop_ : coq_object -&gt; builtin_define_own_prop *<br>
+
+<pre><span id="VALobject_define_own_prop_"><span class="keyword">val</span> object_define_own_prop_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_define_own_prop">builtin_define_own_prop</a></code></pre><br>
+val object_construct_ : coq_object -&gt; construct option *<br>
+
+<pre><span id="VALobject_construct_"><span class="keyword">val</span> object_construct_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEconstruct">construct</a> option</code></pre><br>
+val object_call_ : coq_object -&gt; call option *<br>
+
+<pre><span id="VALobject_call_"><span class="keyword">val</span> object_call_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEcall">call</a> option</code></pre><br>
+val object_has_instance_ : coq_object -&gt; builtin_has_instance option *<br>
+
+<pre><span id="VALobject_has_instance_"><span class="keyword">val</span> object_has_instance_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_has_instance">builtin_has_instance</a> option</code></pre><br>
+val object_scope_ : coq_object -&gt; lexical_env option *<br>
+
+<pre><span id="VALobject_scope_"><span class="keyword">val</span> object_scope_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPElexical_env">lexical_env</a> option</code></pre><br>
+val object_formal_parameters_ : coq_object -&gt; string list option *<br>
+
+<pre><span id="VALobject_formal_parameters_"><span class="keyword">val</span> object_formal_parameters_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> string list option</code></pre><br>
+val object_code_ : coq_object -&gt; funcbody option *<br>
+
+<pre><span id="VALobject_code_"><span class="keyword">val</span> object_code_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEfuncbody">funcbody</a> option</code></pre><br>
+val object_target_function_ : coq_object -&gt; object_loc option *<br>
+
+<pre><span id="VALobject_target_function_"><span class="keyword">val</span> object_target_function_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEobject_loc">object_loc</a> option</code></pre><br>
+val object_bound_this_ : coq_object -&gt; value option *<br>
+
+<pre><span id="VALobject_bound_this_"><span class="keyword">val</span> object_bound_this_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a> option</code></pre><br>
+val object_bound_args_ : coq_object -&gt; value list option *<br>
+
+<pre><span id="VALobject_bound_args_"><span class="keyword">val</span> object_bound_args_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a> list option</code></pre><br>
+val object_parameter_map_ : coq_object -&gt; object_loc option *<br>
+
+<pre><span id="VALobject_parameter_map_"><span class="keyword">val</span> object_parameter_map_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEobject_loc">object_loc</a> option</code></pre>
+<pre><code><span id="TYPEevent"><span class="keyword">type</span> <code class="type"></code>event</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTevent.Coq_delete_event"><span class="constructor">Coq_delete_event</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEobject_loc">object_loc</a> * <a href="JsSyntax.html#TYPEprop_name">prop_name</a> * <a href="JsSyntax.html#TYPEobject_loc">object_loc</a> option</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTevent.Coq_mutateproto_event"><span class="constructor">Coq_mutateproto_event</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEobject_loc">object_loc</a> * (<a href="JsSyntax.html#TYPEobject_loc">object_loc</a> * <a href="JsSyntax.html#TYPEprop_name">prop_name</a>) list<br>        * (<a href="JsSyntax.html#TYPEobject_loc">object_loc</a> * <a href="JsSyntax.html#TYPEprop_name">prop_name</a>) list</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTevent.Coq_enumchange_event"><span class="constructor">Coq_enumchange_event</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEobject_loc">object_loc</a> * <a href="JsSyntax.html#TYPEprop_name">prop_name</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEstate"><span class="keyword">type</span> <code class="type"></code>state</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstate.state_object_heap">state_object_heap</span>&nbsp;: <code class="type">(<a href="JsSyntax.html#TYPEobject_loc">object_loc</a>, <a href="JsSyntax.html#TYPEcoq_object">coq_object</a>) <a href="Heap.html#TYPEheap">Heap.heap</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstate.state_env_record_heap">state_env_record_heap</span>&nbsp;: <code class="type">(<a href="JsSyntax.html#TYPEenv_loc">env_loc</a>, <a href="JsSyntax.html#TYPEenv_record">env_record</a>) <a href="Heap.html#TYPEheap">Heap.heap</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstate.state_fresh_locations">state_fresh_locations</span>&nbsp;: <code class="type">int</code>;</code></td>
+
+</tr></table>
+}
+
+
+<br>
+val state_object_heap : state -&gt; (object_loc, coq_object) Heap.heap *<br>
+
+<pre><span id="VALstate_object_heap"><span class="keyword">val</span> state_object_heap</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">state</a> -> (<a href="JsSyntax.html#TYPEobject_loc">object_loc</a>, <a href="JsSyntax.html#TYPEcoq_object">coq_object</a>) <a href="Heap.html#TYPEheap">Heap.heap</a></code></pre><br>
+val state_env_record_heap : state -&gt; (env_loc, env_record) Heap.heap *<br>
+
+<pre><span id="VALstate_env_record_heap"><span class="keyword">val</span> state_env_record_heap</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">state</a> -> (<a href="JsSyntax.html#TYPEenv_loc">env_loc</a>, <a href="JsSyntax.html#TYPEenv_record">env_record</a>) <a href="Heap.html#TYPEheap">Heap.heap</a></code></pre>
+<pre><code><span id="TYPErestype"><span class="keyword">type</span> <code class="type"></code>restype</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTrestype.Coq_restype_normal"><span class="constructor">Coq_restype_normal</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTrestype.Coq_restype_break"><span class="constructor">Coq_restype_break</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTrestype.Coq_restype_continue"><span class="constructor">Coq_restype_continue</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTrestype.Coq_restype_return"><span class="constructor">Coq_restype_return</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTrestype.Coq_restype_throw"><span class="constructor">Coq_restype_throw</span></span></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEresvalue"><span class="keyword">type</span> <code class="type"></code>resvalue</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTresvalue.Coq_resvalue_empty"><span class="constructor">Coq_resvalue_empty</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTresvalue.Coq_resvalue_value"><span class="constructor">Coq_resvalue_value</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTresvalue.Coq_resvalue_ref"><span class="constructor">Coq_resvalue_ref</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEref">ref</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEres"><span class="keyword">type</span> <code class="type"></code>res</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTres.res_type">res_type</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPErestype">restype</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTres.res_value">res_value</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEresvalue">resvalue</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTres.res_label">res_label</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPElabel">label</a></code>;</code></td>
+
+</tr></table>
+}
+
+
+<br>
+val res_type : res -&gt; restype *<br>
+
+<pre><span id="VALres_type"><span class="keyword">val</span> res_type</span> : <code class="type"><a href="JsSyntax.html#TYPEres">res</a> -> <a href="JsSyntax.html#TYPErestype">restype</a></code></pre><br>
+val res_value : res -&gt; resvalue *<br>
+
+<pre><span id="VALres_value"><span class="keyword">val</span> res_value</span> : <code class="type"><a href="JsSyntax.html#TYPEres">res</a> -> <a href="JsSyntax.html#TYPEresvalue">resvalue</a></code></pre><br>
+val res_label : res -&gt; label *<br>
+
+<pre><span id="VALres_label"><span class="keyword">val</span> res_label</span> : <code class="type"><a href="JsSyntax.html#TYPEres">res</a> -> <a href="JsSyntax.html#TYPElabel">label</a></code></pre><br>
+val res_ref : ref -&gt; res *<br>
+
+<pre><span id="VALres_ref"><span class="keyword">val</span> res_ref</span> : <code class="type"><a href="JsSyntax.html#TYPEref">ref</a> -> <a href="JsSyntax.html#TYPEres">res</a></code></pre><br>
+val res_val : value -&gt; res *<br>
+
+<pre><span id="VALres_val"><span class="keyword">val</span> res_val</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a> -> <a href="JsSyntax.html#TYPEres">res</a></code></pre><br>
+val res_normal : resvalue -&gt; res *<br>
+
+<pre><span id="VALres_normal"><span class="keyword">val</span> res_normal</span> : <code class="type"><a href="JsSyntax.html#TYPEresvalue">resvalue</a> -> <a href="JsSyntax.html#TYPEres">res</a></code></pre><br>
+val res_empty : res *<br>
+
+<pre><span id="VALres_empty"><span class="keyword">val</span> res_empty</span> : <code class="type"><a href="JsSyntax.html#TYPEres">res</a></code></pre><br>
+val res_break : label -&gt; res *<br>
+
+<pre><span id="VALres_break"><span class="keyword">val</span> res_break</span> : <code class="type"><a href="JsSyntax.html#TYPElabel">label</a> -> <a href="JsSyntax.html#TYPEres">res</a></code></pre><br>
+val res_continue : label -&gt; res *<br>
+
+<pre><span id="VALres_continue"><span class="keyword">val</span> res_continue</span> : <code class="type"><a href="JsSyntax.html#TYPElabel">label</a> -> <a href="JsSyntax.html#TYPEres">res</a></code></pre><br>
+val res_return : resvalue -&gt; res *<br>
+
+<pre><span id="VALres_return"><span class="keyword">val</span> res_return</span> : <code class="type"><a href="JsSyntax.html#TYPEresvalue">resvalue</a> -> <a href="JsSyntax.html#TYPEres">res</a></code></pre><br>
+val res_throw : resvalue -&gt; res *<br>
+
+<pre><span id="VALres_throw"><span class="keyword">val</span> res_throw</span> : <code class="type"><a href="JsSyntax.html#TYPEresvalue">resvalue</a> -> <a href="JsSyntax.html#TYPEres">res</a></code></pre>
+<pre><code><span id="TYPEspecret"><span class="keyword">type</span> <code class="type">'t</code> specret</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTspecret.Coq_specret_val"><span class="constructor">Coq_specret_val</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEstate">state</a> * 't</code></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+A pure/specification value<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTspecret.Coq_specret_out"><span class="constructor">Coq_specret_out</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEstate">state</a> * <a href="JsSyntax.html#TYPEres">res</a></code></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+A completion record (possibly abrupt)<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr></table>
+
+<div class="info ">
+Return types from specification functions<br>
+</div>
+
+
+<pre><code><span id="TYPEcodetype"><span class="keyword">type</span> <code class="type"></code>codetype</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcodetype.Coq_codetype_func"><span class="constructor">Coq_codetype_func</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcodetype.Coq_codetype_global"><span class="constructor">Coq_codetype_global</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcodetype.Coq_codetype_eval"><span class="constructor">Coq_codetype_eval</span></span></code></td>
+
+</tr></table>
+
+
+</body></html>

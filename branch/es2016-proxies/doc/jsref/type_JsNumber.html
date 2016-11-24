@@ -1,0 +1,80 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="BinNums" rel="Chapter" href="BinNums.html">
+<link title="Datatypes" rel="Chapter" href="Datatypes.html">
+<link title="Fappli_IEEE_bits" rel="Chapter" href="Fappli_IEEE_bits.html">
+<link title="Fappli_IEEE" rel="Chapter" href="Fappli_IEEE.html">
+<link title="LibList" rel="Chapter" href="LibList.html">
+<link title="LibOption" rel="Chapter" href="LibOption.html">
+<link title="LibProd" rel="Chapter" href="LibProd.html">
+<link title="StdMap" rel="Chapter" href="StdMap.html">
+<link title="Heap" rel="Chapter" href="Heap.html">
+<link title="HeapInt" rel="Chapter" href="HeapInt.html">
+<link title="HeapStr" rel="Chapter" href="HeapStr.html">
+<link title="HeapList" rel="Chapter" href="HeapList.html">
+<link title="Shared" rel="Chapter" href="Shared.html">
+<link title="Compare" rel="Chapter" href="Compare.html">
+<link title="JsNumber" rel="Chapter" href="JsNumber.html">
+<link title="JsSyntax" rel="Chapter" href="JsSyntax.html">
+<link title="JsSyntaxAux" rel="Chapter" href="JsSyntaxAux.html">
+<link title="HeapObj" rel="Chapter" href="HeapObj.html">
+<link title="Translate_syntax" rel="Chapter" href="Translate_syntax.html">
+<link title="JsCommon" rel="Chapter" href="JsCommon.html">
+<link title="JsCommonAux" rel="Chapter" href="JsCommonAux.html">
+<link title="JsInit" rel="Chapter" href="JsInit.html">
+<link title="Prheap" rel="Chapter" href="Prheap.html">
+<link title="Debug" rel="Chapter" href="Debug.html">
+<link title="JsInterpreterMonads" rel="Chapter" href="JsInterpreterMonads.html">
+<link title="JsInterpreter" rel="Chapter" href="JsInterpreter.html">
+<link title="JsInterpreterUtils" rel="Chapter" href="JsInterpreterUtils.html">
+<link title="ModuleExport" rel="Chapter" href="ModuleExport.html">
+<link title="Run_js" rel="Chapter" href="Run_js.html"><title>JsNumber</title>
+</head>
+<body>
+<code class="code"><span class="keyword">sig</span><br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;number&nbsp;=&nbsp;float<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;floor&nbsp;:&nbsp;float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;float<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;zero&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;neg_zero&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;one&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;infinity&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;neg_infinity&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;max_value&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;min_value&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;nan&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;pi&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;e&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ln2&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;from_string&nbsp;:&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;to_string&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;to_int32&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;to_uint32&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int32_left_shift&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int32_right_shift&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int32_bitwise_and&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int32_bitwise_or&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int32_bitwise_xor&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int32_bitwise_not&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uint32_right_shift&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;neg&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;sign&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;absolute&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;modulo_32&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;fmod&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">JsNumber</span>.number<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;isnan&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;bool<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;isposzero&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;bool<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;isnegzero&nbsp;:&nbsp;<span class="constructor">JsNumber</span>.number&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;bool<br>
+<span class="keyword">end</span></code></body></html>
