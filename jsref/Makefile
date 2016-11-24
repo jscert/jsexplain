@@ -9,7 +9,33 @@
 
 all: jsjsref mljsref
 
-ML_FRONTEND_SRC := ml_frontend
+###############################################################
+##### Tools
+
+GENERATOR_DIR := ../generator
+
+OCAMLDEP := ocamldep -one-line
+OCAMLPAR := OCAMLRUNPARAM="l=200M"
+
+LINEOF_BIN := $(GENERATOR_DIR)/lineof.byte
+LINEOF     := $(OCAMLPAR) $(LINEOF_BIN)
+
+PPX_BIN    := $(GENERATOR_DIR)/monad_ppx.byte
+PPX_FLAG   := -ppx $(PPX_BIN)
+
+MLTOJS_BIN := $(GENERATOR_DIR)/main.byte
+MLTOJS 	   := $(OCAMLPAR) $(MLTOJS_BIN) $(PPX_FLAG)
+# -dsource is automatically considered by main.byte
+
+ASSEMBLY_BIN := $(GENERATOR_DIR)/assembly.byte
+ASSEMBLY     := $(ASSEMBLY_BIN)
+
+DISPLAYGEN_BIN := $(GENERATOR_DIR)/displayed_sources.byte
+DISPLAYGEN     := $(OCAMLPAR) $(DISPLAYGEN_BIN)
+
+# Warn if buildtools are missing
+$(MLTOJS_BIN) $(LINEOF_BIN) $(PPX_BIN) $(ASSEMBLY_BIN) $(DISPLAYGEN_BIN):
+	$(error Missing generator tools, build from project root, or set paths.)
 
 ###############################################################
 ##### Dependencies
@@ -20,7 +46,7 @@ include .depends
 endif
 
 .depends: $(JSREF_ML) $(PPX_BIN)
-	$(OCAMLDEP) -ppx $(PPX_BIN) -I . -all * $(ML_FRONTEND_SRC)/* > $@
+	$(OCAMLDEP) -ppx $(PPX_BIN) -I . -all * > $@
 
 ###############################################################
 ###############################################################
@@ -28,7 +54,6 @@ endif
 JSREF_ML  := $(wildcard *.ml)
 JSREF_MLI := $(wildcard *.mli)
 
-GENERATOR_DIR := ../generator
 
 STDLIB_DIR := $(GENERATOR_DIR)/stdlib_ml
 STDLIB_FLAG := -I $(STDLIB_DIR) -open Stdlib
@@ -79,31 +104,6 @@ ALL_DISPLAYED := $(DISPLAYED:.ml=.unlog.js) $(DISPLAYED:.ml=.pseudo.js) $(DISPLA
 
 ALL_LINEOF := $(DISPLAYED:.ml=.token.js) $(DISPLAYED:.ml=.mlloc.js) $(DISPLAYED:.ml=.ptoken.js)
 
-###############################################################
-##### Tools
-
-OCAMLDEP := ocamldep -one-line
-OCAMLPAR := OCAMLRUNPARAM="l=200M"
-
-LINEOF_BIN := $(GENERATOR_DIR)/lineof.byte
-LINEOF     := $(OCAMLPAR) $(LINEOF_BIN)
-
-PPX_BIN    := $(GENERATOR_DIR)/monad_ppx.byte
-PPX_FLAG   := -ppx $(PPX_BIN)
-
-MLTOJS_BIN := $(GENERATOR_DIR)/main.byte
-MLTOJS 	   := $(OCAMLPAR) $(MLTOJS_BIN) $(PPX_FLAG)
-# -dsource is automatically considered by main.byte
-
-ASSEMBLY_BIN := $(GENERATOR_DIR)/assembly.byte
-ASSEMBLY     := $(ASSEMBLY_BIN)
-
-DISPLAYGEN_BIN := $(GENERATOR_DIR)/displayed_sources.byte
-DISPLAYGEN     := $(OCAMLPAR) $(DISPLAYGEN_BIN)
-
-# Warn if buildtools are missing
-$(MLTOJS_BIN) $(LINEOF_BIN) $(PPX_BIN) $(ASSEMBLY_BIN) $(DISPLAYGEN_BIN):
-	$(error Missing generator tools, build from project root, or set paths.)
 
 
 ###############################################################

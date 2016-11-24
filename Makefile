@@ -31,7 +31,7 @@ test: jsjsref
 # Documentation
 doc: doc/jsref
 
-doc/jsref:
+doc/jsref: generator
 	$(MAKE) -C jsref doc
 	mv jsref/doc_build doc/jsref
 
