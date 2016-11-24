@@ -28,11 +28,18 @@ test_init:
 test: jsjsref
 	node_modules/.bin/mocha
 
+# Documentation
+doc: doc/jsref
+
+doc/jsref:
+	$(MAKE) -C jsref doc
+	mv jsref/doc_build doc/jsref
+
 # Publication Stages
 PUB_FILES=driver.html libraries jquery-ui-1.11.4.custom jquery_scroll \
 	  jsref/displayed_sources.js tools.js node_modules/esprima/esprima.js \
 	  esprima-to-ast.js jsref/lineof.js navig-driver.js \
-	  jsref/assembly.js doc/documentation.org doc/screenshots
+	  jsref/assembly.js doc/documentation.org doc/screenshots doc/jsref
 
 dist: jsjsref $(PUB_FILES)
 	mkdir -p $@
@@ -49,6 +56,7 @@ publish-github: dist
 clean:
 	$(MAKE) -C generator clean
 	$(MAKE) -C jsref clean
+	rm -Rf doc/jsref || true
 	rm -Rf dist || true
 
-.PHONY: jsjsref mljsref generator generator-stdlib test_init test publish publish-github clean
+.PHONY: jsjsref mljsref generator generator-stdlib test_init test doc publish publish-github clean

@@ -13,3 +13,4 @@ displayed_sources.js
 *.cmo
 *.byte
 *.native
+doc_build

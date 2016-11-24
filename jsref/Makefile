@@ -36,7 +36,6 @@ REPLACE_STDLIB := -nopervasives -nostdlib $(STDLIB_FLAG)
 
 # ASSEMBLY_JS_FILES must respect dependencies order
 ASSEMBLY_JS_FILES := \
-	$(STDLIB_DIR)/stdlib.js \
 	BinNums.unlog.js \
 	Datatypes.unlog.js \
 	Fappli_IEEE_bits.unlog.js \
@@ -64,11 +63,12 @@ ASSEMBLY_JS_FILES := \
 	Debug.js \
 	JsInterpreterMonads.unlog.js \
 	JsInterpreter.log.js \
-	JsInterpreterUtils.unlog.js
+	JsInterpreterUtils.unlog.js \
+	ModuleExport.js
 
 ASSEMBLY_JS := \
-	$(ASSEMBLY_JS_FILES) \
-	ModuleExport.js
+	$(STDLIB_DIR)/stdlib.js \
+	$(ASSEMBLY_JS_FILES)
 
 ###############################################################
 
@@ -186,16 +186,20 @@ clean_jsjsref:
 # ML-JSRef
 
 # Strip all extensions of $(ASSEMBLY_JS) and replace with .cmo
-ASSEMBLY_ML_FILES := $(addsuffix .cmo,$(basename $(basename $(ASSEMBLY_JS_FILES))))
-ASSEMBLY_ML := $(ASSEMBLY_ML_FILES) \
-	run_js.cmo
+ASSEMBLY_ML_FILES := \
+	$(addsuffix .cmo,$(basename $(basename $(ASSEMBLY_JS_FILES)))) \
+	Run_js.cmo
+
+ASSEMBLY_ML := \
+  	$(STDLIB_DIR)/stdlib.cmo \
+	$(ASSEMBLY_ML_FILES)
 
 mljsref: main.byte
 
 main.byte: $(ASSEMBLY_ML)
 	ocamlfind ocamlc -linkpkg -package JS_Parser -o $@ $^
 
-run_js.cmo: run_js.ml run_js.mli run_js.cmi
+Run_js.cmo: Run_js.ml Run_js.mli Run_js.cmi
 	ocamlfind ocamlc -c -package JS_Parser $<
 
 Translate_syntax.cmo: Translate_syntax.ml Translate_syntax.mli Translate_syntax.cmi
@@ -217,15 +221,46 @@ clean_mljsref:
 
 ##############################################################
 ##############################################################
+# OCamlDocs
+
+DOC_DIR = doc_build
+
+# A dump file is used so indexes are correctly created with separate compilation
+# Dump file cannot have a module twice, so must be recreated each run.
+DUMP_FILE = $(DOC_DIR)/odoc.dump
+DUMP = -dump $(DUMP_FILE) -load $(DUMP_FILE)
+
+ODOC_FLAGS = -html -d $(DOC_DIR) $(DUMP) $(PPX_FLAG)
+
+doc: $(addprefix doc_build/,$(addsuffix .html,$(basename $(ASSEMBLY_ML_FILES))))
+	sh -c "rm -f $(DUMP_FILE)"
+	touch $(DOC_DIR)
+
+$(DOC_DIR):
+	mkdir -p $@
+
+$(DUMP_FILE): $(DOC_DIR)
+	ocamldoc -html -d $(DOC_DIR) -dump $(DUMP_FILE)
+
+$(DOC_DIR)/%.html $(DOC_DIR)/type_%.html: %.ml %.mli %.cmi $(PPX_BIN) $(DUMP_FILE)
+	ocamlfind ocamldoc $(ODOC_FLAGS) -package JS_Parser $(*F).ml $(*F).mli
+
+$(DOC_DIR)/%.html $(DOC_DIR)/type_%.html: %.ml %.cmi $(PPX_BIN) $(DUMP_FILE)
+	ocamldoc $(ODOC_FLAGS) $(STDLIB_FLAG) $<
+
+.PHONY: doc
+
+##############################################################
+##############################################################
 # Global options
 
 clean: clean_jsjsref clean_mljsref
 	sh -c "rm -f *.cmi"
 	sh -c "rm -f .depends"
+	sh -c "rm -Rf $(DOC_DIR)"
 
 # Phony global targets
 .PHONY: all clean
 
-# Do not delete intermediate files.
-.SECONDARY:
-
+.SECONDARY:	# Do not delete intermediate files.
+.NOTPARALLEL: 	# Ordered execution expected due to ocamlc writing out cmi files.
