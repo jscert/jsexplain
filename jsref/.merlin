@@ -1,1 +1,4 @@
+S ../generator/stdlib_ml
+B ../generator/stdlib_ml
 PKG JS_Parser
+FLG -ppx ../generator/monad_ppx.byte -open Stdlib
