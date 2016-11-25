@@ -31,6 +31,9 @@ test: jsjsref
 # Documentation
 doc: doc/jsref
 
+opendoc: doc
+	xdg-open doc/jsref/index.html
+
 esdocgen:
 	$(MAKE) -C tools/esdocgen
 

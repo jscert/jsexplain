@@ -272,21 +272,44 @@ let run_object_heap_set_extensible b s l =
 *)
 
 
+(*****************************************************************************)
+(*****************************************************************************)
+(************* START OF THE BIG RECURSIVE INTERPRETER FUNCTION ***************)
+(*****************************************************************************)
+(*****************************************************************************)
+
+(** New ES6 Spec functions here, writting in the specification in CamelCase()
+    will all be prefixed with spec_ *)
+
+(** {4 Object Internal Methods and Internal Slots }
+    @esid sec-object-internal-methods-and-internal-slots
+    @essec 6.1.7.2 *)
 (** Function to implement the specification text "O has a [[X]] internal slot"
- *  @param l    The location of O
- *  @param prj  The object projection function corresponding to [[X]] *)
-let object_has_internal_slot s l prj =
+    @param l    The location of O
+    @param prj  The object projection function corresponding to [[X]] *)
+let rec object_has_internal_slot s l prj =
   let%some slot_value = run_object_method prj s l in
   match slot_value with
   | Some _ -> res_spec s true
   | None -> res_spec s false
 
 (** Function to implement the specification text of "O has a [[X]] internal method" *)
-let object_has_internal_method = object_has_internal_slot
+and object_has_internal_method s l prj =
+  object_has_internal_slot s l prj
+
+(** {5 Object Internal Method Dispatch Functions }
+    Functions in this section are used to dispatch Internal Methods to the
+    correct implementation based upon the value of the internal slot *)
+
+and object_internal_is_extensible s c l =
+  let%some internal_method = run_object_method object_is_extensible_ s l in
+  match internal_method with
+  | Coq_builtin_is_extensible_default -> object_internal_ordinary_is_extensible s c l
+  | Coq_builtin_is_extensible_proxy   -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
 (** Function to dispatch calls to O.[[Get]](P, receiver)
     @param l  The location of O *)
-let rec object_internal_get s c l p receiver =
+and object_internal_get s c l p receiver =
   (* TODO: Check if c can be dropped. (ES5 compat) *)
   let%some internal_method = (run_object_method object_get_ s l) in
   let dispatch_es5 _ =
@@ -304,15 +327,10 @@ let rec object_internal_get s c l p receiver =
   | Coq_builtin_get_args_obj -> dispatch_es5 ()
   | Coq_builtin_get_proxy    -> Coq_result_not_yet_implemented
 
-
-(*****************************************************************************)
-(*****************************************************************************)
-(************* START OF THE BIG RECURSIVE INTERPRETER FUNCTION ***************)
-(*****************************************************************************)
-(*****************************************************************************)
-
-(** New ES6 Spec functions here, writting in the specification in CamelCase()
-    will all be prefixed with spec_ *)
+(** Function to dispatch calls to O.[[Call]](thisArgument, argumentsList)
+    @param l  The location of O *)
+and object_internal_call s c l thisArgument argumentsList =
+  run_call s c l thisArgument argumentsList
 
 (** {1 Abstract Operations }
     @essec 7
@@ -331,6 +349,14 @@ and is_callable s argument =
     res_spec s1 (Coq_value_prim (Coq_prim_bool b))
   | _ ->
     res_spec s (Coq_value_prim (Coq_prim_bool false))
+
+(** @essec 7.2.5
+    @esid sec-isextensible-o *)
+and is_extensible s c o =
+  let%assert _ = match type_of o with Coq_type_object -> true | _ -> false in
+  match o with
+  | Coq_value_object l -> object_internal_is_extensible s c l
+  | _ -> assert false
 
 (** @essec 7.2.7
     @esid sec-ispropertykey *)
@@ -354,7 +380,7 @@ and get_v s c v p =
 (** @essec 7.3.9
     @esid sec-getmethod *)
 and get_method s c v p =
-  let%assert _ = (is_property_key p) in
+  let%assert _ = is_property_key p in
   let%value (s1, func) = get_v s c v p in
   match type_of func with
   | Coq_type_undef -> res_spec s1 (res_val (Coq_value_prim (Coq_prim_undef)))
@@ -364,6 +390,17 @@ and get_method s c v p =
     if not callable
     then run_error s2 c Coq_native_error_type
     else res_spec s2 (res_val func)
+
+(** @essec 7.3.12
+    @esid sec-call *)
+and call s c f v argumentList =
+  if_some_or_apply_default argumentList [] (fun argumentList ->
+    let%bool (s1, callable) = is_callable s f in
+    if not callable then run_error s1 c Coq_native_error_type
+    else match f with
+    | Coq_value_object l -> object_internal_call s1 c l v argumentList
+    | _ -> assert false
+  )
 
 (** @essec 9.1.1.1
     @esid sec-ordinarygetprototypeof *)
@@ -402,11 +439,17 @@ and ordinary_set_prototype_of s c l v =
     end
     in repeat v false
 
+(** @essec 9.1.3
+    @esid sec-ordinary-object-internal-methods-and-internal-slots-isextensible *)
+and object_internal_ordinary_is_extensible s c l =
+  let%value (s1, v) = ordinary_is_extensible s c l in
+  res_out s (res_val v)
+
 (** @essec 9.1.3.1
     @esid sec-ordinaryisextensible *)
 and ordinary_is_extensible s c l =
   let%some b = run_object_method object_extensible_ s l in
-  res_spec s (res_val (Coq_value_prim (Coq_prim_bool b)))
+  res_out s (res_val (Coq_value_prim (Coq_prim_bool b)))
 
 (** @essec 9.1.4.1
     @esid sec-ordinarypreventextensions *)
@@ -4008,7 +4051,7 @@ and run_call s c l vthis args =
     let%some target = otrg in
     let arguments_ = (LibList.append boundArgs args) in run_call s c target boundThis arguments_
   | Coq_call_prealloc b -> run_call_prealloc s c b vthis args
-  | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
+  | Coq_call_proxy -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
 (** val run_javascript_from_state : state -> prog -> result **)
 

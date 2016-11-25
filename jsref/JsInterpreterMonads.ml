@@ -82,6 +82,11 @@ let if_some op k =
 let if_some_or_default o d k =
   option_case d k o
 
+let if_some_or_apply_default o d k =
+  match o with
+  | Some x -> k x
+  | None   -> k d
+
 (** val if_result_some :
     'a1 resultof -> ('a1 -> 'a2 resultof) -> 'a2 resultof **)
 
@@ -205,9 +210,8 @@ let if_break w k =
     | Coq_restype_return -> res_ter s r
     | Coq_restype_throw -> res_ter s r)
 
-(** val if_value :
-    result -> (state -> value -> 'a1 specres) -> 'a1 specres **)
-
+(** This method is equivalent to the [!] operator of section 5.2 Algorithm Conventions
+    ppx_monads maps this to the [let%value] syntax. *)
 let if_value w k =
   if_success w (fun s rv ->
     match rv with
