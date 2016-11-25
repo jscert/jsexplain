@@ -1,3 +1,5 @@
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="appearance.css" />
+
 #+TITLE: Using JSExplain
 
 *** TODO Generic explanatory text here
@@ -13,30 +15,73 @@ as described in the official ECMAScript standard.
 
 #+CAPTION: JSExplain User Interface
 #+NAME: fig:000_Overall
-#+ATTR_HTML: :width 1024px :border 1 :rules all :frame border
+#+ATTR_HTML: :width 1024px 
 [[./screenshots/000_Overview.png]]
 
 The user interface consists of six components, as shown in Figure [[fig:001_Breakdown]]. These components are:
-1. *Program selection*, where users can choose the program that they wish to execute
-2. *Current program*, where the program that is currently being executed is displayed
-3. *State of the program heap*, where the contents of the program heap at the current point in the execution of the program are displayed
-4. *Navigation panel*, which allows the users to step through the program
+1. *Program Selection*, where users can choose the program that they wish to execute
+2. *Current Program*, where the program that is currently being executed is displayed
+3. *Program Heap State*, where the contents of the program heap at the current point in the execution of the program are displayed
+4. *Navigation Panel*, which allows the users to step through the program
 5. *Interpreter*, displaying the part of the interpreter code that is active at the current point in the execution of the program
-6. *State of the interpreter*, where the state of the interpreter at the current point in the execution of the program is displayed 
+6. *Interpreter State*, where the state of the interpreter at the current point in the execution of the program is displayed 
 
 #+CAPTION: JSExplain User Interface Breakdown
 #+NAME: fig:001_Breakdown
-#+ATTR_HTML: :width 1024px :border 1 :rules all :frame border
+#+ATTR_HTML: :width 1024px 
 [[./screenshots/001_Breakdown.png]]
 
-* TODO Program selection
+* Program Selection
 
-* TODO Current program
+This component allows the users to select the program that they wish
+to execute. This can be accomplished in two ways. First, one can click
+on the list of preset examples, which brings up the selection as shown
+in Figure [[fig:002_PresetExamples]], and there select the example one
+wishes to load. Alternatively, one can load a program from a file, by
+clicking on the "Choose file" button. After either of these
+procedures, the newly loaded program is displayed in the Current
+Program component.
 
-* TODO State of the program heap
+#+CAPTION: Selecting preset examples
+#+NAME: fig:002_PresetExamples
+#+ATTR_HTML: :width 800px 
+[[./screenshots/002_PresetExamples.png]]
+ 
 
-* TODO Navigation panel
+* TODO Current Program
+
+* Program Heap State
+
+This component displays the entire state of the program heap at the
+current point in program execution. Illustratively, Figure
+[[fig:003_StateCollapsed]] shows the heap state before the execution of
+the command =x++=, highlighted in the current program component. This
+heap state is collapsed, in that object properties are not shown, but
+rather just the objects themselves. At this point, three objects exist
+in the heap: the global object, denoted by *this*, as well as the
+lexical and variable environments.
+
+#+CAPTION: Program heap, collapsed
+#+NAME: fig:003_StateCollapsed
+#+ATTR_HTML: :width 1024px
+[[./screenshots/003_StateCollapsed.png]]
+
+Objects can be expanded by clicking on the text =<Object>=, which is
+present to the left of each object's name. This expands the object and
+shows all of its properties. For instance, in Figure
+[[fig:004_StateExpanded]], one can see the expanded global object, with
+all of its properties, such as =Array= and =String=, which are objects
+themselves. Also, one can see that the global object has the property
+=x=, whose value is 1.
+
+#+CAPTION: Program heap, expanded
+#+NAME: fig:004_StateExpanded
+#+ATTR_HTML: :width 1024px
+[[./screenshots/004_StateExpanded.png]]
+
+
+* TODO Navigation Panel
 
 * TODO Interpreter
 
-* TODO State of the interpreter
+* TODO Interpreter State
