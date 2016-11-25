@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2016-11-25 Fri 15:11 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Using JSExplain</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Petar Maksimovic" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="appearance.css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Using JSExplain</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgf88fb49">0.0.1. <span class="todo TODO">TODO</span> Generic explanatory text here</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org025c51c">1. Overview</a></li>
+<li><a href="#org3e63c6d">2. Program Selection</a></li>
+<li><a href="#orgd6879cb">3. <span class="todo TODO">TODO</span> Current Program</a></li>
+<li><a href="#org72d3acd">4. Program Heap State</a></li>
+<li><a href="#org0972432">5. <span class="todo TODO">TODO</span> Navigation Panel</a></li>
+<li><a href="#org236e6dc">6. <span class="todo TODO">TODO</span> Interpreter</a></li>
+<li><a href="#orgd54fad7">7. <span class="todo TODO">TODO</span> Interpreter State</a></div>
+</div>
+
+<div id="outline-container-orgf88fb49" class="outline-4">
+<h4 id="orgf88fb49"><span class="section-number-4">0.0.1</span> <span class="todo TODO">TODO</span> Generic explanatory text here</h4>
+</div>
+
+<div id="outline-container-org025c51c" class="outline-2">
+<h2 id="org025c51c"><span class="section-number-2">1</span> Overview</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+The JSExplain graphical user interface is presented in Figure
+<a href="#org509e4b5">1</a>. It allows the users to load JavaScript programs and
+execute them in our JavaScript interpreter. The users have at their
+disposal a mechanism for step-by-step execution with various levels of
+granularity, exposing all of the underlying details of the execution,
+as described in the official ECMAScript standard.
+</p>
+
+
+<div id="org509e4b5" class="figure">
+<p><img src="./screenshots/000_Overview.png" alt="000_Overview.png" width="1024px" />
+</p>
+<p><span class="figure-number">Figure 1: </span>JSExplain User Interface</p>
+</div>
+
+<p>
+The user interface consists of six components, as shown in Figure <a href="#org3d24722">2</a>. These components are:
+</p>
+<ol class="org-ol">
+<li><b>Program Selection</b>, where users can choose the program that they wish to execute</li>
+<li><b>Current Program</b>, where the program that is currently being executed is displayed</li>
+<li><b>Program Heap State</b>, where the contents of the program heap at the current point in the execution of the program are displayed</li>
+<li><b>Navigation Panel</b>, which allows the users to step through the program</li>
+<li><b>Interpreter</b>, displaying the part of the interpreter code that is active at the current point in the execution of the program</li>
+<li><b>Interpreter State</b>, where the state of the interpreter at the current point in the execution of the program is displayed</li>
+</ol>
+
+
+<div id="org3d24722" class="figure">
+<p><img src="./screenshots/001_Breakdown.png" alt="001_Breakdown.png" width="1024px" />
+</p>
+<p><span class="figure-number">Figure 2: </span>JSExplain User Interface Breakdown</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3e63c6d" class="outline-2">
+<h2 id="org3e63c6d"><span class="section-number-2">2</span> Program Selection</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+This component allows the users to select the program that they wish
+to execute. This can be accomplished in two ways. First, one can click
+on the list of preset examples, which brings up the selection as shown
+in Figure <a href="#org2c54ab8">3</a>, and there select the example one
+wishes to load. Alternatively, one can load a program from a file, by
+clicking on the "Choose file" button. After either of these
+procedures, the newly loaded program is displayed in the Current
+Program component.
+</p>
+
+
+<div id="org2c54ab8" class="figure">
+<p><img src="./screenshots/002_PresetExamples.png" alt="002_PresetExamples.png" width="800px" />
+</p>
+<p><span class="figure-number">Figure 3: </span>Selecting preset examples</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgd6879cb" class="outline-2">
+<h2 id="orgd6879cb"><span class="section-number-2">3</span> <span class="todo TODO">TODO</span> Current Program</h2>
+</div>
+
+<div id="outline-container-org72d3acd" class="outline-2">
+<h2 id="org72d3acd"><span class="section-number-2">4</span> Program Heap State</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+This component displays the entire state of the program heap at the
+current point in program execution. Illustratively, Figure
+<a href="#orgf58cf91">4</a> shows the heap state before the execution of
+the command <code>x++</code>, highlighted in the current program component. This
+heap state is collapsed, in that object properties are not shown, but
+rather just the objects themselves. At this point, three objects exist
+in the heap: the global object, denoted by <b>this</b>, as well as the
+lexical and variable environments.
+</p>
+
+
+<div id="orgf58cf91" class="figure">
+<p><img src="./screenshots/003_StateCollapsed.png" alt="003_StateCollapsed.png" width="1024px" />
+</p>
+<p><span class="figure-number">Figure 4: </span>Program heap, collapsed</p>
+</div>
+
+<p>
+Objects can be expanded by clicking on the text <code>&lt;Object&gt;</code>, which is
+present to the left of each object's name. This expands the object and
+shows all of its properties. For instance, in Figure
+<a href="#orga802d03">5</a>, one can see the expanded global object, with
+all of its properties, such as <code>Array</code> and <code>String</code>, which are objects
+themselves. Also, one can see that the global object has the property
+<code>x</code>, whose value is 1.
+</p>
+
+
+<div id="orga802d03" class="figure">
+<p><img src="./screenshots/004_StateExpanded.png" alt="004_StateExpanded.png" width="1024px" />
+</p>
+<p><span class="figure-number">Figure 5: </span>Program heap, expanded</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org0972432" class="outline-2">
+<h2 id="org0972432"><span class="section-number-2">5</span> <span class="todo TODO">TODO</span> Navigation Panel</h2>
+</div>
+
+<div id="outline-container-org236e6dc" class="outline-2">
+<h2 id="org236e6dc"><span class="section-number-2">6</span> <span class="todo TODO">TODO</span> Interpreter</h2>
+</div>
+
+<div id="outline-container-orgd54fad7" class="outline-2">
+<h2 id="orgd54fad7"><span class="section-number-2">7</span> <span class="todo TODO">TODO</span> Interpreter State</h2>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Petar Maksimovic</p>
+<p class="date">Created: 2016-11-25 Fri 15:11</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
