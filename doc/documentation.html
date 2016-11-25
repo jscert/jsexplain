@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2016-11-25 Fri 15:08 -->
+<!-- 2016-11-25 Fri 15:11 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Using JSExplain</title>
@@ -234,30 +234,30 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orga79a4fc">0.0.1. <span class="todo TODO">TODO</span> Generic explanatory text here</a></li>
+<li><a href="#orgf88fb49">0.0.1. <span class="todo TODO">TODO</span> Generic explanatory text here</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org62af72d">1. Overview</a></li>
-<li><a href="#orgd58570e">2. Program Selection</a></li>
-<li><a href="#org3f4a7a9">3. <span class="todo TODO">TODO</span> Current Program</a></li>
-<li><a href="#orgb802284">4. Program Heap State</a></li>
-<li><a href="#orgb75a5e7">5. <span class="todo TODO">TODO</span> Navigation Panel</a></li>
-<li><a href="#orgdd43f5f">6. <span class="todo TODO">TODO</span> Interpreter</a></li>
-<li><a href="#orga094c4a">7. <span class="todo TODO">TODO</span> Interpreter State</a></div>
+<li><a href="#org025c51c">1. Overview</a></li>
+<li><a href="#org3e63c6d">2. Program Selection</a></li>
+<li><a href="#orgd6879cb">3. <span class="todo TODO">TODO</span> Current Program</a></li>
+<li><a href="#org72d3acd">4. Program Heap State</a></li>
+<li><a href="#org0972432">5. <span class="todo TODO">TODO</span> Navigation Panel</a></li>
+<li><a href="#org236e6dc">6. <span class="todo TODO">TODO</span> Interpreter</a></li>
+<li><a href="#orgd54fad7">7. <span class="todo TODO">TODO</span> Interpreter State</a></div>
 </div>
 
-<div id="outline-container-orga79a4fc" class="outline-4">
-<h4 id="orga79a4fc"><span class="section-number-4">0.0.1</span> <span class="todo TODO">TODO</span> Generic explanatory text here</h4>
+<div id="outline-container-orgf88fb49" class="outline-4">
+<h4 id="orgf88fb49"><span class="section-number-4">0.0.1</span> <span class="todo TODO">TODO</span> Generic explanatory text here</h4>
 </div>
 
-<div id="outline-container-org62af72d" class="outline-2">
-<h2 id="org62af72d"><span class="section-number-2">1</span> Overview</h2>
+<div id="outline-container-org025c51c" class="outline-2">
+<h2 id="org025c51c"><span class="section-number-2">1</span> Overview</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 The JSExplain graphical user interface is presented in Figure
-<a href="#orgffb0a30">1</a>. It allows the users to load JavaScript programs and
+<a href="#org509e4b5">1</a>. It allows the users to load JavaScript programs and
 execute them in our JavaScript interpreter. The users have at their
 disposal a mechanism for step-by-step execution with various levels of
 granularity, exposing all of the underlying details of the execution,
@@ -265,14 +265,14 @@ as described in the official ECMAScript standard.
 </p>
 
 
-<div id="orgffb0a30" class="figure">
+<div id="org509e4b5" class="figure">
 <p><img src="./screenshots/000_Overview.png" alt="000_Overview.png" width="1024px" />
 </p>
 <p><span class="figure-number">Figure 1: </span>JSExplain User Interface</p>
 </div>
 
 <p>
-The user interface consists of six components, as shown in Figure <a href="#orge02a197">2</a>. These components are:
+The user interface consists of six components, as shown in Figure <a href="#org3d24722">2</a>. These components are:
 </p>
 <ol class="org-ol">
 <li><b>Program Selection</b>, where users can choose the program that they wish to execute</li>
@@ -284,7 +284,7 @@ The user interface consists of six components, as shown in Figure <a href="#orge
 </ol>
 
 
-<div id="orge02a197" class="figure">
+<div id="org3d24722" class="figure">
 <p><img src="./screenshots/001_Breakdown.png" alt="001_Breakdown.png" width="1024px" />
 </p>
 <p><span class="figure-number">Figure 2: </span>JSExplain User Interface Breakdown</p>
@@ -292,14 +292,14 @@ The user interface consists of six components, as shown in Figure <a href="#orge
 </div>
 </div>
 
-<div id="outline-container-orgd58570e" class="outline-2">
-<h2 id="orgd58570e"><span class="section-number-2">2</span> Program Selection</h2>
+<div id="outline-container-org3e63c6d" class="outline-2">
+<h2 id="org3e63c6d"><span class="section-number-2">2</span> Program Selection</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 This component allows the users to select the program that they wish
 to execute. This can be accomplished in two ways. First, one can click
 on the list of preset examples, which brings up the selection as shown
-in Figure <a href="#org24297d7">3</a>, and there select the example one
+in Figure <a href="#org2c54ab8">3</a>, and there select the example one
 wishes to load. Alternatively, one can load a program from a file, by
 clicking on the "Choose file" button. After either of these
 procedures, the newly loaded program is displayed in the Current
@@ -307,7 +307,7 @@ Program component.
 </p>
 
 
-<div id="org24297d7" class="figure">
+<div id="org2c54ab8" class="figure">
 <p><img src="./screenshots/002_PresetExamples.png" alt="002_PresetExamples.png" width="800px" />
 </p>
 <p><span class="figure-number">Figure 3: </span>Selecting preset examples</p>
@@ -316,17 +316,17 @@ Program component.
 </div>
 
 
-<div id="outline-container-org3f4a7a9" class="outline-2">
-<h2 id="org3f4a7a9"><span class="section-number-2">3</span> <span class="todo TODO">TODO</span> Current Program</h2>
+<div id="outline-container-orgd6879cb" class="outline-2">
+<h2 id="orgd6879cb"><span class="section-number-2">3</span> <span class="todo TODO">TODO</span> Current Program</h2>
 </div>
 
-<div id="outline-container-orgb802284" class="outline-2">
-<h2 id="orgb802284"><span class="section-number-2">4</span> Program Heap State</h2>
+<div id="outline-container-org72d3acd" class="outline-2">
+<h2 id="org72d3acd"><span class="section-number-2">4</span> Program Heap State</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 This component displays the entire state of the program heap at the
 current point in program execution. Illustratively, Figure
-<a href="#org094ab9a">4</a> shows the heap state before the execution of
+<a href="#orgf58cf91">4</a> shows the heap state before the execution of
 the command <code>x++</code>, highlighted in the current program component. This
 heap state is collapsed, in that object properties are not shown, but
 rather just the objects themselves. At this point, three objects exist
@@ -335,7 +335,7 @@ lexical and variable environments.
 </p>
 
 
-<div id="org094ab9a" class="figure">
+<div id="orgf58cf91" class="figure">
 <p><img src="./screenshots/003_StateCollapsed.png" alt="003_StateCollapsed.png" width="1024px" />
 </p>
 <p><span class="figure-number">Figure 4: </span>Program heap, collapsed</p>
@@ -345,14 +345,14 @@ lexical and variable environments.
 Objects can be expanded by clicking on the text <code>&lt;Object&gt;</code>, which is
 present to the left of each object's name. This expands the object and
 shows all of its properties. For instance, in Figure
-<a href="#orgd714136">5</a>, one can see the expanded global object, with
+<a href="#orga802d03">5</a>, one can see the expanded global object, with
 all of its properties, such as <code>Array</code> and <code>String</code>, which are objects
 themselves. Also, one can see that the global object has the property
 <code>x</code>, whose value is 1.
 </p>
 
 
-<div id="orgd714136" class="figure">
+<div id="orga802d03" class="figure">
 <p><img src="./screenshots/004_StateExpanded.png" alt="004_StateExpanded.png" width="1024px" />
 </p>
 <p><span class="figure-number">Figure 5: </span>Program heap, expanded</p>
@@ -361,21 +361,21 @@ themselves. Also, one can see that the global object has the property
 </div>
 
 
-<div id="outline-container-orgb75a5e7" class="outline-2">
-<h2 id="orgb75a5e7"><span class="section-number-2">5</span> <span class="todo TODO">TODO</span> Navigation Panel</h2>
+<div id="outline-container-org0972432" class="outline-2">
+<h2 id="org0972432"><span class="section-number-2">5</span> <span class="todo TODO">TODO</span> Navigation Panel</h2>
 </div>
 
-<div id="outline-container-orgdd43f5f" class="outline-2">
-<h2 id="orgdd43f5f"><span class="section-number-2">6</span> <span class="todo TODO">TODO</span> Interpreter</h2>
+<div id="outline-container-org236e6dc" class="outline-2">
+<h2 id="org236e6dc"><span class="section-number-2">6</span> <span class="todo TODO">TODO</span> Interpreter</h2>
 </div>
 
-<div id="outline-container-orga094c4a" class="outline-2">
-<h2 id="orga094c4a"><span class="section-number-2">7</span> <span class="todo TODO">TODO</span> Interpreter State</h2>
+<div id="outline-container-orgd54fad7" class="outline-2">
+<h2 id="orgd54fad7"><span class="section-number-2">7</span> <span class="todo TODO">TODO</span> Interpreter State</h2>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Petar Maksimovic</p>
-<p class="date">Created: 2016-11-25 Fri 15:08</p>
+<p class="date">Created: 2016-11-25 Fri 15:11</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
