@@ -20,36 +20,6 @@ open Shared
 
 (*------------JS preliminary -----------*)
 
-(** val convert_number_to_bool : number -> bool **)
-
-let convert_number_to_bool n =
-  if    (JsNumber.isposzero n)
-     || (JsNumber.isnegzero n)
-     || (JsNumber.isnan n)
-  then false
-  else true
-
-(** val convert_string_to_bool : string -> bool **)
-
-let convert_string_to_bool s =
-  if string_eq s "" then false else true
-  (* Arthur hack string.empty *)
-
-(** val convert_prim_to_boolean : prim -> bool **)
-
-let convert_prim_to_boolean _foo_ = match _foo_ with
-| Coq_prim_undef -> false
-| Coq_prim_null -> false
-| Coq_prim_bool b -> b
-| Coq_prim_number n -> convert_number_to_bool n
-| Coq_prim_string s -> convert_string_to_bool s
-
-(** val convert_value_to_boolean : value -> bool **)
-
-let convert_value_to_boolean _foo_ = match _foo_ with
-| Coq_value_prim p -> convert_prim_to_boolean p
-| Coq_value_object o -> true
-
 (** val convert_prim_to_number : prim -> number **)
 
 let convert_prim_to_number _foo_ = match _foo_ with
@@ -336,6 +306,25 @@ and object_internal_call s c l thisArgument argumentsList =
     @essec 7
     @esid sec-abstract-operations *)
 
+(** {2 Type Conversion }
+    @essec 7.1
+    @esid sec-type-conversion *)
+
+(** @essec 7.1.2
+    @esid sec-toboolean *)
+(* FIXME: _foo_ = argument *)
+and to_boolean _foo_ = match _foo_ with
+| Coq_value_prim p -> (match p with
+  | Coq_prim_undef -> false
+  | Coq_prim_null -> false
+  | Coq_prim_bool b -> b
+  | Coq_prim_number n ->
+    if (JsNumber.isposzero n) || (JsNumber.isnegzero n) || (JsNumber.isnan n) then false
+    else true
+  | Coq_prim_string s -> if string_eq s "" then false else true)
+(* | Coq_value_symbol s -> true *)
+| Coq_value_object o -> true
+
 (** {2 Testing and Comparison Operations }
     @essec 7.2
     @esid sec-testing-and-comparison-operations *)
@@ -365,6 +354,53 @@ and is_property_key argument =
   | Coq_type_string -> true
   (* FIXME: | Coq_type_symbol -> true *)
   | _ -> false
+
+(** @essec 7.2.9
+    @esid sec-samevalue *)
+and same_value s x y =
+  if not (type_compare (type_of x) (type_of y))
+  then res_out s (res_val (Coq_value_prim (Coq_prim_bool false)))
+  else match type_of x with
+  | Coq_type_number ->
+    (match x with
+    | Coq_value_prim (Coq_prim_number n_x) ->
+      (match y with
+      | Coq_value_prim (Coq_prim_number n_y) ->
+        if (JsNumber.isnan n_x) && (JsNumber.isnan n_y) then res_out s (res_val (Coq_value_prim (Coq_prim_bool true)))
+        else if (JsNumber.isposzero n_x) && (JsNumber.isnegzero n_y) then res_out s (res_val (Coq_value_prim (Coq_prim_bool true)))
+        else if (JsNumber.isnegzero n_x) && (JsNumber.isposzero n_y) then res_out s (res_val (Coq_value_prim (Coq_prim_bool true)))
+        else res_out s (res_val (Coq_value_prim (Coq_prim_bool (n_x === n_y))))
+      | _ -> assert false)
+    | _ -> assert false)
+  | _ -> same_value_non_number s x y
+
+(** @essec 7.2.11
+    @esid sec-samevaluenonnumber *)
+and same_value_non_number s x y =
+  let%assert _ = not (type_compare (type_of x) Coq_type_number) in
+  let%assert _ = type_compare (type_of x) (type_of y) in
+  match x with
+  | Coq_value_prim (Coq_prim_undef)      -> res_out s (res_val (Coq_value_prim (Coq_prim_bool true)))
+  | Coq_value_prim (Coq_prim_null)       -> res_out s (res_val (Coq_value_prim (Coq_prim_bool true)))
+  | Coq_value_prim (Coq_prim_string s_x) ->
+    (match y with
+    | Coq_value_prim (Coq_prim_string s_y) -> res_out s (res_val (Coq_value_prim (Coq_prim_bool (string_eq s_x s_y))))
+    | _ -> assert false)
+  | Coq_value_prim (Coq_prim_bool b_x)   ->
+    (match y with
+     | Coq_value_prim (Coq_prim_bool b_y) -> res_out s (res_val (Coq_value_prim (Coq_prim_bool (bool_eq b_x b_y))))
+     | _ -> assert false)
+  (* FIXME: Symbol
+  | Coq_value_symbol s_x ->
+     (match y with
+     | Coq_value_symbol s_y -> symbol_compare s_x s_y
+     | _ -> assert false)
+  *)
+  | Coq_value_object l_x ->
+    (match y with
+    | Coq_value_object l_y -> res_out s (res_val (Coq_value_prim (Coq_prim_bool (object_loc_compare l_x l_y))))
+    | _ -> assert false)
+  | _ -> assert false
 
 (** {2 Operations on Objects }
     @essec 7.3
@@ -414,8 +450,9 @@ and ordinary_set_prototype_of s c l v =
   let%assert _ = (match type_of v with Coq_type_object -> true | Coq_type_null -> true | _ -> false) in
   let%some extensible = run_object_method object_extensible_ s l in
   let%some current = run_object_method object_prototype_ s l in
-  if same_value_dec v current then res_spec s (res_val (Coq_value_prim (Coq_prim_bool true)))
-  else if not extensible then res_spec s (res_val (Coq_value_prim (Coq_prim_bool false)))
+  let%spec (s1, sv) = same_value s v current in
+  if sv then res_spec s1 (res_val (Coq_value_prim (Coq_prim_bool true)))
+  else if not extensible then res_spec s1 (res_val (Coq_value_prim (Coq_prim_bool false)))
   else
     let rec repeat p done_ = begin
       if not done_ then
@@ -424,17 +461,19 @@ and ordinary_set_prototype_of s c l v =
           | Coq_prim_null -> repeat p true
           | _ -> assert false)
         | Coq_value_object p_l ->
-          if same_value_dec p (Coq_value_object l) then res_spec s (res_val (Coq_value_prim (Coq_prim_bool false)))
+          let%bool (s2, b) = same_value s1 p (Coq_value_object l) in
+          if b
+          then res_spec s2 (res_val (Coq_value_prim (Coq_prim_bool false)))
           else
-            let%some gpo = run_object_method object_get_prototype_of_ s p_l in
+            let%some gpo = run_object_method object_get_prototype_of_ s2 p_l in
             (match gpo with
             | Coq_builtin_get_prototype_of_default -> (
-              let%some prototype = run_object_method object_prototype_ s p_l in
+              let%some prototype = run_object_method object_prototype_ s2 p_l in
               repeat prototype false)
             | _ -> repeat p true))
       else
         (* Set the value of the [[Prototype]] internal slot of O to V *)
-        let%some s' = run_object_set_internal object_set_proto s l v in
+        let%some s' = run_object_set_internal object_set_proto s1 l v in
         res_spec s' (res_val (Coq_value_prim (Coq_prim_bool true)))
     end
     in repeat v false
@@ -953,11 +992,11 @@ and run_to_descriptor s c _foo_ = match _foo_ with
     in
     sub0 s descriptor_intro_empty ("enumerable")
       (fun s1 v1 desc ->
-         let b = convert_value_to_boolean v1 in
+         let b = to_boolean v1 in
          res_spec s1 (descriptor_with_enumerable desc (Some b))) (fun s1_2 desc ->
           sub0 s1_2 desc ("configurable")
             (fun s2 v2 desc0 ->
-               let b = convert_value_to_boolean v2 in
+               let b = to_boolean v2 in
                res_spec s2 (descriptor_with_configurable desc0 (Some b)))
             (fun s2_2 desc0 ->
                sub0 s2_2 desc0 ("value")
@@ -967,7 +1006,7 @@ and run_to_descriptor s c _foo_ = match _foo_ with
                     sub0 s3_2 desc1
                       ("writable")
                       (fun s4 v4 desc2 ->
-                         let b = convert_value_to_boolean v4 in
+                         let b = to_boolean v4 in
                          res_spec s4 (descriptor_with_writable desc2 (Some b)))
                       (fun s4_2 desc2 ->
                          sub0 s4_2 desc2 ("get") (fun s5 v5 desc3 ->
@@ -1519,7 +1558,7 @@ and run_construct_prealloc s c b args =
     let v = (get_arg 0 args) in call_object_new s c v
   | Coq_prealloc_bool ->
     let v = get_arg 0 args in
-    let b0 = convert_value_to_boolean v in
+    let b0 = to_boolean v in
     let o1 = object_new (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_bool_proto))
       ("Boolean") in
     let o = object_with_primitive_value o1 (Coq_value_prim (Coq_prim_bool b0)) in
@@ -2562,7 +2601,7 @@ and run_unary_op s c op e =
             | Coq_unary_op_not ->
               res_ter s1
                 (res_val (Coq_value_prim (Coq_prim_bool
-                                            (not (convert_value_to_boolean v)))))
+                                            (not (to_boolean v)))))
             | _ ->
               (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
                 s1
@@ -2707,7 +2746,7 @@ and run_block s c _foo_ = match _foo_ with
 
 and run_binary_op_and s c e1 e2 =
   let%run (s1, v1) = (run_expr_get_value s c e1) in
-  let b1 = (convert_value_to_boolean v1) in
+  let b1 = (to_boolean v1) in
   if not b1
     then res_ter s1 (res_val v1)
     else let%run (s2, v) = (run_expr_get_value s1 c e2) in
@@ -2715,7 +2754,7 @@ and run_binary_op_and s c e1 e2 =
 
 and run_binary_op_or s c e1 e2 =
   let%run (s1, v1) = (run_expr_get_value s c e1) in
-  let b1 = (convert_value_to_boolean v1) in
+  let b1 = (to_boolean v1) in
   if b1 
     then res_ter s1 (res_val v1)
     else let%run (s2, v) = (run_expr_get_value s1 c e2) in
@@ -2903,7 +2942,7 @@ and run_expr_call s c e1 e2s =
 
 and run_expr_conditionnal s c e1 e2 e3 =
   let%run (s1, v1) = (run_expr_get_value s c e1) in
-      let  b = (convert_value_to_boolean v1) in
+      let  b = (to_boolean v1) in
           let  e = (if b then e2 else e3) in
               let%run (s0, r) = (run_expr_get_value s1 c e) in
                   res_ter s0 (res_val r)
@@ -2948,7 +2987,7 @@ and run_stat_with s c e1 t2 =
 
 and run_stat_if s c e1 t2 to0 =
   let%run (s1, v1) = (run_expr_get_value s c e1) in
-  let b = (convert_value_to_boolean v1) in
+  let b = (to_boolean v1) in
   if b
   then run_stat s1 c t2
   else (match to0 with
@@ -2961,7 +3000,7 @@ and run_stat_if s c e1 t2 to0 =
 
 and run_stat_while s c rv labs e1 t2 =
   let%run (s1, v1) = (run_expr_get_value s c e1) in
-      let  b = (convert_value_to_boolean v1) in
+      let  b = (to_boolean v1) in
           if b
           then let%ter (s2, r) = (run_stat s1 c t2) in
               let
@@ -3117,7 +3156,7 @@ and run_stat_do_while s c rv labs e1 t2 =
          else r.res_value) in
             let  loop = (fun x ->
                 let%run (s2, v1) = (run_expr_get_value s1 c e1) in
-                    let  b = (convert_value_to_boolean v1) in
+                    let  b = (to_boolean v1) in
                         if b
                         then run_stat_do_while s2 c rv_2 labs e1 t2
                         else res_ter s2 (res_normal rv_2)) in
@@ -3210,7 +3249,7 @@ and run_stat_for_loop s c labs rv eo2 eo3 t =
       match eo2 with
       | Some e2 ->
         let%run (s0, v2) = (run_expr_get_value s c e2) in
-            let  b = (convert_value_to_boolean v2) in
+            let  b = (to_boolean v2) in
                 if b then follows s0 else res_ter s0 (res_normal rv)
       | None -> follows s
 
@@ -3815,7 +3854,7 @@ and run_call_prealloc s c b vthis args =
     else run_error s c Coq_native_error_type
   | Coq_prealloc_bool ->
       let v = get_arg 0 args in
-      res_out s (res_val (Coq_value_prim (Coq_prim_bool (convert_value_to_boolean v))))
+      res_out s (res_val (Coq_value_prim (Coq_prim_bool (to_boolean v))))
   | Coq_prealloc_bool_proto_to_string ->
     (match vthis with
      | Coq_value_prim p ->

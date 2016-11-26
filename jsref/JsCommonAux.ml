@@ -24,48 +24,8 @@ let if_some_then_same_dec x y d =
      | Some a -> false
      | None -> true)
 
-(** val same_value_dec : value -> value -> bool **)
-
-let same_value_dec v1 v2 =
-   let h0 = not (type_compare (type_of v1) (type_of v2)) in
-  (if h0
-   then (fun _ -> false)
-   else (fun _ ->
-          let t = type_of v1 in
-          (match t with
-           | Coq_type_undef -> (fun _ _ -> true)
-           | Coq_type_null -> (fun _ _ -> true)
-           | Coq_type_bool -> (fun _ _ -> value_compare v1 v2)
-           | Coq_type_number ->
-             (fun _ _ ->
-               let h2 =
-                     (value_compare v1 (Coq_value_prim (Coq_prim_number JsNumber.nan)))
-                  && (value_compare v2 (Coq_value_prim (Coq_prim_number JsNumber.nan)))
-               in
-               (if h2
-                then (fun _ -> true)
-                else (fun _ ->
-                       let h3 =
-                           (value_compare v1 (Coq_value_prim (Coq_prim_number JsNumber.zero)))
-                        && (value_compare v2 (Coq_value_prim (Coq_prim_number JsNumber.neg_zero)))
-                       in
-                       (if h3
-                        then (fun _ -> false)
-                        else (fun _ ->
-                               let h4 =
-                                   (value_compare v1 (Coq_value_prim
-                                     (Coq_prim_number JsNumber.neg_zero)))
-                                 &&
-                                   (value_compare v2 (Coq_value_prim
-                                     (Coq_prim_number JsNumber.zero)))
-                               in
-                               (if h4
-                                then (fun _ -> false)
-                                else (fun _ -> value_compare v1 v2)) __))
-                         __)) __)
-           | Coq_type_string -> (fun _ _ -> value_compare v1 v2)
-           | Coq_type_object -> (fun _ _ -> value_compare v1 v2)) __ __))
-    __
+(* FIXME: To be replaced with same_value *)
+let same_value_dec v1 v2 = assert false
 
 (** val attributes_data_compare :
     attributes_data -> attributes_data -> bool **)
