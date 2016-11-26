@@ -22,38 +22,33 @@ let res_label_in r labs =
 (** val convert_literal_to_prim : literal -> prim **)
 
 let convert_literal_to_prim _foo_ = match _foo_ with
-| Coq_literal_null -> Coq_prim_null
-| Coq_literal_bool b -> Coq_prim_bool b
-| Coq_literal_number n -> Coq_prim_number n
-| Coq_literal_string s -> Coq_prim_string s
-
-(** val type_of_prim : prim -> coq_type **)
-
-let type_of_prim _foo_ = match _foo_ with
-| Coq_prim_undef -> Coq_type_undef
-| Coq_prim_null -> Coq_type_null
-| Coq_prim_bool b -> Coq_type_bool
-| Coq_prim_number n -> Coq_type_number
-| Coq_prim_string s -> Coq_type_string
+| Coq_literal_null -> Coq_value_null
+| Coq_literal_bool b -> Coq_value_bool b
+| Coq_literal_number n -> Coq_value_number n
+| Coq_literal_string s -> Coq_value_string s
 
 (** val type_of : value -> coq_type **)
 
 let type_of _foo_ = match _foo_ with
-| Coq_value_prim w -> type_of_prim w
+| Coq_value_undef -> Coq_type_undef
+| Coq_value_null -> Coq_type_null
+| Coq_value_bool b -> Coq_type_bool
+| Coq_value_number n -> Coq_type_number
+| Coq_value_string s -> Coq_type_string
 | Coq_value_object o -> Coq_type_object
 
 (** val attributes_data_default : attributes_data **)
 
 let attributes_data_default =
-  { attributes_data_value = (Coq_value_prim Coq_prim_undef);
+  { attributes_data_value = Coq_value_undef;
     attributes_data_writable = false; attributes_data_enumerable = false;
     attributes_data_configurable = false }
 
 (** val attributes_accessor_default : attributes_accessor **)
 
 let attributes_accessor_default =
-  { attributes_accessor_get = (Coq_value_prim Coq_prim_undef);
-    attributes_accessor_set = (Coq_value_prim Coq_prim_undef);
+  { attributes_accessor_get = Coq_value_undef;
+    attributes_accessor_set = Coq_value_undef;
     attributes_accessor_enumerable = false;
     attributes_accessor_configurable = false }
 
@@ -249,13 +244,11 @@ let ref_kind_of r =
   match r.ref_base with
   | Coq_ref_base_type_value v ->
     (match v with
-     | Coq_value_prim w ->
-       (match w with
-        | Coq_prim_undef -> Coq_ref_kind_undef
-        | Coq_prim_null -> Coq_ref_kind_null
-        | Coq_prim_bool b -> Coq_ref_kind_primitive_base
-        | Coq_prim_number n -> Coq_ref_kind_primitive_base
-        | Coq_prim_string s -> Coq_ref_kind_primitive_base)
+     | Coq_value_undef -> Coq_ref_kind_undef
+     | Coq_value_null -> Coq_ref_kind_null
+     | Coq_value_bool b -> Coq_ref_kind_primitive_base
+     | Coq_value_number n -> Coq_ref_kind_primitive_base
+     | Coq_value_string s -> Coq_ref_kind_primitive_base
      | Coq_value_object o -> Coq_ref_kind_object)
   | Coq_ref_base_type_env_loc l -> Coq_ref_kind_env_record
 

@@ -41,7 +41,7 @@ let res_void s =
 (** val get_arg : int -> value list -> value **)
 
 let get_arg x l =
-  nth_def (Coq_value_prim Coq_prim_undef) x l
+  nth_def Coq_value_undef x l
 
 (** val get_arg_first_and_rest : value list -> value * value list **)
 
@@ -230,25 +230,23 @@ let if_value w k =
 let if_bool w k =
   if_value w (fun s v ->
     match v with
-    | Coq_value_prim p ->
-      (match p with
-       | Coq_prim_undef ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[if_bool] called with non-boolean value.")
-       | Coq_prim_null ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[if_bool] called with non-boolean value.")
-       | Coq_prim_bool b -> k s b
-       | Coq_prim_number n ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[if_bool] called with non-boolean value.")
-       | Coq_prim_string s0 ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[if_bool] called with non-boolean value."))
+    | Coq_value_undef ->
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+        s
+        ("[if_bool] called with non-boolean value.")
+    | Coq_value_null ->
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+        s
+        ("[if_bool] called with non-boolean value.")
+    | Coq_value_bool b -> k s b
+    | Coq_value_number n ->
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+        s
+        ("[if_bool] called with non-boolean value.")
+    | Coq_value_string s0 ->
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+        s
+        ("[if_bool] called with non-boolean value.")
     | Coq_value_object o ->
       (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
@@ -260,11 +258,11 @@ let if_bool w k =
 let if_object w k =
   if_value w (fun s v ->
     match v with
-    | Coq_value_prim p ->
+    | Coq_value_object l -> k s l
+    | _ ->
       (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
-        ("[if_object] called on a primitive.")
-    | Coq_value_object l -> k s l)
+        ("[if_object] called on a non-object."))
 
 (** val if_string :
     result -> (state -> string -> 'a1 specres) -> 'a1 specres **)
@@ -272,18 +270,10 @@ let if_object w k =
 let if_string w k =
   if_value w (fun s v ->
     match v with
-    | Coq_value_prim p ->
-      (match p with
-       | Coq_prim_string s0 -> k s s0
-       | _ ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[if_string] called on a non-string value.")       
-       )
-    | Coq_value_object o ->
+    | Coq_value_string s0 -> k s s0
+    | _ ->
       (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-        s
-        ("[if_string] called on a non-string value."))
+        s ("[if_string] called on a non-string value."))
 
 (** val if_number :
     result -> (state -> number -> 'a1 specres) -> 'a1 specres **)
@@ -291,15 +281,8 @@ let if_string w k =
 let if_number w k =
   if_value w (fun s v ->
     match v with
-    | Coq_value_prim p ->
-      (match p with
-       | Coq_prim_number n -> k s n
-       | _ ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-           s
-           ("[if_number] called with non-number value.")
-       )
-    | Coq_value_object o ->
+    | Coq_value_number n -> k s n
+    | _ ->
       (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
         ("[if_number] called with non-number value."))
@@ -309,11 +292,11 @@ let if_number w k =
 let if_prim w k =
   if_value w (fun s v ->
     match v with
-    | Coq_value_prim w0 -> k s w0
     | Coq_value_object o ->
       (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
         s
-        ("[if_primitive] called on an object."))
+        ("[if_primitive] called on an object.")
+    | _ -> k s v)
 
 (** val convert_option_attributes :
     attributes option -> full_descriptor option **)

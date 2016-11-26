@@ -400,43 +400,35 @@ let object_loc_compare l1 l2 =
      | Coq_object_loc_normal n -> false
      | Coq_object_loc_prealloc bl2 -> prealloc_compare bl1 bl2)
 
-(** val prim_compare : prim -> prim -> bool **)
-
-let prim_compare w1 w2 =
-  match w1 with
-  | Coq_prim_undef ->
-    (match w2 with
-     | Coq_prim_undef -> true
-     | _ -> false)
-  | Coq_prim_null ->
-    (match w2 with
-     | Coq_prim_null -> true
-     | _ -> false)
-  | Coq_prim_bool b1 ->
-    (match w2 with
-     | Coq_prim_bool b2 -> bool_eq b1 b2
-     | _ -> false)
-  | Coq_prim_number n1 ->
-    (match w2 with
-     | Coq_prim_number n2 -> n1 === n2
-     | _ -> false)
-  | Coq_prim_string s1 ->
-    (match w2 with
-     | Coq_prim_string s2 -> string_eq s1 s2
-     | _ -> false)
 
 (** val value_compare : value -> value -> bool **)
 
 let value_compare v1 v2 =
   match v1 with
-  | Coq_value_prim w1 ->
+  | Coq_value_undef ->
     (match v2 with
-     | Coq_value_prim w2 -> prim_compare w1 w2
-     | Coq_value_object o -> false)
+     | Coq_value_undef -> true
+     | _ -> false)
+  | Coq_value_null ->
+    (match v2 with
+     | Coq_value_null -> true
+     | _ -> false)
+  | Coq_value_bool b1 ->
+    (match v2 with
+     | Coq_value_bool b2 -> bool_eq b1 b2
+     | _ -> false)
+  | Coq_value_number n1 ->
+    (match v2 with
+     | Coq_value_number n2 -> n1 === n2
+     | _ -> false)
+  | Coq_value_string s1 ->
+    (match v2 with
+     | Coq_value_string s2 -> string_eq s1 s2
+     | _ -> false)
   | Coq_value_object l1 ->
     (match v2 with
-     | Coq_value_prim p -> false
-     | Coq_value_object l2 -> object_loc_compare l1 l2)
+     | Coq_value_object l2 -> object_loc_compare l1 l2
+     | _ -> false )
 
 (** val mutability_compare : mutability -> mutability -> bool **)
 

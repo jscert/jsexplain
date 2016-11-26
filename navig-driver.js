@@ -189,27 +189,18 @@ function setExample(idx) {
 
 // --------------- Predicate search ----------------
 
-function jsvalue_of_prim(v) {
-  switch (v.tag) {
-  case "Coq_prim_undef":
-    return undefined;
-  case "Coq_prim_null":
-    return null;
-  case "Coq_prim_bool":
-    return (v.value) ? true : false;
-  case "Coq_prim_number":
-    return v.value;
-  case "Coq_prim_string":
-    return v.value;
-  default:
-    throw "unrecognized tag in jsvalue_of_prim";
-  }
-}
-
 function jsvalue_of_value(v) {
   switch (v.tag) {
-     case "Coq_value_prim":
-       return jsvalue_of_prim(v.value);
+     case "Coq_value_undef":
+       return undefined;
+     case "Coq_value_null":
+       return null;
+     case "Coq_value_bool":
+       return (v.value) ? true : false;
+     case "Coq_value_number":
+       return v.value;
+     case "Coq_value_string":
+       return v.value;
      case "Coq_value_object":
        return v.value; // TODO: reflect
      default:
@@ -727,23 +718,6 @@ function string_of_loc(loc) {
   }
 }
 
-function string_of_prim(v) {
-  switch (v.tag) {
-  case "Coq_prim_undef":
-    return "undefined";
-  case "Coq_prim_null":
-    return "null";
-  case "Coq_prim_bool":
-    return (v.value) ? "true" : "false";
-  case "Coq_prim_number":
-    return "" + v.value;
-  case "Coq_prim_string":
-    return "\"" + html_escape(v.value) + "\"";
-  default:
-    throw "unrecognized tag in string_of_prim";
-  }
-}
-
 function string_of_option(string_of_elem, opt_elem) {
   switch (opt_elem.tag) {
   case "None":
@@ -842,7 +816,11 @@ function show_object(state, loc, target, depth) {
           // TODO: complete
 
           break;
-        case "Coq_value_prim":
+        case "Coq_value_undef":
+        case "Coq_value_null":
+        case "Coq_value_bool":
+        case "Coq_value_number":
+        case "Coq_value_string":
         case "Coq_value_object":
           show_value(state, attribute, targetsub, depth-1);
           break;
@@ -875,9 +853,20 @@ function show_object(state, loc, target, depth) {
 function show_value(state, v, target, depth) {
   var t = $("#" + target);
   switch (v.tag) {
-  case "Coq_value_prim":
-    var s = string_of_prim(v.value);
-    t.append(s);
+  case "Coq_value_undef":
+    t.append("undefined");
+    return;
+  case "Coq_value_null":
+    t.append("null");
+    return;
+  case "Coq_value_bool":
+    t.append((v.value) ? "true" : "false");
+    return;
+  case "Coq_value_number":
+    t.append("" + v.value);
+    return;
+  case "Coq_value_string":
+    t.append("\"" + html_escape(v.value) + "\"");
     return;
   case "Coq_value_object":
      var loc = v.value;
@@ -1014,12 +1003,8 @@ function interp_val_is_base_value(val) {
          t == "null";
 }
 
-function interp_val_is_js_prim(v) {
-  return has_tag_in_set(v, [ "Coq_prim_undef", "Coq_prim_null", "Coq_prim_bool", "Coq_prim_number", "Coq_prim_string" ]);
-}
-
 function interp_val_is_js_value(v) {
-  return has_tag_in_set(v, ["Coq_value_prim", "Coq_value_object" ]);
+  return has_tag_in_set(v, ["Coq_value_undef", "Coq_value_null", "Coq_value_bool", "Coq_value_number", "Coq_value_string", "Coq_value_object" ]);
 }
 
 function interp_val_is_loc(v) {
@@ -1059,8 +1044,6 @@ function show_interp_val(state, v, target, depth) {
     show_object(state, v, target, 0);
   } else if (interp_val_is_js_value(v)) {
     show_value(state, v, target, 0);
-  } else if (interp_val_is_js_prim(v)) {
-    t.append(string_of_prim(v));
   } else if (interp_val_is_state(v)) {
     t.append("&lt;state-object&gt;"); 
   } else if (interp_val_is_execution_ctx(v)) {

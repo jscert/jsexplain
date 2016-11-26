@@ -167,15 +167,12 @@ let prliteral = function
 	| Coq_literal_number f -> string_of_float f
 	| Coq_literal_string cl -> string_of_char_list cl
 
-let prprim = function
-  | Coq_prim_undef -> "undefined"
-  | Coq_prim_null -> "null"
-  | Coq_prim_bool b -> string_of_bool b
-  | Coq_prim_number f -> string_of_float f
-  | Coq_prim_string cl -> "\"" ^ string_of_char_list cl ^ "\""
-
 let prvalue = function
-  | Coq_value_prim p -> prprim p
+  | Coq_value_undef -> "undefined"
+  | Coq_value_null -> "null"
+  | Coq_value_bool b -> string_of_bool b
+  | Coq_value_number f -> string_of_float f
+  | Coq_value_string cl -> "\"" ^ string_of_char_list cl ^ "\""
   | Coq_value_object ol -> prloc ol
 
 let prattributes = function

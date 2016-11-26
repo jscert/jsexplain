@@ -120,7 +120,6 @@ let handle_result result =
            | JsSyntax.Coq_resvalue_value v ->
              print_endline ("\tReturned value:\t" ^ Prheap.prvalue v) ;
              (match v with
-              | JsSyntax.Coq_value_prim _ -> ()
               | JsSyntax.Coq_value_object l ->
                 print_newline () ;
                 let r = {
@@ -128,11 +127,13 @@ let handle_result result =
                   JsSyntax.ref_name = "__$ERROR__" ;
                   JsSyntax.ref_strict = false } in
                 if not !noParasite then
-                  match get_value_ref state r with
+                  (match get_value_ref state r with
                   | Some v' ->
                     print_endline ("Fetching the `__$ERROR__' field of this returned object resulted to:\t" ^ Prheap.prvalue v')
                   | None ->
                     print_endline "No `__$ERROR__' field has been defined in this returned object.")
+              | _ -> ()
+             )
               | JsSyntax.Coq_resvalue_ref _ -> print_endline "With a reference."
               | JsSyntax.Coq_resvalue_empty -> print_endline "No result with this throw.") ;
           pr_test state ; exit_if_test ()

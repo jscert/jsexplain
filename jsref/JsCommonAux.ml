@@ -297,7 +297,6 @@ let attributes_change_accessor_on_non_configurable_dec aa desc =
 (* STATEFUL-RO *)
 let run_function_get_error_case s x v =
 match v with
-| Coq_value_prim w -> false
 | Coq_value_object l ->
     (* In strict mode, cannot call "caller" *)
     (if string_eq x ("caller")
@@ -307,6 +306,7 @@ match v with
     (option_case false (fun o ->
       option_case false (fun bd -> funcbody_is_strict bd) o.object_code_)
       (object_binds_option s l))
+| _ -> false
 
 (** val spec_function_get_error_case_dec :
     state -> prop_name -> value -> bool **)
@@ -320,10 +320,10 @@ let spec_function_get_error_case_dec s x v =
 (* STATEFUL-RO *)
 let run_callable s v = 
 match v with
-| Coq_value_prim w -> Some None
 | Coq_value_object l ->
   option_case None (fun o -> Some o.object_call_)
     (object_binds_option s l)
+| _ -> Some None
 
 (** val is_callable_dec : state -> value -> bool **)
 

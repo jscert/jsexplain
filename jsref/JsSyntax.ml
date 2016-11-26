@@ -320,15 +320,12 @@ type object_loc =
 | Coq_object_loc_normal of int [@f address]
 | Coq_object_loc_prealloc of prealloc [@f prealloc]
 
-type prim =
-| Coq_prim_undef
-| Coq_prim_null
-| Coq_prim_bool of bool [@f value]
-| Coq_prim_number of JsNumber.number [@f value]
-| Coq_prim_string of string [@f value]
-
 type value =
-| Coq_value_prim of prim [@f value]
+| Coq_value_undef
+| Coq_value_null
+| Coq_value_bool of bool [@f value]
+| Coq_value_number of JsNumber.number [@f value]
+| Coq_value_string of string [@f value]
 | Coq_value_object of object_loc [@f value]
 
 type coq_type =

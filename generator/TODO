@@ -8,9 +8,6 @@
 	=> inline the definition of "if_ter" inside its body
 	  and assign an explicit name to the local function there
 
-*) remove Coq_value_prim (flatten the value data type)
-
-
 *) make sure the "reach condition" works properly
 
 *) clean up the ML code for: type_compare mutability_compare prim_compare;
