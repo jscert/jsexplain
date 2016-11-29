@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2016-11-25 Fri 15:11 -->
+<!-- 2016-11-29 Tue 11:20 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Using JSExplain</title>
@@ -234,30 +234,30 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgf88fb49">0.0.1. <span class="todo TODO">TODO</span> Generic explanatory text here</a></li>
+<li><a href="#org26f13eb">0.0.1. <span class="todo TODO">TODO</span> Generic explanatory text here</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org025c51c">1. Overview</a></li>
-<li><a href="#org3e63c6d">2. Program Selection</a></li>
-<li><a href="#orgd6879cb">3. <span class="todo TODO">TODO</span> Current Program</a></li>
-<li><a href="#org72d3acd">4. Program Heap State</a></li>
-<li><a href="#org0972432">5. <span class="todo TODO">TODO</span> Navigation Panel</a></li>
-<li><a href="#org236e6dc">6. <span class="todo TODO">TODO</span> Interpreter</a></li>
-<li><a href="#orgd54fad7">7. <span class="todo TODO">TODO</span> Interpreter State</a></div>
+<li><a href="#org8f738bb">1. Overview</a></li>
+<li><a href="#org5b31d8e">2. Program Selection</a></li>
+<li><a href="#org55c09c2">3. Current Program</a></li>
+<li><a href="#orgb0adc2d">4. Program Heap State</a></li>
+<li><a href="#org2e25b05">5. <span class="todo TODO">TODO</span> Navigation Panel</a></li>
+<li><a href="#org2ab9645">6. <span class="todo TODO">TODO</span> Interpreter</a></li>
+<li><a href="#org2bcf954">7. Interpreter State</a></div>
 </div>
 
-<div id="outline-container-orgf88fb49" class="outline-4">
-<h4 id="orgf88fb49"><span class="section-number-4">0.0.1</span> <span class="todo TODO">TODO</span> Generic explanatory text here</h4>
+<div id="outline-container-org26f13eb" class="outline-4">
+<h4 id="org26f13eb"><span class="section-number-4">0.0.1</span> <span class="todo TODO">TODO</span> Generic explanatory text here</h4>
 </div>
 
-<div id="outline-container-org025c51c" class="outline-2">
-<h2 id="org025c51c"><span class="section-number-2">1</span> Overview</h2>
+<div id="outline-container-org8f738bb" class="outline-2">
+<h2 id="org8f738bb"><span class="section-number-2">1</span> Overview</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 The JSExplain graphical user interface is presented in Figure
-<a href="#org509e4b5">1</a>. It allows the users to load JavaScript programs and
+<a href="#orgdf9e0bd">1</a>. It allows the users to load JavaScript programs and
 execute them in our JavaScript interpreter. The users have at their
 disposal a mechanism for step-by-step execution with various levels of
 granularity, exposing all of the underlying details of the execution,
@@ -265,14 +265,14 @@ as described in the official ECMAScript standard.
 </p>
 
 
-<div id="org509e4b5" class="figure">
+<div id="orgdf9e0bd" class="figure">
 <p><img src="./screenshots/000_Overview.png" alt="000_Overview.png" width="1024px" />
 </p>
 <p><span class="figure-number">Figure 1: </span>JSExplain User Interface</p>
 </div>
 
 <p>
-The user interface consists of six components, as shown in Figure <a href="#org3d24722">2</a>. These components are:
+The user interface consists of six components, as shown in Figure <a href="#orgb6d763b">2</a>. These components are:
 </p>
 <ol class="org-ol">
 <li><b>Program Selection</b>, where users can choose the program that they wish to execute</li>
@@ -284,7 +284,7 @@ The user interface consists of six components, as shown in Figure <a href="#org3
 </ol>
 
 
-<div id="org3d24722" class="figure">
+<div id="orgb6d763b" class="figure">
 <p><img src="./screenshots/001_Breakdown.png" alt="001_Breakdown.png" width="1024px" />
 </p>
 <p><span class="figure-number">Figure 2: </span>JSExplain User Interface Breakdown</p>
@@ -292,14 +292,14 @@ The user interface consists of six components, as shown in Figure <a href="#org3
 </div>
 </div>
 
-<div id="outline-container-org3e63c6d" class="outline-2">
-<h2 id="org3e63c6d"><span class="section-number-2">2</span> Program Selection</h2>
+<div id="outline-container-org5b31d8e" class="outline-2">
+<h2 id="org5b31d8e"><span class="section-number-2">2</span> Program Selection</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 This component allows the users to select the program that they wish
 to execute. This can be accomplished in two ways. First, one can click
 on the list of preset examples, which brings up the selection as shown
-in Figure <a href="#org2c54ab8">3</a>, and there select the example one
+in Figure <a href="#orgff40c32">3</a>, and there select the example one
 wishes to load. Alternatively, one can load a program from a file, by
 clicking on the "Choose file" button. After either of these
 procedures, the newly loaded program is displayed in the Current
@@ -307,7 +307,7 @@ Program component.
 </p>
 
 
-<div id="org2c54ab8" class="figure">
+<div id="orgff40c32" class="figure">
 <p><img src="./screenshots/002_PresetExamples.png" alt="002_PresetExamples.png" width="800px" />
 </p>
 <p><span class="figure-number">Figure 3: </span>Selecting preset examples</p>
@@ -316,17 +316,26 @@ Program component.
 </div>
 
 
-<div id="outline-container-orgd6879cb" class="outline-2">
-<h2 id="orgd6879cb"><span class="section-number-2">3</span> <span class="todo TODO">TODO</span> Current Program</h2>
+<div id="outline-container-org55c09c2" class="outline-2">
+<h2 id="org55c09c2"><span class="section-number-2">3</span> Current Program</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+This component serves to display the JavaScript program that we are
+executing. The program is shown in its entirety, whereas the part of
+the code that is currently being executed is highlighted in
+yellow. For instance, in Figure <a href="#org2a053fe">4</a>, we can see
+that the execution of the line <code>x++</code> is in progress.
+</p>
+</div>
 </div>
 
-<div id="outline-container-org72d3acd" class="outline-2">
-<h2 id="org72d3acd"><span class="section-number-2">4</span> Program Heap State</h2>
+<div id="outline-container-orgb0adc2d" class="outline-2">
+<h2 id="orgb0adc2d"><span class="section-number-2">4</span> Program Heap State</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 This component displays the entire state of the program heap at the
 current point in program execution. Illustratively, Figure
-<a href="#orgf58cf91">4</a> shows the heap state before the execution of
+<a href="#org2a053fe">4</a> shows the heap state before the execution of
 the command <code>x++</code>, highlighted in the current program component. This
 heap state is collapsed, in that object properties are not shown, but
 rather just the objects themselves. At this point, three objects exist
@@ -335,7 +344,7 @@ lexical and variable environments.
 </p>
 
 
-<div id="orgf58cf91" class="figure">
+<div id="org2a053fe" class="figure">
 <p><img src="./screenshots/003_StateCollapsed.png" alt="003_StateCollapsed.png" width="1024px" />
 </p>
 <p><span class="figure-number">Figure 4: </span>Program heap, collapsed</p>
@@ -345,14 +354,14 @@ lexical and variable environments.
 Objects can be expanded by clicking on the text <code>&lt;Object&gt;</code>, which is
 present to the left of each object's name. This expands the object and
 shows all of its properties. For instance, in Figure
-<a href="#orga802d03">5</a>, one can see the expanded global object, with
+<a href="#org42d9b0e">5</a>, one can see the expanded global object, with
 all of its properties, such as <code>Array</code> and <code>String</code>, which are objects
 themselves. Also, one can see that the global object has the property
 <code>x</code>, whose value is 1.
 </p>
 
 
-<div id="orga802d03" class="figure">
+<div id="org42d9b0e" class="figure">
 <p><img src="./screenshots/004_StateExpanded.png" alt="004_StateExpanded.png" width="1024px" />
 </p>
 <p><span class="figure-number">Figure 5: </span>Program heap, expanded</p>
@@ -361,21 +370,53 @@ themselves. Also, one can see that the global object has the property
 </div>
 
 
-<div id="outline-container-org0972432" class="outline-2">
-<h2 id="org0972432"><span class="section-number-2">5</span> <span class="todo TODO">TODO</span> Navigation Panel</h2>
+<div id="outline-container-org2e25b05" class="outline-2">
+<h2 id="org2e25b05"><span class="section-number-2">5</span> <span class="todo TODO">TODO</span> Navigation Panel</h2>
+<div class="outline-text-2" id="text-5">
+<ol class="org-ol">
+<li>Run</li>
+<li>Begin/End</li>
+<li>Backward/Forward</li>
+<li>Source Prev/Source Next/Source Cursor</li>
+</ol>
+</div>
 </div>
 
-<div id="outline-container-org236e6dc" class="outline-2">
-<h2 id="org236e6dc"><span class="section-number-2">6</span> <span class="todo TODO">TODO</span> Interpreter</h2>
+<div id="outline-container-org2ab9645" class="outline-2">
+<h2 id="org2ab9645"><span class="section-number-2">6</span> <span class="todo TODO">TODO</span> Interpreter</h2>
+<div class="outline-text-2" id="text-6">
+<ol class="org-ol">
+<li>JsInterpreter.js</li>
+<li>JsInterpreter.pseudo</li>
+<li>JsInterpreter.ml</li>
+</ol>
+</div>
 </div>
 
-<div id="outline-container-orgd54fad7" class="outline-2">
-<h2 id="orgd54fad7"><span class="section-number-2">7</span> <span class="todo TODO">TODO</span> Interpreter State</h2>
+<div id="outline-container-org2bcf954" class="outline-2">
+<h2 id="org2bcf954"><span class="section-number-2">7</span> Interpreter State</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+The bottom part of the display is reserved for the component showing
+the current state of the interpreter, allowing the user an insight
+that is not commonly available, but which is very important in this
+setting. Similarly to the program heap, all of the objects and
+variables are shown, together with the values returned by
+functions. An example of such a state is shown below in Figure <a href="#org89c2b66">6</a>.
+</p>
+
+
+<div id="org89c2b66" class="figure">
+<p><img src="./screenshots/005_InterpreterState.png" alt="005_InterpreterState.png" width="1024px" />
+</p>
+<p><span class="figure-number">Figure 6: </span>Interpreter State</p>
+</div>
+</div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Petar Maksimovic</p>
-<p class="date">Created: 2016-11-25 Fri 15:11</p>
+<p class="date">Created: 2016-11-29 Tue 11:20</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
