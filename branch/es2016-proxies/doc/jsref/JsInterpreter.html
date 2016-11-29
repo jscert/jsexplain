@@ -41,6 +41,7 @@
 <link title="JsInterpreterUtils" rel="Chapter" href="JsInterpreterUtils.html">
 <link title="ModuleExport" rel="Chapter" href="ModuleExport.html">
 <link title="Run_js" rel="Chapter" href="Run_js.html"><link title="Abstract Operations " rel="Section" href="#1_AbstractOperations">
+<link title="Type Conversion " rel="Subsection" href="#2_TypeConversion">
 <link title="Testing and Comparison Operations " rel="Subsection" href="#2_TestingandComparisonOperations">
 <link title="Operations on Objects " rel="Subsection" href="#2_OperationsonObjects">
 <title>JsInterpreter</title>
@@ -59,21 +60,9 @@ ECMAScript Reference Interpreter Implementation<br>
 <br>
 ECMAScript Reference Interpreter Implementation<br>
 <br>
-val convert_number_to_bool : number -&gt; bool *<br>
-
-<pre><span id="VALconvert_number_to_bool"><span class="keyword">val</span> convert_number_to_bool</span> : <code class="type"><a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> bool</code></pre><br>
-val convert_string_to_bool : string -&gt; bool *<br>
-
-<pre><span id="VALconvert_string_to_bool"><span class="keyword">val</span> convert_string_to_bool</span> : <code class="type">string -> bool</code></pre><br>
-val convert_prim_to_boolean : prim -&gt; bool *<br>
-
-<pre><span id="VALconvert_prim_to_boolean"><span class="keyword">val</span> convert_prim_to_boolean</span> : <code class="type"><a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a> -> bool</code></pre><br>
-val convert_value_to_boolean : value -&gt; bool *<br>
-
-<pre><span id="VALconvert_value_to_boolean"><span class="keyword">val</span> convert_value_to_boolean</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><br>
 val convert_prim_to_number : prim -&gt; number *<br>
 
-<pre><span id="VALconvert_prim_to_number"><span class="keyword">val</span> convert_prim_to_number</span> : <code class="type"><a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a> -> <a href="JsNumber.html#TYPEnumber">JsNumber.number</a></code></pre><br>
+<pre><span id="VALconvert_prim_to_number"><span class="keyword">val</span> convert_prim_to_number</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsNumber.html#TYPEnumber">JsNumber.number</a></code></pre><br>
 val convert_number_to_integer : number -&gt; number *<br>
 
 <pre><span id="VALconvert_number_to_integer"><span class="keyword">val</span> convert_number_to_integer</span> : <code class="type"><a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsNumber.html#TYPEnumber">JsNumber.number</a></code></pre><br>
@@ -82,7 +71,7 @@ val convert_bool_to_string : bool -&gt; string *<br>
 <pre><span id="VALconvert_bool_to_string"><span class="keyword">val</span> convert_bool_to_string</span> : <code class="type">bool -> string</code></pre><br>
 val convert_prim_to_string : prim -&gt; string *<br>
 
-<pre><span id="VALconvert_prim_to_string"><span class="keyword">val</span> convert_prim_to_string</span> : <code class="type"><a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a> -> string</code></pre><br>
+<pre><span id="VALconvert_prim_to_string"><span class="keyword">val</span> convert_prim_to_string</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> string</code></pre><br>
 val equality_test_for_same_type : coq_type -&gt; value -&gt; value -&gt; bool *<br>
 
 <pre><span id="VALequality_test_for_same_type"><span class="keyword">val</span> equality_test_for_same_type</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_type">JsSyntax.coq_type</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><br>
@@ -91,16 +80,16 @@ val strict_equality_test : value -&gt; value -&gt; bool *<br>
 <pre><span id="VALstrict_equality_test"><span class="keyword">val</span> strict_equality_test</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><br>
 val inequality_test_number : number -&gt; number -&gt; prim *<br>
 
-<pre><span id="VALinequality_test_number"><span class="keyword">val</span> inequality_test_number</span> : <code class="type"><a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a></code></pre><br>
+<pre><span id="VALinequality_test_number"><span class="keyword">val</span> inequality_test_number</span> : <code class="type"><a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><br>
 val inequality_test_string : string -&gt; string -&gt; bool *<br>
 
 <pre><span id="VALinequality_test_string"><span class="keyword">val</span> inequality_test_string</span> : <code class="type">string -> string -> bool</code></pre><br>
 val inequality_test_primitive : prim -&gt; prim -&gt; prim *<br>
 
-<pre><span id="VALinequality_test_primitive"><span class="keyword">val</span> inequality_test_primitive</span> : <code class="type"><a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a> -> <a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a> -> <a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a></code></pre><br>
+<pre><span id="VALinequality_test_primitive"><span class="keyword">val</span> inequality_test_primitive</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><br>
 val typeof_prim : prim -&gt; string *<br>
 
-<pre><span id="VALtypeof_prim"><span class="keyword">val</span> typeof_prim</span> : <code class="type"><a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a> -> string</code></pre><br>
+<pre><span id="VALtypeof_prim"><span class="keyword">val</span> typeof_prim</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> string</code></pre><br>
 val string_of_propname : propname -&gt; prop_name *<br>
 
 <pre><span id="VALstring_of_propname"><span class="keyword">val</span> string_of_propname</span> : <code class="type"><a href="JsSyntax.html#TYPEpropname">JsSyntax.propname</a> -> string</code></pre><br>
@@ -118,36 +107,60 @@ Updates an object's internal field with the given update function <code class="c
 val run_object_heap_set_extensible :
     bool -&gt; state -&gt; object_loc -&gt; state option *<br>
 
-<pre><span id="VALrun_object_heap_set_extensible"><span class="keyword">val</span> run_object_heap_set_extensible</span> : <code class="type">bool -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> option</code></pre>
-<pre><span id="VALobject_has_internal_slot"><span class="keyword">val</span> object_has_internal_slot</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       (<a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> 'a option) -><br>       bool <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-Function to implement the specification text "O has a <code class="code">[X]</code> internal slot"
- *<br>
+<pre><span id="VALrun_object_heap_set_extensible"><span class="keyword">val</span> run_object_heap_set_extensible</span> : <code class="type">bool -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> option</code></pre><br>
+New ES6 Spec functions here, writting in the specification in CamelCase()
+    will all be prefixed with spec_<br>
+<br>
+<h4 id="4_ObjectInternalMethodsandInternalSlots">Object Internal Methods and Internal Slots </h4><br>
+
+<pre><span id="VALobject_has_internal_slot"><span class="keyword">val</span> object_has_internal_slot</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       (<a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> <a href="JsSyntax.html#TYPEcall">JsSyntax.call</a> option) -><br>       bool <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+Function to implement the specification text "O has a <code class="code">[X]</code> internal slot"<br>
 </div>
-<div class="param_info"><code class="code">l</code> : The location of O
- *</div>
+<div class="param_info"><code class="code">l</code> : The location of O</div>
 <div class="param_info"><code class="code">prj</code> : The object projection function corresponding to <code class="code">[X]</code></div>
 
-<pre><span id="VALobject_has_internal_method"><span class="keyword">val</span> object_has_internal_method</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       (<a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> 'a option) -><br>       bool <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<pre><span id="VALobject_has_internal_method"><span class="keyword">val</span> object_has_internal_method</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       (<a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> <a href="JsSyntax.html#TYPEcall">JsSyntax.call</a> option) -><br>       bool <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 Function to implement the specification text of "O has a <code class="code">[X]</code> internal method"<br>
 </div>
+<br>
+<h5 id="5_ObjectInternalMethodDispatchFunctions">Object Internal Method Dispatch Functions </h5>
+    Functions in this section are used to dispatch Internal Methods to the
+    correct implementation based upon the value of the internal slot<br>
 
+<pre><span id="VALobject_internal_is_extensible"><span class="keyword">val</span> object_internal_is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
 <pre><span id="VALobject_internal_get"><span class="keyword">val</span> object_internal_get</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 Function to dispatch calls to O.<code class="code">[Get]</code>(P, receiver)<br>
 </div>
 <div class="param_info"><code class="code">l</code> : The location of O</div>
-<br>
-New ES6 Spec functions here, writting in the specification in CamelCase()
-    will all be prefixed with spec_<br>
+
+<pre><span id="VALobject_internal_call"><span class="keyword">val</span> object_internal_call</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -><br>       <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+Function to dispatch calls to O.<code class="code">[Call]</code>(thisArgument, argumentsList)<br>
+</div>
+<div class="param_info"><code class="code">l</code> : The location of O</div>
 <br>
 <h1 id="1_AbstractOperations">Abstract Operations </h1><br>
+<br>
+<h2 id="2_TypeConversion">Type Conversion </h2><br>
+
+<pre><span id="VALto_boolean"><span class="keyword">val</span> to_boolean</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-toboolean">7.1.2</a></div>
 <br>
 <h2 id="2_TestingandComparisonOperations">Testing and Comparison Operations </h2><br>
 
 <pre><span id="VALis_callable"><span class="keyword">val</span> is_callable</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-iscallable">7.2.3</a></div>
 
+<pre><span id="VALis_extensible"><span class="keyword">val</span> is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-isextensible-o">7.2.5</a></div>
+
 <pre><span id="VALis_property_key"><span class="keyword">val</span> is_property_key</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ispropertykey">7.2.7</a></div>
+
+<pre><span id="VALsame_value"><span class="keyword">val</span> same_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-samevalue">7.2.9</a></div>
+
+<pre><span id="VALsame_value_non_number"><span class="keyword">val</span> same_value_non_number</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-samevaluenonnumber">7.2.11</a></div>
 <br>
 <h2 id="2_OperationsonObjects">Operations on Objects </h2><br>
 
@@ -157,13 +170,19 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#
 <pre><span id="VALget_method"><span class="keyword">val</span> get_method</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-getmethod">7.3.9</a></div>
 
+<pre><span id="VALcall"><span class="keyword">val</span> call</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list option -><br>       <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-call">7.3.12</a></div>
+
 <pre><span id="VALordinary_get_prototype_of"><span class="keyword">val</span> ordinary_get_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinarygetprototypeof">9.1.1.1</a></div>
 
 <pre><span id="VALordinary_set_prototype_of"><span class="keyword">val</span> ordinary_set_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinarysetprototypeof">9.1.2.1</a></div>
 
-<pre><span id="VALordinary_is_extensible"><span class="keyword">val</span> ordinary_is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<pre><span id="VALobject_internal_ordinary_is_extensible"><span class="keyword">val</span> object_internal_ordinary_is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinary-object-internal-methods-and-internal-slots-isextensible">9.1.3</a></div>
+
+<pre><span id="VALordinary_is_extensible"><span class="keyword">val</span> ordinary_is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinaryisextensible">9.1.3.1</a></div>
 
 <pre><span id="VALordinary_prevent_extensions"><span class="keyword">val</span> ordinary_prevent_extensions</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
@@ -265,7 +284,7 @@ val run_to_descriptor :
 <pre><span id="VALrun_to_descriptor"><span class="keyword">val</span> run_to_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
 val prim_new_object : state -&gt; prim -&gt; result *<br>
 
-<pre><span id="VALprim_new_object"><span class="keyword">val</span> prim_new_object</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a> -> <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+<pre><span id="VALprim_new_object"><span class="keyword">val</span> prim_new_object</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
 val to_object : state -&gt; value -&gt; result *<br>
 
 <pre><span id="VALto_object"><span class="keyword">val</span> to_object</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
@@ -338,7 +357,7 @@ val prim_value_put :
     state -&gt; execution_ctx -&gt; prim -&gt; prop_name -&gt; value -&gt;
     strictness_flag -&gt; result_void *<br>
 
-<pre><span id="VALprim_value_put"><span class="keyword">val</span> prim_value_put</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -><br>       <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+<pre><span id="VALprim_value_put"><span class="keyword">val</span> prim_value_put</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -><br>       <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
 val ref_put_value :
     state -&gt; execution_ctx -&gt; resvalue -&gt; value -&gt; result_void *<br>
 
@@ -482,7 +501,7 @@ val convert_twice_primitive :
     state -&gt; execution_ctx -&gt; value -&gt; value -&gt; (prim * prim)
     specres *<br>
 
-<pre><span id="VALconvert_twice_primitive"><span class="keyword">val</span> convert_twice_primitive</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> (<a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a> * <a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a>) <a href="JsInterpreterMonads.html#TYPEspecres">JsInterpreterMonads.specres</a></code></pre><br>
+<pre><span id="VALconvert_twice_primitive"><span class="keyword">val</span> convert_twice_primitive</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       (<a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> * <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a>) <a href="JsInterpreterMonads.html#TYPEspecres">JsInterpreterMonads.specres</a></code></pre><br>
 val convert_twice_number :
     state -&gt; execution_ctx -&gt; value -&gt; value -&gt;
     (number * number) specres *<br>

@@ -62,10 +62,7 @@ val res_label_in : res -&gt; label_set -&gt; bool *<br>
 <pre><span id="VALres_label_in"><span class="keyword">val</span> res_label_in</span> : <code class="type"><a href="JsSyntax.html#TYPEres">JsSyntax.res</a> -> <a href="JsSyntax.html#TYPElabel">JsSyntax.label</a> list -> bool</code></pre><br>
 val convert_literal_to_prim : literal -&gt; prim *<br>
 
-<pre><span id="VALconvert_literal_to_prim"><span class="keyword">val</span> convert_literal_to_prim</span> : <code class="type"><a href="JsSyntax.html#TYPEliteral">JsSyntax.literal</a> -> <a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a></code></pre><br>
-val type_of_prim : prim -&gt; coq_type *<br>
-
-<pre><span id="VALtype_of_prim"><span class="keyword">val</span> type_of_prim</span> : <code class="type"><a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a> -> <a href="JsSyntax.html#TYPEcoq_type">JsSyntax.coq_type</a></code></pre><br>
+<pre><span id="VALconvert_literal_to_prim"><span class="keyword">val</span> convert_literal_to_prim</span> : <code class="type"><a href="JsSyntax.html#TYPEliteral">JsSyntax.literal</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><br>
 val type_of : value -&gt; coq_type *<br>
 
 <pre><span id="VALtype_of"><span class="keyword">val</span> type_of</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEcoq_type">JsSyntax.coq_type</a></code></pre><br>

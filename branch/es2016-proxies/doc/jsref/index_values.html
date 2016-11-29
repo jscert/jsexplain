@@ -153,6 +153,10 @@
 <tr><td><a href="JsInterpreter.html#VALbuild_error">build_error</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>C</td></tr>
+<tr><td><a href="JsInterpreter.html#VALcall">call</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALcall_object_new">call_object_new</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALcheck_assert">check_assert</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
@@ -165,19 +169,13 @@
 <td></td></tr>
 <tr><td><a href="JsCommon.html#VALconvert_literal_to_prim">convert_literal_to_prim</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALconvert_number_to_bool">convert_number_to_bool</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALconvert_number_to_integer">convert_number_to_integer</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALconvert_option_attributes">convert_option_attributes</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALconvert_prim_to_boolean">convert_prim_to_boolean</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALconvert_prim_to_number">convert_prim_to_number</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALconvert_prim_to_string">convert_prim_to_string</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALconvert_string_to_bool">convert_string_to_bool</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALconvert_twice">convert_twice</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
@@ -186,8 +184,6 @@
 <tr><td><a href="JsInterpreter.html#VALconvert_twice_primitive">convert_twice_primitive</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALconvert_twice_string">convert_twice_string</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALconvert_value_to_boolean">convert_value_to_boolean</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="StdMap.html#VALcreate">create</a> [<a href="StdMap.html">StdMap</a>]</td>
 <td></td></tr>
@@ -457,6 +453,8 @@
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_some">if_some</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALif_some_or_apply_default">if_some_or_apply_default</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_some_or_default">if_some_or_default</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsCommonAux.html#VALif_some_then_same_dec">if_some_then_same_dec</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>
@@ -478,7 +476,11 @@ Unpacks a Coq_specret_val (specification return value), returns an abrupt Coq_sp
 <tr><td><a href="JsInterpreterMonads.html#VALif_ter">if_ter</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_value">if_value</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
-<td></td></tr>
+<td><div class="info">
+This method is equivalent to the <code class="code">!</code> operator of section 5.2 Algorithm Conventions
+    ppx_monads maps this to the <code class="code">let%value</code> syntax.
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_void">if_void</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALifx_any_or_throw">ifx_any_or_throw</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
@@ -549,6 +551,10 @@ Unpacks a Coq_specret_val (specification return value), returns an abrupt Coq_sp
 <td></td></tr>
 <tr><td><a href="StdMap.html#VALis_empty">is_empty</a> [<a href="StdMap.html">StdMap</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALis_extensible">is_extensible</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALis_property_key">is_property_key</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
@@ -736,7 +742,6 @@ Function to implement the specification text of "O has a <code class="code">[X]<
 <tr><td><a href="JsInterpreter.html#VALobject_has_internal_slot">object_has_internal_slot</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 Function to implement the specification text "O has a <code class="code">[X]</code> internal slot"
- *
 </div>
 </td></tr>
 <tr><td><a href="JsInterpreter.html#VALobject_has_prop">object_has_prop</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
@@ -757,9 +762,20 @@ Function to implement the specification text "O has a <code class="code">[X]</co
 <td></td></tr>
 <tr><td><a href="JsCommonAux.html#VALobject_heap_map_properties_option">object_heap_map_properties_option</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALobject_internal_call">object_internal_call</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+Function to dispatch calls to O.
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALobject_internal_get">object_internal_get</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 Function to dispatch calls to O.
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALobject_internal_is_extensible">object_internal_is_extensible</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALobject_internal_ordinary_is_extensible">object_internal_ordinary_is_extensible</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
 </div>
 </td></tr>
 <tr><td><a href="JsSyntax.html#VALobject_is_extensible_">object_is_extensible_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
@@ -944,8 +960,6 @@ Function to dispatch calls to O.
 <tr><td><a href="JsSyntaxAux.html#VALprealloc_compare">prealloc_compare</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsCommonAux.html#VALprepost_unary_op_dec">prepost_unary_op_dec</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>
-<td></td></tr>
-<tr><td><a href="JsSyntaxAux.html#VALprim_compare">prim_compare</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALprim_new_object">prim_new_object</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
@@ -1251,8 +1265,16 @@ Function to dispatch calls to O.
 <tr><td><a href="JsInterpreter.html#VALrun_var_decl_item">run_var_decl_item</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>S</td></tr>
+<tr><td><a href="JsInterpreter.html#VALsame_value">same_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsCommonAux.html#VALsame_value_dec">same_value_dec</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALsame_value_non_number">same_value_non_number</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsNumber.html#VALsign">sign</a> [<a href="JsNumber.html">JsNumber</a>]</td>
 <td></td></tr>
 <tr><td><a href="StdMap.html#VALsingleton">singleton</a> [<a href="StdMap.html">StdMap</a>]</td>
@@ -1316,6 +1338,10 @@ Function to dispatch calls to O.
 <td></td></tr>
 <tr><td><a href="LibList.html#VALtl">tl</a> [<a href="LibList.html">LibList</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALto_boolean">to_boolean</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALto_int32">to_int32</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsNumber.html#VALto_int32">to_int32</a> [<a href="JsNumber.html">JsNumber</a>]</td>
@@ -1349,8 +1375,6 @@ Function to dispatch calls to O.
 <tr><td><a href="JsSyntaxAux.html#VALtype_compare">type_compare</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsCommon.html#VALtype_of">type_of</a> [<a href="JsCommon.html">JsCommon</a>]</td>
-<td></td></tr>
-<tr><td><a href="JsCommon.html#VALtype_of_prim">type_of_prim</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALtypeof_prim">typeof_prim</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>

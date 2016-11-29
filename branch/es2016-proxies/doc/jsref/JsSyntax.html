@@ -1747,51 +1747,40 @@ Identities of implementations for Object Internal Methods<br>
 
 
 
-<pre><code><span id="TYPEprim"><span class="keyword">type</span> <code class="type"></code>prim</span> = </code></pre><table class="typetable">
-<tr>
-<td align="left" valign="top" >
-<code><span class="keyword">|</span></code></td>
-<td align="left" valign="top" >
-<code><span id="TYPEELTprim.Coq_prim_undef"><span class="constructor">Coq_prim_undef</span></span></code></td>
-
-</tr>
-<tr>
-<td align="left" valign="top" >
-<code><span class="keyword">|</span></code></td>
-<td align="left" valign="top" >
-<code><span id="TYPEELTprim.Coq_prim_null"><span class="constructor">Coq_prim_null</span></span></code></td>
-
-</tr>
-<tr>
-<td align="left" valign="top" >
-<code><span class="keyword">|</span></code></td>
-<td align="left" valign="top" >
-<code><span id="TYPEELTprim.Coq_prim_bool"><span class="constructor">Coq_prim_bool</span></span> <span class="keyword">of</span> <code class="type">bool</code></code></td>
-
-</tr>
-<tr>
-<td align="left" valign="top" >
-<code><span class="keyword">|</span></code></td>
-<td align="left" valign="top" >
-<code><span id="TYPEELTprim.Coq_prim_number"><span class="constructor">Coq_prim_number</span></span> <span class="keyword">of</span> <code class="type"><a href="JsNumber.html#TYPEnumber">JsNumber.number</a></code></code></td>
-
-</tr>
-<tr>
-<td align="left" valign="top" >
-<code><span class="keyword">|</span></code></td>
-<td align="left" valign="top" >
-<code><span id="TYPEELTprim.Coq_prim_string"><span class="constructor">Coq_prim_string</span></span> <span class="keyword">of</span> <code class="type">string</code></code></td>
-
-</tr></table>
-
-
-
 <pre><code><span id="TYPEvalue"><span class="keyword">type</span> <code class="type"></code>value</span> = </code></pre><table class="typetable">
 <tr>
 <td align="left" valign="top" >
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
-<code><span id="TYPEELTvalue.Coq_value_prim"><span class="constructor">Coq_value_prim</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEprim">prim</a></code></code></td>
+<code><span id="TYPEELTvalue.Coq_value_undef"><span class="constructor">Coq_value_undef</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTvalue.Coq_value_null"><span class="constructor">Coq_value_null</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTvalue.Coq_value_bool"><span class="constructor">Coq_value_bool</span></span> <span class="keyword">of</span> <code class="type">bool</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTvalue.Coq_value_number"><span class="constructor">Coq_value_number</span></span> <span class="keyword">of</span> <code class="type"><a href="JsNumber.html#TYPEnumber">JsNumber.number</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTvalue.Coq_value_string"><span class="constructor">Coq_value_string</span></span> <span class="keyword">of</span> <code class="type">string</code></code></td>
 
 </tr>
 <tr>
