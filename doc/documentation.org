@@ -48,7 +48,13 @@ Program component.
 [[./screenshots/002_PresetExamples.png]]
  
 
-* TODO Current Program
+* Current Program
+
+This component serves to display the JavaScript program that we are
+executing. The program is shown in its entirety, whereas the part of
+the code that is currently being executed is highlighted in
+yellow. For instance, in Figure [[fig:003_StateCollapsed]], we can see
+that the execution of the line =x++= is in progress.
 
 * Program Heap State
 
@@ -82,6 +88,27 @@ themselves. Also, one can see that the global object has the property
 
 * TODO Navigation Panel
 
+1. Run
+2. Begin/End
+3. Backward/Forward
+4. Source Prev/Source Next/Source Cursor
+
 * TODO Interpreter
 
-* TODO Interpreter State
+1. JsInterpreter.js
+2. JsInterpreter.pseudo
+3. JsInterpreter.ml
+
+* Interpreter State
+
+The bottom part of the display is reserved for the component showing
+the current state of the interpreter, allowing the user an insight
+that is not commonly available, but which is very important in this
+setting. Similarly to the program heap, all of the objects and
+variables are shown, together with the values returned by
+functions. An example of such a state is shown below in Figure [[fig:005_InterpreterState]].
+
+#+CAPTION: Interpreter State
+#+NAME: fig:005_InterpreterState
+#+ATTR_HTML: :width 1024px
+[[./screenshots/005_InterpreterState.png]]
