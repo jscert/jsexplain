@@ -239,6 +239,24 @@ let run_object_heap_set_extensible b s l =
      LibOption.map (fun o -> object_write s l (object_set_extensible o b)) opt
 *)
 
+let rec build_error s c vproto vmsg : 'a specret resultof =
+  let o = object_new vproto ("Error") in
+  let (l, s_2) = object_alloc s o in
+  if value_compare vmsg Coq_value_undef
+  then res_out s_2 (res_val (Coq_value_object l))
+  else (
+    let%value (s_3, vstr) = to_string s_2 c vmsg in
+    let a = { attributes_data_value = vstr; attributes_data_writable = true;
+      attributes_data_enumerable = false; attributes_data_configurable = true } in
+    let%success (s_4, rv) = object_define_own_prop s_3 c l "message" (descriptor_of_attributes (Coq_attributes_data_of a)) throw_true in
+    res_out s_4 (res_val (Coq_value_object l))
+  )
+
+and run_error s c ne : 'a specret resultof =
+  let%object (s_2, l) = (build_error s c (Coq_value_object (Coq_object_loc_prealloc
+                                                            (Coq_prealloc_native_error_proto ne))) Coq_value_undef) in
+  res_out s_2 (res_throw (Coq_resvalue_value (Coq_value_object l)))
+
 
 (*****************************************************************************)
 (*****************************************************************************)
@@ -255,11 +273,13 @@ let run_object_heap_set_extensible b s l =
 (** Function to implement the specification text "O has a [[X]] internal slot"
     @param l    The location of O
     @param prj  The object projection function corresponding to [[X]] *)
-let rec object_has_internal_slot s l prj =
-  let%some slot_value = run_object_method prj s l in
+and object_has_internal_slot s l prj =
+  let slot_value = run_object_method prj s l in
   match slot_value with
-  | Some _ -> res_spec s true
-  | None -> res_spec s false
+  | None -> assert false
+  | Some v -> match v with
+    | Some _ -> true
+    | None -> false
 
 (** Function to implement the specification text of "O has a [[X]] internal method" *)
 and object_has_internal_method s l prj =
@@ -268,12 +288,6 @@ and object_has_internal_method s l prj =
 (** {5 Object Internal Method Dispatch Functions }
     Functions in this section are used to dispatch Internal Methods to the
     correct implementation based upon the value of the internal slot *)
-
-and object_internal_is_extensible s c l =
-  let%some internal_method = run_object_method object_is_extensible_ s l in
-  match internal_method with
-  | Coq_builtin_is_extensible_default -> object_internal_ordinary_is_extensible s c l
-  | Coq_builtin_is_extensible_proxy   -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
 (** Function to dispatch calls to O.[[Get]](P, receiver)
     @param l  The location of O *)
@@ -291,10 +305,103 @@ and object_internal_get s c l p receiver =
   | Coq_builtin_get_args_obj -> dispatch_es5 ()
   | Coq_builtin_get_proxy    -> Coq_result_not_yet_implemented
 
+(** Function to dispatch calls to O.[[HasProperty]](P)
+    @param l  The location of O *)
+and object_internal_has_property s c l p =
+  let%some b = (run_object_method object_has_prop_ s l) in
+  let x = match p with
+  | Coq_value_string x -> x
+  | _ -> assert false in
+  match b with
+  | Coq_builtin_has_prop_default ->
+    let%run (s1, d) = (run_object_get_prop s c l x) in
+    res_ter s1 (res_val (Coq_value_bool (not (full_descriptor_compare d Coq_full_descriptor_undef))))
+  | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
+
 (** Function to dispatch calls to O.[[Call]](thisArgument, argumentsList)
     @param l  The location of O *)
 and object_internal_call s c l thisArgument argumentsList =
   run_call s c l thisArgument argumentsList
+
+(** Function to dispatch calls to O.[[Call]](thisArgument, argumentsList)
+    @param l The location of O *)
+and object_internal_is_extensible s c l =
+  let%some internal_method = run_object_method object_is_extensible_ s l in
+  match internal_method with
+  | Coq_builtin_is_extensible_default -> object_internal_ordinary_is_extensible s c l
+  | Coq_builtin_is_extensible_proxy   -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
+
+(** {3 The Property Descriptor Specification Type}
+    @esid sec-property-descriptor-specification-type
+    @essec 6.2.4 *)
+
+(** @esid sec-topropertydescriptor
+    @essec 6.2.4.5 *)
+and to_property_descriptor s c _foo_ =
+  match _foo_ with
+  | Coq_value_object l ->
+    let desc = descriptor_intro_empty in
+    let%bool (s, hasEnumerable) = has_property s c _foo_ (Coq_value_string "enumerable") in
+    let%spec (s, desc) =
+      if hasEnumerable
+      then
+        let%value (s, v) = get s c _foo_ (Coq_value_string "enumerable") in
+        let enum = to_boolean v in
+        res_spec s (descriptor_with_enumerable desc (Some enum))
+      else res_spec s desc
+    in
+    let%bool (s, hasConfigurable) = has_property s c _foo_ (Coq_value_string "configurable") in
+    let%spec (s, desc) =
+      if hasConfigurable
+      then
+        let%value (s, v) = get s c _foo_ (Coq_value_string "configurable") in
+        let conf = to_boolean v in
+        res_spec s (descriptor_with_configurable desc (Some conf))
+      else res_spec s desc
+    in
+    let%bool (s, hasValue) = has_property s c _foo_ (Coq_value_string "value") in
+    let%spec (s, desc) =
+      if hasValue
+      then
+        let%value (s, value) = get s c _foo_ (Coq_value_string "value") in
+        res_spec s (descriptor_with_value desc (Some value))
+      else res_spec s desc
+    in
+    let%bool (s, hasWritable) = has_property s c _foo_ (Coq_value_string "writable") in
+    let%spec (s, desc) =
+      if hasValue
+      then
+        let%value (s, v) = get s c _foo_ (Coq_value_string "writable") in
+        let writable = to_boolean v in
+        res_spec s (descriptor_with_writable desc (Some writable))
+      else res_spec s desc
+    in
+    let%bool (s, hasGet) = has_property s c _foo_ (Coq_value_string "get") in
+    let%spec (s, desc) =
+      if hasGet
+      then
+        let%value (s, getter) = get s c _foo_ (Coq_value_string "get") in
+        if (not (is_callable s getter)) && (not (type_of getter === Coq_type_undef))
+        then run_error s c Coq_native_error_type
+        else res_spec s (descriptor_with_get desc (Some getter))
+      else res_spec s desc
+    in
+    let%bool (s, hasSet) = has_property s c _foo_ (Coq_value_string "set") in
+    let%spec (s, desc) =
+      if hasSet
+      then
+        let%value (s, setter) = get s c _foo_ (Coq_value_string "set") in
+        if (not (is_callable s setter)) && (not (type_of setter === Coq_type_undef))
+        then run_error s c Coq_native_error_type
+        else res_spec s (descriptor_with_set desc (Some setter))
+      else res_spec s desc
+    in
+    if ((not (desc.descriptor_get === None)) || (not (desc.descriptor_set === None)))
+      && ((not (desc.descriptor_value === None)) || (not (desc.descriptor_writable === None)))
+    then run_error s c Coq_native_error_type
+    else res_spec s desc
+  | _ -> throw_result (run_error s c Coq_native_error_type)
+
 
 (** {1 Abstract Operations }
     @essec 7
@@ -326,11 +433,8 @@ and to_boolean _foo_ = match _foo_ with
     @esid sec-iscallable *)
 and is_callable s argument =
   match argument with
-  | Coq_value_object l ->
-    let%spec (s1, b) = object_has_internal_method s l object_call_ in
-    res_spec s1 (Coq_value_bool b)
-  | _ ->
-    res_spec s (Coq_value_bool false)
+  | Coq_value_object l -> object_has_internal_method s l object_call_
+  | _ -> false
 
 (** @essec 7.2.5
     @esid sec-isextensible-o *)
@@ -399,6 +503,15 @@ and same_value_non_number s x y =
     @essec 7.3
     @esid sec-operations-on-objects *)
 
+(** @essec 7.3.1
+    @esid sec-get-o-p *)
+and get s c o p =
+  let%assert _ = match type_of o with Coq_type_object -> true | _ -> false in
+  let%assert _ = is_property_key p in
+  match o with
+  | Coq_value_object l -> object_internal_get s c l p o
+  | _ -> assert false
+
 (** @essec 7.3.2
     @esid sec-getv *)
 and get_v s c v p =
@@ -412,22 +525,31 @@ and get_method s c v p =
   let%assert _ = is_property_key p in
   let%value (s1, func) = get_v s c v p in
   match type_of func with
-  | Coq_type_undef -> res_spec s1 (res_val Coq_value_undef)
-  | Coq_type_null  -> res_spec s1 (res_val Coq_value_undef)
+  | Coq_type_undef -> res_out s1 (res_val Coq_value_undef)
+  | Coq_type_null  -> res_out s1 (res_val Coq_value_undef)
   | _ ->
-    let%bool (s2, callable) = is_callable s1 func in
+    let callable = is_callable s1 func in
     if not callable
-    then run_error s2 c Coq_native_error_type
-    else res_spec s2 (res_val func)
+    then run_error s1 c Coq_native_error_type
+    else res_out s1 (res_val func)
+
+(** @essec 7.3.10
+    @esid sec-hasproperty *)
+and has_property s c o p =
+  let%assert _ = (type_of o) === Coq_type_object in
+  let%assert _ = is_property_key p in
+  match o with
+  | Coq_value_object l -> object_internal_has_property s c l p
+  | _ -> assert false
 
 (** @essec 7.3.12
     @esid sec-call *)
 and call s c f v argumentList =
   if_some_or_apply_default argumentList [] (fun argumentList ->
-    let%bool (s1, callable) = is_callable s f in
-    if not callable then run_error s1 c Coq_native_error_type
+    let callable = is_callable s f in
+    if not callable then run_error s c Coq_native_error_type
     else match f with
-    | Coq_value_object l -> object_internal_call s1 c l v argumentList
+    | Coq_value_object l -> object_internal_call s c l v argumentList
     | _ -> assert false
   )
 
@@ -495,39 +617,10 @@ and ordinary_own_property_keys s c l =
   (* FIXME: Precise key ordering is to be implemented here! *)
   res_spec s keys
 
-(** val object_has_prop :
-    state -> execution_ctx -> object_loc -> prop_name -> result **)
-
+(** @deprecated Use has_property instead *)
 and object_has_prop s c l x =
-  let%some b = (run_object_method object_has_prop_ s l) in
-  match b with
-  | Coq_builtin_has_prop_default ->
-    let%run (s1, d) = (run_object_get_prop s c l x) in
-    res_ter s1
-      (res_val (Coq_value_bool (not (full_descriptor_compare d Coq_full_descriptor_undef))))
-  | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
+  object_internal_has_property s c l (Coq_value_string x)
 
-(** val build_error : state -> value -> value -> result **)
-
-and build_error s c vproto vmsg =
-  let o = object_new vproto ("Error") in
-  let (l, s_2) = object_alloc s o in
-  if value_compare vmsg Coq_value_undef
-  then res_out s_2 (res_val (Coq_value_object l))
-  else (
-    let%value (s_3, vstr) = to_string s_2 c vmsg in
-    let a = { attributes_data_value = vstr; attributes_data_writable = true;
-      attributes_data_enumerable = false; attributes_data_configurable = true } in
-    let%success (s_4, rv) = object_define_own_prop s_3 c l "message" (descriptor_of_attributes (Coq_attributes_data_of a)) throw_true in
-    res_out s_4 (res_val (Coq_value_object l))
-  )
-
-(** val run_error : state -> native_error -> 'a1 specres **)
-
-and run_error s c ne =
-  let%object (s_2, l) = (build_error s c (Coq_value_object (Coq_object_loc_prealloc
-                                                            (Coq_prealloc_native_error_proto ne))) Coq_value_undef) in
-  res_out s_2 (res_throw (Coq_resvalue_value (Coq_value_object l)))
 
 (** val out_error_or_void :
     state -> strictness_flag -> native_error -> result **)
@@ -945,60 +1038,6 @@ and object_define_own_prop s c l x desc throwcont =
           | None -> follow0 s1
     else reject s1 throwcont
   | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
-
-(** val run_to_descriptor :
-    state -> execution_ctx -> value -> descriptor specres **)
-
-and run_to_descriptor s c _foo_ = match _foo_ with
-  | Coq_value_object l ->
-    let sub0 s0 desc name conv k =
-      let%bool (s1, has) = object_has_prop s0 c l name in
-      if not has
-      then k s1 desc
-      else let%value (s2, v0) = run_object_get s1 c l name in
-        let%run (s3, r) = conv s2 v0 desc in k s3 r
-    in
-    sub0 s descriptor_intro_empty ("enumerable")
-      (fun s1 v1 desc ->
-         let b = to_boolean v1 in
-         res_spec s1 (descriptor_with_enumerable desc (Some b))) (fun s1_2 desc ->
-          sub0 s1_2 desc ("configurable")
-            (fun s2 v2 desc0 ->
-               let b = to_boolean v2 in
-               res_spec s2 (descriptor_with_configurable desc0 (Some b)))
-            (fun s2_2 desc0 ->
-               sub0 s2_2 desc0 ("value")
-                 (fun s3 v3 desc1 ->
-                    res_spec s3 (descriptor_with_value desc1 (Some v3)))
-                 (fun s3_2 desc1 ->
-                    sub0 s3_2 desc1
-                      ("writable")
-                      (fun s4 v4 desc2 ->
-                         let b = to_boolean v4 in
-                         res_spec s4 (descriptor_with_writable desc2 (Some b)))
-                      (fun s4_2 desc2 ->
-                         sub0 s4_2 desc2 ("get") (fun s5 v5 desc3 ->
-                             if (not (is_callable_dec s5 v5))
-                             && (not (value_compare v5 Coq_value_undef))
-                             then throw_result (run_error s5 c Coq_native_error_type)
-                             else res_spec s5 (descriptor_with_get desc3 (Some v5)))
-                           (fun s5_2 desc3 ->
-                              sub0 s5_2 desc3 ("set") (fun s6 v6 desc4 ->
-                                  if (not (is_callable_dec s6 v6))
-                                  && (not (value_compare v6 Coq_value_undef))
-                                  then throw_result (run_error s6 c Coq_native_error_type)
-                                  else res_spec s6 (descriptor_with_set desc4 (Some v6)))
-                                (fun s7 desc4 ->
-                                   if ((not (option_compare value_compare desc4.descriptor_get None))
-                                       ||
-                                       (not (option_compare value_compare desc4.descriptor_set None)))
-                                      &&
-                                      ((not (option_compare value_compare desc4.descriptor_value None))
-                                       ||
-                                       (not (option_compare bool_eq desc4.descriptor_writable None)))
-                                   then throw_result (run_error s7 c Coq_native_error_type)
-                                   else res_spec s7 desc4))))))
-  | _ -> throw_result (run_error s c Coq_native_error_type)
 
 (** val prim_new_object : state -> prim -> result **)
 
@@ -3499,7 +3538,7 @@ and run_call_prealloc s c b vthis args =
       match o with
       | Coq_value_object l ->
         let%string (s1, name) = (to_string s c p) in
-        let%run (s2, desc) = (run_to_descriptor s1 c attr) in
+        let%run (s2, desc) = (to_property_descriptor s1 c attr) in
         let%bool (s3, x) = (object_define_own_prop s2 c l name desc true) in
         res_ter s3 (res_val (Coq_value_object l))
       | _ -> run_error s c Coq_native_error_type

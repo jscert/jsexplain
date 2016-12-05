@@ -24,14 +24,10 @@ let res_out s r =
 let res_spec s a =
   Coq_result_some (Coq_specret_val (s, a))
 
-type result = res specres
-
 (** val res_ter : state -> res -> result **)
 
 let res_ter s r =
   res_out s r
-
-type result_void = result
 
 (** val res_void : state -> result_void **)
 

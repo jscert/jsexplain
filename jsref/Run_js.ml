@@ -1,6 +1,6 @@
 open JsInterpreterUtils
 
-exception AbnormalPreludeTermination of JsInterpreterMonads.result
+exception AbnormalPreludeTermination
 
 let file = ref ""
 let test_prelude = ref []
@@ -151,16 +151,16 @@ let run_prog_with_state state prog =
     (JsInterpreter.execution_ctx_binding_inst state ctx JsSyntax.Coq_codetype_global None prog [])
     (fun s' -> JsInterpreter.run_prog s' ctx prog))
 
-let run_prog_incremental (prog_res:JsInterpreterMonads.result) prog =
+let run_prog_incremental prog_res prog =
   match prog_res with
   | JsInterpreterMonads.Coq_result_some (JsSyntax.Coq_specret_out (state, res)) ->
     begin
       match JsSyntax.res_type res with
       | JsSyntax.Coq_restype_normal ->
           (run_prog_with_state state prog)
-      | _ -> raise (AbnormalPreludeTermination prog_res) (* to print out a sensible error *)
+      | _ -> (handle_result prog_res; raise AbnormalPreludeTermination) (* to print out a sensible error *)
     end
-  | _ -> raise (AbnormalPreludeTermination prog_res) (* to print out a sensible error *)
+  | _ -> (handle_result prog_res; raise AbnormalPreludeTermination) (* to print out a sensible error *)
 
 let _ =
   arguments ();
@@ -181,8 +181,8 @@ let _ =
     let prelude_res = JsInterpreter.run_javascript exp_prelude in
     handle_result (run_prog_incremental prelude_res prog')
   with
-  | AbnormalPreludeTermination res ->
-    handle_result res;
+  | AbnormalPreludeTermination ->
+    (* Should call handle_result before this *)
     exit 2
   | Assert_failure (file, line, col) ->
     print_string (
