@@ -335,6 +335,28 @@ and object_internal_is_extensible s c l =
     @esid sec-property-descriptor-specification-type
     @essec 6.2.4 *)
 
+(** @essec 6.2.4.1
+    @esid sec-isaccessordescriptor *)
+and is_accessor_descriptor desc =
+  (* FIXME: Type mismatch: If Desc is undefined, return false *)
+  not
+    (   (option_compare value_compare desc.descriptor_get None)
+     && (option_compare value_compare desc.descriptor_set None))
+
+(** @essec 6.2.4.2
+    @esid sec-isdatadescriptor *)
+and is_data_descriptor desc =
+  (* FIXME: Type mismatch: If Desc is undefined, return false *)
+  not
+    (  (option_compare value_compare desc.descriptor_value None)
+    && (option_compare bool_eq desc.descriptor_writable None))
+
+(** @essec 6.2.4.3
+    @esid sec-isgenericdescriptor *)
+and is_generic_descriptor desc =
+     (not (is_accessor_descriptor desc))
+  && (not (is_data_descriptor desc))
+
 (** @esid sec-topropertydescriptor
     @essec 6.2.4.5 *)
 and to_property_descriptor s c _foo_ =
@@ -402,6 +424,33 @@ and to_property_descriptor s c _foo_ =
     else res_spec s desc
   | _ -> throw_result (run_error s c Coq_native_error_type)
 
+(** @essec 6.2.4.6
+    @esid sec-completepropertydescriptor *)
+and complete_property_descriptor s c desc =
+  (* assert desc is a Property Descriptor: implicit from type *)
+  let like = { descriptor_value        = Some Coq_value_undef;
+               descriptor_writable     = Some false;
+               descriptor_get          = Some Coq_value_undef;
+               descriptor_set          = Some Coq_value_undef;
+               descriptor_enumerable   = Some false;
+               descriptor_configurable = Some false }
+  in let desc =
+    if is_generic_descriptor desc || is_data_descriptor desc
+    then
+      let desc = descriptor_with_value desc like.descriptor_value in
+      descriptor_with_writable desc like.descriptor_writable
+    else
+      let desc = descriptor_with_get desc like.descriptor_get in
+      descriptor_with_set desc like.descriptor_set
+  in let desc =
+    if option_compare bool_eq desc.descriptor_enumerable None
+    then descriptor_with_enumerable desc like.descriptor_enumerable
+    else desc
+  in let desc =
+    if option_compare bool_eq desc.descriptor_configurable None
+    then descriptor_with_configurable desc like.descriptor_configurable
+    else desc
+  in desc
 
 (** {1 Abstract Operations }
     @essec 7
@@ -892,7 +941,7 @@ and object_define_own_prop s c l x desc throwcont =
     match d with
     | Coq_full_descriptor_undef ->
       if ext
-      then let a = (if (descriptor_is_generic_dec desc0) || (descriptor_is_data_dec desc0)
+      then let a = (if (is_generic_descriptor desc0) || (is_data_descriptor desc0)
                     then Coq_attributes_data_of
                         (attributes_data_of_descriptor desc0)
                     else Coq_attributes_accessor_of
@@ -911,9 +960,9 @@ and object_define_own_prop s c l x desc throwcont =
       then res_ter s1 (res_val (Coq_value_bool true))
       else if attributes_change_enumerable_on_non_configurable_dec a desc0
       then reject s1 throwcont0
-      else if descriptor_is_generic_dec desc0
+      else if is_generic_descriptor desc0
       then object_define_own_prop_write s1 a
-      else if not (bool_eq (attributes_is_data_dec a) (descriptor_is_data_dec desc0))
+      else if not (bool_eq (attributes_is_data_dec a) (is_data_descriptor desc0))
       then if attributes_configurable a
         then let a_2 = (match a with
             | Coq_attributes_data_of ad ->
@@ -924,7 +973,7 @@ and object_define_own_prop s c l x desc throwcont =
                            s1 l (fun p -> HeapStr.write p x0 a_2)) in
           object_define_own_prop_write s2 a_2
         else reject s1 throwcont0
-      else if (attributes_is_data_dec a) && (descriptor_is_data_dec desc0)
+      else if (attributes_is_data_dec a) && (is_data_descriptor desc0)
       then (match a with
           | Coq_attributes_data_of ad ->
             if attributes_change_data_on_non_configurable_dec ad desc0
@@ -934,7 +983,7 @@ and object_define_own_prop s c l x desc throwcont =
             (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
               s0
               ("data is not accessor in [defineOwnProperty]"))
-      else if (not (attributes_is_data_dec a)) && (descriptor_is_accessor_dec desc0)
+      else if (not (attributes_is_data_dec a)) && (is_accessor_descriptor desc0)
       then (match a with
           | Coq_attributes_data_of a0 ->
             (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
@@ -1025,7 +1074,7 @@ and object_define_own_prop s c l x desc throwcont =
       match d with
       | Coq_full_descriptor_undef -> follow s1
       | Coq_full_descriptor_some a ->
-        if descriptor_is_accessor_dec desc
+        if is_accessor_descriptor desc
         then let%bool (s2, x0) = (object_delete s1 c lmap x false) in follow s2
         else let follow0 s2 =
                if option_compare bool_eq desc.descriptor_writable (Some false)
@@ -1865,7 +1914,7 @@ and binding_inst_function_decls s c l fds str bconfig =
                                                             (Coq_attributes_data_of a_2))
                                                          true) in follow s0
                                                 else if 
-                                                       (descriptor_is_accessor_dec (descriptor_of_attributes a))                                                  
+                                                       (is_accessor_descriptor (descriptor_of_attributes a))
                                                     || (not (attributes_writable a))
                                                     || (not (attributes_enumerable a))
                                                 then run_error s3 c Coq_native_error_type

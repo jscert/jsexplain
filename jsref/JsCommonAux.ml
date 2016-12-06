@@ -149,26 +149,6 @@ let env_record_binds_option s l =
 let decl_env_record_option ed x =
   HeapStr.read_option ed x
 
-(** val descriptor_is_data_dec : descriptor -> bool **)
-
-let descriptor_is_data_dec desc =
-  not
-    (  (option_compare value_compare desc.descriptor_value None)
-    && (option_compare bool_eq desc.descriptor_writable None))
-
-(** val descriptor_is_accessor_dec : descriptor -> bool **)
-
-let descriptor_is_accessor_dec desc =
-  not
-    (   (option_compare value_compare desc.descriptor_get None)
-     && (option_compare value_compare desc.descriptor_set None))
-
-(** val descriptor_is_generic_dec : descriptor -> bool **)
-
-let descriptor_is_generic_dec desc =
-     (not (descriptor_is_data_dec desc))
-  && (not (descriptor_is_accessor_dec desc))
-
 (** val prepost_unary_op_dec : unary_op -> bool **)
 
 let prepost_unary_op_dec op = match op with
