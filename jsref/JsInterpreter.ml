@@ -946,15 +946,13 @@ and object_define_own_prop s c l x desc throwcont =
                         (attributes_data_of_descriptor desc0)
                     else Coq_attributes_accessor_of
                         (attributes_accessor_of_descriptor desc0)) in
-        let%some s2 = (object_heap_map_properties_option s1 l
-                         (fun p -> HeapStr.write p x0 a)) in
-        res_ter s2
-          (res_val (Coq_value_bool true))
+        let%some s2 = (run_object_heap_map_properties s1 l (fun p -> HeapStr.write p x0 a)) in
+        res_ter s2 (res_val (Coq_value_bool true))
       else reject s1 throwcont0
     | Coq_full_descriptor_some a ->
       let object_define_own_prop_write s2 a0 =
           let a_2 = attributes_update a0 desc0 in
-          let%some s3 = (object_heap_map_properties_option s2 l (fun p -> HeapStr.write p x0 a_2)) in
+          let%some s3 = (run_object_heap_map_properties s2 l (fun p -> HeapStr.write p x0 a_2)) in
           res_ter s3 (res_val (Coq_value_bool true)) in
       if descriptor_contains_dec (descriptor_of_attributes a) desc0
       then res_ter s1 (res_val (Coq_value_bool true))
@@ -969,7 +967,7 @@ and object_define_own_prop s c l x desc throwcont =
               Coq_attributes_accessor_of (attributes_accessor_of_attributes_data ad)
             | Coq_attributes_accessor_of aa ->
               Coq_attributes_data_of (attributes_data_of_attributes_accessor aa)) in
-          let%some s2 = (object_heap_map_properties_option
+          let%some s2 = (run_object_heap_map_properties
                            s1 l (fun p -> HeapStr.write p x0 a_2)) in
           object_define_own_prop_write s2 a_2
         else reject s1 throwcont0
@@ -1106,7 +1104,7 @@ and prim_new_object s _foo_ = match _foo_ with
     let o1 = (object_with_get_own_property o2 Coq_builtin_get_own_prop_string) in
     let o = (object_with_primitive_value o1 (Coq_value_string s0)) in
     let (l, s1) = object_alloc s o in
-    let%some s_2 = (object_heap_map_properties_option s1 l
+    let%some s_2 = (run_object_heap_map_properties s1 l
       (fun p -> HeapStr.write p ("length")
          (Coq_attributes_data_of (attributes_data_intro_constant
          (Coq_value_number (number_of_int (strlength s0))))))) in
@@ -1176,7 +1174,7 @@ and object_delete_default s c l x str =
       | Coq_full_descriptor_some a ->
         if attributes_configurable a
         then let%some
-             s_2 = (object_heap_map_properties_option s1 l (fun p ->
+             s_2 = (run_object_heap_map_properties s1 l (fun p ->
                  HeapStr.rem p x)) in
                 res_ter s_2 (res_val (Coq_value_bool true))
         else out_error_or_cst s1 c str Coq_native_error_type (Coq_value_bool false)
@@ -1588,7 +1586,7 @@ and array_args_map_loop s c l args ind =
   match args with
   | [] -> res_void s
   | h :: rest ->
-    let%some s_2 = (object_heap_map_properties_option s l (fun p ->
+    let%some s_2 = (run_object_heap_map_properties s l (fun p ->
            HeapStr.write p (JsNumber.to_string ind)
              (Coq_attributes_data_of (attributes_data_intro_all_true h)))) in
              array_args_map_loop s_2 c l rest (ind +. 1.)
@@ -1629,7 +1627,7 @@ and run_construct_prealloc s c b args =
     let p = (object_alloc s o) in
     let (l, s_2) = p in
     let follow = (fun s_3 length0 ->
-      let%some s0 = (object_heap_map_properties_option s_3 l (fun p0 ->
+      let%some s0 = (run_object_heap_map_properties s_3 l (fun p0 ->
         HeapStr.write p0 ("length") (Coq_attributes_data_of
           { attributes_data_value = (Coq_value_number length0);
             attributes_data_writable = true;
@@ -1641,15 +1639,15 @@ and run_construct_prealloc s c b args =
     then let v = get_arg 0 args in
     match v with
     | Coq_value_undef ->
-      let%some s0 = (object_heap_map_properties_option s_2 l
+      let%some s0 = (run_object_heap_map_properties s_2 l
         (fun p1 -> HeapStr.write p1 ("0") (Coq_attributes_data_of (attributes_data_intro_all_true v)))) in
       follow s0 1.0
     | Coq_value_null ->
-      let%some s0 = (object_heap_map_properties_option s_2 l
+      let%some s0 = (run_object_heap_map_properties s_2 l
         (fun p1 -> HeapStr.write p1 ("0") (Coq_attributes_data_of (attributes_data_intro_all_true v)))) in
       follow s0 1.0
     | Coq_value_bool b0 ->
-      let%some s0 = (object_heap_map_properties_option s_2 l
+      let%some s0 = (run_object_heap_map_properties s_2 l
         (fun p1 -> HeapStr.write p1 ("0") (Coq_attributes_data_of (attributes_data_intro_all_true v)))) in
       follow s0 1.0
     | Coq_value_number vlen ->
@@ -1658,18 +1656,18 @@ and run_construct_prealloc s c b args =
       then follow s0 ilen
       else run_error s0 c Coq_native_error_range
     | Coq_value_string s0 ->
-      let%some s1 = (object_heap_map_properties_option s_2 l
+      let%some s1 = (run_object_heap_map_properties s_2 l
         (fun p1 -> HeapStr.write p1 ("0") (Coq_attributes_data_of (attributes_data_intro_all_true v)))) in
       follow s1 1.0
     | Coq_value_object o0 ->
       let%some
-         s0 = (object_heap_map_properties_option s_2 l
+         s0 = (run_object_heap_map_properties s_2 l
            (fun p0 ->
               HeapStr.write p0 ("0") (Coq_attributes_data_of
                                      (attributes_data_intro_all_true v)))) in
             follow s0 1.0
                           else let%some
-                               s0 = (object_heap_map_properties_option s_2 l
+                               s0 = (run_object_heap_map_properties s_2 l
                                  (fun p0 ->
                                     HeapStr.write p0
                                       ("length")
@@ -1694,7 +1692,7 @@ and run_construct_prealloc s c b args =
                          let (l, s2) = object_alloc s0 o in
                          let lenDesc = (attributes_data_intro_constant (Coq_value_number (number_of_int (strlength s1)))) in
                               let%some
-                                 s_2 = (object_heap_map_properties_option s2 l (fun p ->
+                                 s_2 = (run_object_heap_map_properties s2 l (fun p ->
                                      HeapStr.write p ("length")
                                        (Coq_attributes_data_of lenDesc))) in
                                     res_ter s_2 (res_val (Coq_value_object l))) in
@@ -3766,7 +3764,7 @@ and run_call_prealloc s c b vthis args =
                     attributes_data_writable = false;
                     attributes_data_enumerable = false;
                     attributes_data_configurable = false }) in
-        let%some s11 = (object_heap_map_properties_option s10 l
+        let%some s11 = (run_object_heap_map_properties s10 l
           (fun p -> HeapStr.write p ("length") (Coq_attributes_data_of a0))) in
         let vthrower = (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_throw_type_error)) in
         let a1 = ({ attributes_accessor_get = vthrower;

@@ -179,14 +179,6 @@ let run_object_heap_map_properties s l f =
   map (fun o -> object_write s l (object_map_properties o f))
     (object_binds_option s l)
 
-(** val object_heap_map_properties_option :
-    state -> object_loc -> (object_properties_type -> object_properties_type)
-    -> state option **)
-
-(* STATEFUL -- eliminate by inlining *)
-let object_heap_map_properties_option s l f =
-  run_object_heap_map_properties s l f
-
 (** val descriptor_contains_dec :
     descriptor -> descriptor -> bool **)
 
