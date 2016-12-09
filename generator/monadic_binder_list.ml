@@ -1,5 +1,4 @@
-let monad_mapping =
-   [("run", "if_run");
+let monad_mapping = [
     ("string", "if_string");
     ("object", "if_object");
     ("value", "if_value");

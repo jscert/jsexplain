@@ -317,9 +317,6 @@ let if_spec w k =
     | Coq_specret_val (s0, a) -> k s0 a
     | Coq_specret_out (s0, r) -> if_abort r (fun _ -> res_out s0 r))
 
-
-let if_run w k = if_spec w k
-
 let check_assert b k =
   if b then k () else (Debug.impossible_because __LOC__ "spec assertion failed"; Coq_result_impossible)
 

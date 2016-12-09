@@ -96,7 +96,6 @@ type 'a tree =
 
    The full list of available monads is provided in the file
    [[monadic_binder_list.ml]], but is reproduced below for convenience:
-   - run
    - string
    - object
    - value

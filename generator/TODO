@@ -14,7 +14,6 @@
    for prim_compare, we should be able to match on pairs of arguments, with a catch-all
 
 *) move prim_compare and value_compare to JsInterpreter because it is interesting and should be logged;
-   move same_value_dec from jscommonaux 
 
 *) bigger test262 testing.
 
