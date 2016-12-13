@@ -503,38 +503,38 @@ and is_property_key argument =
 
 (** @essec 7.2.9
     @esid sec-samevalue *)
-and same_value s x y =
+and same_value x y =
   if not (type_compare (type_of x) (type_of y))
-  then res_out s (res_val (Coq_value_bool false))
+  then false
   else match type_of x with
   | Coq_type_number ->
     (match x with
     | Coq_value_number n_x ->
       (match y with
       | Coq_value_number n_y ->
-        if (JsNumber.isnan n_x) && (JsNumber.isnan n_y) then res_out s (res_val (Coq_value_bool true))
-        else if (JsNumber.isposzero n_x) && (JsNumber.isnegzero n_y) then res_out s (res_val (Coq_value_bool true))
-        else if (JsNumber.isnegzero n_x) && (JsNumber.isposzero n_y) then res_out s (res_val (Coq_value_bool true))
-        else res_out s (res_val (Coq_value_bool (n_x === n_y)))
+        if (JsNumber.isnan n_x) && (JsNumber.isnan n_y) then true
+        else if (JsNumber.isposzero n_x) && (JsNumber.isnegzero n_y) then true
+        else if (JsNumber.isnegzero n_x) && (JsNumber.isposzero n_y) then true
+        else n_x === n_y
       | _ -> assert false)
     | _ -> assert false)
-  | _ -> same_value_non_number s x y
+  | _ -> same_value_non_number x y
 
 (** @essec 7.2.11
     @esid sec-samevaluenonnumber *)
-and same_value_non_number s x y =
-  let%assert _ = not (type_compare (type_of x) Coq_type_number) in
-  let%assert _ = type_compare (type_of x) (type_of y) in
+and same_value_non_number x y =
+  let (*%assert*) asrt = assert (not (type_compare (type_of x) Coq_type_number)) in
+  let (*%assert*) asrt = assert (type_compare (type_of x) (type_of y)) in
   match x with
-  | Coq_value_undef      -> res_out s (res_val (Coq_value_bool true))
-  | Coq_value_null       -> res_out s (res_val (Coq_value_bool true))
+  | Coq_value_undef      -> true
+  | Coq_value_null       -> true
   | Coq_value_string s_x ->
     (match y with
-    | Coq_value_string s_y -> res_out s (res_val (Coq_value_bool (string_eq s_x s_y)))
+    | Coq_value_string s_y -> string_eq s_x s_y
     | _ -> assert false)
   | Coq_value_bool b_x   ->
     (match y with
-     | Coq_value_bool b_y -> res_out s (res_val (Coq_value_bool (bool_eq b_x b_y)))
+     | Coq_value_bool b_y -> bool_eq b_x b_y
      | _ -> assert false)
   (* FIXME: Symbol
   | Coq_value_symbol s_x ->
@@ -544,7 +544,7 @@ and same_value_non_number s x y =
   *)
   | Coq_value_object l_x ->
     (match y with
-    | Coq_value_object l_y -> res_out s (res_val (Coq_value_bool (object_loc_compare l_x l_y)))
+    | Coq_value_object l_y -> object_loc_compare l_x l_y
     | _ -> assert false)
   | _ -> assert false
 
@@ -614,29 +614,28 @@ and ordinary_set_prototype_of s c l v =
   let%assert _ = (match type_of v with Coq_type_object -> true | Coq_type_null -> true | _ -> false) in
   let%some extensible = run_object_method object_extensible_ s l in
   let%some current = run_object_method object_prototype_ s l in
-  let%spec (s1, sv) = same_value s v current in
-  if sv then res_spec s1 (res_val (Coq_value_bool true))
-  else if not extensible then res_spec s1 (res_val (Coq_value_bool false))
+  let sv = same_value v current in
+  if sv then res_spec s (res_val (Coq_value_bool true))
+  else if not extensible then res_spec s (res_val (Coq_value_bool false))
   else
     let rec repeat p done_ = begin
       if not done_ then
         (match p with
         | Coq_value_null -> repeat p true
         | Coq_value_object p_l ->
-          let%bool (s2, b) = same_value s1 p (Coq_value_object l) in
-          if b
-          then res_spec s2 (res_val (Coq_value_bool false))
+          if same_value p (Coq_value_object l)
+          then res_spec s (res_val (Coq_value_bool false))
           else
-            let%some gpo = run_object_method object_get_prototype_of_ s2 p_l in
+            let%some gpo = run_object_method object_get_prototype_of_ s p_l in
             (match gpo with
             | Coq_builtin_get_prototype_of_default -> (
-              let%some prototype = run_object_method object_prototype_ s2 p_l in
+              let%some prototype = run_object_method object_prototype_ s p_l in
               repeat prototype false)
             | _ -> repeat p true)
         | _ -> assert false)
       else
         (* Set the value of the [[Prototype]] internal slot of O to V *)
-        let%some s' = run_object_set_internal object_set_proto s1 l v in
+        let%some s' = run_object_set_internal object_set_proto s l v in
         res_spec s' (res_val (Coq_value_bool true))
     end
     in repeat v false
