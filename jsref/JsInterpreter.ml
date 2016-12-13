@@ -685,7 +685,7 @@ and ordinary_get_own_property s o p =
   let%assert _ = is_property_key p in
   let p = string_of_value p in
   let l = loc_of_value o in
-  if not (object_property_exists s l p) then res_spec s Coq_full_descriptor_undef
+  if not (object_property_exists s l p) then res_spec s Descriptor_undef
   else let d = descriptor_intro_empty in
   let%some x = object_retrieve_property s l p in
   let d = match x with
@@ -697,7 +697,7 @@ and ordinary_get_own_property s o p =
                descriptor_set = (Some x.attributes_accessor_set) } in
   let d = { d with descriptor_enumerable   = (Some (attributes_enumerable x)) } in
   let d = { d with descriptor_configurable = (Some (attributes_configurable x)) } in
-  res_spec s (Coq_full_descriptor d)
+  res_spec s (Descriptor d)
 
 (** @essec 9.1.6
     @esid sec-ordinary-object-internal-methods-and-internal-slots-defineownproperty-p-desc *)
@@ -728,8 +728,7 @@ and validate_and_apply_property_descriptor s o p extensible desc current =
   (* Three types of descriptors: full, attributes: accessor and data...
      Spec assumes one with variable field definitions, move to this? (equiv. our full)
    *)
-  | Coq_full_descriptor_some _ -> assert false (* This code path is deprecated *)
-  | Coq_full_descriptor_undef ->
+  | Descriptor_undef ->
     if not extensible then res_out s (res_val (Coq_value_bool false))
     else
       let%assert _ = extensible in (* SPEC: This assert assumes extensible is any value, but is strictly typed for us *)
@@ -743,7 +742,7 @@ and validate_and_apply_property_descriptor s o p extensible desc current =
         | _ -> None
       in res_ter s (res_val (Coq_value_bool true))
 
-  | Coq_full_descriptor current ->
+  | Descriptor current ->
     (* The following two steps 3 & 4 of the spec are implied by the rest of the function, except in the
        case of NaN values for [[Value]] which may change internal representation.
        Otherwise, they are only an optimisation as far as I can tell. *)

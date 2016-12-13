@@ -77,11 +77,11 @@ let full_descriptor_compare an1 an2 =
   | Coq_full_descriptor_undef ->
     (match an2 with
      | Coq_full_descriptor_undef -> true
-     | Coq_full_descriptor_some a -> false)
+     | _ -> false)
   | Coq_full_descriptor_some a1 ->
     (match an2 with
-     | Coq_full_descriptor_undef -> false
-     | Coq_full_descriptor_some a2 -> attributes_compare a1 a2)
+     | Coq_full_descriptor_some a2 -> attributes_compare a1 a2
+     | _ -> false)
 
 (** val ref_kind_comparable : ref_kind coq_Comparable **)
 
