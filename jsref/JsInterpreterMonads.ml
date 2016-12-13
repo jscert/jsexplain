@@ -317,9 +317,19 @@ let if_spec w k =
     | Coq_specret_val (s0, a) -> k s0 a
     | Coq_specret_out (s0, r) -> if_abort r (fun _ -> res_out s0 r))
 
+(** A Specification assertion that b is true, continuing with k,
+    or failing with Coq_result_impossible otherwise *)
 let check_assert b k =
   if b then k () else (Debug.impossible_because __LOC__ "spec assertion failed"; Coq_result_impossible)
 
+(** Executes the continuation if a specret_val, else returns the specret_out.
+    Bound to the syntax let%can_return *)
+let if_spec_else_return w k =
+  if_result_some w (fun sp ->
+    match sp with
+    | Coq_specret_val (s, v) -> k s v
+     (* Don't just reuse w here, the return type needs to be distinct from the input type. *)
+    | Coq_specret_out (s, r) -> Coq_result_some (Coq_specret_out (s, r)))
 
 let ifx_prim w k = if_prim w k
 let ifx_number w k = if_number w k

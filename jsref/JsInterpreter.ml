@@ -199,9 +199,8 @@ let string_of_propname _foo_ = match _foo_ with
 (*---------------------------------*)
 
 
-(** val run_object_method :
-    (coq_object -> 'a1) -> state -> object_loc -> 'a1 option **)
-
+(** Fetches a given object slot value (using proj) from the object l in state s
+    FIXME: The name is very confusing. *)
 let run_object_method proj s l =
   LibOption.map proj (object_binds_option s l)
 
@@ -257,7 +256,6 @@ and run_error s c ne : 'a specret resultof =
                                                             (Coq_prealloc_native_error_proto ne))) Coq_value_undef) in
   res_out s_2 (res_throw (Coq_resvalue_value (Coq_value_object l)))
 
-
 (*****************************************************************************)
 (*****************************************************************************)
 (************* START OF THE BIG RECURSIVE INTERPRETER FUNCTION ***************)
@@ -289,6 +287,40 @@ and object_has_internal_method s l prj =
     Functions in this section are used to dispatch Internal Methods to the
     correct implementation based upon the value of the internal slot *)
 
+(** Function to dispatch calls to O.[[GetOwnProperty]](P)
+    @param l  The location of O *)
+and object_internal_get_own_property s o p =
+  (* FIXME: ES5 *)
+  let l = loc_of_value o in
+  let%some internal_method = (run_object_method object_get_own_prop_ s l) in
+  match internal_method with
+  | Coq_builtin_get_own_prop_default -> ordinary_object_internal_get_own_property s o p
+  | _ -> assert false (* FIXME *)
+
+(** Function to dispatch calls to O.[[DefineOwnProperty]](P, desc)
+    @param l  The location of O *)
+and object_internal_define_own_property s o p desc =
+  let l = loc_of_value o in
+  (* TODO: Check if c can be dropped. (ES5 compat) *)
+  let%some internal_method = (run_object_method object_define_own_prop_ s l) in
+  match internal_method with
+  (* FIXME: Dispatch to new versions of functions *)
+  | Coq_builtin_define_own_prop_default -> ordinary_object_internal_define_own_property s o p desc
+  | _ -> Coq_result_not_yet_implemented
+
+(** Function to dispatch calls to O.[[HasProperty]](P)
+    @param l  The location of O *)
+and object_internal_has_property s c l p =
+  let%some b = (run_object_method object_has_prop_ s l) in
+  let x = match p with
+  | Coq_value_string x -> x
+  | _ -> assert false in
+  match b with
+  | Coq_builtin_has_prop_default ->
+    let%spec (s1, d) = (run_object_get_prop s c l x) in
+    res_ter s1 (res_val (Coq_value_bool (not (full_descriptor_compare d Coq_full_descriptor_undef))))
+  | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
+
 (** Function to dispatch calls to O.[[Get]](P, receiver)
     @param l  The location of O *)
 and object_internal_get s c l p receiver =
@@ -304,19 +336,6 @@ and object_internal_get s c l p receiver =
   | Coq_builtin_get_function -> dispatch_es5 ()
   | Coq_builtin_get_args_obj -> dispatch_es5 ()
   | Coq_builtin_get_proxy    -> Coq_result_not_yet_implemented
-
-(** Function to dispatch calls to O.[[HasProperty]](P)
-    @param l  The location of O *)
-and object_internal_has_property s c l p =
-  let%some b = (run_object_method object_has_prop_ s l) in
-  let x = match p with
-  | Coq_value_string x -> x
-  | _ -> assert false in
-  match b with
-  | Coq_builtin_has_prop_default ->
-    let%spec (s1, d) = (run_object_get_prop s c l x) in
-    res_ter s1 (res_val (Coq_value_bool (not (full_descriptor_compare d Coq_full_descriptor_undef))))
-  | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
 (** Function to dispatch calls to O.[[Call]](thisArgument, argumentsList)
     @param l  The location of O *)
@@ -496,10 +515,7 @@ and is_extensible s c o =
 (** @essec 7.2.7
     @esid sec-ispropertykey *)
 and is_property_key argument =
-  match type_of argument with
-  | Coq_type_string -> true
-  (* FIXME: | Coq_type_symbol -> true *)
-  | _ -> false
+  (type_of argument) === Coq_type_string (* FIXME: || (type_of argument) === Coq_type_symbol *)
 
 (** @essec 7.2.9
     @esid sec-samevalue *)
@@ -657,6 +673,170 @@ and ordinary_is_extensible s c l =
 and ordinary_prevent_extensions s c l =
   let%some s' = run_object_set_internal object_set_extensible s l false in
   res_spec s (res_val (Coq_value_bool true))
+
+(** @essec 9.1.5
+    @esid sec-ordinary-object-internal-methods-and-internal-slots-getownproperty-p *)
+and ordinary_object_internal_get_own_property s o p =
+  ordinary_get_own_property s o p
+
+(** @essec 9.1.5.1
+    @esid sec-ordinarygetownproperty *)
+and ordinary_get_own_property s o p =
+  let%assert _ = is_property_key p in
+  let p = string_of_value p in
+  let l = loc_of_value o in
+  if not (object_property_exists s l p) then res_spec s Coq_full_descriptor_undef
+  else let d = descriptor_intro_empty in
+  let%some x = object_retrieve_property s l p in
+  let d = match x with
+  | Coq_attributes_data_of x ->
+      { d with descriptor_value    = (Some x.attributes_data_value);
+               descriptor_writable = (Some x.attributes_data_writable) }
+  | Coq_attributes_accessor_of x ->
+      { d with descriptor_get = (Some x.attributes_accessor_get);
+               descriptor_set = (Some x.attributes_accessor_set) } in
+  let d = { d with descriptor_enumerable   = (Some (attributes_enumerable x)) } in
+  let d = { d with descriptor_configurable = (Some (attributes_configurable x)) } in
+  res_spec s (Coq_full_descriptor d)
+
+(** @essec 9.1.6
+    @esid sec-ordinary-object-internal-methods-and-internal-slots-defineownproperty-p-desc *)
+and ordinary_object_internal_define_own_property s o p desc =
+  ordinary_define_own_property s o p desc
+
+(** @essec 9.1.6.1
+    @esid sec-ordinarydefineownproperty *)
+and ordinary_define_own_property s o p desc =
+  let%spec (s, current) = object_internal_get_own_property s o p in
+  let l = loc_of_value o in
+  let%some extensible = run_object_method object_extensible_ s l in
+  validate_and_apply_property_descriptor s o p extensible desc current
+
+(** @essec 9.1.6.2
+    @esid sec-iscompatiblepropertydescriptor *)
+and is_compatible_property_descriptor s extensible desc current =
+  validate_and_apply_property_descriptor s Coq_value_undef Coq_value_undef extensible desc current
+
+(** @essec 9.1.6.3
+    @esid sec-validateandapplypropertydescriptor *)
+and validate_and_apply_property_descriptor s o p extensible desc current =
+  (* FIXME: o, p type mismatch, specified as object, property key but undefined passed *)
+  (* A -> B === !A || B *)
+  let%assert _ = (value_compare o Coq_value_undef) || (is_property_key p) in
+  let p = string_of_value p in (* FIXME: Will break with Symbols *)
+  match current with
+  (* Three types of descriptors: full, attributes: accessor and data...
+     Spec assumes one with variable field definitions, move to this? (equiv. our full)
+   *)
+  | Coq_full_descriptor_some _ -> assert false (* This code path is deprecated *)
+  | Coq_full_descriptor_undef ->
+    if not extensible then res_out s (res_val (Coq_value_bool false))
+    else
+      let%assert _ = extensible in (* SPEC: This assert assumes extensible is any value, but is strictly typed for us *)
+      let%some s =
+        match o with
+        | Coq_value_object l ->
+          if (is_generic_descriptor desc) || (is_data_descriptor desc)
+          then object_set_property s l p (Coq_attributes_data_of (attributes_data_of_descriptor desc))
+          else object_set_property s l p (Coq_attributes_accessor_of (attributes_accessor_of_descriptor desc))
+        | Coq_value_undef -> Some s
+        | _ -> None
+      in res_ter s (res_val (Coq_value_bool true))
+
+  | Coq_full_descriptor current ->
+    (* The following two steps 3 & 4 of the spec are implied by the rest of the function, except in the
+       case of NaN values for [[Value]] which may change internal representation.
+       Otherwise, they are only an optimisation as far as I can tell. *)
+    (* Step 3 (also implied by step 4) *)
+    if descriptor_is_empty desc
+      then res_ter s (res_val (Coq_value_bool true))
+
+    (* Step 4 *)
+    else if descriptor_contained_by desc current same_value
+      then res_ter s (res_val (Coq_value_bool true))
+
+    (* Steps 5 *)
+    else let%can_return (s, _) =
+    if (option_compare bool_eq current.descriptor_configurable (Some false))
+    then
+      if (option_compare bool_eq desc.descriptor_configurable (Some true))
+      then res_ter s (res_val (Coq_value_bool false))
+      else if ((is_some desc.descriptor_enumerable) &&
+        not (some_compare bool_eq current.descriptor_enumerable desc.descriptor_enumerable))
+      then res_ter s (res_val (Coq_value_bool false))
+      else res_spec s () (* Continue *)
+    else res_spec s () (* Continue *)
+
+    (* Step 6 if IsGenericDescriptor(Desc) is true, implied by following conditions *)
+    in let%can_return (s, _) =
+    if is_generic_descriptor desc
+    then res_spec s () (* Continue *)
+
+    (* Step 7 *)
+    else if not (bool_eq (is_data_descriptor current) (is_data_descriptor desc))
+    then
+      (* 7a *)
+      if (option_compare bool_eq current.descriptor_configurable (Some false))
+        then res_ter s (res_val (Coq_value_bool false))
+      (* 7b *)
+      else if is_data_descriptor current
+        then
+          let%some s = match o with
+          | Coq_value_object l -> object_map_property s l p attributes_accessor_of_attributes_data
+          | _ -> Some s
+          in res_spec s ()
+        else
+          let%some s = match o with
+          | Coq_value_object l -> object_map_property s l p attributes_data_of_attributes_accessor
+          | _ -> Some s
+          in res_spec s ()
+
+    (* Step 8 *)
+    else if (is_data_descriptor current) && (is_data_descriptor desc)
+    then
+      (* Step 8a *)
+      if option_compare bool_eq current.descriptor_configurable (Some false)
+      then
+        (* Step 8ai *)
+        if (option_compare bool_eq current.descriptor_writable (Some false))
+           && (option_compare bool_eq desc.descriptor_writable (Some true))
+        then res_ter s (res_val (Coq_value_bool false))
+
+        (* Step 8aii *)
+        else if option_compare bool_eq current.descriptor_writable (Some false)
+        then
+          (* Step 8aii1 *)
+          if (is_some desc.descriptor_value)
+             && not (option_compare same_value desc.descriptor_value current.descriptor_value)
+          then res_ter s (res_val (Coq_value_bool false))
+          else res_spec s ()
+        else res_spec s ()
+
+      (* Step 8b *)
+      else let%assert _ = option_compare bool_eq current.descriptor_configurable (Some true) in
+        res_spec s () (* So any change is acceptable, i.e: Continue *)
+
+    (* Step 9 *)
+    else let%assert _ = (is_accessor_descriptor current) && (is_accessor_descriptor desc) in
+      if option_compare bool_eq current.descriptor_configurable (Some false)
+      then
+        if (is_some desc.descriptor_set) &&
+            not (option_compare same_value desc.descriptor_set current.descriptor_set)
+        then res_ter s (res_val (Coq_value_bool false))
+        else if (is_some desc.descriptor_get) &&
+                not (option_compare same_value desc.descriptor_get current.descriptor_get)
+        then res_ter s (res_val (Coq_value_bool false))
+        else res_spec s ()
+      else res_spec s ()
+
+    (* Step 10 *)
+    in let%some s = match o with
+    | Coq_value_object l ->
+       object_map_property s l p (fun a -> attributes_update a desc)
+    | _ -> Some s
+
+    (* Step 11 *)
+    in res_ter s (res_val (Coq_value_bool true))
 
 (** @essec 9.1.11.1
     @esid sec-ordinaryownpropertykeys *)
@@ -934,70 +1114,14 @@ and object_define_own_prop s c l x desc throwcont =
   let reject s0 throwcont0 =
     out_error_or_cst
       s0 c throwcont0 Coq_native_error_type (Coq_value_bool false) in
-  let def s0 x0 desc0 throwcont0 =
-    let%spec (s1, d) = (run_object_get_own_prop s0 c l x0) in
-    let%some ext = (run_object_method object_extensible_ s1 l) in
-    match d with
-    | Coq_full_descriptor_undef ->
-      if ext
-      then let a = (if (is_generic_descriptor desc0) || (is_data_descriptor desc0)
-                    then Coq_attributes_data_of
-                        (attributes_data_of_descriptor desc0)
-                    else Coq_attributes_accessor_of
-                        (attributes_accessor_of_descriptor desc0)) in
-        let%some s2 = (run_object_heap_map_properties s1 l (fun p -> HeapStr.write p x0 a)) in
-        res_ter s2 (res_val (Coq_value_bool true))
-      else reject s1 throwcont0
-    | Coq_full_descriptor_some a ->
-      let object_define_own_prop_write s2 a0 =
-          let a_2 = attributes_update a0 desc0 in
-          let%some s3 = (run_object_heap_map_properties s2 l (fun p -> HeapStr.write p x0 a_2)) in
-          res_ter s3 (res_val (Coq_value_bool true)) in
-      if descriptor_contains_dec (descriptor_of_attributes a) desc0
-      then res_ter s1 (res_val (Coq_value_bool true))
-      else if attributes_change_enumerable_on_non_configurable_dec a desc0
-      then reject s1 throwcont0
-      else if is_generic_descriptor desc0
-      then object_define_own_prop_write s1 a
-      else if not (bool_eq (attributes_is_data_dec a) (is_data_descriptor desc0))
-      then if attributes_configurable a
-        then let a_2 = (match a with
-            | Coq_attributes_data_of ad ->
-              Coq_attributes_accessor_of (attributes_accessor_of_attributes_data ad)
-            | Coq_attributes_accessor_of aa ->
-              Coq_attributes_data_of (attributes_data_of_attributes_accessor aa)) in
-          let%some s2 = (run_object_heap_map_properties
-                           s1 l (fun p -> HeapStr.write p x0 a_2)) in
-          object_define_own_prop_write s2 a_2
-        else reject s1 throwcont0
-      else if (attributes_is_data_dec a) && (is_data_descriptor desc0)
-      then (match a with
-          | Coq_attributes_data_of ad ->
-            if attributes_change_data_on_non_configurable_dec ad desc0
-            then reject s1 throwcont0
-            else object_define_own_prop_write s1 a
-          | Coq_attributes_accessor_of a0 ->
-            (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-              s0
-              ("data is not accessor in [defineOwnProperty]"))
-      else if (not (attributes_is_data_dec a)) && (is_accessor_descriptor desc0)
-      then (match a with
-          | Coq_attributes_data_of a0 ->
-            (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-              s0
-              ("accessor is not data in [defineOwnProperty]")
-          | Coq_attributes_accessor_of aa ->
-            if attributes_change_accessor_on_non_configurable_dec aa desc0
-            then reject s1 throwcont0
-            else object_define_own_prop_write s1 a)
-      else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-          s0
-          ("cases are mutually exclusives in [defineOwnProperty]") in
+  let def s p d _ = ordinary_define_own_property s (Coq_value_object l) (Coq_value_string p) d in
   let%some b = (run_object_method object_define_own_prop_ s l) in
   match b with
-  | Coq_builtin_define_own_prop_default -> def s x desc throwcont
+  | Coq_builtin_define_own_prop_default -> 
+      object_internal_define_own_property s (Coq_value_object l) (Coq_value_string x) desc (* ES6 hack *)
   | Coq_builtin_define_own_prop_array ->
-    let%spec (s0, d) = (run_object_get_own_prop s c l ("length")) in begin
+    let%spec (s0, d) = (run_object_get_own_prop s c l ("length")) in
+    begin
       match d with
       | Coq_full_descriptor_undef ->
         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)

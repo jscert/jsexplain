@@ -110,3 +110,4 @@ type 'a tree =
    - break
    - spec
    - assert
+   - can_return

@@ -588,3 +588,21 @@ let descriptor_with_configurable desc bc' =
 (** val codetype_compare : codetype -> codetype -> bool **)
 
 let codetype_compare ct1 ct2 = (ct1:codetype) === ct2
+
+(** {3 Convenience functions to unpack JS Value types to natives}
+    Intended for use after explicit typechecks in the spec. *)
+let string_of_value v = match v with
+| Coq_value_string s -> s
+| _ -> assert false
+
+let bool_of_value v = match v with
+| Coq_value_bool b -> b
+| _ -> assert false
+
+let number_of_value v = match v with
+| Coq_value_number n -> n
+| _ -> assert false
+
+let loc_of_value v = match v with
+| Coq_value_object l -> l
+| _ -> assert false

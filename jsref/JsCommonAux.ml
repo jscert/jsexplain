@@ -7,22 +7,16 @@ open LibList
 open LibOption
 open Shared
 
-let __ = ()
-
-(** val if_some_then_same_dec :
-    'a1 option -> 'a1 option -> ('a1 -> 'a1 -> bool) ->
-    bool **)
-
-let if_some_then_same_dec x y d =
+(** If x is Some value, then y has same value, according to comparison d.
+    (x = Some a) implies (y = Some b) and (d a b) *)
+let if_some_then_same x y d =
   match x with
+  | None -> true (* <<-- if_some *)
   | Some a ->
     (match y with
-     | Some a0 -> d a0 a
-     | None -> true)
-  | None ->
-    (match y with
-     | Some a -> false
-     | None -> true)
+     | Some b -> d a b
+     | None -> false)
+
 
 (* FIXME: To be replaced with same_value *)
 let same_value_dec v1 v2 = assert false
@@ -129,9 +123,7 @@ let ref_kind_comparable x y =
      | Coq_ref_kind_object -> false
      | Coq_ref_kind_env_record -> true)
 
-(** val object_binds_option :
-    state -> object_loc -> coq_object option **)
-
+(** Fetches Some object from location l in the heap, None if it is not allocated *)
 (* STATEFUL-RO *)
 let object_binds_option s l =
   HeapObj.read_option s.state_object_heap l
@@ -170,44 +162,22 @@ let attributes_is_data_dec a = match a with
 | Coq_attributes_data_of a0 -> true
 | Coq_attributes_accessor_of a0 -> false
 
-(** val run_object_heap_map_properties :
-    state -> object_loc -> (object_properties_type -> object_properties_type)
-    -> state option **)
+(** Function to test if d0 is contained within d1.
+    Implements the spec text:
+    "true, if every field in d0 also occurs in d1 and the value of every field in d0 is the
+    same value as the corresponding field in d1 when compared using the sv algorithm."
+*)
+let descriptor_contained_by d0 d1 sv =
+     (if_some_then_same d0.descriptor_writable     d1.descriptor_writable     bool_eq)
+  && (if_some_then_same d0.descriptor_enumerable   d1.descriptor_enumerable   bool_eq)
+  && (if_some_then_same d0.descriptor_configurable d1.descriptor_configurable bool_eq)
+  && (if_some_then_same d0.descriptor_value        d1.descriptor_value        sv)
+  && (if_some_then_same d0.descriptor_get          d1.descriptor_get          sv)
+  && (if_some_then_same d0.descriptor_set          d1.descriptor_set          sv)
 
-(* STATEFUL -- idea is to have this one imperative *)
-let run_object_heap_map_properties s l f =
-  map (fun o -> object_write s l (object_map_properties o f))
-    (object_binds_option s l)
-
-(** val descriptor_contains_dec :
-    descriptor -> descriptor -> bool **)
-
-let descriptor_contains_dec desc1 desc2 =
-  let { descriptor_value = descriptor_value0; descriptor_writable =
-    descriptor_writable0; descriptor_get = descriptor_get0; descriptor_set =
-    descriptor_set0; descriptor_enumerable = descriptor_enumerable0;
-    descriptor_configurable = descriptor_configurable0 } = desc1
-  in
-  let { descriptor_value = descriptor_value1; descriptor_writable =
-    descriptor_writable1; descriptor_get = descriptor_get1; descriptor_set =
-    descriptor_set1; descriptor_enumerable = descriptor_enumerable1;
-    descriptor_configurable = descriptor_configurable1 } = desc2
-  in
-     (if_some_then_same_dec descriptor_value0 descriptor_value1 (fun u v -> same_value_dec u v))
-  && (if_some_then_same_dec descriptor_writable0 descriptor_writable1 (fun u v -> bool_eq u v))
-  && (if_some_then_same_dec descriptor_get0 descriptor_get1 (fun u v -> same_value_dec u v))
-  && (if_some_then_same_dec descriptor_set0 descriptor_set1 (fun u v -> same_value_dec u v))
-  && (if_some_then_same_dec descriptor_enumerable0 descriptor_enumerable1 (fun u v -> bool_eq u v))
-  && (if_some_then_same_dec descriptor_configurable0 descriptor_configurable1 (fun u v -> bool_eq u v))
-
-(** val descriptor_enumerable_not_same_dec :
-    attributes -> descriptor -> bool **)
-
-let descriptor_enumerable_not_same_dec a desc =
-  let o = desc.descriptor_enumerable in
-  (match o with
-   | Some b -> not (bool_eq b (attributes_enumerable a))
-   | None -> false)
+(** Implements spec text: "true, if every field in d is absent" *)
+let descriptor_is_empty d =
+  descriptor_contained_by d descriptor_intro_empty (fun v1 v2 -> false)
 
 (** val descriptor_value_not_same_dec :
     attributes_data -> descriptor -> bool **)
@@ -235,16 +205,6 @@ let descriptor_set_not_same_dec aa desc =
   (match o with
    | Some v -> not (same_value_dec v aa.attributes_accessor_set)
    | None -> false)
-
-(** val attributes_change_enumerable_on_non_configurable_dec :
-    attributes -> descriptor -> bool **)
-
-let attributes_change_enumerable_on_non_configurable_dec a desc =
-    (not (attributes_configurable a))
-  &&
-    ((option_compare bool_eq desc.descriptor_configurable (Some
-        true)) 
-     || (descriptor_enumerable_not_same_dec a desc))
 
 (** val attributes_change_data_on_non_configurable_dec :
     attributes_data -> descriptor -> bool **)
@@ -311,3 +271,29 @@ let object_properties_keys_as_list_option s l =
   map (fun props -> LibList.map fst (HeapStr.to_list props))
     (map object_properties_ (object_binds_option s l))
 
+(** Updates the properties Heap of a given object using f *)
+(* STATEFUL -- idea is to have this one imperative *)
+let run_object_heap_map_properties s l f =
+  map (fun o -> object_write s l (object_map_properties o f)) (object_binds_option s l)
+
+(** Given a properties Heap, a property name, updates the given property attributes using function f *)
+let properties_map_property p x f =
+  HeapStr.write p x (f (HeapStr.read p x))
+
+(** Update an object's property given the location, property name and new attributes value *)
+(* STATEFUL *)
+let object_set_property s l x a =
+  run_object_heap_map_properties s l (fun p -> HeapStr.write p x a)
+
+(** Updates an object's property given the location, property name and function mapping old to new attributes *)
+let object_map_property s l x f =
+  run_object_heap_map_properties s l (fun p -> properties_map_property p x f)
+
+let object_retrieve_property s l x =
+  let so = object_binds_option s l in
+  match map object_properties_ so with
+  | None -> None
+  | Some p -> HeapStr.read_option p x
+
+let object_property_exists s l x =
+  is_some (object_retrieve_property s l x)

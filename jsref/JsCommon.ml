@@ -37,87 +37,98 @@ let type_of _foo_ = match _foo_ with
 | Coq_value_string s -> Coq_type_string
 | Coq_value_object o -> Coq_type_object
 
-(** val attributes_data_default : attributes_data **)
-
+(** Default vales for data property attributes.
+    @esid table-4
+    @essec 6.1.7.1 Table 4 *)
 let attributes_data_default =
   { attributes_data_value = Coq_value_undef;
-    attributes_data_writable = false; attributes_data_enumerable = false;
+    attributes_data_writable = false;
+    attributes_data_enumerable = false;
     attributes_data_configurable = false }
 
-(** val attributes_accessor_default : attributes_accessor **)
-
+(** Default vales for accessor property attributes.
+    @esid table-4
+    @essec 6.1.7.1 Table 4 *)
 let attributes_accessor_default =
   { attributes_accessor_get = Coq_value_undef;
     attributes_accessor_set = Coq_value_undef;
     attributes_accessor_enumerable = false;
     attributes_accessor_configurable = false }
 
-(** val attributes_accessor_of_attributes_data :
-    attributes_data -> attributes_accessor **)
+(** Convert a data attribute into an accessor attribute.
 
-let attributes_accessor_of_attributes_data ad =
-  { attributes_accessor_get =
-    attributes_accessor_default.attributes_accessor_get;
-    attributes_accessor_set =
-    attributes_accessor_default.attributes_accessor_set;
-    attributes_accessor_enumerable = ad.attributes_data_enumerable;
-    attributes_accessor_configurable = ad.attributes_data_configurable }
+    Implements the following spec text: "Convert the property \[...\] from a
+    data property to an accessor property.  Preserve the existing values of the
+    converted property's \[\[Configurable\]\] and \[\[Enumerable\]\] attributes
+    and set the rest of the property's attributes to their default values."
 
-(** val attributes_data_of_attributes_accessor :
-    attributes_accessor -> attributes_data **)
+    @essec 9.1.6.3-7.b.i *)
+let attributes_accessor_of_attributes_data a =
+  match a with
+  | Coq_attributes_data_of ad ->
+    Coq_attributes_accessor_of {
+      attributes_accessor_get = attributes_accessor_default.attributes_accessor_get;
+      attributes_accessor_set = attributes_accessor_default.attributes_accessor_set;
+      attributes_accessor_enumerable = ad.attributes_data_enumerable;
+      attributes_accessor_configurable = ad.attributes_data_configurable }
+  | _ -> assert false
 
-let attributes_data_of_attributes_accessor aa =
-  { attributes_data_value = attributes_data_default.attributes_data_value;
-    attributes_data_writable =
-    attributes_data_default.attributes_data_writable;
-    attributes_data_enumerable = aa.attributes_accessor_enumerable;
-    attributes_data_configurable = aa.attributes_accessor_configurable }
+(** Convert an accessor attribute into a data attribute.
 
-(** val attributes_data_update :
-    attributes_data -> descriptor -> attributes_data **)
+    Implements the following spec text: "Convert the property \[...\] from an
+    accessor property to a data property.  Preserve the existing values of the
+    converted property's \[\[Configurable\]\] and \[\[Enumerable\]\] attributes
+    and set the rest of the property's attributes to their default values."
 
+    @essec 9.1.6.3-7.c.i *)
+let attributes_data_of_attributes_accessor a =
+  match a with
+  | Coq_attributes_accessor_of aa ->
+      Coq_attributes_data_of {
+        attributes_data_value = attributes_data_default.attributes_data_value;
+        attributes_data_writable = attributes_data_default.attributes_data_writable;
+        attributes_data_enumerable = aa.attributes_accessor_enumerable;
+        attributes_data_configurable = aa.attributes_accessor_configurable }
+  | _ -> assert false
+
+(** Updates a given data attribute with values from the given descriptor *)
 let attributes_data_update ad desc =
   { attributes_data_value =
-    (unsome_default ad.attributes_data_value desc.descriptor_value);
+      (unsome_default ad.attributes_data_value desc.descriptor_value);
     attributes_data_writable =
-    (unsome_default ad.attributes_data_writable desc.descriptor_writable);
+      (unsome_default ad.attributes_data_writable desc.descriptor_writable);
     attributes_data_enumerable =
-    (unsome_default ad.attributes_data_enumerable desc.descriptor_enumerable);
+      (unsome_default ad.attributes_data_enumerable desc.descriptor_enumerable);
     attributes_data_configurable =
-    (unsome_default ad.attributes_data_configurable
-      desc.descriptor_configurable) }
+      (unsome_default ad.attributes_data_configurable desc.descriptor_configurable) }
 
-(** val attributes_accessor_update :
-    attributes_accessor -> descriptor -> attributes_accessor **)
-
+(** Updates a given accessor attribute with values from the given descriptor *)
 let attributes_accessor_update aa desc =
   { attributes_accessor_get =
-    (unsome_default aa.attributes_accessor_get desc.descriptor_get);
+      (unsome_default aa.attributes_accessor_get desc.descriptor_get);
     attributes_accessor_set =
-    (unsome_default aa.attributes_accessor_set desc.descriptor_set);
+      (unsome_default aa.attributes_accessor_set desc.descriptor_set);
     attributes_accessor_enumerable =
-    (unsome_default aa.attributes_accessor_enumerable
-      desc.descriptor_enumerable); attributes_accessor_configurable =
-    (unsome_default aa.attributes_accessor_configurable
-      desc.descriptor_configurable) }
+      (unsome_default aa.attributes_accessor_enumerable desc.descriptor_enumerable);
+    attributes_accessor_configurable =
+      (unsome_default aa.attributes_accessor_configurable desc.descriptor_configurable) }
 
-(** val attributes_update : attributes -> descriptor -> attributes **)
-
+(** Updates a given attribute with values from the given descriptor. Additional
+    attributes on the descriptor are ignored. *)
 let attributes_update a desc =
   match a with
   | Coq_attributes_data_of ad ->
-    Coq_attributes_data_of (attributes_data_update ad desc)
+      Coq_attributes_data_of (attributes_data_update ad desc)
   | Coq_attributes_accessor_of aa ->
-    Coq_attributes_accessor_of (attributes_accessor_update aa desc)
+      Coq_attributes_accessor_of (attributes_accessor_update aa desc)
 
-(** val attributes_data_of_descriptor : descriptor -> attributes_data **)
-
+(** Create a data property from a descriptor, using default attribute values if
+    the required attribute is absent. *)
 let attributes_data_of_descriptor desc =
   attributes_data_update attributes_data_default desc
 
-(** val attributes_accessor_of_descriptor :
-    descriptor -> attributes_accessor **)
-
+(** Create an accessor property from a descriptor, using default attribute
+    values if the required attribute is absent. *)
 let attributes_accessor_of_descriptor desc =
   attributes_accessor_update attributes_accessor_default desc
 
@@ -125,17 +136,19 @@ let attributes_accessor_of_descriptor desc =
 
 let descriptor_of_attributes _foo_ = match _foo_ with
 | Coq_attributes_data_of ad ->
-  { descriptor_value = (Some ad.attributes_data_value); descriptor_writable =
-    (Some ad.attributes_data_writable); descriptor_get = None;
-    descriptor_set = None; descriptor_enumerable = (Some
-    ad.attributes_data_enumerable); descriptor_configurable = (Some
-    ad.attributes_data_configurable) }
+  { descriptor_value = (Some ad.attributes_data_value);
+    descriptor_writable = (Some ad.attributes_data_writable);
+    descriptor_get = None;
+    descriptor_set = None;
+    descriptor_enumerable = (Some ad.attributes_data_enumerable);
+    descriptor_configurable = (Some ad.attributes_data_configurable) }
 | Coq_attributes_accessor_of aa ->
-  { descriptor_value = None; descriptor_writable = None; descriptor_get =
-    (Some aa.attributes_accessor_get); descriptor_set = (Some
-    aa.attributes_accessor_set); descriptor_enumerable = (Some
-    aa.attributes_accessor_enumerable); descriptor_configurable = (Some
-    aa.attributes_accessor_configurable) }
+  { descriptor_value = None;
+    descriptor_writable = None;
+    descriptor_get = (Some aa.attributes_accessor_get);
+    descriptor_set = (Some aa.attributes_accessor_set);
+    descriptor_enumerable = (Some aa.attributes_accessor_enumerable);
+    descriptor_configurable = (Some aa.attributes_accessor_configurable) }
 
 (** val attributes_configurable : attributes -> bool **)
 

@@ -413,9 +413,14 @@ let descriptor_enumerable x = x.descriptor_enumerable
 
 let descriptor_configurable x = x.descriptor_configurable
 
+(** Representing the option type [undefined | descriptor]
+  used when undefined returned from [[GetOwnProperty]] *)
 type full_descriptor =
 | Coq_full_descriptor_undef
+(** @deprecated Raw attributes should not be returned by GetOwnProperty *)
 | Coq_full_descriptor_some of attributes [@f value]
+| Coq_full_descriptor of descriptor [@f descriptor]
+
 
 type mutability =
 | Coq_mutability_uninitialized_immutable
