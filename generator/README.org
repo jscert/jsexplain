@@ -94,8 +94,8 @@ type 'a tree =
    - ~let%some x = expr in cont~ becomes ~if_some expr (fun x -> cont)~
    - ~let%if_spec (s,x) = expr in cont~ becomes ~if_spec expr (fun s x -> cont)~
 
-   The full list of available moands is provided in `monad_mapping` of
-   monad_ppx.ml, but is reproduced below for convenience:
+   The full list of available monads is provided in the file
+   [[monadic_binder_list.ml]], but is reproduced below for convenience:
    - run
    - string
    - object
@@ -109,3 +109,5 @@ type 'a tree =
    - not_throw
    - ter
    - break
+   - spec
+   - assert

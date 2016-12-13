@@ -266,20 +266,7 @@ let is_monadic_function f =
   match f.exp_desc with
   | Texp_ident (path, ident,  _) ->
       let x = Path.name path in 
-      List.mem x [
-        "JsInterpreterMonads.if_run";
-        "JsInterpreterMonads.if_string";
-        "JsInterpreterMonads.if_object";
-        "JsInterpreterMonads.if_value";
-        "JsInterpreterMonads.if_prim";
-        "JsInterpreterMonads.if_number";
-        "JsInterpreterMonads.if_some";
-        "JsInterpreterMonads.if_bool";
-        "JsInterpreterMonads.if_void";
-        "JsInterpreterMonads.if_success";
-        "JsInterpreterMonads.if_not_throw";
-        "JsInterpreterMonads.if_ter";
-        "JsInterpreterMonads.if_break";]
+      List.mem x Monadic_binder_list.monad_identifiers
   | _ -> false
 
 
