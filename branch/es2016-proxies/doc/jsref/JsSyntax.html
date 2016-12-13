@@ -2012,6 +2012,28 @@ val descriptor_enumerable : descriptor -&gt; bool option *<br>
 val descriptor_configurable : descriptor -&gt; bool option *<br>
 
 <pre><span id="VALdescriptor_configurable"><span class="keyword">val</span> descriptor_configurable</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">descriptor</a> -> bool option</code></pre>
+<pre><code><span id="TYPEundef_descriptor"><span class="keyword">type</span> <code class="type"></code>undef_descriptor</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTundef_descriptor.Descriptor_undef"><span class="constructor">Descriptor_undef</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTundef_descriptor.Descriptor"><span class="constructor">Descriptor</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEdescriptor">descriptor</a></code></code></td>
+
+</tr></table>
+
+<div class="info ">
+Representing the option type <code class="code">undefined | descriptor</code>
+  used when undefined returned from <code class="code">[GetOwnProperty]</code><br>
+</div>
+
+
 <pre><code><span id="TYPEfull_descriptor"><span class="keyword">type</span> <code class="type"></code>full_descriptor</span> = </code></pre><table class="typetable">
 <tr>
 <td align="left" valign="top" >
@@ -2028,6 +2050,9 @@ val descriptor_configurable : descriptor -&gt; bool option *<br>
 
 </tr></table>
 
+<div class="info ">
+<span class="warning">Deprecated.</span>Raw attributes should not be returned by GetOwnProperty<br>
+</div>
 
 
 <pre><code><span id="TYPEmutability"><span class="keyword">type</span> <code class="type"></code>mutability</span> = </code></pre><table class="typetable">

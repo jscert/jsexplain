@@ -65,39 +65,58 @@ val convert_literal_to_prim : literal -&gt; prim *<br>
 <pre><span id="VALconvert_literal_to_prim"><span class="keyword">val</span> convert_literal_to_prim</span> : <code class="type"><a href="JsSyntax.html#TYPEliteral">JsSyntax.literal</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><br>
 val type_of : value -&gt; coq_type *<br>
 
-<pre><span id="VALtype_of"><span class="keyword">val</span> type_of</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEcoq_type">JsSyntax.coq_type</a></code></pre><br>
-val attributes_data_default : attributes_data *<br>
+<pre><span id="VALtype_of"><span class="keyword">val</span> type_of</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEcoq_type">JsSyntax.coq_type</a></code></pre>
+<pre><span id="VALattributes_data_default"><span class="keyword">val</span> attributes_data_default</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><div class="info ">
+Default vales for data property attributes.<br>
+ECMAScript Specification section: <a href="#table-4">6.1.7.1 Table 4</a></div>
 
-<pre><span id="VALattributes_data_default"><span class="keyword">val</span> attributes_data_default</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><br>
-val attributes_accessor_default : attributes_accessor *<br>
+<pre><span id="VALattributes_accessor_default"><span class="keyword">val</span> attributes_accessor_default</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><div class="info ">
+Default vales for accessor property attributes.<br>
+ECMAScript Specification section: <a href="#table-4">6.1.7.1 Table 4</a></div>
 
-<pre><span id="VALattributes_accessor_default"><span class="keyword">val</span> attributes_accessor_default</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><br>
-val attributes_accessor_of_attributes_data :
-    attributes_data -&gt; attributes_accessor *<br>
+<pre><span id="VALattributes_accessor_of_attributes_data"><span class="keyword">val</span> attributes_accessor_of_attributes_data</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a></code></pre><div class="info ">
+Convert a data attribute into an accessor attribute.
+<p>
 
-<pre><span id="VALattributes_accessor_of_attributes_data"><span class="keyword">val</span> attributes_accessor_of_attributes_data</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a> -> <a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><br>
-val attributes_data_of_attributes_accessor :
-    attributes_accessor -&gt; attributes_data *<br>
+    Implements the following spec text: "Convert the property [...] from a
+    data property to an accessor property.  Preserve the existing values of the
+    converted property's [[Configurable]] and [[Enumerable]] attributes
+    and set the rest of the property's attributes to their default values."<br>
+</div>
 
-<pre><span id="VALattributes_data_of_attributes_accessor"><span class="keyword">val</span> attributes_data_of_attributes_accessor</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><br>
-val attributes_data_update :
-    attributes_data -&gt; descriptor -&gt; attributes_data *<br>
+<pre><span id="VALattributes_data_of_attributes_accessor"><span class="keyword">val</span> attributes_data_of_attributes_accessor</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a></code></pre><div class="info ">
+Convert an accessor attribute into a data attribute.
+<p>
 
-<pre><span id="VALattributes_data_update"><span class="keyword">val</span> attributes_data_update</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><br>
-val attributes_accessor_update :
-    attributes_accessor -&gt; descriptor -&gt; attributes_accessor *<br>
+    Implements the following spec text: "Convert the property [...] from an
+    accessor property to a data property.  Preserve the existing values of the
+    converted property's [[Configurable]] and [[Enumerable]] attributes
+    and set the rest of the property's attributes to their default values."<br>
+</div>
 
-<pre><span id="VALattributes_accessor_update"><span class="keyword">val</span> attributes_accessor_update</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><br>
-val attributes_update : attributes -&gt; descriptor -&gt; attributes *<br>
+<pre><span id="VALattributes_data_update"><span class="keyword">val</span> attributes_data_update</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><div class="info ">
+Updates a given data attribute with values from the given descriptor<br>
+</div>
 
-<pre><span id="VALattributes_update"><span class="keyword">val</span> attributes_update</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a></code></pre><br>
-val attributes_data_of_descriptor : descriptor -&gt; attributes_data *<br>
+<pre><span id="VALattributes_accessor_update"><span class="keyword">val</span> attributes_accessor_update</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><div class="info ">
+Updates a given accessor attribute with values from the given descriptor<br>
+</div>
 
-<pre><span id="VALattributes_data_of_descriptor"><span class="keyword">val</span> attributes_data_of_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><br>
-val attributes_accessor_of_descriptor :
-    descriptor -&gt; attributes_accessor *<br>
+<pre><span id="VALattributes_update"><span class="keyword">val</span> attributes_update</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a></code></pre><div class="info ">
+Updates a given attribute with values from the given descriptor. Additional
+    attributes on the descriptor are ignored.<br>
+</div>
 
-<pre><span id="VALattributes_accessor_of_descriptor"><span class="keyword">val</span> attributes_accessor_of_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><br>
+<pre><span id="VALattributes_data_of_descriptor"><span class="keyword">val</span> attributes_data_of_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><div class="info ">
+Create a data property from a descriptor, using default attribute values if
+    the required attribute is absent.<br>
+</div>
+
+<pre><span id="VALattributes_accessor_of_descriptor"><span class="keyword">val</span> attributes_accessor_of_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><div class="info ">
+Create an accessor property from a descriptor, using default attribute
+    values if the required attribute is absent.<br>
+</div>
+<br>
 val descriptor_of_attributes : attributes -&gt; descriptor *<br>
 
 <pre><span id="VALdescriptor_of_attributes"><span class="keyword">val</span> descriptor_of_attributes</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a></code></pre><br>

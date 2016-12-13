@@ -210,4 +210,12 @@ val descriptor_with_configurable :
 <pre><span id="VALdescriptor_with_configurable"><span class="keyword">val</span> descriptor_with_configurable</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> bool option -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a></code></pre><br>
 val codetype_compare : codetype -&gt; codetype -&gt; bool *<br>
 
-<pre><span id="VALcodetype_compare"><span class="keyword">val</span> codetype_compare</span> : <code class="type"><a href="JsSyntax.html#TYPEcodetype">JsSyntax.codetype</a> -> <a href="JsSyntax.html#TYPEcodetype">JsSyntax.codetype</a> -> bool</code></pre></body></html>
+<pre><span id="VALcodetype_compare"><span class="keyword">val</span> codetype_compare</span> : <code class="type"><a href="JsSyntax.html#TYPEcodetype">JsSyntax.codetype</a> -> <a href="JsSyntax.html#TYPEcodetype">JsSyntax.codetype</a> -> bool</code></pre>
+<pre><span id="VALstring_of_value"><span class="keyword">val</span> string_of_value</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> string</code></pre><div class="info ">
+<h3 id="3_ConveniencefunctionstounpackJSValuetypestonatives">Convenience functions to unpack JS Value types to natives</h3>
+    Intended for use after explicit typechecks in the spec.<br>
+</div>
+
+<pre><span id="VALbool_of_value"><span class="keyword">val</span> bool_of_value</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre>
+<pre><span id="VALnumber_of_value"><span class="keyword">val</span> number_of_value</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsNumber.html#TYPEnumber">JsNumber.number</a></code></pre>
+<pre><span id="VALloc_of_value"><span class="keyword">val</span> loc_of_value</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a></code></pre></body></html>

@@ -61,4 +61,9 @@ val unsome_default : 'a1 -&gt; 'a1 option -&gt; 'a1 *<br>
 <pre><span id="VALunsome_default"><span class="keyword">val</span> unsome_default</span> : <code class="type">'a -> 'a option -> 'a</code></pre><br>
 val map : ('a1 -&gt; 'a2) -&gt; 'a1 option -&gt; 'a2 option *<br>
 
-<pre><span id="VALmap"><span class="keyword">val</span> map</span> : <code class="type">('a -> 'b) -> 'a option -> 'b option</code></pre></body></html>
+<pre><span id="VALmap"><span class="keyword">val</span> map</span> : <code class="type">('a -> 'b) -> 'a option -> 'b option</code></pre>
+<pre><span id="VALis_some"><span class="keyword">val</span> is_some</span> : <code class="type">'a option -> bool</code></pre>
+<pre><span id="VALsome_compare"><span class="keyword">val</span> some_compare</span> : <code class="type">('a -> 'b -> 'c) -> 'a option -> 'b option -> 'c</code></pre><div class="info ">
+Compares two Some values, failing if either are None<br>
+</div>
+</body></html>
