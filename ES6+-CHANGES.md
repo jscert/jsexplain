@@ -33,6 +33,9 @@
 * `[[Match]]`             (RegExp)
 * `[[ParameterMap]]`      (arguments)
 
+### List Internal Specification Type
+In ES5 lists are only used in cases where they may be treated as either a value or a reference type, assuming
+specification variables are treated as per other value types.
 
 ## New Specification Items
 ### Specification Syntax
@@ -167,3 +170,13 @@ It seems like this piece of work would be ideally suited to formal Coq proofs.
 * FunctionAllocate() given a name (ex-13.2)
 
 * Built-in functions get their own special `[[Call]]` and `[[Construct]]` internals
+
+* JSON.stringify gives writeable local variable access to subroutines
+
+### List Internal Specification Type
+Lists are now treated implicitly as reference-like values, for example in
+[8.1.1.4.7 Global Environment Records DeleteBinding(N)](https://tc39.github.io/ecma262/#sec-global-environment-records-deletebinding-n)
+step 7b, `varNames` is assigned the List value from `envNames.[[VarNames]]`. Subsequently `varNames` has an element
+removed. The algorithm does not explicitly propagate this value back to the `envNames` record.
+
+
