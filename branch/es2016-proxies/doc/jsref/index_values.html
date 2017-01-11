@@ -249,6 +249,11 @@ Function to test if d0 is contained within d1.
 <td></td></tr>
 <tr><td><a href="JsSyntax.html#VALdescriptor_get">descriptor_get</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsCommonAux.html#VALdescriptor_get_defined">descriptor_get_defined</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>
+<td><div class="info">
+Unpacks a the descriptor_undef type to a descriptor.
+</div>
+</td></tr>
 <tr><td><a href="JsCommonAux.html#VALdescriptor_get_not_same_dec">descriptor_get_not_same_dec</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsCommon.html#VALdescriptor_intro_data">descriptor_intro_data</a> [<a href="JsCommon.html">JsCommon</a>]</td>
@@ -508,11 +513,6 @@ Unpacks a Coq_specret_val (specification return value), returns an abrupt Coq_sp
     This function is nearly equivalent to ReturnIfAbrupt in the ES spec
 </div>
 </td></tr>
-<tr><td><a href="JsInterpreterMonads.html#VALif_spec_else_return">if_spec_else_return</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
-<td><div class="info">
-Executes the continuation if a specret_val, else returns the specret_out.
-</div>
-</td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_string">if_string</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_success">if_success</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
@@ -650,6 +650,12 @@ This method is equivalent to the <code class="code">!</code> operator of section
 <td></td></tr>
 <tr><td><a href="LibList.html#VALlength">length</a> [<a href="LibList.html">LibList</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALlet_ret">let_ret</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td><div class="info">
+Executes the continuation with state s of a <code class="code">Continue s</code>,
+    else returns the result <code class="code">r</code> of <code class="code">Return r</code>.
+</div>
+</td></tr>
 <tr><td><a href="JsCommon.html#VALlexical_env_alloc">lexical_env_alloc</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsCommon.html#VALlexical_env_alloc_decl">lexical_env_alloc_decl</a> [<a href="JsCommon.html">JsCommon</a>]</td>
@@ -1415,6 +1421,11 @@ Fetches a given object slot value (using proj) from the object l in state s
 <tr><td><a href="LibOption.html#VALsome_compare">some_compare</a> [<a href="LibOption.html">LibOption</a>]</td>
 <td><div class="info">
 Compares two Some values, failing if either are None
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALspec_assertion_failure">spec_assertion_failure</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td><div class="info">
+Call when a spec assertion fails
 </div>
 </td></tr>
 <tr><td><a href="JsCommonAux.html#VALspec_function_get_error_case_dec">spec_function_get_error_case_dec</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>

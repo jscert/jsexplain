@@ -160,19 +160,19 @@ Function to dispatch calls to O.<code class="code">[Call]</code>(thisArgument, a
 <br>
 <h3 id="3_ThePropertyDescriptorSpecificationType">The Property Descriptor Specification Type</h3><br>
 
-<pre><span id="VALis_accessor_descriptor"><span class="keyword">val</span> is_accessor_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> bool</code></pre><div class="info ">
+<pre><span id="VALis_accessor_descriptor"><span class="keyword">val</span> is_accessor_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> bool</code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-isaccessordescriptor">6.2.4.1</a></div>
 
-<pre><span id="VALis_data_descriptor"><span class="keyword">val</span> is_data_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> bool</code></pre><div class="info ">
+<pre><span id="VALis_data_descriptor"><span class="keyword">val</span> is_data_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> bool</code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-isdatadescriptor">6.2.4.2</a></div>
 
-<pre><span id="VALis_generic_descriptor"><span class="keyword">val</span> is_generic_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> bool</code></pre><div class="info ">
+<pre><span id="VALis_generic_descriptor"><span class="keyword">val</span> is_generic_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> bool</code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-isgenericdescriptor">6.2.4.3</a></div>
 
 <pre><span id="VALto_property_descriptor"><span class="keyword">val</span> to_property_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-topropertydescriptor">6.2.4.5</a></div>
 
-<pre><span id="VALcomplete_property_descriptor"><span class="keyword">val</span> complete_property_descriptor</span> : <code class="type">'a -> 'b -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a></code></pre><div class="info ">
+<pre><span id="VALcomplete_property_descriptor"><span class="keyword">val</span> complete_property_descriptor</span> : <code class="type">'a -> 'b -> <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-completepropertydescriptor">6.2.4.6</a></div>
 <br>
 <h1 id="1_AbstractOperations">Abstract Operations </h1><br>

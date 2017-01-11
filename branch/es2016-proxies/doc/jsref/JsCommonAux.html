@@ -97,6 +97,15 @@ val prepost_unary_op_dec : unary_op -&gt; bool *<br>
 val attributes_is_data_dec : attributes -&gt; bool *<br>
 
 <pre><span id="VALattributes_is_data_dec"><span class="keyword">val</span> attributes_is_data_dec</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> bool</code></pre>
+<pre><span id="VALdescriptor_get_defined"><span class="keyword">val</span> descriptor_get_defined</span> : <code class="type"><a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a></code></pre><div class="info ">
+Unpacks a the descriptor_undef type to a descriptor.
+<p>
+
+    The spec assumes this step automatically after testing that a
+    descriptor is not undefined, or through the IsGenericDescriptor
+    and IsDataDescriptor tests.<br>
+</div>
+
 <pre><span id="VALdescriptor_contained_by"><span class="keyword">val</span> descriptor_contained_by</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> (<a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool) -> bool</code></pre><div class="info ">
 Function to test if d0 is contained within d1.
     Implements the spec text:

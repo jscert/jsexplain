@@ -100,7 +100,11 @@ val res_ter : state -&gt; res -&gt; result *<br>
 <pre><span id="VALres_ter"><span class="keyword">val</span> res_ter</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></pre><br>
 val res_void : state -&gt; result_void *<br>
 
-<pre><span id="VALres_void"><span class="keyword">val</span> res_void</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></pre><br>
+<pre><span id="VALres_void"><span class="keyword">val</span> res_void</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></pre>
+<pre><span id="VALspec_assertion_failure"><span class="keyword">val</span> spec_assertion_failure</span> : <code class="type">'a -> 'b <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></pre><div class="info ">
+Call when a spec assertion fails<br>
+</div>
+<br>
 val get_arg : int -&gt; value list -&gt; value *<br>
 
 <pre><span id="VALget_arg"><span class="keyword">val</span> get_arg</span> : <code class="type">int -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><br>
@@ -205,9 +209,62 @@ A Specification assertion that b is true, continuing with k,
     or failing with Coq_result_impossible otherwise<br>
 </div>
 
-<pre><span id="VALif_spec_else_return"><span class="keyword">val</span> if_spec_else_return</span> : <code class="type">'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a> -><br>       (<a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> 'a -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a>) -><br>       'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></pre><div class="info ">
-Executes the continuation if a specret_val, else returns the specret_out.
-    Bound to the syntax let%can_return<br>
+<pre><code><span id="TYPEif_ret_type"><span class="keyword">type</span> <code class="type">'t</code> if_ret_type</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTif_ret_type.Return"><span class="constructor">Return</span></span> <span class="keyword">of</span> <code class="type">'t <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTif_ret_type.Continue"><span class="constructor">Continue</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><span id="VALlet_ret"><span class="keyword">val</span> let_ret</span> : <code class="type">'a <a href="JsInterpreterMonads.html#TYPEif_ret_type">if_ret_type</a> -><br>       (<a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> 'a <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a>) -><br>       'a <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></pre><div class="info ">
+Executes the continuation with state s of a <code class="code">Continue s</code>,
+    else returns the result <code class="code">r</code> of <code class="code">Return r</code>.
+<p>
+
+    Bound to the syntax: <code class="code">let%ret s = e1 in e2</code>
+    Which compiles to: <code class="code">if_ret e1 (fun s -&gt; e2)</code>
+<p>
+
+    Example usage:
+      <code class="code">let%ret s =
+        if condition
+        then Return (ret_val ...)
+        else Continue s
+      in continuation</code>
+<p>
+
+    This is designed to be used with the <code class="code">if%ret</code> syntax, which allows else
+    branches to be elided in place of writing <code class="code">else Continue s</code>
+<p>
+
+    Extended syntax: <code class="code">if%ret condition, s then r1</code>
+    Maps to: <code class="code">if condition then Return r1 else Continue s</code>
+<p>
+
+    It is syntactically required that the first expr position is a pair of
+    condition expression and initial state variable to Continue with.
+<p>
+
+    Extended syntax:
+      <code class="code">if%ret condition, s then r1 else r2</code>
+    Maps to:
+      <code class="code">if condition then Return r1 else Return r2</code>
+    Note that the state parameter of the tuple is still required in this
+    instance, but is ignored.
+<p>
+
+    Nesting <code class="code">if%ret</code>s is currently unsupported. :(<br>
 </div>
 
 <pre><span id="VALifx_prim"><span class="keyword">val</span> ifx_prim</span> : <code class="type">'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a> -><br>       (<a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>        <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a>) -><br>       'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></pre>
