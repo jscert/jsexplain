@@ -162,6 +162,16 @@ let attributes_is_data_dec a = match a with
 | Coq_attributes_data_of a0 -> true
 | Coq_attributes_accessor_of a0 -> false
 
+(** Unpacks a the descriptor_undef type to a descriptor.
+
+    The spec assumes this step automatically after testing that a
+    descriptor is not undefined, or through the IsGenericDescriptor
+    and IsDataDescriptor tests. *)
+let descriptor_get_defined desc =
+  match desc with
+  | Descriptor_undef -> assert false
+  | Descriptor d -> d
+
 (** Function to test if d0 is contained within d1.
     Implements the spec text:
     "true, if every field in d0 also occurs in d1 and the value of every field in d0 is the

@@ -34,6 +34,11 @@ let res_ter s r =
 let res_void s =
   res_out s res_empty
 
+(** Call when a spec assertion fails *)
+let spec_assertion_failure _ =
+  Debug.impossible_because __LOC__ "spec assertion failed";
+  Coq_result_impossible
+
 (** val get_arg : int -> value list -> value **)
 
 let get_arg x l =
@@ -320,7 +325,7 @@ let if_spec w k =
 (** A Specification assertion that b is true, continuing with k,
     or failing with Coq_result_impossible otherwise *)
 let check_assert b k =
-  if b then k () else (Debug.impossible_because __LOC__ "spec assertion failed"; Coq_result_impossible)
+  if b then k () else spec_assertion_failure ()
 
 (** Executes the continuation if a specret_val, else returns the specret_out.
     Bound to the syntax let%can_return *)

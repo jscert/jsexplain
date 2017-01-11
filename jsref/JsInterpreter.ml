@@ -357,24 +357,27 @@ and object_internal_is_extensible s c l =
 (** @essec 6.2.4.1
     @esid sec-isaccessordescriptor *)
 and is_accessor_descriptor desc =
-  (* FIXME: Type mismatch: If Desc is undefined, return false *)
-  not
-    (   (option_compare value_compare desc.descriptor_get None)
-     && (option_compare value_compare desc.descriptor_set None))
+  match desc with
+  | Descriptor_undef -> false
+  | Descriptor desc -> not
+    (  (option_compare value_compare desc.descriptor_get None)
+    && (option_compare value_compare desc.descriptor_set None))
 
 (** @essec 6.2.4.2
     @esid sec-isdatadescriptor *)
 and is_data_descriptor desc =
-  (* FIXME: Type mismatch: If Desc is undefined, return false *)
-  not
+  match desc with
+  | Descriptor_undef -> false
+  | Descriptor desc -> not
     (  (option_compare value_compare desc.descriptor_value None)
     && (option_compare bool_eq desc.descriptor_writable None))
 
 (** @essec 6.2.4.3
     @esid sec-isgenericdescriptor *)
 and is_generic_descriptor desc =
-     (not (is_accessor_descriptor desc))
-  && (not (is_data_descriptor desc))
+  match desc with
+  | Descriptor_undef -> false
+  | Descriptor _ -> (not (is_accessor_descriptor desc)) && (not (is_data_descriptor desc))
 
 (** @esid sec-topropertydescriptor
     @essec 6.2.4.5 *)
@@ -446,7 +449,7 @@ and to_property_descriptor s c _foo_ =
 (** @essec 6.2.4.6
     @esid sec-completepropertydescriptor *)
 and complete_property_descriptor s c desc =
-  (* assert desc is a Property Descriptor: implicit from type *)
+  let desc = descriptor_get_defined desc in
   let like = { descriptor_value        = Some Coq_value_undef;
                descriptor_writable     = Some false;
                descriptor_get          = Some Coq_value_undef;
@@ -454,7 +457,7 @@ and complete_property_descriptor s c desc =
                descriptor_enumerable   = Some false;
                descriptor_configurable = Some false }
   in let desc =
-    if is_generic_descriptor desc || is_data_descriptor desc
+    if is_generic_descriptor (Descriptor desc) || is_data_descriptor (Descriptor desc)
     then
       let desc = descriptor_with_value desc like.descriptor_value in
       descriptor_with_writable desc like.descriptor_writable
@@ -735,7 +738,7 @@ and validate_and_apply_property_descriptor s o p extensible desc current =
       let%some s =
         match o with
         | Coq_value_object l ->
-          if (is_generic_descriptor desc) || (is_data_descriptor desc)
+          if (is_generic_descriptor (Descriptor desc)) || (is_data_descriptor (Descriptor desc))
           then object_set_property s l p (Coq_attributes_data_of (attributes_data_of_descriptor desc))
           else object_set_property s l p (Coq_attributes_accessor_of (attributes_accessor_of_descriptor desc))
         | Coq_value_undef -> Some s
@@ -772,13 +775,13 @@ and validate_and_apply_property_descriptor s o p extensible desc current =
     then res_spec s () (* Continue *)
 
     (* Step 7 *)
-    else if not (bool_eq (is_data_descriptor current) (is_data_descriptor desc))
+    else if not (bool_eq (is_data_descriptor (Descriptor current)) (is_data_descriptor (Descriptor desc)))
     then
       (* 7a *)
       if (option_compare bool_eq current.descriptor_configurable (Some false))
         then res_ter s (res_val (Coq_value_bool false))
       (* 7b *)
-      else if is_data_descriptor current
+      else if is_data_descriptor (Descriptor current)
         then
           let%some s = match o with
           | Coq_value_object l -> object_map_property s l p attributes_accessor_of_attributes_data
@@ -791,7 +794,7 @@ and validate_and_apply_property_descriptor s o p extensible desc current =
           in res_spec s ()
 
     (* Step 8 *)
-    else if (is_data_descriptor current) && (is_data_descriptor desc)
+    else if (is_data_descriptor (Descriptor current)) && (is_data_descriptor (Descriptor desc))
     then
       (* Step 8a *)
       if option_compare bool_eq current.descriptor_configurable (Some false)
@@ -816,8 +819,9 @@ and validate_and_apply_property_descriptor s o p extensible desc current =
         res_spec s () (* So any change is acceptable, i.e: Continue *)
 
     (* Step 9 *)
-    else let%assert _ = (is_accessor_descriptor current) && (is_accessor_descriptor desc) in
-      if option_compare bool_eq current.descriptor_configurable (Some false)
+    else if not ((is_accessor_descriptor (Descriptor current)) && (is_accessor_descriptor (Descriptor desc)))
+      then spec_assertion_failure ()
+      else if option_compare bool_eq current.descriptor_configurable (Some false)
       then
         if (is_some desc.descriptor_set) &&
             not (option_compare same_value desc.descriptor_set current.descriptor_set)
@@ -1194,7 +1198,7 @@ and object_define_own_prop s c l x desc throwcont =
       match d with
       | Coq_full_descriptor_undef -> follow s1
       | Coq_full_descriptor_some a ->
-        if is_accessor_descriptor desc
+        if is_accessor_descriptor (Descriptor desc)
         then let%bool (s2, x0) = (object_delete s1 c lmap x false) in follow s2
         else let follow0 s2 =
                if option_compare bool_eq desc.descriptor_writable (Some false)
@@ -2034,7 +2038,7 @@ and binding_inst_function_decls s c l fds str bconfig =
                                                             (Coq_attributes_data_of a_2))
                                                          true) in follow s0
                                                 else if 
-                                                       (is_accessor_descriptor (descriptor_of_attributes a))
+                                                       (is_accessor_descriptor (Descriptor (descriptor_of_attributes a)))
                                                     || (not (attributes_writable a))
                                                     || (not (attributes_enumerable a))
                                                 then run_error s3 c Coq_native_error_type
