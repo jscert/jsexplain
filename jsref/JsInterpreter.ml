@@ -750,48 +750,49 @@ and validate_and_apply_property_descriptor s o p extensible desc current =
        case of NaN values for [[Value]] which may change internal representation.
        Otherwise, they are only an optimisation as far as I can tell. *)
     (* Step 3 (also implied by step 4) *)
-    if descriptor_is_empty desc
+    let%ret s = if%ret descriptor_is_empty desc, s
       then res_ter s (res_val (Coq_value_bool true))
 
     (* Step 4 *)
-    else if descriptor_contained_by desc current same_value
+    in let%ret s =
+    if%ret descriptor_contained_by desc current same_value, s
       then res_ter s (res_val (Coq_value_bool true))
 
     (* Steps 5 *)
-    else let%can_return (s, _) =
+    in let%ret s =
     if (option_compare bool_eq current.descriptor_configurable (Some false))
     then
       if (option_compare bool_eq desc.descriptor_configurable (Some true))
-      then res_ter s (res_val (Coq_value_bool false))
+      then Return (res_ter s (res_val (Coq_value_bool false)))
       else if ((is_some desc.descriptor_enumerable) &&
         not (some_compare bool_eq current.descriptor_enumerable desc.descriptor_enumerable))
-      then res_ter s (res_val (Coq_value_bool false))
-      else res_spec s () (* Continue *)
-    else res_spec s () (* Continue *)
+      then Return (res_ter s (res_val (Coq_value_bool false)))
+      else Continue s
+    else Continue s
 
     (* Step 6 if IsGenericDescriptor(Desc) is true, implied by following conditions *)
-    in let%can_return (s, _) =
-    if is_generic_descriptor desc
-    then res_spec s () (* Continue *)
+    in let%ret s =
+    if is_generic_descriptor (Descriptor desc)
+    then Continue s
 
     (* Step 7 *)
     else if not (bool_eq (is_data_descriptor (Descriptor current)) (is_data_descriptor (Descriptor desc)))
     then
       (* 7a *)
       if (option_compare bool_eq current.descriptor_configurable (Some false))
-        then res_ter s (res_val (Coq_value_bool false))
+        then Return (res_ter s (res_val (Coq_value_bool false)))
       (* 7b *)
       else if is_data_descriptor (Descriptor current)
         then
-          let%some s = match o with
+          let s = unsome_default s (match o with
           | Coq_value_object l -> object_map_property s l p attributes_accessor_of_attributes_data
-          | _ -> Some s
-          in res_spec s ()
+          | _ -> Some s)
+          in Continue s
         else
-          let%some s = match o with
+          let s = unsome_default s (match o with
           | Coq_value_object l -> object_map_property s l p attributes_data_of_attributes_accessor
-          | _ -> Some s
-          in res_spec s ()
+          | _ -> Some s)
+          in Continue s
 
     (* Step 8 *)
     else if (is_data_descriptor (Descriptor current)) && (is_data_descriptor (Descriptor desc))
@@ -802,7 +803,7 @@ and validate_and_apply_property_descriptor s o p extensible desc current =
         (* Step 8ai *)
         if (option_compare bool_eq current.descriptor_writable (Some false))
            && (option_compare bool_eq desc.descriptor_writable (Some true))
-        then res_ter s (res_val (Coq_value_bool false))
+        then Return (res_ter s (res_val (Coq_value_bool false)))
 
         (* Step 8aii *)
         else if option_compare bool_eq current.descriptor_writable (Some false)
@@ -810,27 +811,28 @@ and validate_and_apply_property_descriptor s o p extensible desc current =
           (* Step 8aii1 *)
           if (is_some desc.descriptor_value)
              && not (option_compare same_value desc.descriptor_value current.descriptor_value)
-          then res_ter s (res_val (Coq_value_bool false))
-          else res_spec s ()
-        else res_spec s ()
+          then Return (res_ter s (res_val (Coq_value_bool false)))
+          else Continue s
+        else Continue s
 
       (* Step 8b *)
-      else let%assert _ = option_compare bool_eq current.descriptor_configurable (Some true) in
-        res_spec s () (* So any change is acceptable, i.e: Continue *)
+      else if not (option_compare bool_eq current.descriptor_configurable (Some true))
+        then Return (spec_assertion_failure ())
+        else Continue s
 
     (* Step 9 *)
     else if not ((is_accessor_descriptor (Descriptor current)) && (is_accessor_descriptor (Descriptor desc)))
-      then spec_assertion_failure ()
+      then Return (spec_assertion_failure ())
       else if option_compare bool_eq current.descriptor_configurable (Some false)
       then
         if (is_some desc.descriptor_set) &&
             not (option_compare same_value desc.descriptor_set current.descriptor_set)
-        then res_ter s (res_val (Coq_value_bool false))
+        then Return (res_ter s (res_val (Coq_value_bool false)))
         else if (is_some desc.descriptor_get) &&
                 not (option_compare same_value desc.descriptor_get current.descriptor_get)
-        then res_ter s (res_val (Coq_value_bool false))
-        else res_spec s ()
-      else res_spec s ()
+        then Return (res_ter s (res_val (Coq_value_bool false)))
+        else Continue s
+      else Continue s
 
     (* Step 10 *)
     in let%some s = match o with

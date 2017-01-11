@@ -110,4 +110,24 @@ type 'a tree =
    - break
    - spec
    - assert
-   - can_return
+   - ret
+
+*** ~if%ret~ Syntax Extension
+
+   The ~if%ret~ syntax, which allows else
+   branches to be elided in place of writing ~else Continue s~
+
+   Extended syntax: ~if%ret condition, s then r1~
+   Maps to: ~if condition then Return r1 else Continue s~
+
+   It is syntactically required that the first expr position is a pair of
+   condition expression and initial state variable to Continue with.
+
+   Extended syntax:
+     ~if%ret condition, s then r1 else r2~
+   Maps to:
+     ~if condition then Return r1 else Return r2~
+   Note that the state parameter of the tuple is still required in this
+   instance, but is ignored.
+
+   Nesting ~if%ret~s is currently unsupported. :(

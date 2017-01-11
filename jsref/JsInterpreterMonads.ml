@@ -327,14 +327,45 @@ let if_spec w k =
 let check_assert b k =
   if b then k () else spec_assertion_failure ()
 
-(** Executes the continuation if a specret_val, else returns the specret_out.
-    Bound to the syntax let%can_return *)
-let if_spec_else_return w k =
-  if_result_some w (fun sp ->
-    match sp with
-    | Coq_specret_val (s, v) -> k s v
-     (* Don't just reuse w here, the return type needs to be distinct from the input type. *)
-    | Coq_specret_out (s, r) -> Coq_result_some (Coq_specret_out (s, r)))
+type 't if_ret_type =
+| Return of 't resultof [@f result]
+| Continue of state [@f state]
+
+(** Executes the continuation with state s of a [Continue s],
+    else returns the result [r] of [Return r].
+
+    Bound to the syntax: [let%ret s = e1 in e2]
+    Which compiles to: [if_ret e1 (fun s -> e2)]
+
+    Example usage:
+      [let%ret s =
+        if condition
+        then Return (ret_val ...)
+        else Continue s
+      in continuation]
+
+    This is designed to be used with the [if%ret] syntax, which allows else
+    branches to be elided in place of writing [else Continue s]
+
+    Extended syntax: [if%ret condition, s then r1]
+    Maps to: [if condition then Return r1 else Continue s]
+
+    It is syntactically required that the first expr position is a pair of
+    condition expression and initial state variable to Continue with.
+
+    Extended syntax:
+      [if%ret condition, s then r1 else r2]
+    Maps to:
+      [if condition then Return r1 else Return r2]
+    Note that the state parameter of the tuple is still required in this
+    instance, but is ignored.
+
+    Nesting [if%ret]s is currently unsupported. :(
+*)
+let let_ret w k =
+  match w with
+  | Continue s -> k s
+  | Return  r -> r
 
 let ifx_prim w k = if_prim w k
 let ifx_number w k = if_number w k
