@@ -1,3 +1,19 @@
+(*
+   Copyright 2017 Inria and Imperial College London
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*)
+
 open Params
 open Asttypes
 open Attributes
@@ -23,7 +39,7 @@ let rename_constructor s =
     let n = String.length s in
     if (n > 4 && s.[0] = 'C' && s.[1] = 'o' && s.[2] = 'q' && s.[3] = '_') then begin
       let r = String.sub s 4 (n-4) in
-      r.[0] <- Char.uppercase r.[0];
+      r.[0] <- Char.uppercase_ascii r.[0];
       r
     end else s
   end
@@ -1263,6 +1279,7 @@ and js_of_expression ctx dest e =
   | Texp_lazy        _                -> out_of_scope loc "lazy expressions"
   | Texp_object     (_,_)             -> out_of_scope loc "objects"
   | Texp_pack        _                -> out_of_scope loc "packing"
+  | _                                 -> out_of_scope loc "ADD ME"
 
 (* returns the name bound and the code that assigns a value to this name *)
 and js_of_let_pattern ctx pat expr =
