@@ -16,12 +16,14 @@ let rec extract_attrs attrs =
     |> List.map extract_attr
     |> List.flatten
 
-and extract_attr (_, pl) = extract_payload pl
+and extract_attr (identifier, pl) =
+  if identifier.txt = "f" then extract_payload pl else []
 
 and extract_payload = function
   | PStr  s    -> extract_structure s
   | PTyp  _    -> error "Type found. A tuple or a single value was expected"
   | PPat (_,_) -> error "Pattern found. A tuple or a single value was expected"
+  | PSig _ -> error "Signature found. A tuple or a single value was expected"
 
 and extract_structure s =
   let rec aux acc = function
@@ -81,7 +83,7 @@ and extract_expression e = match e.pexp_desc with
   | Pexp_pack        _          -> error "An identifier, a tuple or an array was expected but a pack was found"
   | Pexp_open        _          -> error "An identifier, a tuple or an array was expected but an open statement was found"
   | Pexp_extension   _          -> error "An identifier, a tuple or an array was expected but an extension was found"
-  
+
 and extract_constant = function
   | Pconst_char     c     -> String.make 1 c
   | Pconst_string  (s, _) -> s
