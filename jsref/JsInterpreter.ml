@@ -347,7 +347,7 @@ and object_internal_call s c l thisArgument argumentsList =
 and object_internal_is_extensible s c l =
   let%some internal_method = run_object_method object_is_extensible_ s l in
   match internal_method with
-  | Coq_builtin_is_extensible_default -> object_internal_ordinary_is_extensible s c l
+  | Coq_builtin_is_extensible_default -> ordinary_object_internal_is_extensible s c l
   | Coq_builtin_is_extensible_proxy   -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
 (** {3 The Property Descriptor Specification Type}
@@ -621,11 +621,36 @@ and call s c f v argumentList =
     | _ -> assert false
   )
 
+(** {1 Ordinary and Exotic Objects Behaviours }
+    @essec 9
+    @esid sec-ordinary-and-exotic-objects-behaviours
+*)
+
+(**
+    {2 Ordinary Object Internal Methods and Internal Slots }
+    @essec 9.1
+    @esid sec-ordinary-object-internal-methods-and-internal-slots
+*)
+
+(** [[GetPrototypeOf]]()
+    @essec 9.1.1
+    @esid sec-ordinary-object-internal-methods-and-internal-slots-getprototypeof *)
+and ordinary_object_internal_get_prototype_of s c l =
+  let%value (s1, v) = ordinary_get_prototype_of s c l in
+  res_out s (res_val v)
+
 (** @essec 9.1.1.1
     @esid sec-ordinarygetprototypeof *)
 and ordinary_get_prototype_of s c l =
   let%some v = run_object_method object_proto_ s l in
   res_spec s (res_val v)
+
+(** [[SetPrototypeOf]](V)
+    @essec 9.1.2
+    @esid sec-ordinary-object-internal-methods-and-internal-slots-setprototypeof-v *)
+and ordinary_object_internal_set_prototype_of s c l v =
+  let%value (s1, v) = ordinary_set_prototype_of s c l v in
+  res_out s (res_val v)
 
 (** @essec 9.1.2.1
     @esid sec-ordinarysetprototypeof *)
@@ -661,7 +686,7 @@ and ordinary_set_prototype_of s c l v =
 
 (** @essec 9.1.3
     @esid sec-ordinary-object-internal-methods-and-internal-slots-isextensible *)
-and object_internal_ordinary_is_extensible s c l =
+and ordinary_object_internal_is_extensible s c l =
   let%value (s1, v) = ordinary_is_extensible s c l in
   res_out s (res_val v)
 
@@ -670,6 +695,12 @@ and object_internal_ordinary_is_extensible s c l =
 and ordinary_is_extensible s c l =
   let%some b = run_object_method object_extensible_ s l in
   res_out s (res_val (Coq_value_bool b))
+
+(** @essec 9.1.4
+    @esid sec-ordinary-object-internal-methods-and-internal-slots-preventextensions *)
+and ordinary_object_internal_prevent_extensions s c l =
+  let%value (s1, v) = ordinary_prevent_extensions s c l in
+  res_out s (res_val v)
 
 (** @essec 9.1.4.1
     @esid sec-ordinarypreventextensions *)
@@ -849,6 +880,8 @@ and ordinary_own_property_keys s c l =
   let%some keys = object_properties_keys_as_list_option s l in
   (* FIXME: Precise key ordering is to be implemented here! *)
   res_spec s keys
+
+(******** UNCHECKED ES5 IMPLEMENTATION CONTINUES BELOW ***********)
 
 (** @deprecated Use has_property instead *)
 and object_has_prop s c l x =
