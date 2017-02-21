@@ -1525,7 +1525,7 @@ function Coq_prealloc_object_keys() { return {tag: "Coq_prealloc_object_keys" };
 
 function Coq_prealloc_object_keys_call() { return {tag: "Coq_prealloc_object_keys_call" }; }
 
-function Coq_prealloc_object_proto( ObjectPrototype ) { return {tag: "Coq_prealloc_object_proto",  ObjectPrototype :  ObjectPrototype }; }
+function Coq_prealloc_object_proto() { return {tag: "Coq_prealloc_object_proto" }; }
 
 function Coq_prealloc_object_proto_to_string() { return {tag: "Coq_prealloc_object_proto_to_string" }; }
 
@@ -1613,7 +1613,7 @@ function Coq_prealloc_throw_type_error() { return {tag: "Coq_prealloc_throw_type
 
 function Coq_prealloc_json() { return {tag: "Coq_prealloc_json" }; }
 
-function Coq_prealloc_proxy( Proxy ) { return {tag: "Coq_prealloc_proxy",  Proxy :  Proxy }; }
+function Coq_prealloc_proxy() { return {tag: "Coq_prealloc_proxy" }; }
 
 function Coq_prealloc_proxy_revocable() { return {tag: "Coq_prealloc_proxy_revocable" }; }
 
@@ -2226,11 +2226,9 @@ var res_throw = function (v) {
     });
 };
 
-function Coq_specret_val(state, value,  A pure/specification value ) { return {
-tag: "Coq_specret_val", state: state, value: value,  A pure/specification value :  A pure/specification value }; }
+function Coq_specret_val(state, value) { return {tag: "Coq_specret_val", state: state, value: value}; }
 
-function Coq_specret_out(state, res,  A completion record (possibly abrupt) ) { return {
-tag: "Coq_specret_out", state: state, res: res,  A completion record (possibly abrupt) :  A completion record (possibly abrupt) }; }
+function Coq_specret_out(state, res) { return {tag: "Coq_specret_out", state: state, res: res}; }
 
 function Coq_codetype_func() { return {tag: "Coq_codetype_func" }; }
 
