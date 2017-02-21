@@ -1286,16 +1286,16 @@ and js_of_let_pattern ctx pat expr =
   let id = 
     match pat.pat_desc with
     | Tpat_var (id, _) -> ppf_ident id
-    | Tpat_any -> Printf.printf "warning: unsupported let-any\n"; ""
-    | Tpat_alias _ -> Printf.printf "warning: unsupported let-alias\n"; ""
-    | Tpat_constant _ -> Printf.printf "warning: unsupported let-constant\n"; ""
-    | Tpat_tuple _ -> Printf.printf "warning: unsupported let-tuple\n"; ""
-    | Tpat_construct _ -> Printf.printf "warning: unsupported let-construct\n"; ""
-    | Tpat_variant _ -> Printf.printf "warning: unsupported let-variant\n"; ""
-    | Tpat_record _ -> Printf.printf "warning: unsupported let-record\n"; ""
-    | Tpat_array _ -> Printf.printf "warning: unsupported let-array\n"; ""
-    | Tpat_or _ -> Printf.printf "warning: unsupported let-or\n"; ""
-    | Tpat_lazy _ -> Printf.printf "warning: unsupported let-lazy\n"; ""
+    | Tpat_any -> out_of_scope pat.pat_loc "_ in let"
+    | Tpat_alias _ -> out_of_scope pat.pat_loc "alias in let"
+    | Tpat_constant _ -> out_of_scope pat.pat_loc "constant in let"
+    | Tpat_tuple _ -> out_of_scope pat.pat_loc "tuple in let"
+    | Tpat_construct _ -> out_of_scope pat.pat_loc "construct in let"
+    | Tpat_variant _ -> out_of_scope pat.pat_loc "variant in let"
+    | Tpat_record _ -> out_of_scope pat.pat_loc "record in let"
+    | Tpat_array _ -> out_of_scope pat.pat_loc "array in let"
+    | Tpat_or _ -> out_of_scope pat.pat_loc "or in let"
+    | Tpat_lazy _ -> out_of_scope pat.pat_loc "lazy"
       (*  error ~loc:pat.pat_loc "let can't deconstruct values"  *)
     in
   check_shadowing ~loc:pat.pat_loc pat.pat_env id;
