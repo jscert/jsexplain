@@ -41,9 +41,11 @@
 <link title="JsInterpreterUtils" rel="Chapter" href="JsInterpreterUtils.html">
 <link title="ModuleExport" rel="Chapter" href="ModuleExport.html">
 <link title="Run_js" rel="Chapter" href="Run_js.html"><link title="Abstract Operations " rel="Section" href="#1_AbstractOperations">
+<link title="Ordinary and Exotic Objects Behaviours " rel="Section" href="#1_OrdinaryandExoticObjectsBehaviours">
 <link title="Type Conversion " rel="Subsection" href="#2_TypeConversion">
 <link title="Testing and Comparison Operations " rel="Subsection" href="#2_TestingandComparisonOperations">
 <link title="Operations on Objects " rel="Subsection" href="#2_OperationsonObjects">
+<link title="Ordinary Object Internal Methods and Internal Slots " rel="Subsection" href="#2_OrdinaryObjectInternalMethodsandInternalSlots">
 <title>JsInterpreter</title>
 </head>
 <body>
@@ -215,18 +217,33 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#
 
 <pre><span id="VALcall"><span class="keyword">val</span> call</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list option -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-call">7.3.12</a></div>
+<br>
+<h1 id="1_OrdinaryandExoticObjectsBehaviours">Ordinary and Exotic Objects Behaviours </h1><br>
+<br>
+<h2 id="2_OrdinaryObjectInternalMethodsandInternalSlots">Ordinary Object Internal Methods and Internal Slots </h2><br>
+
+<pre><span id="VALordinary_object_internal_get_prototype_of"><span class="keyword">val</span> ordinary_object_internal_get_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<code class="code">[GetPrototypeOf]</code>()<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinary-object-internal-methods-and-internal-slots-getprototypeof">9.1.1</a></div>
 
 <pre><span id="VALordinary_get_prototype_of"><span class="keyword">val</span> ordinary_get_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinarygetprototypeof">9.1.1.1</a></div>
 
+<pre><span id="VALordinary_object_internal_set_prototype_of"><span class="keyword">val</span> ordinary_object_internal_set_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<code class="code">[SetPrototypeOf]</code>(V)<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinary-object-internal-methods-and-internal-slots-setprototypeof-v">9.1.2</a></div>
+
 <pre><span id="VALordinary_set_prototype_of"><span class="keyword">val</span> ordinary_set_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinarysetprototypeof">9.1.2.1</a></div>
 
-<pre><span id="VALobject_internal_ordinary_is_extensible"><span class="keyword">val</span> object_internal_ordinary_is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<pre><span id="VALordinary_object_internal_is_extensible"><span class="keyword">val</span> ordinary_object_internal_is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinary-object-internal-methods-and-internal-slots-isextensible">9.1.3</a></div>
 
 <pre><span id="VALordinary_is_extensible"><span class="keyword">val</span> ordinary_is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinaryisextensible">9.1.3.1</a></div>
+
+<pre><span id="VALordinary_object_internal_prevent_extensions"><span class="keyword">val</span> ordinary_object_internal_prevent_extensions</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinary-object-internal-methods-and-internal-slots-preventextensions">9.1.4</a></div>
 
 <pre><span id="VALordinary_prevent_extensions"><span class="keyword">val</span> ordinary_prevent_extensions</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinarypreventextensions">9.1.4.1</a></div>
