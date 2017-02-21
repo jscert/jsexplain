@@ -285,50 +285,49 @@ and object_has_internal_method s l prj =
 
 (** {5 Object Internal Method Dispatch Functions }
     Functions in this section are used to dispatch Internal Methods to the
-    correct implementation based upon the value of the internal slot *)
+    correct implementation based upon the value of the internal slot
 
-(** Function to dispatch calls to O.[[GetOwnProperty]](P)
-    @param l  The location of O *)
+    All these functions accept a parameter o, which is the {i location} of the object.
+ *)
+
+(** Function to dispatch calls to O.[[GetOwnProperty]](P) *)
+and object_internal_get_prototype_of s o =
+  let%some internal_method = (run_object_method object_get_prototype_of_ s o) in
+  match internal_method with
+  | Coq_builtin_get_prototype_of_default -> ordinary_object_internal_get_prototype_of s o
+  | Coq_builtin_get_prototype_of_proxy -> assert false (* FIXME *)
+
+(** Function to dispatch calls to O.[[GetOwnProperty]](P) *)
 and object_internal_get_own_property s o p =
   (* FIXME: ES5 *)
-  let l = loc_of_value o in
-  let%some internal_method = (run_object_method object_get_own_prop_ s l) in
+  let%some internal_method = (run_object_method object_get_own_prop_ s o) in
   match internal_method with
   | Coq_builtin_get_own_prop_default -> ordinary_object_internal_get_own_property s o p
   | _ -> assert false (* FIXME *)
 
-(** Function to dispatch calls to O.[[DefineOwnProperty]](P, desc)
-    @param l  The location of O *)
+(** Function to dispatch calls to O.[[DefineOwnProperty]](P, desc) *)
 and object_internal_define_own_property s o p desc =
-  let l = loc_of_value o in
   (* TODO: Check if c can be dropped. (ES5 compat) *)
-  let%some internal_method = (run_object_method object_define_own_prop_ s l) in
+  let%some internal_method = (run_object_method object_define_own_prop_ s o) in
   match internal_method with
   (* FIXME: Dispatch to new versions of functions *)
   | Coq_builtin_define_own_prop_default -> ordinary_object_internal_define_own_property s o p desc
   | _ -> Coq_result_not_yet_implemented
 
-(** Function to dispatch calls to O.[[HasProperty]](P)
-    @param l  The location of O *)
-and object_internal_has_property s c l p =
-  let%some b = (run_object_method object_has_prop_ s l) in
-  let x = match p with
-  | Coq_value_string x -> x
-  | _ -> assert false in
+(** Function to dispatch calls to O.[[HasProperty]](P) *)
+and object_internal_has_property s o p =
+  let%some b = (run_object_method object_has_prop_ s o) in
   match b with
-  | Coq_builtin_has_prop_default ->
-    let%spec (s1, d) = (run_object_get_prop s c l x) in
-    res_ter s1 (res_val (Coq_value_bool (not (full_descriptor_compare d Coq_full_descriptor_undef))))
+  | Coq_builtin_has_prop_default -> ordinary_has_property s o p
   | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
-(** Function to dispatch calls to O.[[Get]](P, receiver)
-    @param l  The location of O *)
-and object_internal_get s c l p receiver =
+(** Function to dispatch calls to O.[[Get]](P, receiver) *)
+and object_internal_get s c o p receiver =
   (* TODO: Check if c can be dropped. (ES5 compat) *)
-  let%some internal_method = (run_object_method object_get_ s l) in
+  let%some internal_method = (run_object_method object_get_ s o) in
   let dispatch_es5 _ =
     match p with
-    | Coq_value_string x -> object_get_builtin s c internal_method (Coq_value_object l) l x
+    | Coq_value_string x -> object_get_builtin s c internal_method (Coq_value_object o) o x
     | _ -> assert false
   in match internal_method with
   (* FIXME: Dispatch to new versions of functions *)
@@ -337,17 +336,15 @@ and object_internal_get s c l p receiver =
   | Coq_builtin_get_args_obj -> dispatch_es5 ()
   | Coq_builtin_get_proxy    -> Coq_result_not_yet_implemented
 
-(** Function to dispatch calls to O.[[Call]](thisArgument, argumentsList)
-    @param l  The location of O *)
-and object_internal_call s c l thisArgument argumentsList =
-  run_call s c l thisArgument argumentsList
+(** Function to dispatch calls to O.[[Call]](thisArgument, argumentsList) *)
+and object_internal_call s c o thisArgument argumentsList =
+  run_call s c o thisArgument argumentsList
 
-(** Function to dispatch calls to O.[[Call]](thisArgument, argumentsList)
-    @param l The location of O *)
-and object_internal_is_extensible s c l =
-  let%some internal_method = run_object_method object_is_extensible_ s l in
+(** Function to dispatch calls to O.[[Call]](thisArgument, argumentsList) *)
+and object_internal_is_extensible s c o =
+  let%some internal_method = run_object_method object_is_extensible_ s o in
   match internal_method with
-  | Coq_builtin_is_extensible_default -> ordinary_object_internal_is_extensible s c l
+  | Coq_builtin_is_extensible_default -> ordinary_object_internal_is_extensible s c o
   | Coq_builtin_is_extensible_proxy   -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
 (** {3 The Property Descriptor Specification Type}
@@ -607,7 +604,7 @@ and has_property s c o p =
   let%assert _ = (type_of o) === Coq_type_object in
   let%assert _ = is_property_key p in
   match o with
-  | Coq_value_object l -> object_internal_has_property s c l p
+  | Coq_value_object l -> object_internal_has_property s l p
   | _ -> assert false
 
 (** @essec 7.3.12
@@ -635,13 +632,13 @@ and call s c f v argumentList =
 (** [[GetPrototypeOf]]()
     @essec 9.1.1
     @esid sec-ordinary-object-internal-methods-and-internal-slots-getprototypeof *)
-and ordinary_object_internal_get_prototype_of s c l =
-  let%value (s1, v) = ordinary_get_prototype_of s c l in
+and ordinary_object_internal_get_prototype_of s l =
+  let%value (s1, v) = ordinary_get_prototype_of s l in
   res_out s (res_val v)
 
 (** @essec 9.1.1.1
     @esid sec-ordinarygetprototypeof *)
-and ordinary_get_prototype_of s c l =
+and ordinary_get_prototype_of s l =
   let%some v = run_object_method object_proto_ s l in
   res_spec s (res_val v)
 
@@ -718,10 +715,9 @@ and ordinary_object_internal_get_own_property s o p =
 and ordinary_get_own_property s o p =
   let%assert _ = is_property_key p in
   let p = string_of_value p in
-  let l = loc_of_value o in
-  if not (object_property_exists s l p) then res_spec s Descriptor_undef
+  if not (object_property_exists s o p) then res_spec s Descriptor_undef
   else let d = descriptor_intro_empty in
-  let%some x = object_retrieve_property s l p in
+  let%some x = object_retrieve_property s o p in
   let d = match x with
   | Coq_attributes_data_of x ->
       { d with descriptor_value    = (Some x.attributes_data_value);
@@ -742,9 +738,8 @@ and ordinary_object_internal_define_own_property s o p desc =
     @esid sec-ordinarydefineownproperty *)
 and ordinary_define_own_property s o p desc =
   let%spec (s, current) = object_internal_get_own_property s o p in
-  let l = loc_of_value o in
-  let%some extensible = run_object_method object_extensible_ s l in
-  validate_and_apply_property_descriptor s o p extensible desc current
+  let%some extensible = run_object_method object_extensible_ s o in
+  validate_and_apply_property_descriptor s (Coq_value_object o) p extensible desc current
 
 (** @essec 9.1.6.2
     @esid sec-iscompatiblepropertydescriptor *)
@@ -874,6 +869,21 @@ and validate_and_apply_property_descriptor s o p extensible desc current =
     (* Step 11 *)
     in res_ter s (res_val (Coq_value_bool true))
 
+(** @essesc 9.1.7
+    @esid sec-ordinary-object-internal-methods-and-internal-slots-hasproperty-p *)
+and ordinary_object_internal_has_property s o p =
+  ordinary_has_property s o p
+
+(** @essec 9.1.7.1
+    @esid sec-ordinaryhasproperty *)
+and ordinary_has_property s o p =
+  let%assert _ = is_property_key p in
+  let%spec s, hasOwn = object_internal_get_own_property s o p in
+  if not (hasOwn === Descriptor_undef) then res_ter s (res_val (Coq_value_bool true))
+  else let%value s, parent = object_internal_get_prototype_of s o in
+  if not ((type_of parent) === Coq_type_null) then object_internal_has_property s (loc_of_value parent) p
+  else res_ter s (res_val (Coq_value_bool false))
+
 (** @essec 9.1.11.1
     @esid sec-ordinaryownpropertykeys *)
 and ordinary_own_property_keys s c l =
@@ -883,9 +893,10 @@ and ordinary_own_property_keys s c l =
 
 (******** UNCHECKED ES5 IMPLEMENTATION CONTINUES BELOW ***********)
 
-(** @deprecated Use has_property instead *)
+(** @deprecated Compatibility wrapper for ES5 code to ES6
+                implementation use [has_property] instead *)
 and object_has_prop s c l x =
-  object_internal_has_property s c l (Coq_value_string x)
+  object_internal_has_property s l (Coq_value_string x)
 
 
 (** val out_error_or_void :
@@ -1152,11 +1163,11 @@ and object_define_own_prop s c l x desc throwcont =
   let reject s0 throwcont0 =
     out_error_or_cst
       s0 c throwcont0 Coq_native_error_type (Coq_value_bool false) in
-  let def s p d _ = ordinary_define_own_property s (Coq_value_object l) (Coq_value_string p) d in
+  let def s p d _ = ordinary_define_own_property s l (Coq_value_string p) d in
   let%some b = (run_object_method object_define_own_prop_ s l) in
   match b with
   | Coq_builtin_define_own_prop_default -> 
-      object_internal_define_own_property s (Coq_value_object l) (Coq_value_string x) desc (* ES6 hack *)
+      object_internal_define_own_property s l (Coq_value_string x) desc (* ES6 hack *)
   | Coq_builtin_define_own_prop_array ->
     let%spec (s0, d) = (run_object_get_own_prop s c l ("length")) in
     begin
