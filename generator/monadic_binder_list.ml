@@ -14,6 +14,7 @@ let monad_mapping = [
     ("spec", "if_spec");
     ("assert", "check_assert");
     ("ret", "let_ret");
+    ("value_ret", "if_value_ret");
    ]
 
 let monad_identifiers = List.map (fun (_, f) -> "JsInterpreterMonads." ^ f) monad_mapping

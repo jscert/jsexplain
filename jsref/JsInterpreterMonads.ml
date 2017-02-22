@@ -59,15 +59,14 @@ let destr_list l d f =
   | [] -> d
   | a :: l0 -> f a
 
-(** val if_empty_label :
-    state -> res -> (unit -> 'a1 resultof) -> 'a1 resultof **)
-
-let if_empty_label s r k =
+let if_empty_label2 s r k kfail =
   if label_compare r.res_label Coq_label_empty
   then k ()
-  else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+  else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
          s
          ("[if_empty_label] received a normal result with non-empty label.")
+
+let if_empty_label s r k = if_empty_label2 s r k (fun x -> x)
 
 (** val if_some : 'a1 option -> ('a1 -> 'a2 resultof) -> 'a2 resultof **)
 
@@ -91,22 +90,26 @@ let if_some_or_apply_default o d k =
 (** val if_result_some :
     'a1 resultof -> ('a1 -> 'a2 resultof) -> 'a2 resultof **)
 
-let if_result_some w k =
+let if_result_some2 w k kfail =
   match w with
   | Coq_result_some a -> k a
-  | Coq_result_not_yet_implemented -> Coq_result_not_yet_implemented
-  | Coq_result_impossible -> Coq_result_impossible
-  | Coq_result_bottom s0 -> Coq_result_bottom s0
+  | Coq_result_not_yet_implemented -> kfail Coq_result_not_yet_implemented
+  | Coq_result_impossible -> kfail Coq_result_impossible
+  | Coq_result_bottom s0 -> kfail (Coq_result_bottom s0)
+
+let if_result_some w k = if_result_some2 w k (fun x -> x)
 
 (** val if_ter : result -> (state -> res -> 'a1 specres) -> 'a1 specres **)
 (** Unpack a result assuming it contains a Coq_specret_out *)
 
-let if_ter w k =
-  if_result_some w (fun sp ->
+let if_ter2 w k kfail =
+  if_result_some2 w (fun sp ->
     match sp with
     | Coq_specret_out (s, r) -> k s r
     | _ -> assert false
-  )
+  ) kfail
+
+let if_ter w k = if_ter2 w k (fun x -> x)
 
 (** val throw_result : result -> 'a1 specres **)
 (** This appears to be the identity function (with input checking, this matches
@@ -134,14 +137,18 @@ let if_success_state rv w k =
 (** val if_success :
     result -> (state -> resvalue -> 'a1 specres) -> 'a1 specres **)
 
-let if_success w k =
-  if_ter w (fun s0 r ->
+let if_success2 w k kfail =
+  if_ter2 w (fun s0 r ->
     match r.res_type with
-    | Coq_restype_normal -> if_empty_label s0 r (fun x -> k s0 r.res_value)
-    | Coq_restype_break -> res_out s0 r
-    | Coq_restype_continue -> res_out s0 r
-    | Coq_restype_return -> res_out s0 r
-    | Coq_restype_throw -> res_out s0 r)
+    | Coq_restype_normal -> if_empty_label2 s0 r (fun x -> k s0 r.res_value) kfail
+    | Coq_restype_break -> kfail (res_out s0 r)
+    | Coq_restype_continue -> kfail (res_out s0 r)
+    | Coq_restype_return -> kfail (res_out s0 r)
+    | Coq_restype_throw -> kfail (res_out s0 r))
+    kfail
+
+let if_success w k =
+  if_success2 w k (fun x -> x)
 
 (** val if_void : result_void -> (state -> result) -> result **)
 
@@ -213,18 +220,22 @@ let if_break w k =
 
 (** This method is equivalent to the [!] operator of section 5.2 Algorithm Conventions
     ppx_monads maps this to the [let%value] syntax. *)
-let if_value w k =
-  if_success w (fun s rv ->
+let if_value2 w k kfail =
+  if_success2 w (fun s rv ->
     match rv with
     | Coq_resvalue_empty ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
         s
         ("[if_value] called with non-value.")
     | Coq_resvalue_value v -> k s v
     | Coq_resvalue_ref r ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
         s
         ("[if_value] called with non-value."))
+    kfail
+
+let if_value w k =
+  if_value2 w k (fun x -> x)
 
 (** val if_bool : result -> (state -> bool -> 'a1 specres) -> 'a1 specres **)
 
@@ -366,6 +377,9 @@ let let_ret w k =
   match w with
   | Continue s -> k s
   | Return  r -> r
+
+let if_value_ret w k =
+  if_value2 w k (fun x -> Return x)
 
 let ifx_prim w k = if_prim w k
 let ifx_number w k = if_number w k
