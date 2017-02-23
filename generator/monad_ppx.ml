@@ -46,10 +46,10 @@ let generate_mapper namesid = function argv ->
                     | Ppat_var _
                     | Ppat_any           -> (pat, aux cont)
                     (* let%exn (a,b) = ... *)
-                    | Ppat_tuple [p1;p2] -> (p1, (Exp.fun_ Nolabel None p2 (aux cont)))
+                    | Ppat_tuple [p1;p2] -> (p1, (Exp.fun_ ~loc Nolabel None p2 (aux cont)))
                     | _ -> raise (Location.Error (Location.error ~loc:pat.ppat_loc ("unknown pattern type with let%"^name)))
                   in
-                  Exp.apply ~loc (mk_ident ident) [(Nolabel, aux e); (Nolabel, Exp.fun_ Nolabel None param body)]
+                  Exp.apply ~loc (mk_ident ident) [(Nolabel, aux e); (Nolabel, Exp.fun_ ~loc Nolabel None param body)]
                 with
                   | Not_found -> raise (Location.Error (Location.error ~loc ("no let%"^name)))
                 end
@@ -64,10 +64,10 @@ let generate_mapper namesid = function argv ->
 
                   (* if%ret (condition, state) then e_then else e_else *)
                   | Pexp_tuple [condition; state] ->
-                    Exp.ifthenelse ~loc condition (Exp.construct (mk_lid ~loc "Return") (Some e_then)) (Some
+                    Exp.ifthenelse ~loc condition (Exp.construct ~loc (mk_lid ~loc "Return") (Some e_then)) (Some
                       (Mytools.option_app
-                        (Exp.construct (mk_lid ~loc "Continue") (Some state))
-                        (fun rv -> Exp.construct (mk_lid ~loc "Return") (Some rv))
+                        (Exp.construct ~loc (mk_lid ~loc "Continue") (Some state))
+                        (fun rv -> Exp.construct ~loc (mk_lid ~loc "Return") (Some rv))
                         e_else))
 
                   | _ -> raise (Location.Error (Location.error ~loc:e_if.pexp_loc "conditional of if%ret must syntactically be a pair"))
