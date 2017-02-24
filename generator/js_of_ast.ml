@@ -1360,8 +1360,7 @@ let to_javascript basename module_name typedtree =
        Format.mark_close_tag = (fun t -> Printf.sprintf "#%s>#" t);
        Format.print_open_tag = (fun _ -> ());
        Format.print_close_tag = (fun _ -> ()) };
-  | _ -> ()
-    (* 
+  | _ ->
     Format.pp_set_tags str_ppf false;
     Format.pp_set_mark_tags str_ppf false;
     Format.pp_set_formatter_tag_functions str_ppf
@@ -1369,9 +1368,6 @@ let to_javascript basename module_name typedtree =
        Format.mark_close_tag = (fun t -> "");
        Format.print_open_tag = (fun _ -> ());
        Format.print_close_tag = (fun _ -> ()) };
-    Format.fprintf str_ppf (Scanf.format_from_string pre_res "");
-    Format.flush_str_formatter ()
-    *)
   end;
   Format.fprintf str_ppf (Scanf.format_from_string pre_res "");
   Format.flush_str_formatter ()
