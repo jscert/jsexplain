@@ -354,24 +354,6 @@ type 't if_ret_type =
         then Return (ret_val ...)
         else Continue s
       in continuation]
-
-    This is designed to be used with the [if%ret] syntax, which allows else
-    branches to be elided in place of writing [else Continue s]
-
-    Extended syntax: [if%ret condition, s then r1]
-    Maps to: [if condition then Return r1 else Continue s]
-
-    It is syntactically required that the first expr position is a pair of
-    condition expression and initial state variable to Continue with.
-
-    Extended syntax:
-      [if%ret condition, s then r1 else r2]
-    Maps to:
-      [if condition then Return r1 else Return r2]
-    Note that the state parameter of the tuple is still required in this
-    instance, but is ignored.
-
-    Nesting [if%ret]s is currently unsupported. :(
 *)
 let let_ret w k =
   match w with

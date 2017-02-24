@@ -54,25 +54,6 @@ let generate_mapper namesid = function argv ->
                   | Not_found -> raise (Location.Error (Location.error ~loc ("no let%"^name)))
                 end
 
-              (* if%exn e_if then e_then else e_else *)
-              | Pexp_ifthenelse (e_if, e_then, e_else) ->
-                if name <> "ret" then
-                  raise (Location.Error (Location.error ~loc ("if%"^ name ^ " extension is unknown")))
-                else begin
-                  let (e_if, e_then, e_else) = (aux e_if, aux e_then, map_opt aux e_else) in
-                  match e_if.pexp_desc with
-
-                  (* if%ret (condition, state) then e_then else e_else *)
-                  | Pexp_tuple [condition; state] ->
-                    Exp.ifthenelse ~loc condition (Exp.construct ~loc (mk_lid ~loc "Return") (Some e_then)) (Some
-                      (Mytools.option_app
-                        (Exp.construct ~loc (mk_lid ~loc "Continue") (Some state))
-                        (fun rv -> Exp.construct ~loc (mk_lid ~loc "Return") (Some rv))
-                        e_else))
-
-                  | _ -> raise (Location.Error (Location.error ~loc:e_if.pexp_loc "conditional of if%ret must syntactically be a pair"))
-                end
-
               | _ -> raise (Location.Error (Location.error ~loc "unable to extend this sort of expression"))
               end
             | _ -> raise (Location.Error ( Location.error ~loc "Expression extension node containing non-expression"))

@@ -776,13 +776,15 @@ and validate_and_apply_property_descriptor s o p extensible desc current =
        case of NaN values for [[Value]] which may change internal representation.
        Otherwise, they are only an optimisation as far as I can tell. *)
     (* Step 3 (also implied by step 4) *)
-    let%ret s = if%ret descriptor_is_empty desc, s
-      then res_ter s (res_val (Coq_value_bool true))
+    let%ret s = if descriptor_is_empty desc
+      then Return (res_ter s (res_val (Coq_value_bool true)))
+      else Continue s
 
     (* Step 4 *)
     in let%ret s =
-    if%ret descriptor_contained_by desc current same_value, s
-      then res_ter s (res_val (Coq_value_bool true))
+    if descriptor_contained_by desc current same_value
+      then Return (res_ter s (res_val (Coq_value_bool true)))
+      else Continue s
 
     (* Steps 5 *)
     in let%ret s =
