@@ -1,5 +1,3 @@
-
-
 let test0 x =
   let y = 2*x in
   y+y
@@ -16,7 +14,7 @@ let app2 = fun x -> x
 
 type carte =
   | As
-  | Petite [@f petite] of int
+  | Petite of int [@f petite] 
 
 
 let affiche x = match x with
