@@ -362,6 +362,15 @@ and object_internal_get s o p receiver =
   | Coq_builtin_get_args_obj -> dispatch_es5 ()
   | Coq_builtin_get_proxy    -> Coq_result_not_yet_implemented
 
+(** Function to dispatch calls to O.[[Set]](P, V, Receiver) *)
+and object_internal_set s o p v receiver =
+  let%some internal_method = (run_object_method object_set_ s o) in
+  match internal_method with
+  | Coq_builtin_set_default -> ordinary_object_internal_set s o p v receiver
+  | Coq_builtin_set_proxy   -> Coq_result_not_yet_implemented
+
+(** @deprecated In favour of potentially the same [object_internal_set] ES6 method *)
+and object_put s c l p v str = object_internal_set s l (Coq_value_string p) v (Coq_value_object l)
 
 (** Function to dispatch calls to O.[[Call]](thisArgument, argumentsList) *)
 and object_internal_call s o thisArgument argumentsList =
@@ -604,6 +613,15 @@ and get_v s v p =
   let%assert _ = is_property_key p in
   let%object (s1, l) = to_object s v in
   object_internal_get s1 l p v
+
+(** @essec 7.3.4
+    @esid sec-createdataproperty *)
+and create_data_property s o p v =
+  let%assert _ = type_of o === Coq_type_object in
+  let o = loc_of_value o in
+  let%assert _ = is_property_key p in
+  let newDesc = descriptor_intro_data v true true true in
+  object_internal_define_own_property s o p newDesc
 
 (** @essec 7.3.9
     @esid sec-getmethod *)
@@ -907,6 +925,60 @@ and ordinary_has_property s o p =
   if not (parent === Coq_value_null) then object_internal_has_property s (loc_of_value parent) p
   else res_ter s (res_val (Coq_value_bool false))
 
+(** @essec 9.1.9
+    @esid sec-ordinary-object-internal-methods-and-internal-slots-set-p-v-receiver *)
+and ordinary_object_internal_set s o p v receiver =
+  ordinary_set s o p v receiver
+
+(** @essec 9.1.9.1
+    @esid sec-ordinaryset *)
+and ordinary_set s o p v receiver =
+  let%assert _ = is_property_key p in
+  let%spec s, ownDesc = object_internal_get_own_property s o p in
+  let%ret ownDesc =
+    if ownDesc === Descriptor_undef then begin
+      let%value_ret s, parent = object_internal_get_prototype_of s o in
+      if not (parent === Coq_value_null) then
+        let parent = loc_of_value parent in
+        Return (object_internal_set s parent p v receiver)
+      else Continue (Descriptor {
+        descriptor_value = Some Coq_value_undef;
+        descriptor_writable = Some false;
+        descriptor_get = None;
+        descriptor_set = None;
+        descriptor_enumerable = Some true;
+        descriptor_configurable = Some true
+      })
+    end else Continue ownDesc
+  in
+  if is_data_descriptor ownDesc then begin
+    let ownDesc = descriptor_get_defined ownDesc in
+    let%some writable = ownDesc.descriptor_writable in
+    if writable then res_ter s (res_val (Coq_value_bool false))
+    else if not (type_of receiver === Coq_type_object) then res_ter s (res_val (Coq_value_bool false))
+    else
+      let receiver = loc_of_value receiver in
+      let%spec s, existingDescriptor = object_internal_get_own_property s receiver p in
+      if not (existingDescriptor === Descriptor_undef) then begin
+        if is_accessor_descriptor existingDescriptor then res_ter s (res_val (Coq_value_bool false))
+        else
+          let existingDescriptor = descriptor_get_defined existingDescriptor in
+          let%some w = existingDescriptor.descriptor_writable in
+          if not w then res_ter s (res_val (Coq_value_bool false))
+          else
+            let valueDesc = (descriptor_with_value descriptor_intro_empty (Some v)) in
+            object_internal_define_own_property s receiver p valueDesc
+      end else
+        create_data_property s (Coq_value_object receiver) p v
+  end else
+    let%assert _ = is_accessor_descriptor ownDesc in
+    let ownDesc = descriptor_get_defined ownDesc in
+    let%some setter = ownDesc.descriptor_set in
+    if setter === Coq_value_undef then res_ter s (res_val (Coq_value_bool false))
+    else
+      let%spec s, _ = call s setter receiver (Some [v]) in
+      res_ter s (res_val (Coq_value_bool true))
+
 (** @essec 9.1.11.1
     @esid sec-ordinaryownpropertykeys *)
 and ordinary_own_property_keys s c l =
@@ -1099,52 +1171,6 @@ and to_string s c _foo_ = match _foo_ with
       (res_val (Coq_value_string (convert_prim_to_string w)))
   | _ ->
     res_out s (res_val (Coq_value_string (convert_prim_to_string _foo_)))
-
-(** val object_can_put :
-    state -> execution_ctx -> object_loc -> prop_name -> result **)
-
-and object_can_put s c l x =
-  let%some b = (run_object_method object_can_put_ s l) in
-  match b with Coq_builtin_can_put_default ->
-    let%spec (s1, d) = (run_object_get_own_prop s c l x) in begin
-      match d with
-      | Coq_full_descriptor_undef ->
-        let%some vproto = (run_object_method object_proto_ s1 l) in begin
-          match vproto with
-          | Coq_value_null ->
-            let%some b0 = run_object_method object_extensible_ s1 l in
-            res_ter s1 (res_val (Coq_value_bool b0))
-          | Coq_value_object lproto ->
-            let%spec (s2, d_2) = (run_object_get_prop s1 c lproto x) in
-            (match d_2 with
-            | Coq_full_descriptor_undef ->
-              let%some b0= (run_object_method object_extensible_ s2 l) in
-              res_ter s2 (res_val (Coq_value_bool b0))
-            | Coq_full_descriptor_some a ->
-              (match a with
-               | Coq_attributes_data_of ad ->
-                 let%some ext = (run_object_method object_extensible_ s2 l) in
-                 res_ter s2
-                   (if ext
-                    then res_val (Coq_value_bool ad.attributes_data_writable)
-                    else res_val (Coq_value_bool false))
-               | Coq_attributes_accessor_of aa ->
-                 res_ter s2 (res_val (Coq_value_bool
-                   (not (value_compare aa.attributes_accessor_set Coq_value_undef))))))
-          | _ ->
-            (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-              s1
-              ("Non-null primitive get as a prototype value in [object_can_put].")
-        end
-      | Coq_full_descriptor_some a ->
-        (match a with
-         | Coq_attributes_data_of ad ->
-           res_ter s1
-             (res_val (Coq_value_bool ad.attributes_data_writable))
-         | Coq_attributes_accessor_of aa ->
-           res_ter s1 (res_val (Coq_value_bool
-             (not (value_compare aa.attributes_accessor_set Coq_value_undef)))))
-    end
 
 (** val run_object_define_own_prop_array_loop :
     state -> execution_ctx -> object_loc -> float -> float ->
@@ -1537,70 +1563,6 @@ and run_expr_get_value s c e =
   let%success (s0, rv) = (run_expr s c e) in
       ref_get_value s0 c rv
 
-(** val object_put_complete :
-    builtin_put -> state -> execution_ctx -> value -> object_loc
-    -> prop_name -> value -> strictness_flag -> result_void **)
-
-and object_put_complete b s c vthis l x v str =
-  match b with Coq_builtin_put_default ->
-    let%bool (s1, b0) = (object_can_put s c l x) in
-        if b0
-        then let%spec (s2, d) = (run_object_get_own_prop s1 c l x) in
-            let 
-              follow = (fun x0 ->
-                let%spec (s3, d_2) = (run_object_get_prop s2 c l x) in
-                    let follow_2 = (fun x1 ->
-                        match vthis with
-                        | Coq_value_object lthis ->
-                          let desc = (descriptor_intro_data v true true true) in
-                          let%success (s4, rv) = (object_define_own_prop s3 c l x desc str) in
-                          res_void s4
-                        | _ ->
-                          out_error_or_void s3 c str Coq_native_error_type
-                    ) in
-                        match d_2 with
-                        | Coq_full_descriptor_undef -> follow_2 ()
-                        | Coq_full_descriptor_some a ->
-                          (match a with
-                           | Coq_attributes_data_of a0 -> follow_2 ()
-                           | Coq_attributes_accessor_of aa_2 ->
-                             (match aa_2.attributes_accessor_set with
-                              | Coq_value_object lfsetter ->
-                                let%success
-                                   (s4, rv) = (run_call s3 c lfsetter vthis
-                                     (v :: [])) in  res_void s4
-                              | _ ->
-                                (Debug.impossible_with_heap_because __LOC__ s3
-                                   "[object_put_complete] found a primitive in an `set\' accessor.";
-                                Coq_result_impossible)
-                             ))) in
-                 match d with
-                 | Coq_full_descriptor_undef -> follow ()
-                 | Coq_full_descriptor_some a ->
-                   (match a with
-                    | Coq_attributes_data_of ad ->
-                      (match vthis with
-                       | Coq_value_object lthis ->
-                         let  desc = ({ descriptor_value = (Some v);
-                                       descriptor_writable = None; descriptor_get = None;
-                                       descriptor_set = None; descriptor_enumerable = None;
-                                       descriptor_configurable = None }) in
-                         let%success (s3, rv) = (object_define_own_prop s2 c l x desc str) in
-                         res_void s3
-                       | _ ->
-                         out_error_or_void s2 c str Coq_native_error_type
-                      )
-                    | Coq_attributes_accessor_of a0 -> follow ())
-        else out_error_or_void s1 c str Coq_native_error_type
-
-(** val object_put :
-    state -> execution_ctx -> object_loc -> prop_name -> value
-    -> strictness_flag -> result_void **)
-
-and object_put s c l x v str =
-  let%some b = (run_object_method object_put_ s l) in
-      object_put_complete b s c (Coq_value_object l) l x v str
-
 (** val env_record_set_mutable_binding :
     state -> execution_ctx -> env_loc -> prop_name -> value ->
     strictness_flag -> result_void **)
@@ -1621,8 +1583,9 @@ and env_record_set_mutable_binding s c l x v str =
     strictness_flag -> result_void **)
 
 and prim_value_put s c w x v str =
-  let%object (s1, l) = (to_object s w) in
-      object_put_complete Coq_builtin_put_default s1 c w l x v str
+  assert false (* FIXME *)
+  (* let%object (s1, l) = (to_object s w) in
+      object_put_complete Coq_builtin_put_default s1 c w l x v str *)
 
 (** val ref_put_value :
     state -> execution_ctx -> resvalue -> value -> result_void **)

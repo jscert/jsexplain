@@ -261,14 +261,6 @@ type builtin_get_own_prop =
 type builtin_get_prop =
 | Coq_builtin_get_prop_default
 
-(* FIXME: RENAMED TO SET IN ES7 *)
-type builtin_put =
-| Coq_builtin_put_default
-
-(* FIXME: REMOVED IN ES7 *)
-type builtin_can_put =
-| Coq_builtin_can_put_default
-
 type builtin_has_prop =
 | Coq_builtin_has_prop_default
 | Coq_builtin_has_prop_proxy
@@ -509,9 +501,8 @@ type coq_object = { object_proto_ : value;
                     object_get_own_prop_ : builtin_get_own_prop;
                     object_has_prop_ : builtin_has_prop;
                     object_get_ : builtin_get;
+                    object_set_ : builtin_set;
                     object_get_prop_ : builtin_get_prop;
-                    object_put_ : builtin_put;
-                    object_can_put_ : builtin_can_put;
                     object_delete_ : builtin_delete;
                     object_default_value_ : builtin_default_value;
                     object_define_own_prop_ : builtin_define_own_prop;
@@ -560,6 +551,8 @@ let object_prevent_extensions_ x = x.object_prevent_extensions_
 
 let object_get_ x = x.object_get_
 
+let object_set_ x = x.object_set_
+
 (** val object_get_own_prop_ : coq_object -> builtin_get_own_prop **)
 
 let object_get_own_prop_ x = x.object_get_own_prop_
@@ -567,14 +560,6 @@ let object_get_own_prop_ x = x.object_get_own_prop_
 (** val object_get_prop_ : coq_object -> builtin_get_prop **)
 
 let object_get_prop_ x = x.object_get_prop_
-
-(** val object_put_ : coq_object -> builtin_put **)
-
-let object_put_ x = x.object_put_
-
-(** val object_can_put_ : coq_object -> builtin_can_put **)
-
-let object_can_put_ x = x.object_can_put_
 
 (** val object_has_prop_ : coq_object -> builtin_has_prop **)
 
