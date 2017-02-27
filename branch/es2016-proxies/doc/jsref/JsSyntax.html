@@ -1513,28 +1513,6 @@ Identities of implementations for Object Internal Methods<br>
 
 
 
-<pre><code><span id="TYPEbuiltin_put"><span class="keyword">type</span> <code class="type"></code>builtin_put</span> = </code></pre><table class="typetable">
-<tr>
-<td align="left" valign="top" >
-<code><span class="keyword">|</span></code></td>
-<td align="left" valign="top" >
-<code><span id="TYPEELTbuiltin_put.Coq_builtin_put_default"><span class="constructor">Coq_builtin_put_default</span></span></code></td>
-
-</tr></table>
-
-
-
-<pre><code><span id="TYPEbuiltin_can_put"><span class="keyword">type</span> <code class="type"></code>builtin_can_put</span> = </code></pre><table class="typetable">
-<tr>
-<td align="left" valign="top" >
-<code><span class="keyword">|</span></code></td>
-<td align="left" valign="top" >
-<code><span id="TYPEELTbuiltin_can_put.Coq_builtin_can_put_default"><span class="constructor">Coq_builtin_can_put_default</span></span></code></td>
-
-</tr></table>
-
-
-
 <pre><code><span id="TYPEbuiltin_has_prop"><span class="keyword">type</span> <code class="type"></code>builtin_has_prop</span> = </code></pre><table class="typetable">
 <tr>
 <td align="left" valign="top" >
@@ -2316,21 +2294,14 @@ val ref_strict : ref -&gt; bool *<br>
 <td align="left" valign="top" >
 <code>&nbsp;&nbsp;</code></td>
 <td align="left" valign="top" >
+<code><span id="TYPEELTcoq_object.object_set_">object_set_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_set">builtin_set</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
 <code><span id="TYPEELTcoq_object.object_get_prop_">object_get_prop_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_get_prop">builtin_get_prop</a></code>;</code></td>
-
-</tr>
-<tr>
-<td align="left" valign="top" >
-<code>&nbsp;&nbsp;</code></td>
-<td align="left" valign="top" >
-<code><span id="TYPEELTcoq_object.object_put_">object_put_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_put">builtin_put</a></code>;</code></td>
-
-</tr>
-<tr>
-<td align="left" valign="top" >
-<code>&nbsp;&nbsp;</code></td>
-<td align="left" valign="top" >
-<code><span id="TYPEELTcoq_object.object_can_put_">object_can_put_</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEbuiltin_can_put">builtin_can_put</a></code>;</code></td>
 
 </tr>
 <tr>
@@ -2482,19 +2453,14 @@ val object_properties_ : coq_object -&gt; object_properties_type *<br>
 <pre><span id="VALobject_prevent_extensions_"><span class="keyword">val</span> object_prevent_extensions_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_prevent_extensions">builtin_prevent_extensions</a></code></pre><br>
 val object_get_ : coq_object -&gt; builtin_get *<br>
 
-<pre><span id="VALobject_get_"><span class="keyword">val</span> object_get_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_get">builtin_get</a></code></pre><br>
+<pre><span id="VALobject_get_"><span class="keyword">val</span> object_get_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_get">builtin_get</a></code></pre>
+<pre><span id="VALobject_set_"><span class="keyword">val</span> object_set_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_set">builtin_set</a></code></pre><br>
 val object_get_own_prop_ : coq_object -&gt; builtin_get_own_prop *<br>
 
 <pre><span id="VALobject_get_own_prop_"><span class="keyword">val</span> object_get_own_prop_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_get_own_prop">builtin_get_own_prop</a></code></pre><br>
 val object_get_prop_ : coq_object -&gt; builtin_get_prop *<br>
 
 <pre><span id="VALobject_get_prop_"><span class="keyword">val</span> object_get_prop_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_get_prop">builtin_get_prop</a></code></pre><br>
-val object_put_ : coq_object -&gt; builtin_put *<br>
-
-<pre><span id="VALobject_put_"><span class="keyword">val</span> object_put_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_put">builtin_put</a></code></pre><br>
-val object_can_put_ : coq_object -&gt; builtin_can_put *<br>
-
-<pre><span id="VALobject_can_put_"><span class="keyword">val</span> object_can_put_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_can_put">builtin_can_put</a></code></pre><br>
 val object_has_prop_ : coq_object -&gt; builtin_has_prop *<br>
 
 <pre><span id="VALobject_has_prop_"><span class="keyword">val</span> object_has_prop_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_has_prop">builtin_has_prop</a></code></pre><br>

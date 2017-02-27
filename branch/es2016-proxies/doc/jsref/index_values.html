@@ -68,6 +68,10 @@
 <td></td></tr>
 <tr><td><a href="JsInit.html#VALarray_proto_to_string_function_object">array_proto_to_string_function_object</a> [<a href="JsInit.html">JsInit</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALassert_object">assert_object</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALassert_object_ret">assert_object_ret</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInit.html#VALattrib_constant">attrib_constant</a> [<a href="JsInit.html">JsInit</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsCommonAux.html#VALattributes_accessor_compare">attributes_accessor_compare</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>
@@ -191,6 +195,8 @@ A Specification assertion that b is true, continuing with k,
     or failing with Coq_result_impossible otherwise
 </div>
 </td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALcheck_assert_ret">check_assert_ret</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsSyntaxAux.html#VALcodetype_compare">codetype_compare</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALcomplete_property_descriptor">complete_property_descriptor</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
@@ -223,6 +229,10 @@ A Specification assertion that b is true, continuing with k,
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALcreate_arguments_object">create_arguments_object</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALcreate_data_property">create_data_property</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALcreate_new_function_in">create_new_function_in</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALcreating_function_object">creating_function_object</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
@@ -486,15 +496,23 @@ Implements spec text: "true, if every field in d is absent"
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_empty_label">if_empty_label</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALif_empty_label2">if_empty_label2</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_not_throw">if_not_throw</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_number">if_number</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_object">if_object</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALif_object2">if_object2</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALif_object_ret">if_object_ret</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_prim">if_prim</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_result_some">if_result_some</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALif_result_some2">if_result_some2</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_some">if_some</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
@@ -517,18 +535,26 @@ Unpacks a Coq_specret_val (specification return value), returns an abrupt Coq_sp
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_success">if_success</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALif_success2">if_success2</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_success_or_return">if_success_or_return</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_success_state">if_success_state</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_ter">if_ter</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALif_ter2">if_ter2</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_value">if_value</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALif_value2">if_value2</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td><div class="info">
 This method is equivalent to the <code class="code">!</code> operator of section 5.2 Algorithm Conventions
     ppx_monads maps this to the <code class="code">let%value</code> syntax.
 </div>
 </td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALif_value_ret">if_value_ret</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_void">if_void</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALifx_any_or_throw">ifx_any_or_throw</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
@@ -740,10 +766,6 @@ Fetches Some object from location l in the heap, None if it is not allocated
 <td></td></tr>
 <tr><td><a href="JsSyntax.html#VALobject_call_">object_call_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALobject_can_put">object_can_put</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
-<tr><td><a href="JsSyntax.html#VALobject_can_put_">object_can_put_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
-<td></td></tr>
 <tr><td><a href="JsSyntax.html#VALobject_class_">object_class_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsSyntax.html#VALobject_code_">object_code_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
@@ -876,6 +898,21 @@ Function to dispatch calls to O.
 Function to dispatch calls to O.
 </div>
 </td></tr>
+<tr><td><a href="JsInterpreter.html#VALobject_internal_prevent_extensions">object_internal_prevent_extensions</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+Function to dispatch calls to O.
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALobject_internal_set">object_internal_set</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+Function to dispatch calls to O.
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALobject_internal_set_prototype_of">object_internal_set_prototype_of</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+Function to dispatch calls to O.
+</div>
+</td></tr>
 <tr><td><a href="JsSyntax.html#VALobject_is_extensible_">object_is_extensible_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInit.html#VALobject_is_extensible_function_object">object_is_extensible_function_object</a> [<a href="JsInit.html">JsInit</a>]</td>
@@ -980,16 +1017,16 @@ Updates an object's property given the location, property name and function mapp
 <tr><td><a href="JsSyntax.html#VALobject_prototype_">object_prototype_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALobject_put">object_put</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
-<tr><td><a href="JsSyntax.html#VALobject_put_">object_put_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
-<td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALobject_put_complete">object_put_complete</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
+<td><div class="info">
+<span class="deprecated"></span></div>
+</td></tr>
 <tr><td><a href="JsCommonAux.html#VALobject_retrieve_property">object_retrieve_property</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsSyntax.html#VALobject_scope_">object_scope_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInit.html#VALobject_seal_function_object">object_seal_function_object</a> [<a href="JsInit.html">JsInit</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsSyntax.html#VALobject_set_">object_set_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsSyntaxAux.html#VALobject_set_class">object_set_class</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
 <td></td></tr>
@@ -1077,6 +1114,10 @@ Update an object's property given the location, property name and new attributes
 <td><div class="info">
 </div>
 </td></tr>
+<tr><td><a href="JsInterpreter.html#VALordinary_object_internal_set">ordinary_object_internal_set</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALordinary_object_internal_set_prototype_of">ordinary_object_internal_set_prototype_of</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 <code class="code">[SetPrototypeOf]</code>(V)
@@ -1087,6 +1128,10 @@ Update an object's property given the location, property name and new attributes
 </div>
 </td></tr>
 <tr><td><a href="JsInterpreter.html#VALordinary_prevent_extensions">ordinary_prevent_extensions</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALordinary_set">ordinary_set</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
 </td></tr>
@@ -1302,6 +1347,8 @@ Given a properties Heap, a property name, updates the given property attributes 
 <tr><td><a href="JsInterpreter.html#VALrun_equal">run_equal</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_error">run_error</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALrun_error_no_c">run_error_no_c</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_eval">run_eval</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
