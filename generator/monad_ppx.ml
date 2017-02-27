@@ -46,7 +46,8 @@ let generate_mapper namesid = function argv ->
                     | Ppat_var _
                     | Ppat_any           -> (pat, aux cont)
                     (* let%exn (a,b) = ... *)
-                    | Ppat_tuple [p1;p2] -> (p1, (Exp.fun_ ~loc Nolabel None p2 (aux cont)))
+                    | Ppat_tuple [p1;p2] ->
+                        if name = "ret" then (pat, aux cont) else (p1, (Exp.fun_ ~loc Nolabel None p2 (aux cont)))
                     | _ -> raise (Location.Error (Location.error ~loc:pat.ppat_loc ("unknown pattern type with let%"^name)))
                   in
                   Exp.apply ~loc (mk_ident ident) [(Nolabel, aux e); (Nolabel, Exp.fun_ ~loc Nolabel None param body)]

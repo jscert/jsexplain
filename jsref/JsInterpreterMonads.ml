@@ -267,14 +267,16 @@ let if_bool w k =
 (** val if_object :
     result -> (state -> object_loc -> 'a1 specres) -> 'a1 specres **)
 
-let if_object w k =
-  if_value w (fun s v ->
+let if_object2 w k kfail =
+  if_value2 w (fun s v ->
     match v with
     | Coq_value_object l -> k s l
     | _ ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
         s
-        ("[if_object] called on a non-object."))
+        ("[if_object] called on a non-object.")) kfail
+
+let if_object w k = if_object2 w k (fun x -> x)
 
 (** val if_string :
     result -> (state -> string -> 'a1 specres) -> 'a1 specres **)
@@ -338,9 +340,9 @@ let if_spec w k =
 let check_assert b k =
   if b then k () else spec_assertion_failure ()
 
-type 't if_ret_type =
+type ('t, 'a) if_ret_type =
 | Return of 't resultof [@f result]
-| Continue of state [@f state]
+| Continue of 'a [@f cont]
 
 (** Executes the continuation with state s of a [Continue s],
     else returns the result [r] of [Return r].
@@ -362,6 +364,18 @@ let let_ret w k =
 
 let if_value_ret w k =
   if_value2 w k (fun x -> Return x)
+
+let if_object_ret w k =
+  if_object2 w k (fun x -> Return x)
+
+let assert_object w k =
+  if_object2 w k (fun x -> spec_assertion_failure ())
+
+let assert_object_ret w k =
+  if_object2 w k (fun x -> Return (spec_assertion_failure ()))
+
+let check_assert_ret b k =
+  if b then k () else Return (spec_assertion_failure ())
 
 let ifx_prim w k = if_prim w k
 let ifx_number w k = if_number w k

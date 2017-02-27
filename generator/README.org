@@ -110,4 +110,9 @@ type 'a tree =
    - break
    - spec
    - assert
-   - ret
+   - ret /Note: argument is special-cased to pass tuples rather than unpack to argument application/
+
+   ~_ret~ forms of binders are provided to be wrapped in the Return monad for
+   use inside of a ~let%ret~,
+   UPPERCASE forms of binders are the ~!~/"never abrupt" spec-text equivalent
+   binders to the standard (~ReturnIfAbrupt~/~?~) binders.
