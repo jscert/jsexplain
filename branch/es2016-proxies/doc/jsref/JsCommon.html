@@ -66,6 +66,8 @@ val convert_literal_to_prim : literal -&gt; prim *<br>
 val type_of : value -&gt; coq_type *<br>
 
 <pre><span id="VALtype_of"><span class="keyword">val</span> type_of</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEcoq_type">JsSyntax.coq_type</a></code></pre>
+<pre><span id="VALtype_of_resvalue"><span class="keyword">val</span> type_of_resvalue</span> : <code class="type"><a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -> <a href="JsSyntax.html#TYPEresvalue_type">JsSyntax.resvalue_type</a></code></pre>
+<pre><span id="VALref_of_resvalue"><span class="keyword">val</span> ref_of_resvalue</span> : <code class="type"><a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -> <a href="JsSyntax.html#TYPEref">JsSyntax.ref</a></code></pre>
 <pre><span id="VALattributes_data_default"><span class="keyword">val</span> attributes_data_default</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><div class="info ">
 Default vales for data property attributes.<br>
 ECMAScript Specification section: <a href="#table-4">6.1.7.1 Table 4</a></div>
@@ -206,7 +208,9 @@ val descriptor_intro_empty : descriptor *<br>
 <br>
 val ref_kind_of : ref -&gt; ref_kind *<br>
 
-<pre><span id="VALref_kind_of"><span class="keyword">val</span> ref_kind_of</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> <a href="JsCommon.html#TYPEref_kind">ref_kind</a></code></pre><br>
+<pre><span id="VALref_kind_of"><span class="keyword">val</span> ref_kind_of</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> <a href="JsCommon.html#TYPEref_kind">ref_kind</a></code></pre>
+<pre><span id="VALvalue_of_ref_base_type"><span class="keyword">val</span> value_of_ref_base_type</span> : <code class="type"><a href="JsSyntax.html#TYPEref_base_type">JsSyntax.ref_base_type</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre>
+<pre><span id="VALenv_loc_of_ref_base_type"><span class="keyword">val</span> env_loc_of_ref_base_type</span> : <code class="type"><a href="JsSyntax.html#TYPEref_base_type">JsSyntax.ref_base_type</a> -> <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a></code></pre><br>
 val ref_create_value : value -&gt; prop_name -&gt; bool -&gt; ref *<br>
 
 <pre><span id="VALref_create_value"><span class="keyword">val</span> ref_create_value</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -> bool -> <a href="JsSyntax.html#TYPEref">JsSyntax.ref</a></code></pre><br>

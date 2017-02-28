@@ -242,6 +242,10 @@ A Specification assertion that b is true, continuing with k,
 <tr><td align="left"><br>D</td></tr>
 <tr><td><a href="JsCommon.html#VALdecl_env_record_empty">decl_env_record_empty</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALdecl_env_record_get_binding_value">decl_env_record_get_binding_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsCommonAux.html#VALdecl_env_record_option">decl_env_record_option</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsCommon.html#VALdecl_env_record_rem">decl_env_record_rem</a> [<a href="JsCommon.html">JsCommon</a>]</td>
@@ -336,6 +340,8 @@ Implements spec text: "true, if every field in d is absent"
 <td></td></tr>
 <tr><td><a href="JsSyntax.html#VALenv_loc_global_env_record">env_loc_global_env_record</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsCommon.html#VALenv_loc_of_ref_base_type">env_loc_of_ref_base_type</a> [<a href="JsCommon.html">JsCommon</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsCommon.html#VALenv_record_alloc">env_record_alloc</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsCommonAux.html#VALenv_record_binds_option">env_record_binds_option</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>
@@ -349,7 +355,9 @@ Implements spec text: "true, if every field in d is absent"
 <tr><td><a href="JsInterpreter.html#VALenv_record_delete_binding">env_record_delete_binding</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALenv_record_get_binding_value">env_record_get_binding_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
+<td><div class="info">
+<span class="deprecated"></span></div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALenv_record_has_binding">env_record_has_binding</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInit.html#VALenv_record_heap_initial">env_record_heap_initial</a> [<a href="JsInit.html">JsInit</a>]</td>
@@ -442,6 +450,10 @@ Implements spec text: "true, if every field in d is absent"
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALget_arg_first_and_rest">get_arg_first_and_rest</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALget_base">get_base</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALget_binding_value">get_binding_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreterUtils.html#VALget_global_value">get_global_value</a> [<a href="JsInterpreterUtils.html">JsInterpreterUtils</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALget_method">get_method</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
@@ -450,7 +462,17 @@ Implements spec text: "true, if every field in d is absent"
 </td></tr>
 <tr><td><a href="JsInterpreterUtils.html#VALget_object_value">get_object_value</a> [<a href="JsInterpreterUtils.html">JsInterpreterUtils</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALget_referenced_name">get_referenced_name</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALget_this_value">get_this_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALget_v">get_v</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALget_value">get_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
 </td></tr>
@@ -475,6 +497,8 @@ Implements spec text: "true, if every field in d is absent"
 <tr><td><a href="JsInit.html#VALglobal_parse_int_function_object">global_parse_int_function_object</a> [<a href="JsInit.html">JsInit</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>H</td></tr>
+<tr><td><a href="JsInterpreter.html#VALhas_primitive_base">has_primitive_base</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALhas_property">has_property</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
@@ -649,9 +673,17 @@ This method is equivalent to the <code class="code">!</code> operator of section
 <td><div class="info">
 </div>
 </td></tr>
+<tr><td><a href="JsInterpreter.html#VALis_property_reference">is_property_reference</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
 <tr><td><a href="LibOption.html#VALis_some">is_some</a> [<a href="LibOption.html">LibOption</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALis_strict_reference">is_strict_reference</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALis_super_reference">is_super_reference</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsCommon.html#VALis_syntactic_eval">is_syntactic_eval</a> [<a href="JsCommon.html">JsCommon</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALis_unresolvable_reference">is_unresolvable_reference</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsNumber.html#VALisnan">isnan</a> [<a href="JsNumber.html">JsNumber</a>]</td>
 <td></td></tr>
@@ -802,6 +834,10 @@ Fetches Some object from location l in the heap, None if it is not allocated
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALobject_delete_default">object_delete_default</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALobject_env_record_get_binding_value">object_env_record_get_binding_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsSyntax.html#VALobject_extensible_">object_extensible_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsSyntaxAux.html#VALobject_for_args_object">object_for_args_object</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
@@ -1231,7 +1267,9 @@ Given a properties Heap, a property name, updates the given property attributes 
 <tr><td><a href="JsCommon.html#VALref_create_value">ref_create_value</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALref_get_value">ref_get_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
+<td><div class="info">
+<span class="deprecated"></span></div>
+</td></tr>
 <tr><td><a href="Debug.html#VALref_get_value">ref_get_value</a> [<a href="Debug.html">Debug</a>]</td>
 <td></td></tr>
 <tr><td><a href="Debug.html#VALref_get_value_2">ref_get_value_2</a> [<a href="Debug.html">Debug</a>]</td>
@@ -1242,9 +1280,13 @@ Given a properties Heap, a property name, updates the given property attributes 
 <td></td></tr>
 <tr><td><a href="JsSyntax.html#VALref_name">ref_name</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsCommon.html#VALref_of_resvalue">ref_of_resvalue</a> [<a href="JsCommon.html">JsCommon</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALref_put_value">ref_put_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsSyntax.html#VALref_strict">ref_strict</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsSyntax.html#VALref_this_value">ref_this_value</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
 <tr><td><a href="HeapObj.html#VALrem">rem</a> [<a href="HeapObj.html">HeapObj</a>]</td>
 <td></td></tr>
@@ -1367,7 +1409,9 @@ Given a properties Heap, a property name, updates the given property attributes 
 <tr><td><a href="JsInterpreter.html#VALrun_expr_function">run_expr_function</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_expr_get_value">run_expr_get_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
+<td><div class="info">
+<span class="deprecated"></span></div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_expr_new">run_expr_new</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsCommonAux.html#VALrun_function_get_error_case">run_function_get_error_case</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>
@@ -1607,12 +1651,16 @@ Convenience functions to unpack JS Value types to natives
 <td></td></tr>
 <tr><td><a href="JsCommon.html#VALtype_of">type_of</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsCommon.html#VALtype_of_resvalue">type_of_resvalue</a> [<a href="JsCommon.html">JsCommon</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALtypeof_prim">typeof_prim</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>U</td></tr>
 <tr><td><a href="JsNumber.html#VALuint32_right_shift">uint32_right_shift</a> [<a href="JsNumber.html">JsNumber</a>]</td>
 <td></td></tr>
 <tr><td><a href="LibOption.html#VALunsome_default">unsome_default</a> [<a href="LibOption.html">LibOption</a>]</td>
+<td></td></tr>
+<tr><td><a href="LibOption.html#VALunsome_error">unsome_error</a> [<a href="LibOption.html">LibOption</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>V</td></tr>
 <tr><td><a href="JsInterpreter.html#VALvalidate_and_apply_property_descriptor">validate_and_apply_property_descriptor</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
@@ -1622,6 +1670,8 @@ Convenience functions to unpack JS Value types to natives
 <tr><td><a href="JsInterpreter.html#VALvalueToStringForJoin">valueToStringForJoin</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsSyntaxAux.html#VALvalue_compare">value_compare</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsCommon.html#VALvalue_of_ref_base_type">value_of_ref_base_type</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>W</td></tr>
 <tr><td><a href="HeapObj.html#VALwrite">write</a> [<a href="HeapObj.html">HeapObj</a>]</td>

@@ -2144,6 +2144,9 @@ val execution_ctx_strict : execution_ctx -&gt; strictness_flag *<br>
 
 <pre><span id="VALexecution_ctx_strict"><span class="keyword">val</span> execution_ctx_strict</span> : <code class="type"><a href="JsSyntax.html#TYPEexecution_ctx">execution_ctx</a> -> <a href="JsSyntax.html#TYPEstrictness_flag">strictness_flag</a></code></pre>
 <pre><span id="TYPEprop_name"><span class="keyword">type</span> <code class="type"></code>prop_name</span> = <code class="type">string</code> </pre>
+<div class="info ">
+<h3 id="3_ReferenceSpecificationTypeDefinitions">Reference Specification Type (Definitions)</h3><br>
+ECMAScript Specification section: <a href="#sec-reference-specification-type">6.2.4</a></div>
 
 
 <pre><code><span id="TYPEref_base_type"><span class="keyword">type</span> <code class="type"></code>ref_base_type</span> = </code></pre><table class="typetable">
@@ -2184,6 +2187,16 @@ val execution_ctx_strict : execution_ctx -&gt; strictness_flag *<br>
 <code>&nbsp;&nbsp;</code></td>
 <td align="left" valign="top" >
 <code><span id="TYPEELTref.ref_strict">ref_strict</span>&nbsp;: <code class="type">bool</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+A ref with a thisValue shall never have a base type of env_loc<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTref.ref_this_value">ref_this_value</span>&nbsp;: <code class="type"><a href="JsSyntax.html#TYPEvalue">value</a> option</code>;</code></td>
 
 </tr></table>
 }
@@ -2199,6 +2212,7 @@ val ref_name : ref -&gt; prop_name *<br>
 val ref_strict : ref -&gt; bool *<br>
 
 <pre><span id="VALref_strict"><span class="keyword">val</span> ref_strict</span> : <code class="type"><a href="JsSyntax.html#TYPEref">ref</a> -> bool</code></pre>
+<pre><span id="VALref_this_value"><span class="keyword">val</span> ref_this_value</span> : <code class="type"><a href="JsSyntax.html#TYPEref">ref</a> -> <a href="JsSyntax.html#TYPEvalue">value</a></code></pre>
 <pre><span id="TYPEclass_name"><span class="keyword">type</span> <code class="type"></code>class_name</span> = <code class="type">string</code> </pre>
 
 
@@ -2619,6 +2633,31 @@ val state_env_record_heap : state -&gt; (env_loc, env_record) Heap.heap *<br>
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
 <code><span id="TYPEELTresvalue.Coq_resvalue_ref"><span class="constructor">Coq_resvalue_ref</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEref">ref</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEresvalue_type"><span class="keyword">type</span> <code class="type"></code>resvalue_type</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTresvalue_type.Type_resvalue_empty"><span class="constructor">Type_resvalue_empty</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTresvalue_type.Type_resvalue_value"><span class="constructor">Type_resvalue_value</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTresvalue_type.Type_resvalue_ref"><span class="constructor">Type_resvalue_ref</span></span></code></td>
 
 </tr></table>
 
