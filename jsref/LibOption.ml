@@ -37,3 +37,7 @@ match o1 with
    | Some v2 -> h v1 v2
    | None -> assert false)
 | None -> assert false
+
+let unsome_error o = match o with
+| Some x -> x
+| None -> assert false

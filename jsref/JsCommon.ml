@@ -37,6 +37,15 @@ let type_of _foo_ = match _foo_ with
 | Coq_value_string s -> Coq_type_string
 | Coq_value_object o -> Coq_type_object
 
+let type_of_resvalue r = match r with
+| Coq_resvalue_empty   -> Type_resvalue_empty
+| Coq_resvalue_value _ -> Type_resvalue_value
+| Coq_resvalue_ref _   -> Type_resvalue_ref
+
+let ref_of_resvalue r = match r with
+| Coq_resvalue_ref ref -> ref
+| _ -> assert false
+
 (** Default vales for data property attributes.
     @esid table-4
     @essec 6.1.7.1 Table 4 *)
@@ -265,17 +274,31 @@ let ref_kind_of r =
      | Coq_value_object o -> Coq_ref_kind_object)
   | Coq_ref_base_type_env_loc l -> Coq_ref_kind_env_record
 
+let value_of_ref_base_type r = match r with
+| Coq_ref_base_type_value v -> v
+| _ -> assert false
+
+let env_loc_of_ref_base_type r = match r with
+| Coq_ref_base_type_env_loc l -> l
+| _ -> assert false
+
 (** val ref_create_value : value -> prop_name -> bool -> ref **)
 
 let ref_create_value v x strict =
-  { ref_base = (Coq_ref_base_type_value v); ref_name = x; ref_strict =
-    strict }
+  { ref_base = (Coq_ref_base_type_value v);
+    ref_name = x;
+    ref_strict = strict;
+    ref_this_value = None
+  }
 
 (** val ref_create_env_loc : env_loc -> prop_name -> bool -> ref **)
 
 let ref_create_env_loc l x strict =
-  { ref_base = (Coq_ref_base_type_env_loc l); ref_name = x; ref_strict =
-    strict }
+  { ref_base = (Coq_ref_base_type_env_loc l);
+    ref_name = x;
+    ref_strict = strict;
+    ref_this_value = None
+  }
 
 (** val mutability_of_bool : bool -> mutability **)
 

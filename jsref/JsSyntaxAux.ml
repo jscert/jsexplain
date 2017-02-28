@@ -1,6 +1,7 @@
 (*open JsNumber*)  
 open JsSyntax
 open LibList
+open LibOption
 
 let int_of_native_error e =
   match e with
@@ -452,6 +453,7 @@ let ref_compare r1 r2 =
     (ref_base_type_compare r1.ref_base r2.ref_base)
  && (string_eq r1.ref_name r2.ref_name)
  && (bool_eq r1.ref_strict r2.ref_strict)
+ && (some_compare value_compare r1.ref_this_value r2.ref_this_value)
 
 (** val type_compare : coq_type -> coq_type -> bool **)
 

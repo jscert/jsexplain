@@ -1,6 +1,7 @@
 (*open JsNumber*)
 open Heap
 open Shared
+open LibOption
 
 type unary_op =
 | Coq_unary_op_delete
@@ -460,14 +461,22 @@ let execution_ctx_this_binding x = x.execution_ctx_this_binding
 
 let execution_ctx_strict x = x.execution_ctx_strict
 
+
+(** {3 Reference Specification Type (Definitions)}
+    @essec 6.2.4
+    @esid sec-reference-specification-type *)
 type prop_name = string
 
 type ref_base_type =
 | Coq_ref_base_type_value of value [@f value]
 | Coq_ref_base_type_env_loc of env_loc [@f value]
 
-type ref = { ref_base : ref_base_type; ref_name : prop_name;
-             ref_strict : bool }
+type ref = { ref_base : ref_base_type;
+             ref_name : prop_name;
+             ref_strict : bool;
+             (** A ref with a thisValue shall never have a base type of env_loc *)
+             ref_this_value : value option
+           }
 
 (** val ref_base : ref -> ref_base_type **)
 
@@ -480,6 +489,9 @@ let ref_name x = x.ref_name
 (** val ref_strict : ref -> bool **)
 
 let ref_strict x = x.ref_strict
+
+let ref_this_value x =
+  unsome_error x.ref_this_value
 
 type class_name = string
 
@@ -645,6 +657,11 @@ type resvalue =
 | Coq_resvalue_empty
 | Coq_resvalue_value of value [@f value]
 | Coq_resvalue_ref of ref [@f ref]
+
+type resvalue_type =
+| Type_resvalue_empty
+| Type_resvalue_value
+| Type_resvalue_ref
 
 type res = { res_type : restype; res_value : resvalue; res_label : label }
 

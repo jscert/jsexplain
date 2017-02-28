@@ -125,7 +125,9 @@ let handle_result result =
                 let r = {
                   JsSyntax.ref_base = JsSyntax.Coq_ref_base_type_value v ;
                   JsSyntax.ref_name = "__$ERROR__" ;
-                  JsSyntax.ref_strict = false } in
+                  JsSyntax.ref_strict = false;
+                  JsSyntax.ref_this_value = None
+                } in
                 if not !noParasite then
                   (match get_value_ref state r with
                   | Some v' ->
