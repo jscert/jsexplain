@@ -13,7 +13,7 @@ open Shared
 (** ECMAScript Reference Interpreter Implementation
 
     @esurl     https://tc39.github.io/ecma262/
-    @esversion 2016
+    @esversion 2017
 *)
 
 (* Basically, the ordering of the functions in this file are random. They need to be sorted. *)
@@ -402,13 +402,17 @@ and is_unresolvable_reference r =
 and is_super_reference r =
   is_some r.ref_this_value
 
-(** @esid sec-getvalue
-    @essec 6.2.4.1
+(** GetValue(V)
 
-    Note: get_value receives its state from the first parameter, which is a result.
-    *)
-and get_value v =
-  let%success (s, v') = v in
+    Note: Although the type of [v] is a resultof, its state is disregarded
+    and must be explicitly passed to prevent issues with the value being
+    computed prior to other state mutations.
+
+    @esid sec-getvalue
+    @essec 6.2.4.1
+*)
+and get_value s v =
+  let%success (_, v') = v in
   if not (type_of_resvalue v' === Type_resvalue_ref) then v
   else
     let v = ref_of_resvalue v' in
@@ -428,6 +432,48 @@ and get_value v =
     else
       let base = env_loc_of_ref_base_type base in
       get_binding_value s base (get_referenced_name v) (is_strict_reference v)
+
+(** PutValue(V,W)
+
+    Note: Although the types of [v] and [w] are resultof, their states are
+    disregarded and must be explicitly passed, as it is not clear in which
+    order they were calculated.
+
+    @esid sec-putvalue
+    @essec 6.2.4.2
+*)
+and put_value s c v w =
+  let%success (_, v) = v in
+  let%value (_, w) = w in
+  if not (type_of_resvalue v === Type_resvalue_ref) then
+    run_error_no_c s Coq_native_error_ref
+  else
+  let v = ref_of_resvalue v in
+  let base = get_base v in
+  if is_unresolvable_reference v then
+    if is_strict_reference v then
+      run_error_no_c s Coq_native_error_ref
+    else
+      let globalObj = get_global_object s c in
+      set s globalObj (get_referenced_name v) w (Coq_value_bool false)
+  else if is_property_reference v then
+    let base = value_of_ref_base_type base in
+    let%ret s, base =
+      if has_primitive_base v then
+        let%assert_ret _ = not (base === Coq_value_null || base === Coq_value_undef) in
+        let%OBJECT_ret s, base = to_object s base in
+        Continue (s, base)
+      else
+        Continue (s, loc_of_value base)
+    in
+    let%bool s, succeeded = object_internal_set s base (get_referenced_name v) w (get_this_value v) in
+    if (not succeeded) && (is_strict_reference v) then
+      run_error_no_c s Coq_native_error_type
+    else
+      res_void s
+  else
+    let base = env_loc_of_ref_base_type base in
+    set_mutable_binding s base (get_referenced_name v) w (Coq_value_bool (is_strict_reference v))
 
 (** @esid sec-getthisvalue
     @essec 6.2.4.3 *)
@@ -663,7 +709,7 @@ and same_value_non_number x y =
 (** @essec 7.3.1
     @esid sec-get-o-p *)
 and get s o p =
-  let%assert _ = match type_of o with Coq_type_object -> true | _ -> false in
+  let%assert _ = (type_of o) === Coq_type_object in
   let%assert _ = is_property_key p in
   match o with
   | Coq_value_object l -> object_internal_get s l p o
@@ -675,6 +721,20 @@ and get_v s v p =
   let%assert _ = is_property_key p in
   let%object (s1, l) = to_object s v in
   object_internal_get s1 l p v
+
+(** @essec 7.3.3
+    @esid sec-set-o-p-v-throw *)
+and set s o p v throw =
+  let%assert _ = (type_of o) === Coq_type_object in
+  let l = loc_of_value o in
+  let%assert _ = is_property_key p in
+  let%assert _ = (type_of throw) === Coq_type_bool in
+  let throw = bool_of_value throw in
+  let%bool s, success = object_internal_set s l p v o in
+  if (not success) && throw then
+    run_error_no_c s Coq_native_error_type
+  else
+    res_ter s (res_val (Coq_value_bool success))
 
 (** @essec 7.3.4
     @esid sec-createdataproperty *)
@@ -721,20 +781,17 @@ and call s f v argumentList =
 
 (** {1 Executable Code and Execution Contexts}
     @essec 8
-    @esid sec-executable-code-and-execution-contexts
-
-    {2 Lexical Environments}
+    @esid sec-executable-code-and-execution-contexts *)
+(** {2 Lexical Environments}
     @essec 8.1
-    @esid sec-lexical-environments
-
-    {3 Environment Records}
+    @esid sec-lexical-environments *)
+(** {3 Environment Records}
     @essec 8.1.1
-    @esid sec-environment-records
-
-    {4 Abstract Methods}
-    @esid table-15
-
+    @esid sec-environment-records *)
+(** {4 Abstract Methods}
     Dynamic dispatch functions for environment record abstract methods.
+
+    @esid table-15
 *)
 (*
 and has_binding s e n =
@@ -756,12 +813,13 @@ and initialize_binding s e n v =
   match e with
   | Coq_env_record_decl e           -> decl_env_record_initialize_binding s e n v
   | Coq_env_record_object (l, this) -> object_env_record_initialize_binding s l this n v
-
-and set_mutable_binding s e n v str =
-  match e with
-  | Coq_env_record_decl e           -> decl_env_record_set_mutable_binding s e n v str
-  | Coq_env_record_object (l, this) -> object_env_record_set_mutable_binding s l this n v str
 *)
+
+and set_mutable_binding s l n v str =
+  let%some e = env_record_binds_option s l in
+  match e with
+  | Coq_env_record_decl e           -> decl_env_record_set_mutable_binding s l e n v str
+  | Coq_env_record_object (l, this) -> object_env_record_set_mutable_binding s (Coq_value_object l) this n v str
 
 and get_binding_value s l n str =
   let%some e = env_record_binds_option s l in
@@ -797,6 +855,64 @@ and with_base_object s e =
     @esid sec-declarative-environment-records
 *)
 
+(* FIXME: Move to a bindings data structure section. Apply to mutable bindings also. *)
+and binding_is_uninitialized binding =
+  let (mutability, unused) = binding in
+  mutability_compare mutability Coq_mutability_uninitialized_immutable
+
+and binding_is_mutable binding =
+  let (mutability, unused) = binding in
+  (mutability === Coq_mutability_nondeletable) || (mutability === Coq_mutability_deletable)
+
+(** @essec 8.1.1.1.2
+    @esid sec-declarative-environment-records-createmutablebinding-n-d *)
+and decl_env_record_create_mutable_binding s l envRec n' d =
+  let n = string_of_value n' in
+  let d = bool_of_value d in
+  let%assert _ = not (HeapStr.indom_dec envRec n) in
+  let s = env_record_write_decl_env s l n (mutability_of_bool d) Coq_value_undef in (* FIXME: Uninitialized field *)
+  res_void s
+
+(** @essec 8.1.1.1.4
+    @esid sec-declarative-environment-records-initializebinding-n-v *)
+and decl_env_record_initialize_binding s l envRec n' v =
+  let n = string_of_value n' in
+  let%some binding = HeapStr.read_option envRec n in
+  let (mutability, unused) = binding in (* TODO: Tidy up *)
+  let%assert _ = binding_is_uninitialized binding in
+  (* Update mutability / initialization flag *)
+  let s = env_record_write_decl_env s l n mutability v in
+  res_void s
+
+(** @essec 8.1.1.1.5
+    @esid sec-declarative-environment-records-setmutablebinding-n-v-s *)
+and decl_env_record_set_mutable_binding s l envRec n' v str =
+  let n = string_of_value n' in
+  let str = bool_of_value str in
+  if not (HeapStr.indom_dec envRec n) then
+    if str then
+      run_error_no_c s Coq_native_error_ref
+    else
+      let%success s, _ = decl_env_record_create_mutable_binding s l envRec n' (Coq_value_bool true) in
+      let%success s, _ = decl_env_record_initialize_binding s l envRec n' v in
+      res_void s
+  else
+  let%some binding = HeapStr.read_option envRec n in
+  let (mutability, unused) = binding in
+  (* FIXME: Implement strictness for bindings: let str = if binding.ref_strict then true else str in *)
+  if binding_is_uninitialized binding then
+    run_error_no_c s Coq_native_error_ref
+  else let%ret s =
+    if binding_is_mutable binding then
+      Continue (env_record_write_decl_env s l n mutability v)
+    else
+      if str then
+        Return (run_error_no_c s Coq_native_error_type)
+      else
+        Continue s
+    in
+    res_void s
+
 (** @essec 8.1.1.1.6
     @esid sec sec-declarative-environment-records-getbindingvalue-n-s *)
 and decl_env_record_get_binding_value s envRec n str =
@@ -804,7 +920,7 @@ and decl_env_record_get_binding_value s envRec n str =
   let%assert _ = HeapStr.indom_dec envRec n in
   let%some binding = HeapStr.read_option envRec n in
   let (mutability, v) = binding in
-  if mutability_compare mutability Coq_mutability_uninitialized_immutable
+  if mutability_compare mutability Coq_mutability_uninitialized_immutable (* FIXME: Need to handle mutable uninitialized also *)
   then run_error_no_c s Coq_native_error_ref
   else res_ter s (res_val v)
 
@@ -813,6 +929,12 @@ and decl_env_record_get_binding_value s envRec n str =
     @essec 8.1.1.2
     @esid sec-object-environment-records
 *)
+
+(** @essec 8.1.1.1.2.5
+    @edid sec-object-environment-records-setmutablebinding-n-v-s *)
+and object_env_record_set_mutable_binding s bindings this n v str =
+  set s bindings n v str
+
 (** @essec 8.1.1.1.2.6
     @esid sec-object-environment-records-getbindingvalue-n-s *)
 and object_env_record_get_binding_value s bindings this n str =
@@ -824,18 +946,27 @@ and object_env_record_get_binding_value s bindings this n str =
   else
     get s bindings n
 
+(** {2 Execution Contexts}
+    @essec 8.3
+    @esid sec-execution-contexts *)
 
+(** @esid sec-getglobalobject
+    @essec 8.3.6 *)
+and get_global_object s ctx =
+  (* FIXME: ES5 hack (realms required) *)
+  let e = unsome_error (env_record_binds_option s env_loc_global_env_record) in
+  match e with
+  | Coq_env_record_object (l, this) -> Coq_value_object l
+  |  _ -> assert false
 
 (** {1 Ordinary and Exotic Objects Behaviours }
     @essec 9
-    @esid sec-ordinary-and-exotic-objects-behaviours
-*)
+    @esid sec-ordinary-and-exotic-objects-behaviours *)
 
 (**
     {2 Ordinary Object Internal Methods and Internal Slots }
     @essec 9.1
-    @esid sec-ordinary-object-internal-methods-and-internal-slots
-*)
+    @esid sec-ordinary-object-internal-methods-and-internal-slots *)
 
 (** [[GetPrototypeOf]]()
     @essec 9.1.1
@@ -1646,12 +1777,12 @@ and env_record_get_binding_value s c l x str =
 
 (** @deprecated ES5 *)
 and ref_get_value s c _foo_ =
-  let%value s, v = get_value (res_ter s (res_normal _foo_)) in
+  let%value s, v = get_value s (res_ter s (res_normal _foo_)) in
   res_spec s v
 
 (** @deprecated ES5 *)
 and run_expr_get_value s c e =
-  let%value s, v = get_value (run_expr s c e) in
+  let%value s, v = get_value s (run_expr s c e) in
   res_spec s v
 
 (** val env_record_set_mutable_binding :
