@@ -1800,66 +1800,9 @@ and env_record_set_mutable_binding s c l x v str =
             else out_error_or_void s c str Coq_native_error_type
       | Coq_env_record_object (l0, pt) -> object_put s c l0 x v str
 
-(** val prim_value_put :
-    state -> execution_ctx -> prim -> prop_name -> value ->
-    strictness_flag -> result_void **)
-
-and prim_value_put s c w x v str =
-  assert false (* FIXME *)
-  (* let%object (s1, l) = (to_object s w) in
-      object_put_complete Coq_builtin_put_default s1 c w l x v str *)
-
-(** val ref_put_value :
-    state -> execution_ctx -> resvalue -> value -> result_void **)
-
+(** @deprecated ES5 *)
 and ref_put_value s c rv v =
-  match rv with
-  | Coq_resvalue_empty ->
-    (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-      s
-      ("[ref_put_value] received an empty result.")
-  | Coq_resvalue_value v0 -> run_error s c Coq_native_error_ref
-  | Coq_resvalue_ref r ->
-    if ref_kind_comparable (ref_kind_of r) Coq_ref_kind_undef
-    then if r.ref_strict
-      then run_error s c Coq_native_error_ref
-      else object_put s c (Coq_object_loc_prealloc
-                             Coq_prealloc_global) r.ref_name v throw_false
-    else if
-          (ref_kind_comparable (ref_kind_of r) Coq_ref_kind_primitive_base)
-       || (ref_kind_comparable (ref_kind_of r) Coq_ref_kind_null)
-       || (ref_kind_comparable (ref_kind_of r) Coq_ref_kind_object)
-    then (match r.ref_base with
-        | Coq_ref_base_type_value v_2 ->
-          if ref_kind_comparable (ref_kind_of r) Coq_ref_kind_primitive_base
-          then (match v_2 with
-              | Coq_value_object o ->
-                (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                  s
-                  ("[ref_put_value] impossible case")
-              | _ ->
-                prim_value_put s c v_2 r.ref_name v r.ref_strict
-            )
-          else (match v_2 with
-              | Coq_value_object l ->
-                object_put s c l r.ref_name v r.ref_strict
-              | _ ->
-                (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                  s
-                  ("[ref_put_value] impossible case")
-            )
-        | Coq_ref_base_type_env_loc l ->
-          (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-            s
-            ("[ref_put_value] contradicts ref_is_property"))
-    else (match r.ref_base with
-        | Coq_ref_base_type_value v0 ->
-          (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-            s
-            ("[ref_put_value] impossible spec")
-        | Coq_ref_base_type_env_loc l ->
-          env_record_set_mutable_binding s c l r.ref_name v
-            r.ref_strict)
+  put_value s c (res_ter s (res_normal rv)) (res_ter s (res_val v))
 
 (** val env_record_create_mutable_binding :
     state -> execution_ctx -> env_loc -> prop_name -> bool
