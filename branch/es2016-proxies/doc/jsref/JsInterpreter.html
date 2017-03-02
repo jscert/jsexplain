@@ -201,7 +201,7 @@ GetValue(V)
     computed prior to other state mutations.<br>
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-getvalue">6.2.4.1</a></div>
 
-<pre><span id="VALput_value"><span class="keyword">val</span> put_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       'c <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<pre><span id="VALput_value"><span class="keyword">val</span> put_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 PutValue(V,W)
 <p>
 
@@ -314,7 +314,7 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#
 <br>
 <h2 id="2_ExecutionContexts">Execution Contexts</h2><br>
 
-<pre><span id="VALget_global_object"><span class="keyword">val</span> get_global_object</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> 'a -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><div class="info ">
+<pre><span id="VALget_global_object"><span class="keyword">val</span> get_global_object</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-getglobalobject">8.3.6</a></div>
 <br>
 <h1 id="1_OrdinaryandExoticObjectsBehaviours">Ordinary and Exotic Objects Behaviours </h1><br>
@@ -517,16 +517,11 @@ val env_record_set_mutable_binding :
     state -&gt; execution_ctx -&gt; env_loc -&gt; prop_name -&gt; value -&gt;
     strictness_flag -&gt; result_void *<br>
 
-<pre><span id="VALenv_record_set_mutable_binding"><span class="keyword">val</span> env_record_set_mutable_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
-val prim_value_put :
-    state -&gt; execution_ctx -&gt; prim -&gt; prop_name -&gt; value -&gt;
-    strictness_flag -&gt; result_void *<br>
-
-<pre><span id="VALprim_value_put"><span class="keyword">val</span> prim_value_put</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       bool -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
-val ref_put_value :
-    state -&gt; execution_ctx -&gt; resvalue -&gt; value -&gt; result_void *<br>
-
-<pre><span id="VALref_put_value"><span class="keyword">val</span> ref_put_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+<pre><span id="VALenv_record_set_mutable_binding"><span class="keyword">val</span> env_record_set_mutable_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALref_put_value"><span class="keyword">val</span> ref_put_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>ES5<br>
+</div>
+<br>
 val env_record_create_mutable_binding :
     state -&gt; execution_ctx -&gt; env_loc -&gt; prop_name -&gt; bool
     option -&gt; result_void *<br>
