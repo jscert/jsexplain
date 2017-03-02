@@ -46,6 +46,8 @@
 <link title="Type Conversion " rel="Subsection" href="#2_TypeConversion">
 <link title="Testing and Comparison Operations " rel="Subsection" href="#2_TestingandComparisonOperations">
 <link title="Operations on Objects " rel="Subsection" href="#2_OperationsonObjects">
+<link title="Lexical Environments" rel="Subsection" href="#2_LexicalEnvironments">
+<link title="Execution Contexts" rel="Subsection" href="#2_ExecutionContexts">
 <link title="Ordinary Object Internal Methods and Internal Slots " rel="Subsection" href="#2_OrdinaryObjectInternalMethodsandInternalSlots">
 <title>JsInterpreter</title>
 </head>
@@ -190,87 +192,130 @@ Function to dispatch calls to O.<code class="code">[Call]</code>(thisArgument, a
 <pre><span id="VALis_property_reference"><span class="keyword">val</span> is_property_reference</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
 <pre><span id="VALis_unresolvable_reference"><span class="keyword">val</span> is_unresolvable_reference</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
 <pre><span id="VALis_super_reference"><span class="keyword">val</span> is_super_reference</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
-<pre><span id="VALget_value"><span class="keyword">val</span> get_value</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-getvalue">6.2.4.1
+<pre><span id="VALget_value"><span class="keyword">val</span> get_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+GetValue(V)
+<p>
 
-    Note: get_value receives its state from the first parameter, which is a result.</a></div>
+    Note: Although the type of <code class="code">v</code> is a resultof, its state is disregarded
+    and must be explicitly passed to prevent issues with the value being
+    computed prior to other state mutations.<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-getvalue">6.2.4.1</a></div>
+
+<pre><span id="VALput_value"><span class="keyword">val</span> put_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       'c <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+PutValue(V,W)
+<p>
+
+    Note: Although the types of <code class="code">v</code> and <code class="code">w</code> are resultof, their states are
+    disregarded and must be explicitly passed, as it is not clear in which
+    order they were calculated.<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-putvalue">6.2.4.2</a></div>
 
 <pre><span id="VALget_this_value"><span class="keyword">val</span> get_this_value</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-getthisvalue">6.2.4.3</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-getthisvalue">6.2.4.3</a></div>
 <br>
 <h3 id="3_ThePropertyDescriptorSpecificationType">The Property Descriptor Specification Type</h3><br>
 
 <pre><span id="VALis_accessor_descriptor"><span class="keyword">val</span> is_accessor_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> bool</code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-isaccessordescriptor">6.2.5.1</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-isaccessordescriptor">6.2.5.1</a></div>
 
 <pre><span id="VALis_data_descriptor"><span class="keyword">val</span> is_data_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> bool</code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-isdatadescriptor">6.2.5.2</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-isdatadescriptor">6.2.5.2</a></div>
 
 <pre><span id="VALis_generic_descriptor"><span class="keyword">val</span> is_generic_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> bool</code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-isgenericdescriptor">6.2.5.3</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-isgenericdescriptor">6.2.5.3</a></div>
 
 <pre><span id="VALto_property_descriptor"><span class="keyword">val</span> to_property_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-topropertydescriptor">6.2.5.5</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-topropertydescriptor">6.2.5.5</a></div>
 
 <pre><span id="VALcomplete_property_descriptor"><span class="keyword">val</span> complete_property_descriptor</span> : <code class="type">'a -> <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-completepropertydescriptor">6.2.5.6</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-completepropertydescriptor">6.2.5.6</a></div>
 <br>
 <h1 id="1_AbstractOperations">Abstract Operations </h1><br>
 <br>
 <h2 id="2_TypeConversion">Type Conversion </h2><br>
 
 <pre><span id="VALto_boolean"><span class="keyword">val</span> to_boolean</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-toboolean">7.1.2</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-toboolean">7.1.2</a></div>
 <br>
 <h2 id="2_TestingandComparisonOperations">Testing and Comparison Operations </h2><br>
 
 <pre><span id="VALis_callable"><span class="keyword">val</span> is_callable</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-iscallable">7.2.3</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-iscallable">7.2.3</a></div>
 
 <pre><span id="VALis_extensible"><span class="keyword">val</span> is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-isextensible-o">7.2.5</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-isextensible-o">7.2.5</a></div>
 
 <pre><span id="VALis_property_key"><span class="keyword">val</span> is_property_key</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ispropertykey">7.2.7</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ispropertykey">7.2.7</a></div>
 
 <pre><span id="VALsame_value"><span class="keyword">val</span> same_value</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-samevalue">7.2.9</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-samevalue">7.2.9</a></div>
 
 <pre><span id="VALsame_value_non_number"><span class="keyword">val</span> same_value_non_number</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-samevaluenonnumber">7.2.11</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-samevaluenonnumber">7.2.11</a></div>
 <br>
 <h2 id="2_OperationsonObjects">Operations on Objects </h2><br>
 
 <pre><span id="VALget"><span class="keyword">val</span> get</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-get-o-p">7.3.1</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-get-o-p">7.3.1</a></div>
 
 <pre><span id="VALget_v"><span class="keyword">val</span> get_v</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-getv">7.3.2</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-getv">7.3.2</a></div>
+
+<pre><span id="VALset"><span class="keyword">val</span> set</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-set-o-p-v-throw">7.3.3</a></div>
 
 <pre><span id="VALcreate_data_property"><span class="keyword">val</span> create_data_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-createdataproperty">7.3.4</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-createdataproperty">7.3.4</a></div>
 
 <pre><span id="VALget_method"><span class="keyword">val</span> get_method</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-getmethod">7.3.9</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-getmethod">7.3.9</a></div>
 
 <pre><span id="VALhas_property"><span class="keyword">val</span> has_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-hasproperty">7.3.10</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-hasproperty">7.3.10</a></div>
 
 <pre><span id="VALcall"><span class="keyword">val</span> call</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list option -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-call">7.3.12</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-call">7.3.12</a></div>
 <br>
 <h1 id="1_ExecutableCodeandExecutionContexts">Executable Code and Execution Contexts</h1><br>
+<br>
+<h2 id="2_LexicalEnvironments">Lexical Environments</h2><br>
+<br>
+<h3 id="3_EnvironmentRecords">Environment Records</h3><br>
+<br>
+<h4 id="4_AbstractMethods">Abstract Methods</h4>
+    Dynamic dispatch functions for environment record abstract methods.<br>
 
+<pre><span id="VALset_mutable_binding"><span class="keyword">val</span> set_mutable_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
 <pre><span id="VALget_binding_value"><span class="keyword">val</span> get_binding_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       bool -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
 <h4 id="4_DeclarativeEnvironmentRecords">Declarative Environment Records</h4><br>
 
+<pre><span id="VALbinding_is_uninitialized"><span class="keyword">val</span> binding_is_uninitialized</span> : <code class="type"><a href="JsSyntax.html#TYPEmutability">JsSyntax.mutability</a> * <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre>
+<pre><span id="VALbinding_is_mutable"><span class="keyword">val</span> binding_is_mutable</span> : <code class="type"><a href="JsSyntax.html#TYPEmutability">JsSyntax.mutability</a> * <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre>
+<pre><span id="VALdecl_env_record_create_mutable_binding"><span class="keyword">val</span> decl_env_record_create_mutable_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEdecl_env_record">JsSyntax.decl_env_record</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-declarative-environment-records-createmutablebinding-n-d">8.1.1.1.2</a></div>
+
+<pre><span id="VALdecl_env_record_initialize_binding"><span class="keyword">val</span> decl_env_record_initialize_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEdecl_env_record">JsSyntax.decl_env_record</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-declarative-environment-records-initializebinding-n-v">8.1.1.1.4</a></div>
+
+<pre><span id="VALdecl_env_record_set_mutable_binding"><span class="keyword">val</span> decl_env_record_set_mutable_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEdecl_env_record">JsSyntax.decl_env_record</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-declarative-environment-records-setmutablebinding-n-v-s">8.1.1.1.5</a></div>
+
 <pre><span id="VALdecl_env_record_get_binding_value"><span class="keyword">val</span> decl_env_record_get_binding_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEdecl_env_record">JsSyntax.decl_env_record</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       bool -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec sec-declarative-environment-records-getbindingvalue-n-s">8.1.1.1.6</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec sec-declarative-environment-records-getbindingvalue-n-s">8.1.1.1.6</a></div>
 <br>
 <h4 id="4_ObjectEnvironmentRecords">Object Environment Records</h4><br>
 
+<pre><span id="VALobject_env_record_set_mutable_binding"><span class="keyword">val</span> object_env_record_set_mutable_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEprovide_this_flag">JsSyntax.provide_this_flag</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+</div>
+
 <pre><span id="VALobject_env_record_get_binding_value"><span class="keyword">val</span> object_env_record_get_binding_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEprovide_this_flag">JsSyntax.provide_this_flag</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       bool -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-object-environment-records-getbindingvalue-n-s">8.1.1.1.2.6</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object-environment-records-getbindingvalue-n-s">8.1.1.1.2.6</a></div>
+<br>
+<h2 id="2_ExecutionContexts">Execution Contexts</h2><br>
+
+<pre><span id="VALget_global_object"><span class="keyword">val</span> get_global_object</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> 'a -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-getglobalobject">8.3.6</a></div>
 <br>
 <h1 id="1_OrdinaryandExoticObjectsBehaviours">Ordinary and Exotic Objects Behaviours </h1><br>
 <br>
@@ -278,62 +323,62 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#
 
 <pre><span id="VALordinary_object_internal_get_prototype_of"><span class="keyword">val</span> ordinary_object_internal_get_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 <code class="code">[GetPrototypeOf]</code>()<br>
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinary-object-internal-methods-and-internal-slots-getprototypeof">9.1.1</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-getprototypeof">9.1.1</a></div>
 
 <pre><span id="VALordinary_get_prototype_of"><span class="keyword">val</span> ordinary_get_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinarygetprototypeof">9.1.1.1</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinarygetprototypeof">9.1.1.1</a></div>
 
 <pre><span id="VALordinary_object_internal_set_prototype_of"><span class="keyword">val</span> ordinary_object_internal_set_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 <code class="code">[SetPrototypeOf]</code>(V)<br>
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinary-object-internal-methods-and-internal-slots-setprototypeof-v">9.1.2</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-setprototypeof-v">9.1.2</a></div>
 
 <pre><span id="VALordinary_set_prototype_of"><span class="keyword">val</span> ordinary_set_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinarysetprototypeof">9.1.2.1</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinarysetprototypeof">9.1.2.1</a></div>
 
 <pre><span id="VALordinary_object_internal_is_extensible"><span class="keyword">val</span> ordinary_object_internal_is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinary-object-internal-methods-and-internal-slots-isextensible">9.1.3</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-isextensible">9.1.3</a></div>
 
 <pre><span id="VALordinary_is_extensible"><span class="keyword">val</span> ordinary_is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinaryisextensible">9.1.3.1</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinaryisextensible">9.1.3.1</a></div>
 
 <pre><span id="VALordinary_object_internal_prevent_extensions"><span class="keyword">val</span> ordinary_object_internal_prevent_extensions</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinary-object-internal-methods-and-internal-slots-preventextensions">9.1.4</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-preventextensions">9.1.4</a></div>
 
 <pre><span id="VALordinary_prevent_extensions"><span class="keyword">val</span> ordinary_prevent_extensions</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinarypreventextensions">9.1.4.1</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinarypreventextensions">9.1.4.1</a></div>
 
 <pre><span id="VALordinary_object_internal_get_own_property"><span class="keyword">val</span> ordinary_object_internal_get_own_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinary-object-internal-methods-and-internal-slots-getownproperty-p">9.1.5</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-getownproperty-p">9.1.5</a></div>
 
 <pre><span id="VALordinary_get_own_property"><span class="keyword">val</span> ordinary_get_own_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinarygetownproperty">9.1.5.1</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinarygetownproperty">9.1.5.1</a></div>
 
 <pre><span id="VALordinary_object_internal_define_own_property"><span class="keyword">val</span> ordinary_object_internal_define_own_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinary-object-internal-methods-and-internal-slots-defineownproperty-p-desc">9.1.6</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-defineownproperty-p-desc">9.1.6</a></div>
 
 <pre><span id="VALordinary_define_own_property"><span class="keyword">val</span> ordinary_define_own_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinarydefineownproperty">9.1.6.1</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinarydefineownproperty">9.1.6.1</a></div>
 
 <pre><span id="VALis_compatible_property_descriptor"><span class="keyword">val</span> is_compatible_property_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       bool -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -><br>       <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-iscompatiblepropertydescriptor">9.1.6.2</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-iscompatiblepropertydescriptor">9.1.6.2</a></div>
 
 <pre><span id="VALvalidate_and_apply_property_descriptor"><span class="keyword">val</span> validate_and_apply_property_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       bool -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -><br>       <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-validateandapplypropertydescriptor">9.1.6.3</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-validateandapplypropertydescriptor">9.1.6.3</a></div>
 
 <pre><span id="VALordinary_object_internal_has_property"><span class="keyword">val</span> ordinary_object_internal_has_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinary-object-internal-methods-and-internal-slots-hasproperty-p">link</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-hasproperty-p">link</a></div>
 
 <pre><span id="VALordinary_has_property"><span class="keyword">val</span> ordinary_has_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinaryhasproperty">9.1.7.1</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinaryhasproperty">9.1.7.1</a></div>
 
 <pre><span id="VALordinary_object_internal_set"><span class="keyword">val</span> ordinary_object_internal_set</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinary-object-internal-methods-and-internal-slots-set-p-v-receiver">9.1.9</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-set-p-v-receiver">9.1.9</a></div>
 
 <pre><span id="VALordinary_set"><span class="keyword">val</span> ordinary_set</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinaryset">9.1.9.1</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinaryset">9.1.9.1</a></div>
 
 <pre><span id="VALordinary_own_property_keys"><span class="keyword">val</span> ordinary_own_property_keys</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> list <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2016/#sec-ordinaryownpropertykeys">9.1.11.1</a></div>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinaryownpropertykeys">9.1.11.1</a></div>
 
 <pre><span id="VALobject_has_prop"><span class="keyword">val</span> object_has_prop</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 <span class="warning">Deprecated.</span>Compatibility wrapper for ES5 code to ES6

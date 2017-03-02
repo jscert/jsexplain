@@ -174,6 +174,10 @@ Updates a given attribute with values from the given descriptor.
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALbinding_inst_var_decls">binding_inst_var_decls</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALbinding_is_mutable">binding_is_mutable</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALbinding_is_uninitialized">binding_is_uninitialized</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsSyntaxAux.html#VALbool_of_value">bool_of_value</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInit.html#VALbool_proto_to_string_function_object">bool_proto_to_string_function_object</a> [<a href="JsInit.html">JsInit</a>]</td>
@@ -240,9 +244,17 @@ A Specification assertion that b is true, continuing with k,
 <tr><td><a href="JsInterpreter.html#VALcreating_function_object_proto">creating_function_object_proto</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>D</td></tr>
+<tr><td><a href="JsInterpreter.html#VALdecl_env_record_create_mutable_binding">decl_env_record_create_mutable_binding</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsCommon.html#VALdecl_env_record_empty">decl_env_record_empty</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALdecl_env_record_get_binding_value">decl_env_record_get_binding_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALdecl_env_record_initialize_binding">decl_env_record_initialize_binding</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
 </td></tr>
@@ -250,6 +262,10 @@ A Specification assertion that b is true, continuing with k,
 <td></td></tr>
 <tr><td><a href="JsCommon.html#VALdecl_env_record_rem">decl_env_record_rem</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALdecl_env_record_set_mutable_binding">decl_env_record_set_mutable_binding</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsCommon.html#VALdecl_env_record_write">decl_env_record_write</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsSyntax.html#VALdescriptor_configurable">descriptor_configurable</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
@@ -454,6 +470,10 @@ Implements spec text: "true, if every field in d is absent"
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALget_binding_value">get_binding_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALget_global_object">get_global_object</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreterUtils.html#VALget_global_value">get_global_value</a> [<a href="JsInterpreterUtils.html">JsInterpreterUtils</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALget_method">get_method</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
@@ -474,6 +494,7 @@ Implements spec text: "true, if every field in d is absent"
 </td></tr>
 <tr><td><a href="JsInterpreter.html#VALget_value">get_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
+GetValue(V)
 </div>
 </td></tr>
 <tr><td><a href="JsInterpreterUtils.html#VALget_value_ref">get_value_ref</a> [<a href="JsInterpreterUtils.html">JsInterpreterUtils</a>]</td>
@@ -835,6 +856,10 @@ Fetches Some object from location l in the heap, None if it is not allocated
 <tr><td><a href="JsInterpreter.html#VALobject_delete_default">object_delete_default</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALobject_env_record_get_binding_value">object_env_record_get_binding_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALobject_env_record_set_mutable_binding">object_env_record_set_mutable_binding</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
 </td></tr>
@@ -1235,6 +1260,11 @@ Given a properties Heap, a property name, updates the given property attributes 
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALpush">push</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALput_value">put_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+PutValue(V,W)
+</div>
+</td></tr>
 <tr><td align="left"><br>R</td></tr>
 <tr><td><a href="HeapObj.html#VALread">read</a> [<a href="HeapObj.html">HeapObj</a>]</td>
 <td></td></tr>
@@ -1530,6 +1560,12 @@ Fetches a given object slot value (using proj) from the object l in state s
 <td><div class="info">
 </div>
 </td></tr>
+<tr><td><a href="JsInterpreter.html#VALset">set</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALset_mutable_binding">set_mutable_binding</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsNumber.html#VALsign">sign</a> [<a href="JsNumber.html">JsNumber</a>]</td>
 <td></td></tr>
 <tr><td><a href="StdMap.html#VALsingleton">singleton</a> [<a href="StdMap.html">StdMap</a>]</td>
