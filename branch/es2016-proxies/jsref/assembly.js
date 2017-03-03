@@ -8672,7 +8672,8 @@ var object_internal_get = function (s, o, p, receiver) {
                           
                             var _return_228 = (function () {
                               log_event("JsInterpreter.js", 491, ctx_75, "call");
-                              var _return_227 = dispatch_es5({});
+                              var _return_227 = ordinary_object_internal_get(
+                                                  s, o, p, receiver);
                               log_event("JsInterpreter.js", 490, ctx_push(ctx_75, [{key: "#RETURN_VALUE#", val: _return_227}]), "return");
                               return (_return_227); 
                             }())
