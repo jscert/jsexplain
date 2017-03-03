@@ -357,7 +357,7 @@ and object_internal_get s o p receiver =
     | _ -> assert false
   in match internal_method with
   (* FIXME: Dispatch to new versions of functions *)
-  | Coq_builtin_get_default  -> dispatch_es5 ()
+  | Coq_builtin_get_default  -> ordinary_object_internal_get s o p receiver
   | Coq_builtin_get_function -> dispatch_es5 ()
   | Coq_builtin_get_args_obj -> dispatch_es5 ()
   | Coq_builtin_get_proxy    -> Coq_result_not_yet_implemented
@@ -1224,6 +1224,36 @@ and ordinary_has_property s o p =
   else let%value s, parent = object_internal_get_prototype_of s o in
   if not (parent === Coq_value_null) then object_internal_has_property s (loc_of_value parent) p
   else res_ter s (res_val (Coq_value_bool false))
+
+(** @essec 9.1.8
+    @esid sec-ordinary-object-internal-methods-and-internal-slots-get-p-receiver *)
+and ordinary_object_internal_get s o p receiver =
+  ordinary_get s o p receiver
+
+(** @essec 9.1.8.1
+    @esid sec-ordinaryget *)
+and ordinary_get s o p receiver =
+  let%assert _ = is_property_key p in
+  let%spec s, desc = object_internal_get_own_property s o p in
+  if desc === Descriptor_undef then
+    let%value s, parent = object_internal_get_prototype_of s o in
+    if parent === Coq_value_null then
+      res_ter s (res_val Coq_value_undef)
+    else
+      let parent = loc_of_value parent in
+      object_internal_get s parent p receiver
+  else if is_data_descriptor desc then
+    let desc = descriptor_get_defined desc in
+    let%some value = descriptor_value desc in
+    res_ter s (res_val value)
+  else
+    let%assert _ = is_accessor_descriptor desc in
+    let desc = descriptor_get_defined desc in
+    let%some getter = descriptor_get desc in (* None value should be invalid as it represents "absent" in spec *)
+    if getter === Coq_value_undef then
+      res_ter s (res_val Coq_value_undef)
+    else
+      call s getter receiver None
 
 (** @essec 9.1.9
     @esid sec-ordinary-object-internal-methods-and-internal-slots-set-p-v-receiver *)
