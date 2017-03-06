@@ -372,6 +372,22 @@ and object_internal_set s o p v receiver =
 (** @deprecated In favour of potentially the same [object_internal_set] ES6 method *)
 and object_put s c l p v str = object_internal_set s l (Coq_value_string p) v (Coq_value_object l)
 
+(** Function to dispatch calls to O.[[Delete]](P) *)
+and object_internal_delete s o p =
+  let%some internal_method = run_object_method object_delete_ s o in
+  match internal_method with
+  | Coq_builtin_delete_default  -> ordinary_object_internal_delete s o p
+  | Coq_builtin_delete_args_obj -> assert false
+  | Coq_builtin_delete_proxy    -> Coq_result_not_yet_implemented
+
+(** @deprecated ES5 *)
+and object_delete_default s c l x str =
+  let%bool s, b = ordinary_object_internal_delete s l (Coq_value_string x) in
+  if str && (not b) then
+    run_error_no_c s Coq_native_error_type
+  else
+    res_ter s (res_val (Coq_value_bool b))
+
 (** Function to dispatch calls to O.[[Call]](thisArgument, argumentsList) *)
 and object_internal_call s o thisArgument argumentsList =
   (* FIXME: ES5 HACK CONTEXT *)
@@ -1309,6 +1325,27 @@ and ordinary_set s o p v receiver =
       let%spec s, _ = call s setter receiver (Some [v]) in
       res_ter s (res_val (Coq_value_bool true))
 
+(** @essec 9.1.10
+    @esid sec-ordinary-object-internal-methods-and-internal-slots-delete-p *)
+and ordinary_object_internal_delete s o p =
+  ordinary_delete s o p
+
+(** @essec 9.1.10.1
+    @esid sec-ordinarydelete *)
+and ordinary_delete s o p =
+  let%assert _ = is_property_key p in
+  let%spec s, desc = object_internal_get_own_property s o p in
+  if desc === Descriptor_undef then
+    res_ter s (res_val (Coq_value_bool true))
+  else
+  let desc = descriptor_get_defined desc in
+  if some_compare (===) (descriptor_configurable desc) (Some true) then
+    let p = string_of_value p in
+    let%some s = run_object_heap_map_properties s o (fun props -> HeapStr.rem props p)  in
+    res_ter s (res_val (Coq_value_bool true))
+  else
+    res_ter s (res_val (Coq_value_bool false))
+
 (** @essec 9.1.11.1
     @esid sec-ordinaryownpropertykeys *)
 and ordinary_own_property_keys s c l =
@@ -1712,23 +1749,6 @@ and lexical_env_get_identifier_ref s c x x0 str =
         if has
         then res_spec s1 (ref_create_env_loc l x0 str)
         else lexical_env_get_identifier_ref s1 c x_2 x0 str
-
-(** val object_delete_default :
-    state -> execution_ctx -> object_loc -> prop_name ->
-    strictness_flag -> result **)
-
-and object_delete_default s c l x str =
-  let%spec (s1, d) = (run_object_get_own_prop s c l x) in
-      match d with
-      | Coq_full_descriptor_undef ->
-        res_ter s1 (res_val (Coq_value_bool true))
-      | Coq_full_descriptor_some a ->
-        if attributes_configurable a
-        then let%some
-             s_2 = (run_object_heap_map_properties s1 l (fun p ->
-                 HeapStr.rem p x)) in
-                res_ter s_2 (res_val (Coq_value_bool true))
-        else out_error_or_cst s1 c str Coq_native_error_type (Coq_value_bool false)
 
 (** val object_delete :
     state -> execution_ctx -> object_loc -> prop_name ->
@@ -4265,7 +4285,7 @@ and run_call_prealloc s c b vthis args =
     else
       let%string (s3, sindx) = (to_string s2 c (Coq_value_number (ilen -. 1.))) in
       let%value (s4, velem) = (run_object_get s3 c l sindx) in
-      let%not_throw (s5, x) = (object_delete_default s4 c l sindx throw_true) in
+      let%not_throw (s5, x) = (object_delete s4 c l sindx throw_true) in
       let%not_throw (s6, x0) = (object_put s5 c l ("length") (Coq_value_string sindx) throw_true) in
       res_out s6 (res_val velem)
   | Coq_prealloc_array_proto_push ->
