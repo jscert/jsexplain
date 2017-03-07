@@ -17,6 +17,7 @@ let monad_mapping = [
 
     ("ret", "let_ret");
     ("value_ret", "if_value_ret");
+    ("bool_ret", "if_bool_ret");
     ("object_ret", "if_object_ret");
     ("OBJECT_ret", "assert_object_ret");
     ("assert_ret", "check_assert_ret");

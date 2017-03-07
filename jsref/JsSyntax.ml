@@ -533,27 +533,13 @@ type coq_object = { object_proto_ : value;
                     object_proxy_target_ : value option;
                     object_proxy_handler_ : value option }
 
-(** val object_proto_ : coq_object -> value **)
-
+(* Object projection functions *)
 let object_proto_ x = x.object_proto_
 let object_prototype_ x = x.object_proto_
-
-(** val object_class_ : coq_object -> class_name **)
-
 let object_class_ x = x.object_class_
-
-(** val object_extensible_ : coq_object -> bool **)
-
 let object_extensible_ x = x.object_extensible_
-
-(** val object_prim_value_ : coq_object -> value option **)
-
 let object_prim_value_ x = x.object_prim_value_
-
-(** val object_properties_ : coq_object -> object_properties_type **)
-
 let object_properties_ x = x.object_properties_
-
 let object_get_prototype_of_ x = x.object_get_prototype_of_
 let object_set_prototype_of_ x = x.object_set_prototype_of_
 let object_is_extensible_ x = x.object_is_extensible_
@@ -577,6 +563,9 @@ let object_target_function_ x = x.object_target_function_
 let object_bound_this_ x = x.object_bound_this_
 let object_bound_args_ x = x.object_bound_args_
 let object_parameter_map_ x = x.object_parameter_map_
+let object_revocable_proxy_ x = x.object_revocable_proxy_
+let object_proxy_target_ x = x.object_proxy_target_
+let object_proxy_handler_ x = x.object_proxy_handler_
 
 type event =
 | Coq_delete_event of object_loc * prop_name * object_loc option [@f loc, name, locopt]

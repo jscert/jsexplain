@@ -299,28 +299,28 @@ and object_internal_get_prototype_of s o =
   let%some internal_method = (run_object_method object_get_prototype_of_ s o) in
   match internal_method with
   | Coq_builtin_get_prototype_of_default -> ordinary_object_internal_get_prototype_of s o
-  | Coq_builtin_get_prototype_of_proxy   -> Coq_result_not_yet_implemented (* TODO *)
+  | Coq_builtin_get_prototype_of_proxy   -> proxy_object_internal_get_prototype_of s o
 
 (** Function to dispatch calls to O.[[GetPrototypeOf]](V) *)
 and object_internal_set_prototype_of s o v =
   let%some internal_method = (run_object_method object_set_prototype_of_ s o) in
   match internal_method with
   | Coq_builtin_set_prototype_of_default -> ordinary_object_internal_set_prototype_of s o v
-  | Coq_builtin_set_prototype_of_proxy   -> Coq_result_not_yet_implemented (* TODO *)
+  | Coq_builtin_set_prototype_of_proxy   -> proxy_object_internal_set_prototype_of s o v
 
 (** Function to dispatch calls to O.[[IsExtensible]]() *)
 and object_internal_is_extensible s o =
   let%some internal_method = run_object_method object_is_extensible_ s o in
   match internal_method with
   | Coq_builtin_is_extensible_default -> ordinary_object_internal_is_extensible s o
-  | Coq_builtin_is_extensible_proxy   -> Coq_result_not_yet_implemented (* TODO *)
+  | Coq_builtin_is_extensible_proxy   -> proxy_object_internal_is_extensible s o
 
 (** Function to dispatch calls to O.[[PreventExtensions]]() *)
 and object_internal_prevent_extensions s o =
   let%some internal_method = run_object_method object_prevent_extensions_ s o in
   match internal_method with
   | Coq_builtin_prevent_extensions_default -> ordinary_object_internal_prevent_extensions s o
-  | Coq_builtin_prevent_extensions_proxy   -> Coq_result_not_yet_implemented (* TODO *)
+  | Coq_builtin_prevent_extensions_proxy   -> proxy_object_internal_prevent_extensions s o
 
 (** Function to dispatch calls to O.[[GetOwnProperty]](P) *)
 and object_internal_get_own_property s o p =
@@ -1363,6 +1363,132 @@ and ordinary_own_property_keys s o =
   let%some keys = object_properties_keys_as_list_option s o in
   (* FIXME: Precise key ordering is to be implemented here! *)
   res_spec s keys
+
+(** {2 Proxy Object Internal Methods and Internal Slots}
+    @essec 9.5
+    @esid sec-proxy-object-internal-methods-and-internal-slots *)
+
+(*
+  outline implementation:
+
+(** @essec 9.5.
+    @esid  *)
+and proxy_object_internal_ s o =
+  let%some handler = run_object_method object_proxy_handler_ s o in
+  let%some handler = handler in
+  (** Note: this check also implies that [target] is not null *)
+  if handler === Coq_value_null then run_error_no_c s Coq_native_error_type
+  else
+  let%assert _ = (type_of handler) === Coq_type_object in
+  let%some target = run_object_method object_proxy_target_ s o in
+  let%some target = target in
+  let%value s, trap = get_method s handler (Coq_value_string "") in
+  if trap === Coq_value_undef then
+
+*)
+
+(** @essec 9.5.1
+    @esid sec-proxy-object-internal-methods-and-internal-slots-getprototypeof *)
+and proxy_object_internal_get_prototype_of s o =
+  let%some handler = run_object_method object_proxy_handler_ s o in
+  let%some handler = handler in
+  (** Note: this check also implies that [target] is not null *)
+  if handler === Coq_value_null then run_error_no_c s Coq_native_error_type
+  else
+  let%assert _ = (type_of handler) === Coq_type_object in
+  let%some target = run_object_method object_proxy_target_ s o in
+  let%some target = target in
+  let%value s, trap = get_method s handler (Coq_value_string "getPrototypeOf") in
+  if trap === Coq_value_undef then
+    object_internal_get_prototype_of s (loc_of_value target)
+  else
+  let%value s, handlerProto = call s trap handler (Some [target]) in
+  if not ((type_of handlerProto === Coq_type_object) || (handlerProto === Coq_value_null)) then
+    run_error_no_c s Coq_native_error_type
+  else
+  let%bool s, extensibleTarget = is_extensible s target in
+  if extensibleTarget then res_ter s (res_val handlerProto)
+  else
+  let%value s, targetProto = object_internal_get_prototype_of s (loc_of_value target) in
+  if not (same_value handlerProto targetProto) then
+    run_error_no_c s Coq_native_error_type
+  else
+    res_ter s (res_val handlerProto)
+
+(** @essec 9.5.2
+    @esid sec-proxy-object-internal-methods-and-internal-slots-setprototypeof-v *)
+and proxy_object_internal_set_prototype_of s o v =
+  let%assert _ = (type_of v) === Coq_type_object || (type_of v) === Coq_type_null in
+  let%some handler = run_object_method object_proxy_handler_ s o in
+  let%some handler = handler in
+  (** Note: this check also implies that [target] is not null *)
+  if handler === Coq_value_null then run_error_no_c s Coq_native_error_type
+  else
+  let%assert _ = (type_of handler) === Coq_type_object in
+  let%some target = run_object_method object_proxy_target_ s o in
+  let%some target = target in
+  let%value s, trap = get_method s handler (Coq_value_string "") in
+  if trap === Coq_value_undef then
+    object_internal_set_prototype_of s (loc_of_value target) v
+  else
+  let%value s, tempVal = call s trap handler (Some [target; v]) in
+  let booleanTrapResult = to_boolean tempVal in
+  if not booleanTrapResult then res_ter s (res_val (Coq_value_bool false))
+  else
+  let%bool s, extensibleTarget = is_extensible s target in
+  if extensibleTarget then res_ter s (res_val (Coq_value_bool true))
+  else
+  let%value s, targetProto = object_internal_get_prototype_of s (loc_of_value target) in
+  if not (same_value v targetProto) then run_error_no_c s Coq_native_error_type
+  else res_ter s (res_val (Coq_value_bool true))
+
+(** @essec 9.5.3
+    @esid sec-proxy-object-internal-methods-and-internal-slots-isextensible *)
+and proxy_object_internal_is_extensible s o =
+  let%some handler = run_object_method object_proxy_handler_ s o in
+  let%some handler = handler in
+  (** Note: this check also implies that [target] is not null *)
+  if handler === Coq_value_null then run_error_no_c s Coq_native_error_type
+  else
+  let%assert _ = (type_of handler) === Coq_type_object in
+  let%some target = run_object_method object_proxy_target_ s o in
+  let%some target = target in
+  let%value s, trap = get_method s handler (Coq_value_string "isExtensible") in
+  if trap === Coq_value_undef then
+    object_internal_is_extensible s (loc_of_value target)
+  else
+  let%value s, tempVal = call s trap handler (Some [target]) in
+  let booleanTrapResult = to_boolean tempVal in
+  let%value s, targetResult = object_internal_is_extensible s (loc_of_value target) in
+  if not (same_value (Coq_value_bool booleanTrapResult) targetResult) then run_error_no_c s Coq_native_error_type
+  else res_ter s (res_val (Coq_value_bool booleanTrapResult))
+
+(** @essec 9.5.4
+    @esid sec-proxy-object-internal-methods-and-internal-slots-preventextensions *)
+and proxy_object_internal_prevent_extensions s o =
+  let%some handler = run_object_method object_proxy_handler_ s o in
+  let%some handler = handler in
+  (** Note: this check also implies that [target] is not null *)
+  if handler === Coq_value_null then run_error_no_c s Coq_native_error_type
+  else
+  let%assert _ = (type_of handler) === Coq_type_object in
+  let%some target = run_object_method object_proxy_target_ s o in
+  let%some target = target in
+  let%value s, trap = get_method s handler (Coq_value_string "preventExtensions") in
+  if trap === Coq_value_undef then
+    object_internal_prevent_extensions s (loc_of_value target)
+  else
+  let%value s, tempVal = call s trap handler (Some [target]) in
+  let booleanTrapResult = to_boolean tempVal in
+  let%ret s =
+  if booleanTrapResult then
+    let%bool_ret s, targetIsExtensible = object_internal_is_extensible s (loc_of_value target) in
+    if targetIsExtensible then Return (run_error_no_c s Coq_native_error_type)
+    else Continue s
+  else Continue s
+  in
+  res_ter s (res_val (Coq_value_bool booleanTrapResult))
+
 
 (******** UNCHECKED ES5 IMPLEMENTATION CONTINUES BELOW ***********)
 

@@ -237,32 +237,33 @@ let if_value2 w k kfail =
 let if_value w k =
   if_value2 w k (fun x -> x)
 
-(** val if_bool : result -> (state -> bool -> 'a1 specres) -> 'a1 specres **)
-
-let if_bool w k =
-  if_value w (fun s v ->
+let if_bool2 w k kfail =
+  if_value2 w (fun s v ->
     match v with
     | Coq_value_undef ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
         s
         ("[if_bool] called with non-boolean value.")
     | Coq_value_null ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
         s
         ("[if_bool] called with non-boolean value.")
     | Coq_value_bool b -> k s b
     | Coq_value_number n ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
         s
         ("[if_bool] called with non-boolean value.")
     | Coq_value_string s0 ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
         s
         ("[if_bool] called with non-boolean value.")
     | Coq_value_object o ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
         s
-        ("[if_bool] called with non-boolean value."))
+        ("[if_bool] called with non-boolean value.")) kfail
+
+let if_bool w k =
+  if_bool2 w k (fun x -> x)
 
 (** val if_object :
     result -> (state -> object_loc -> 'a1 specres) -> 'a1 specres **)
@@ -367,6 +368,9 @@ let if_value_ret w k =
 
 let if_object_ret w k =
   if_object2 w k (fun x -> Return x)
+
+let if_bool_ret w k =
+  if_bool2 w k (fun x -> Return x)
 
 let assert_object w k =
   if_object2 w k (fun x -> spec_assertion_failure ())
