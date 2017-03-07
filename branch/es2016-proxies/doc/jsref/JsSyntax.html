@@ -2444,79 +2444,39 @@ Object type definition
     es-id: sec-object-type<br>
 </div>
 
-<br>
-val object_proto_ : coq_object -&gt; value *<br>
 
 <pre><span id="VALobject_proto_"><span class="keyword">val</span> object_proto_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a></code></pre>
-<pre><span id="VALobject_prototype_"><span class="keyword">val</span> object_prototype_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a></code></pre><br>
-val object_class_ : coq_object -&gt; class_name *<br>
-
-<pre><span id="VALobject_class_"><span class="keyword">val</span> object_class_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEclass_name">class_name</a></code></pre><br>
-val object_extensible_ : coq_object -&gt; bool *<br>
-
-<pre><span id="VALobject_extensible_"><span class="keyword">val</span> object_extensible_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> bool</code></pre><br>
-val object_prim_value_ : coq_object -&gt; value option *<br>
-
-<pre><span id="VALobject_prim_value_"><span class="keyword">val</span> object_prim_value_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a> option</code></pre><br>
-val object_properties_ : coq_object -&gt; object_properties_type *<br>
-
+<pre><span id="VALobject_prototype_"><span class="keyword">val</span> object_prototype_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a></code></pre>
+<pre><span id="VALobject_class_"><span class="keyword">val</span> object_class_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEclass_name">class_name</a></code></pre>
+<pre><span id="VALobject_extensible_"><span class="keyword">val</span> object_extensible_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> bool</code></pre>
+<pre><span id="VALobject_prim_value_"><span class="keyword">val</span> object_prim_value_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a> option</code></pre>
 <pre><span id="VALobject_properties_"><span class="keyword">val</span> object_properties_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEobject_properties_type">object_properties_type</a></code></pre>
 <pre><span id="VALobject_get_prototype_of_"><span class="keyword">val</span> object_get_prototype_of_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_get_prototype_of">builtin_get_prototype_of</a></code></pre>
 <pre><span id="VALobject_set_prototype_of_"><span class="keyword">val</span> object_set_prototype_of_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_set_prototype_of">builtin_set_prototype_of</a></code></pre>
 <pre><span id="VALobject_is_extensible_"><span class="keyword">val</span> object_is_extensible_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_is_extensible">builtin_is_extensible</a></code></pre>
-<pre><span id="VALobject_prevent_extensions_"><span class="keyword">val</span> object_prevent_extensions_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_prevent_extensions">builtin_prevent_extensions</a></code></pre><br>
-val object_get_ : coq_object -&gt; builtin_get *<br>
-
+<pre><span id="VALobject_prevent_extensions_"><span class="keyword">val</span> object_prevent_extensions_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_prevent_extensions">builtin_prevent_extensions</a></code></pre>
 <pre><span id="VALobject_get_"><span class="keyword">val</span> object_get_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_get">builtin_get</a></code></pre>
-<pre><span id="VALobject_set_"><span class="keyword">val</span> object_set_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_set">builtin_set</a></code></pre><br>
-val object_get_own_prop_ : coq_object -&gt; builtin_get_own_prop *<br>
-
-<pre><span id="VALobject_get_own_prop_"><span class="keyword">val</span> object_get_own_prop_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_get_own_prop">builtin_get_own_prop</a></code></pre><br>
-val object_get_prop_ : coq_object -&gt; builtin_get_prop *<br>
-
-<pre><span id="VALobject_get_prop_"><span class="keyword">val</span> object_get_prop_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_get_prop">builtin_get_prop</a></code></pre><br>
-val object_has_prop_ : coq_object -&gt; builtin_has_prop *<br>
-
-<pre><span id="VALobject_has_prop_"><span class="keyword">val</span> object_has_prop_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_has_prop">builtin_has_prop</a></code></pre><br>
-val object_delete_ : coq_object -&gt; builtin_delete *<br>
-
-<pre><span id="VALobject_delete_"><span class="keyword">val</span> object_delete_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_delete">builtin_delete</a></code></pre><br>
-val object_default_value_ : coq_object -&gt; builtin_default_value *<br>
-
-<pre><span id="VALobject_default_value_"><span class="keyword">val</span> object_default_value_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_default_value">builtin_default_value</a></code></pre><br>
-val object_define_own_prop_ : coq_object -&gt; builtin_define_own_prop *<br>
-
-<pre><span id="VALobject_define_own_prop_"><span class="keyword">val</span> object_define_own_prop_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_define_own_prop">builtin_define_own_prop</a></code></pre><br>
-val object_construct_ : coq_object -&gt; construct option *<br>
-
-<pre><span id="VALobject_construct_"><span class="keyword">val</span> object_construct_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEconstruct">construct</a> option</code></pre><br>
-val object_call_ : coq_object -&gt; call option *<br>
-
-<pre><span id="VALobject_call_"><span class="keyword">val</span> object_call_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEcall">call</a> option</code></pre><br>
-val object_has_instance_ : coq_object -&gt; builtin_has_instance option *<br>
-
-<pre><span id="VALobject_has_instance_"><span class="keyword">val</span> object_has_instance_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_has_instance">builtin_has_instance</a> option</code></pre><br>
-val object_scope_ : coq_object -&gt; lexical_env option *<br>
-
-<pre><span id="VALobject_scope_"><span class="keyword">val</span> object_scope_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPElexical_env">lexical_env</a> option</code></pre><br>
-val object_formal_parameters_ : coq_object -&gt; string list option *<br>
-
-<pre><span id="VALobject_formal_parameters_"><span class="keyword">val</span> object_formal_parameters_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> string list option</code></pre><br>
-val object_code_ : coq_object -&gt; funcbody option *<br>
-
-<pre><span id="VALobject_code_"><span class="keyword">val</span> object_code_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEfuncbody">funcbody</a> option</code></pre><br>
-val object_target_function_ : coq_object -&gt; object_loc option *<br>
-
-<pre><span id="VALobject_target_function_"><span class="keyword">val</span> object_target_function_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEobject_loc">object_loc</a> option</code></pre><br>
-val object_bound_this_ : coq_object -&gt; value option *<br>
-
-<pre><span id="VALobject_bound_this_"><span class="keyword">val</span> object_bound_this_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a> option</code></pre><br>
-val object_bound_args_ : coq_object -&gt; value list option *<br>
-
-<pre><span id="VALobject_bound_args_"><span class="keyword">val</span> object_bound_args_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a> list option</code></pre><br>
-val object_parameter_map_ : coq_object -&gt; object_loc option *<br>
-
+<pre><span id="VALobject_set_"><span class="keyword">val</span> object_set_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_set">builtin_set</a></code></pre>
+<pre><span id="VALobject_get_own_prop_"><span class="keyword">val</span> object_get_own_prop_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_get_own_prop">builtin_get_own_prop</a></code></pre>
+<pre><span id="VALobject_get_prop_"><span class="keyword">val</span> object_get_prop_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_get_prop">builtin_get_prop</a></code></pre>
+<pre><span id="VALobject_has_prop_"><span class="keyword">val</span> object_has_prop_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_has_prop">builtin_has_prop</a></code></pre>
+<pre><span id="VALobject_delete_"><span class="keyword">val</span> object_delete_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_delete">builtin_delete</a></code></pre>
+<pre><span id="VALobject_default_value_"><span class="keyword">val</span> object_default_value_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_default_value">builtin_default_value</a></code></pre>
+<pre><span id="VALobject_define_own_prop_"><span class="keyword">val</span> object_define_own_prop_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_define_own_prop">builtin_define_own_prop</a></code></pre>
+<pre><span id="VALobject_own_property_keys_"><span class="keyword">val</span> object_own_property_keys_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_own_property_keys">builtin_own_property_keys</a></code></pre>
+<pre><span id="VALobject_construct_"><span class="keyword">val</span> object_construct_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEconstruct">construct</a> option</code></pre>
+<pre><span id="VALobject_call_"><span class="keyword">val</span> object_call_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEcall">call</a> option</code></pre>
+<pre><span id="VALobject_has_instance_"><span class="keyword">val</span> object_has_instance_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEbuiltin_has_instance">builtin_has_instance</a> option</code></pre>
+<pre><span id="VALobject_scope_"><span class="keyword">val</span> object_scope_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPElexical_env">lexical_env</a> option</code></pre>
+<pre><span id="VALobject_formal_parameters_"><span class="keyword">val</span> object_formal_parameters_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> string list option</code></pre>
+<pre><span id="VALobject_code_"><span class="keyword">val</span> object_code_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEfuncbody">funcbody</a> option</code></pre>
+<pre><span id="VALobject_target_function_"><span class="keyword">val</span> object_target_function_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEobject_loc">object_loc</a> option</code></pre>
+<pre><span id="VALobject_bound_this_"><span class="keyword">val</span> object_bound_this_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a> option</code></pre>
+<pre><span id="VALobject_bound_args_"><span class="keyword">val</span> object_bound_args_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a> list option</code></pre>
 <pre><span id="VALobject_parameter_map_"><span class="keyword">val</span> object_parameter_map_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEobject_loc">object_loc</a> option</code></pre>
+<pre><span id="VALobject_revocable_proxy_"><span class="keyword">val</span> object_revocable_proxy_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a> option</code></pre>
+<pre><span id="VALobject_proxy_target_"><span class="keyword">val</span> object_proxy_target_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a> option</code></pre>
+<pre><span id="VALobject_proxy_handler_"><span class="keyword">val</span> object_proxy_handler_</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">coq_object</a> -> <a href="JsSyntax.html#TYPEvalue">value</a> option</code></pre>
 <pre><code><span id="TYPEevent"><span class="keyword">type</span> <code class="type"></code>event</span> = </code></pre><table class="typetable">
 <tr>
 <td align="left" valign="top" >

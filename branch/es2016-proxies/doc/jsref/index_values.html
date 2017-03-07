@@ -537,6 +537,10 @@ GetValue(V)
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_bool">if_bool</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALif_bool2">if_bool2</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALif_bool_ret">if_bool_ret</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_break">if_break</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_empty_label">if_empty_label</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
@@ -854,7 +858,9 @@ Fetches Some object from location l in the heap, None if it is not allocated
 <tr><td><a href="JsSyntax.html#VALobject_delete_">object_delete_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALobject_delete_default">object_delete_default</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
+<td><div class="info">
+<span class="deprecated"></span></div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALobject_env_record_get_binding_value">object_env_record_get_binding_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
@@ -934,6 +940,11 @@ Function to dispatch calls to O.
 Function to dispatch calls to O.
 </div>
 </td></tr>
+<tr><td><a href="JsInterpreter.html#VALobject_internal_delete">object_internal_delete</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+Function to dispatch calls to O.
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALobject_internal_get">object_internal_get</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 Function to dispatch calls to O.
@@ -959,6 +970,8 @@ Function to dispatch calls to O.
 Function to dispatch calls to O.
 </div>
 </td></tr>
+<tr><td><a href="JsInterpreter.html#VALobject_internal_own_property_keys">object_internal_own_property_keys</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALobject_internal_prevent_extensions">object_internal_prevent_extensions</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 Function to dispatch calls to O.
@@ -994,6 +1007,8 @@ Updates an object's property given the location, property name and function mapp
 </div>
 </td></tr>
 <tr><td><a href="JsCommon.html#VALobject_new">object_new</a> [<a href="JsCommon.html">JsCommon</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsSyntax.html#VALobject_own_property_keys_">object_own_property_keys_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsSyntax.html#VALobject_parameter_map_">object_parameter_map_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
@@ -1077,11 +1092,17 @@ Updates an object's property given the location, property name and function mapp
 <td></td></tr>
 <tr><td><a href="JsSyntax.html#VALobject_prototype_">object_prototype_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsSyntax.html#VALobject_proxy_handler_">object_proxy_handler_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsSyntax.html#VALobject_proxy_target_">object_proxy_target_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALobject_put">object_put</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 <span class="deprecated"></span></div>
 </td></tr>
 <tr><td><a href="JsCommonAux.html#VALobject_retrieve_property">object_retrieve_property</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsSyntax.html#VALobject_revocable_proxy_">object_revocable_proxy_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsSyntax.html#VALobject_scope_">object_scope_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
@@ -1134,6 +1155,10 @@ Update an object's property given the location, property name and new attributes
 <td><div class="info">
 </div>
 </td></tr>
+<tr><td><a href="JsInterpreter.html#VALordinary_delete">ordinary_delete</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALordinary_get">ordinary_get</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
@@ -1158,6 +1183,10 @@ Update an object's property given the location, property name and new attributes
 <td><div class="info">
 </div>
 </td></tr>
+<tr><td><a href="JsInterpreter.html#VALordinary_object_internal_delete">ordinary_object_internal_delete</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALordinary_object_internal_get">ordinary_object_internal_get</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
@@ -1179,6 +1208,8 @@ Update an object's property given the location, property name and new attributes
 <td><div class="info">
 </div>
 </td></tr>
+<tr><td><a href="JsInterpreter.html#VALordinary_object_internal_own_property_keys">ordinary_object_internal_own_property_keys</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALordinary_object_internal_prevent_extensions">ordinary_object_internal_prevent_extensions</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
@@ -1256,6 +1287,22 @@ Given a properties Heap, a property name, updates the given property attributes 
 <td></td></tr>
 <tr><td><a href="JsCommon.html#VALprovide_this_true">provide_this_true</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALproxy_object_internal_get_prototype_of">proxy_object_internal_get_prototype_of</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALproxy_object_internal_is_extensible">proxy_object_internal_is_extensible</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALproxy_object_internal_prevent_extensions">proxy_object_internal_prevent_extensions</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALproxy_object_internal_set_prototype_of">proxy_object_internal_set_prototype_of</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="Prheap.html#VALprref">prref</a> [<a href="Prheap.html">Prheap</a>]</td>
 <td></td></tr>
 <tr><td><a href="Prheap.html#VALprresvalue">prresvalue</a> [<a href="Prheap.html">Prheap</a>]</td>
