@@ -388,6 +388,12 @@ and object_delete_default s c l x str =
   else
     res_ter s (res_val (Coq_value_bool b))
 
+and object_internal_own_property_keys s o =
+  let%some internal_method = run_object_method object_own_property_keys_ s o in
+  match internal_method with
+  | Coq_builtin_own_property_keys_default -> ordinary_object_internal_own_property_keys s o
+  | Coq_builtin_own_property_keys_proxy   -> Coq_result_not_yet_implemented
+
 (** Function to dispatch calls to O.[[Call]](thisArgument, argumentsList) *)
 and object_internal_call s o thisArgument argumentsList =
   (* FIXME: ES5 HACK CONTEXT *)
@@ -1063,7 +1069,8 @@ and ordinary_prevent_extensions s o =
 (** @essec 9.1.5
     @esid sec-ordinary-object-internal-methods-and-internal-slots-getownproperty-p *)
 and ordinary_object_internal_get_own_property s o p =
-  ordinary_get_own_property s o p
+  let%spec s, d = ordinary_get_own_property s o p in
+  res_spec s d
 
 (** @essec 9.1.5.1
     @esid sec-ordinarygetownproperty *)
@@ -1346,10 +1353,14 @@ and ordinary_delete s o p =
   else
     res_ter s (res_val (Coq_value_bool false))
 
+and ordinary_object_internal_own_property_keys s o =
+  let%spec s, k = ordinary_own_property_keys s o in
+  res_spec s k
+
 (** @essec 9.1.11.1
     @esid sec-ordinaryownpropertykeys *)
-and ordinary_own_property_keys s c l =
-  let%some keys = object_properties_keys_as_list_option s l in
+and ordinary_own_property_keys s o =
+  let%some keys = object_properties_keys_as_list_option s o in
   (* FIXME: Precise key ordering is to be implemented here! *)
   res_spec s keys
 
@@ -1889,7 +1900,7 @@ and env_record_create_mutable_binding s c l x deletable_opt =
     option -> value -> strictness_flag -> result_void **)
 
 and env_record_create_set_mutable_binding s c l x deletable_opt v str =
-  let%void 
+  let%void
     s0 = (env_record_create_mutable_binding s c l x deletable_opt) in  env_record_set_mutable_binding s0 c l x v str
 
 (** val env_record_create_immutable_binding :
@@ -2049,7 +2060,7 @@ and run_construct_prealloc s c b args =
                                                                 attributes_data_writable = true;
                                                                 attributes_data_enumerable = false;
                                                                 attributes_data_configurable = false }))) in
-                                  let%void 
+                                  let%void
                                     s1 = (array_args_map_loop s0 c l args 0.) in  res_ter s1 (res_val (Coq_value_object l))
   | Coq_prealloc_string ->
     let
@@ -2057,7 +2068,7 @@ and run_construct_prealloc s c b args =
                                        Coq_prealloc_string_proto))
          ("String")) in
           let
-            
+
             o1 = (object_with_get_own_property o2 Coq_builtin_get_own_prop_string) in
                let  follow = (fun s0 s1 ->
                    let
@@ -2096,7 +2107,7 @@ and run_construct_prealloc s c b args =
 
 and run_construct_default s c l args =
   let%value
-    
+
     (s1, v1) = (run_object_get s c l
        ("prototype")) in
        let
@@ -2105,11 +2116,11 @@ and run_construct_default s c l args =
           else Coq_value_object (Coq_object_loc_prealloc
                                    Coq_prealloc_object_proto)) in
              let
-               
+
                o = (object_new vproto ("Object")) in
                   let  p = (object_alloc s1 o) in
                       let (l_2, s2) = p in
-                      let%value 
+                      let%value
                         (s3, v2) = (run_call s2 c l (Coq_value_object l_2) args) in
                            let
                               vr = (if type_compare (type_of v2) Coq_type_object
@@ -2157,13 +2168,13 @@ and run_call_default s c lf =
     state -> execution_ctx -> object_loc -> result **)
 
 and creating_function_object_proto s c l =
-  let%object 
+  let%object
     (s1, lproto) = (run_construct_prealloc s c Coq_prealloc_object []) in
        let  a1 = ({ attributes_data_value = (Coq_value_object l);
                      attributes_data_writable = true; attributes_data_enumerable = false;
                      attributes_data_configurable = true }) in
            let%bool
-             
+
              (s2, b) = (object_define_own_prop s1 c lproto
                 ("constructor")
                 (descriptor_of_attributes (Coq_attributes_data_of a1)) false) in
@@ -2222,10 +2233,10 @@ and binding_inst_formal_params s c l args names str =
     let  v = (hd Coq_value_undef args) in
         let  args_2 = (tl args) in
             let%bool (s1, hb) = (env_record_has_binding s c l argname) in
-                let 
+                let
                   follow = (fun s_2 ->
                     let%void
-                      
+
                       s_3= (env_record_set_mutable_binding s_2 c l argname v str) in
                          binding_inst_formal_params s_3 c l args_2 names_2 str) in
                      if hb
@@ -2250,13 +2261,13 @@ and binding_inst_function_decls s c l fds str bconfig =
                     let%object
                        (s1, fo) = (creating_function_object s c fparams fbd
                          c.execution_ctx_variable_env str_fd) in
-                          let 
+                          let
                             follow = (fun s2 ->
                               let%void
                                  s3= (env_record_set_mutable_binding s2 c l fname
                                    (Coq_value_object fo) str) in
                                     binding_inst_function_decls s3 c l fds_2 str bconfig) in
-                               let%bool 
+                               let%bool
                                  (s2, has) = (env_record_has_binding s1 c l fname) in
                                     if has
                                     then if nat_eq l env_loc_global_env_record
@@ -2284,7 +2295,7 @@ and binding_inst_function_decls s c l fds str bconfig =
                                                          (descriptor_of_attributes
                                                             (Coq_attributes_data_of a_2))
                                                          true) in follow s0
-                                                else if 
+                                                else if
                                                        (is_accessor_descriptor (Descriptor (descriptor_of_attributes a)))
                                                     || (not (attributes_writable a))
                                                     || (not (attributes_enumerable a))
@@ -2347,7 +2358,7 @@ and arguments_object_map_loop s c l xs len args x str lmap xsmap =
                  xsmap0) in
                let  a = (attributes_data_intro_all_true largs) in
                    let%bool
-                     
+
                      (s1, b) = (object_define_own_prop s c l
                         (convert_prim_to_string (Coq_value_number (number_of_int len_2)))
                         (descriptor_of_attributes (Coq_attributes_data_of a)) false) in
@@ -2358,9 +2369,9 @@ and arguments_object_map_loop s c l xs len args x str lmap xsmap =
                               if    (str)
                                  || (mem_decide string_eq x0 xsmap)
                               then arguments_object_map_loop_2 s1 xsmap
-                              else let%object 
+                              else let%object
                                   (s2, lgetter) = (make_arg_getter s1 c x0 x) in
-                                     let%object 
+                                     let%object
                                        (s3, lsetter) = (make_arg_setter s2 c x0 x) in
                                           let  a_2 = ({ attributes_accessor_get =
                                                           (Coq_value_object lgetter);
@@ -2369,7 +2380,7 @@ and arguments_object_map_loop s c l xs len args x str lmap xsmap =
                                                                                                  false; attributes_accessor_configurable =
                                                                                                           true }) in
                                               let%bool
-                                                
+
                                                 (s4, b_2) = (object_define_own_prop s3 c lmap
                                                    (convert_prim_to_string (Coq_value_number (number_of_int len_2)))
                                                    (descriptor_of_attributes
@@ -2382,7 +2393,7 @@ and arguments_object_map_loop s c l xs len args x str lmap xsmap =
     value list -> lexical_env -> strictness_flag -> result_void **)
 
 and arguments_object_map s c l xs args x str =
-  let%object 
+  let%object
     (s_2, lmap) = (run_construct_prealloc s c Coq_prealloc_object []) in
        arguments_object_map_loop s_2 c l xs (LibList.length args) args x
          str lmap []
@@ -2403,11 +2414,11 @@ and create_arguments_object s c lf xs args x str =
                           attributes_data_writable = true; attributes_data_enumerable = false;
                           attributes_data_configurable = true }) in
                 let%bool
-                  
+
                   (s1, b) = (object_define_own_prop s_2 c l
                      ("length")
                      (descriptor_of_attributes (Coq_attributes_data_of a)) false) in
-                     let%void 
+                     let%void
                        s2= (arguments_object_map s1 c l xs args x str) in
                           if str
                           then let  vthrower = (Coq_value_object (Coq_object_loc_prealloc
@@ -2417,13 +2428,13 @@ and create_arguments_object s c lf xs args x str =
                                             attributes_accessor_enumerable = false;
                                             attributes_accessor_configurable = false }) in
                                   let%bool
-                                    
+
                                     (s3, b_2) = (object_define_own_prop s2 c l
                                        ("caller")
                                        (descriptor_of_attributes
                                           (Coq_attributes_accessor_of a0)) false) in
                                        let%bool
-                                         
+
                                          (s4, b_3) = (object_define_own_prop s3 c l
                                             ("callee")
                                             (descriptor_of_attributes
@@ -2453,7 +2464,7 @@ and binding_inst_arg_obj s c lf p xs args l =
          (s1, largs) = (create_arguments_object s c lf xs args
            c.execution_ctx_variable_env str) in
             if str
-            then let%void 
+            then let%void
                 s2= (env_record_create_immutable_binding s1 l arguments_) in
                    env_record_initialize_immutable_binding s2 l arguments_
                      (Coq_value_object largs)
@@ -2490,17 +2501,17 @@ and execution_ctx_binding_inst s c ct funco p args =
   | l :: l0 ->
     let  str = (prog_intro_strictness p) in
         let  follow = (fun s_2 names ->
-            let 
+            let
               bconfig = (codetype_compare ct Coq_codetype_eval) in
                  let  fds = (prog_funcdecl p) in
                      let%void
-                       
+
                        s1= (binding_inst_function_decls s_2 c l fds str bconfig) in
                           let%bool
-                            
+
                             (s2, bdefined) = (env_record_has_binding s1 c l
                                ("arguments")) in
-                               let 
+                               let
                                  follow2 = (fun s10 ->
                                    let vds = prog_vardecl p in
                                    binding_inst_var_decls s10 c l vds bconfig str) in
@@ -2525,11 +2536,11 @@ and execution_ctx_binding_inst s c ct funco p args =
             | Coq_codetype_func ->
               (match funco with
                | Some func ->
-                 let%some 
+                 let%some
                    nameso = (run_object_method object_formal_parameters_ s func) in
                       let%some names = (nameso) in
                           let%void
-                            
+
                             s_2 = (binding_inst_formal_params s c l args names str) in  follow s_2 names
                | None ->
                  (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
@@ -2952,7 +2963,7 @@ and run_unary_op s c op e =
               if ref_kind_comparable (ref_kind_of r) Coq_ref_kind_undef
               then res_ter s1
                   (res_val (Coq_value_string ("undefined")))
-              else let%spec 
+              else let%spec
                   (s2, v) = (ref_get_value s1 c (Coq_resvalue_ref r)) in
                      res_ter s2
                        (res_val (Coq_value_string (run_typeof_value s2 v)))
@@ -2996,7 +3007,7 @@ and init_object s c l _foo_ = match _foo_ with
     let (pn, pb) = p in
     let  x = (string_of_propname pn) in
         let  follows = (fun s1 desc ->
-            let%success 
+            let%success
               (s2, rv) = (object_define_own_prop s1 c l x desc false) in  init_object s2 c l pds_2) in
             match pb with
             | Coq_propbody_val e0 ->
@@ -3034,7 +3045,7 @@ and run_array_element_list s c l oes n =
   | o :: oes_2 ->
     (match o with
      | Some e ->
-       let 
+       let
          loop_result = (fun s0 ->
            run_array_element_list s0 c l oes_2 0.) in
             let%spec (s0, v) = (run_expr_get_value s c e) in
@@ -3126,7 +3137,7 @@ and run_binary_op_and s c e1 e2 =
 and run_binary_op_or s c e1 e2 =
   let%spec (s1, v1) = (run_expr_get_value s c e1) in
   let b1 = (to_boolean v1) in
-  if b1 
+  if b1
     then res_ter s1 (res_val v1)
     else let%spec (s2, v) = (run_expr_get_value s1 c e2) in
     res_ter s2 (res_val v)
@@ -3344,7 +3355,7 @@ and run_stat_with s c e1 t2 =
   let%spec (s1, v1) = (run_expr_get_value s c e1) in
       let%object (s2, l) = (to_object s1 v1) in
           let  lex = (c.execution_ctx_lexical_env) in
-              let 
+              let
                 p = (lexical_env_alloc_object s2 lex l provide_this_true) in
                    let (lex_2, s3) = p in
                    let  c_2 = (execution_ctx_with_lex c lex_2) in
@@ -3381,7 +3392,7 @@ and run_stat_while s c rv labs e1 t2 =
                         run_stat_while s2 c rv_2 labs e1 t2) in
                         if  (not (restype_compare r.res_type Coq_restype_continue))
                          || (not (res_label_in r labs))
-                        then if 
+                        then if
                              (restype_compare r.res_type Coq_restype_break)
                            && (res_label_in r labs)
                           then res_ter s2 (res_normal rv_2)
@@ -3454,7 +3465,7 @@ and run_stat_switch_with_default_A s c found vi rv scs1 ts0 scs2 =
     else run_stat_switch_with_default_B s c vi rv ts0 scs2
   | y :: scs_2 ->
     match y with Coq_switchclause_intro (e, ts) ->
-      let 
+      let
         follow = (fun s0 ->
           ifx_success_state rv (run_block s0 c (rev ts)) (fun s1 rv0 ->
               run_stat_switch_with_default_A s1 c true vi rv0 scs_2 ts0 scs2)) in
@@ -3478,7 +3489,7 @@ and run_stat_switch s c labs e sb =
   | Coq_switchbody_nodefault scs ->
     let%success (s0, r) = begin
       let%break (s2, r) =
-        run_stat_switch_no_default s1 c vi 
+        run_stat_switch_no_default s1 c vi
         Coq_resvalue_empty scs in
       if res_label_in r labs
       then res_out s2 (res_normal r.res_value)
@@ -3487,7 +3498,7 @@ and run_stat_switch s c labs e sb =
     res_ter s0 (res_normal r)
   | Coq_switchbody_withdefault (scs1, ts, scs2) ->
     let%success (s0, r) = begin
-      let%break (s2, r) = 
+      let%break (s2, r) =
         run_stat_switch_with_default_A s1 c false vi
          Coq_resvalue_empty scs1 ts scs2 in
       if res_label_in r labs
@@ -3507,7 +3518,7 @@ and run_stat_switch s c labs e sb =
     res_ter s0 (res_normal r)) in
   match sb with
   | Coq_switchbody_nodefault scs ->
-    follow (run_stat_switch_no_default s1 c vi 
+    follow (run_stat_switch_no_default s1 c vi
               Coq_resvalue_empty scs)
   | Coq_switchbody_withdefault (scs1, ts, scs2) ->
     follow (run_stat_switch_with_default_A s1 c false vi
@@ -3532,7 +3543,7 @@ and run_stat_do_while s c rv labs e1 t2 =
                 if  (restype_compare r.res_type Coq_restype_continue)
                    && (res_label_in r labs)
                 then loop ()
-                else if 
+                else if
                     (restype_compare r.res_type Coq_restype_break)
                  && (res_label_in r labs)
                 then res_ter s1 (res_normal rv_2)
@@ -3605,13 +3616,13 @@ and run_stat_for_loop s c labs rv eo2 eo3 t =
                     if   (restype_compare r.res_type Coq_restype_break)
                       && (res_label_in r labs)
                     then res_ter s1 (res_normal rv_2)
-                    else if 
+                    else if
                          (restype_compare r.res_type Coq_restype_normal)
                       || (    (restype_compare r.res_type Coq_restype_continue)
                            && (res_label_in r labs))
                     then (match eo3 with
                         | Some e3 ->
-                          let%spec 
+                          let%spec
                             (s2, v3) = (run_expr_get_value s1 c e3) in loop s2
                         | None -> loop s1)
                     else res_ter s1 r) in
@@ -3738,7 +3749,7 @@ and push s c l args ilen =
              (Coq_value_number vlen) throw_true) in
               res_out s0 (res_val (Coq_value_number vlen))
       | v :: vs ->
-        let%string 
+        let%string
           (s0, slen) = (to_string s c (Coq_value_number vlen)) in
              let%not_throw  (s1, x) = (object_put s0 c l slen v throw_true) in
                  push s1 c l vs (ilen +. 1.)
@@ -3870,7 +3881,7 @@ and run_get_args_for_apply s c l index n =
        (s0, sindex) = (to_string s c (Coq_value_number index)) in
           let%value (s1, v) = (run_object_get s0 c l sindex) in
               let
-                
+
                 tail_args = (run_get_args_for_apply s1 c l (index +. 1.) n) in
                    let%spec (s2, tail) = (tail_args) in res_spec s2 (v :: tail)
   else res_spec s []

@@ -558,75 +558,24 @@ let object_get_prototype_of_ x = x.object_get_prototype_of_
 let object_set_prototype_of_ x = x.object_set_prototype_of_
 let object_is_extensible_ x = x.object_is_extensible_
 let object_prevent_extensions_ x = x.object_prevent_extensions_
-
-(** val object_get_ : coq_object -> builtin_get **)
-
 let object_get_ x = x.object_get_
-
 let object_set_ x = x.object_set_
-
-(** val object_get_own_prop_ : coq_object -> builtin_get_own_prop **)
-
 let object_get_own_prop_ x = x.object_get_own_prop_
-
-(** val object_get_prop_ : coq_object -> builtin_get_prop **)
-
 let object_get_prop_ x = x.object_get_prop_
-
-(** val object_has_prop_ : coq_object -> builtin_has_prop **)
-
 let object_has_prop_ x = x.object_has_prop_
-
-(** val object_delete_ : coq_object -> builtin_delete **)
-
 let object_delete_ x = x.object_delete_
-
-(** val object_default_value_ : coq_object -> builtin_default_value **)
-
 let object_default_value_ x = x.object_default_value_
-
-(** val object_define_own_prop_ : coq_object -> builtin_define_own_prop **)
-
 let object_define_own_prop_ x = x.object_define_own_prop_
-
-(** val object_construct_ : coq_object -> construct option **)
-
+let object_own_property_keys_ x = x.object_own_property_keys_
 let object_construct_ x = x.object_construct_
-
-(** val object_call_ : coq_object -> call option **)
-
 let object_call_ x = x.object_call_
-
-(** val object_has_instance_ : coq_object -> builtin_has_instance option **)
-
 let object_has_instance_ x = x.object_has_instance_
-
-(** val object_scope_ : coq_object -> lexical_env option **)
-
 let object_scope_ x = x.object_scope_
-
-(** val object_formal_parameters_ : coq_object -> string list option **)
-
 let object_formal_parameters_ x = x.object_formal_parameters_
-
-(** val object_code_ : coq_object -> funcbody option **)
-
 let object_code_ x = x.object_code_
-
-(** val object_target_function_ : coq_object -> object_loc option **)
-
 let object_target_function_ x = x.object_target_function_
-
-(** val object_bound_this_ : coq_object -> value option **)
-
 let object_bound_this_ x = x.object_bound_this_
-
-(** val object_bound_args_ : coq_object -> value list option **)
-
 let object_bound_args_ x = x.object_bound_args_
-
-(** val object_parameter_map_ : coq_object -> object_loc option **)
-
 let object_parameter_map_ x = x.object_parameter_map_
 
 type event =
