@@ -217,7 +217,10 @@ let object_map_properties o f =
 (** val object_new : value -> class_name -> coq_object **)
 
 let object_new vproto sclass =
-  object_create vproto sclass true Heap.empty
+  object_create_default_record vproto sclass true Heap.empty
+
+let proxy_object_new s =
+  object_alloc s (proxy_object_create_record Heap.empty)
 
 (** val attributes_writable : attributes -> bool **)
 

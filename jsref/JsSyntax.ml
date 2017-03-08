@@ -499,8 +499,9 @@ type object_properties_type = (prop_name, attributes) Heap.heap
 
 
 (** Object type definition
-    es-id: sec-object-type *)
+    @esid: sec-object-type *)
 (* FIXME: ES7 defines internal slots as being able to take the undefined value *)
+(* FIXME: prototype, extensible are now optional slots. class, default_value, others to be removed. *)
 type coq_object = { object_proto_ : value;
                     object_class_ : class_name;
                     object_extensible_ : bool;

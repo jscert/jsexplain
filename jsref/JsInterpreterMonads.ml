@@ -70,12 +70,14 @@ let if_empty_label s r k = if_empty_label2 s r k (fun x -> x)
 
 (** val if_some : 'a1 option -> ('a1 -> 'a2 resultof) -> 'a2 resultof **)
 
-let if_some op k =
+let if_some2 op k kfail =
   match op with
   | Some a -> k a
   | None ->
-    (fun s -> Debug.impossible_because __LOC__ s; Coq_result_impossible)
+    (fun s -> Debug.impossible_because __LOC__ s; kfail Coq_result_impossible)
       ("[if_some] called with [None].")
+
+let if_some op k = if_some2 op k (fun x -> x)
 
 (** val if_some_or_default : 'a2 option -> 'a1 -> ('a2 -> 'a1) -> 'a1 **)
 
@@ -99,9 +101,7 @@ let if_result_some2 w k kfail =
 
 let if_result_some w k = if_result_some2 w k (fun x -> x)
 
-(** val if_ter : result -> (state -> res -> 'a1 specres) -> 'a1 specres **)
 (** Unpack a result assuming it contains a Coq_specret_out *)
-
 let if_ter2 w k kfail =
   if_result_some2 w (fun sp ->
     match sp with
@@ -111,10 +111,7 @@ let if_ter2 w k kfail =
 
 let if_ter w k = if_ter2 w k (fun x -> x)
 
-(** val throw_result : result -> 'a1 specres **)
-(** This appears to be the identity function (with input checking, this matches
-    the behaviour of the original, with the out type flattened. *)
-
+(** if_ter, repacking the specret_out to erase the polymorphic type associated with specret_val *)
 let throw_result w =
   if_ter w (fun s r -> res_out s r)
 
@@ -174,7 +171,7 @@ let if_not_throw w k =
     | Coq_restype_break -> k s0 r
     | Coq_restype_continue -> k s0 r
     | Coq_restype_return -> k s0 r
-    | Coq_restype_throw -> w)
+    | Coq_restype_throw -> res_out s0 r)
 
 (** val if_any_or_throw :
     result -> (state -> res -> result) -> (state -> value -> result) ->
@@ -202,10 +199,10 @@ let if_success_or_return w k1 k2 =
   if_ter w (fun s r ->
     match r.res_type with
     | Coq_restype_normal -> if_empty_label s r (fun x -> k1 s)
-    | Coq_restype_break -> w
-    | Coq_restype_continue -> w
+    | Coq_restype_break -> res_out s r
+    | Coq_restype_continue -> res_out s r
     | Coq_restype_return -> if_empty_label s r (fun x -> k2 s r.res_value)
-    | Coq_restype_throw -> w)
+    | Coq_restype_throw -> res_out s r)
 
 (** val if_break : result -> (state -> res -> result) -> result **)
 
@@ -326,15 +323,14 @@ let if_abort r k =
     then (Debug.impossible_because __LOC__ "[if_abort] received a normal result!"; Coq_result_impossible)
     else k ()
 
-(** val if_spec :
-    'a1 specres -> (state -> 'a1 -> 'a2 specres) -> 'a2 specres **)
-(** Unpacks a Coq_specret_val (specification return value), returns an abrupt Coq_specret_out
-    This function is nearly equivalent to ReturnIfAbrupt in the ES spec *)
-let if_spec w k =
-  if_result_some w (fun sp ->
+(** Unpacks a Coq_specret_val (specification return value), returns an abrupt Coq_specret_out *)
+let if_spec2 w k kfail =
+  if_result_some2 w (fun sp ->
     match sp with
     | Coq_specret_val (s0, a) -> k s0 a
-    | Coq_specret_out (s0, r) -> if_abort r (fun _ -> res_out s0 r))
+    | Coq_specret_out (s0, r) -> kfail (if_abort r (fun _ -> res_out s0 r))) kfail
+
+let if_spec w k = if_spec2 w k (fun x -> x)
 
 (** A Specification assertion that b is true, continuing with k,
     or failing with Coq_result_impossible otherwise *)
@@ -349,7 +345,7 @@ type ('t, 'a) if_ret_type =
     else returns the result [r] of [Return r].
 
     Bound to the syntax: [let%ret s = e1 in e2]
-    Which compiles to: [if_ret e1 (fun s -> e2)]
+    Which compiles to: [let_ret e1 (fun s -> e2)]
 
     Example usage:
       [let%ret s =
@@ -358,10 +354,18 @@ type ('t, 'a) if_ret_type =
         else Continue s
       in continuation]
 *)
-let let_ret w k =
+let let_ret2 w k kret =
   match w with
   | Continue s -> k s
-  | Return  r -> r
+  | Return  r -> kret r
+
+let let_ret w k = let_ret2 w k (fun x -> x)
+let let_ret_ret w k = let_ret2 w k (fun x -> Return x)
+
+let if_some_ret w k = if_some2 w k (fun x -> Return x)
+
+let if_success_ret w k =
+  if_success2 w k (fun x -> Return x)
 
 let if_value_ret w k =
   if_value2 w k (fun x -> Return x)
@@ -380,6 +384,9 @@ let assert_object_ret w k =
 
 let check_assert_ret b k =
   if b then k () else Return (spec_assertion_failure ())
+
+let if_spec_ret w k =
+  if_spec2 w k (fun x -> Return x)
 
 let ifx_prim w k = if_prim w k
 let ifx_number w k = if_number w k

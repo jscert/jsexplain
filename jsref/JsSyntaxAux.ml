@@ -250,7 +250,7 @@ let object_loc_cmp l1 l2 =
 (** val object_create :
     value -> class_name -> bool -> object_properties_type -> coq_object **)
 
-let object_create vproto sclass bextens p =
+let object_create_default_record vproto sclass bextens p =
   { object_proto_ = vproto;
     object_class_ = sclass;
     object_extensible_ = bextens;
@@ -283,6 +283,39 @@ let object_create vproto sclass bextens p =
     object_proxy_target_ = None;
     object_proxy_handler_ = None }
 
+let proxy_object_create_record p =
+  { object_proto_ = Coq_value_undef;
+    object_class_ = "";
+    object_extensible_ = false;
+    object_prim_value_ = None;
+    object_properties_ = p;
+    object_get_prototype_of_ = Coq_builtin_get_prototype_of_proxy;
+    object_set_prototype_of_ = Coq_builtin_set_prototype_of_proxy;
+    object_is_extensible_ = Coq_builtin_is_extensible_proxy;
+    object_prevent_extensions_ = Coq_builtin_prevent_extensions_proxy;
+    object_get_ = Coq_builtin_get_proxy;
+    object_get_own_prop_ = Coq_builtin_get_own_prop_proxy;
+    object_get_prop_ = Coq_builtin_get_prop_default;
+    object_set_ = Coq_builtin_set_proxy;
+    object_has_prop_ = Coq_builtin_has_prop_proxy;
+    object_delete_ = Coq_builtin_delete_proxy;
+    object_default_value_ = Coq_builtin_default_value_default;
+    object_define_own_prop_ = Coq_builtin_define_own_prop_proxy;
+    object_own_property_keys_ = Coq_builtin_own_property_keys_proxy;
+    object_construct_ = None;
+    object_call_ = None;
+    object_has_instance_ = None;
+    object_scope_ = None;
+    object_formal_parameters_ = None;
+    object_code_ = None;
+    object_target_function_ = None;
+    object_bound_this_ = None;
+    object_bound_args_ = None;
+    object_parameter_map_ = None;
+    object_revocable_proxy_ = None;
+    object_proxy_target_ = Some Coq_value_undef;
+    object_proxy_handler_ = Some Coq_value_undef }
+
 (** val object_set_proto : coq_object -> value -> coq_object **)
 
 let object_set_proto o v =
@@ -297,6 +330,17 @@ let object_set_class o s =
 
 let object_set_extensible o b =
   { o with object_extensible_ = b }
+
+let object_set_call o v =
+  { o with object_call_ = Some v }
+let object_set_construct o v =
+  { o with object_construct_ = Some v }
+let object_set_proxy_target o v =
+  { o with object_proxy_target_ = Some v }
+let object_set_proxy_handler o v =
+  { o with object_proxy_handler_ = Some v }
+let object_set_revocable_proxy o v =
+  { o with object_revocable_proxy_ = Some v }
 
 (** val object_with_primitive_value : coq_object -> value -> coq_object **)
 

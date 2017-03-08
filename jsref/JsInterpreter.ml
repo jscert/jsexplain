@@ -238,7 +238,7 @@ let run_object_heap_set_extensible b s l =
      LibOption.map (fun o -> object_write s l (object_set_extensible o b)) opt
 *)
 
-let rec build_error s c vproto vmsg : 'a specret resultof =
+let rec build_error s c vproto vmsg =
   let o = object_new vproto ("Error") in
   let (l, s_2) = object_alloc s o in
   if value_compare vmsg Coq_value_undef
@@ -251,14 +251,17 @@ let rec build_error s c vproto vmsg : 'a specret resultof =
     res_out s_4 (res_val (Coq_value_object l))
   )
 
-and run_error s c ne : 'a specret resultof =
+and run_error s c ne =
   let%object (s_2, l) = (build_error s c (Coq_value_object (Coq_object_loc_prealloc
                                                             (Coq_prealloc_native_error_proto ne))) Coq_value_undef) in
   res_out s_2 (res_throw (Coq_resvalue_value (Coq_value_object l)))
 
-and run_error_no_c s ne =
-  (* FIXME: Try and run c *)
-  run_error s (execution_ctx_initial true) ne
+and run_error_no_c : 'a. state -> native_error -> 'a specret resultof =
+  fun s ne ->
+  let vproto = Coq_value_object (Coq_object_loc_prealloc (Coq_prealloc_native_error_proto ne)) in
+  let o = object_new vproto ("error") in
+  let (l, s_2) = object_alloc s o in
+  res_out s_2 (res_throw (Coq_resvalue_value (Coq_value_object l)))
 
 (*****************************************************************************)
 (*****************************************************************************)
@@ -275,16 +278,15 @@ and run_error_no_c s ne =
 (** Function to implement the specification text "O has a [[X]] internal slot"
     @param l    The location of O
     @param prj  The object projection function corresponding to [[X]] *)
-and object_has_internal_slot s l prj =
-  let slot_value = run_object_method prj s l in
-  match slot_value with
+and object_has_internal_slot : 'a. state -> object_loc -> (coq_object -> 'a option) -> bool =
+  fun s l prj ->
+  match run_object_method prj s l with
   | None -> assert false
-  | Some v -> match v with
-    | Some _ -> true
-    | None -> false
+  | Some a -> is_some a
 
 (** Function to implement the specification text of "O has a [[X]] internal method" *)
-and object_has_internal_method s l prj =
+and object_has_internal_method : 'a. state -> object_loc -> (coq_object -> 'a option) -> bool =
+  fun s l prj ->
   object_has_internal_slot s l prj
 
 (** {5 Object Internal Method Dispatch Functions }
@@ -296,14 +298,14 @@ and object_has_internal_method s l prj =
 
 (** Function to dispatch calls to O.[[GetPrototypeOf]]() *)
 and object_internal_get_prototype_of s o =
-  let%some internal_method = (run_object_method object_get_prototype_of_ s o) in
+  let%some internal_method = run_object_method object_get_prototype_of_ s o in
   match internal_method with
   | Coq_builtin_get_prototype_of_default -> ordinary_object_internal_get_prototype_of s o
   | Coq_builtin_get_prototype_of_proxy   -> proxy_object_internal_get_prototype_of s o
 
 (** Function to dispatch calls to O.[[GetPrototypeOf]](V) *)
 and object_internal_set_prototype_of s o v =
-  let%some internal_method = (run_object_method object_set_prototype_of_ s o) in
+  let%some internal_method = run_object_method object_set_prototype_of_ s o in
   match internal_method with
   | Coq_builtin_set_prototype_of_default -> ordinary_object_internal_set_prototype_of s o v
   | Coq_builtin_set_prototype_of_proxy   -> proxy_object_internal_set_prototype_of s o v
@@ -324,52 +326,46 @@ and object_internal_prevent_extensions s o =
 
 (** Function to dispatch calls to O.[[GetOwnProperty]](P) *)
 and object_internal_get_own_property s o p =
-  let%some internal_method = (run_object_method object_get_own_prop_ s o) in
+  let%some internal_method = run_object_method object_get_own_prop_ s o in
   match internal_method with
   | Coq_builtin_get_own_prop_default  -> ordinary_object_internal_get_own_property s o p
   | Coq_builtin_get_own_prop_args_obj -> Coq_result_not_yet_implemented (* TODO *)
   | Coq_builtin_get_own_prop_string   -> Coq_result_not_yet_implemented (* TODO *)
-  | Coq_builtin_get_own_prop_proxy    -> Coq_result_not_yet_implemented (* TODO *)
+  | Coq_builtin_get_own_prop_proxy    -> proxy_object_internal_get_own_property s o p
 
 (** Function to dispatch calls to O.[[DefineOwnProperty]](P, desc) *)
 and object_internal_define_own_property s o p desc =
-  let%some internal_method = (run_object_method object_define_own_prop_ s o) in
+  let%some internal_method = run_object_method object_define_own_prop_ s o in
   match internal_method with
   | Coq_builtin_define_own_prop_default  -> ordinary_object_internal_define_own_property s o p desc
   | Coq_builtin_define_own_prop_array    -> Coq_result_not_yet_implemented (* TODO *)
   | Coq_builtin_define_own_prop_args_obj -> Coq_result_not_yet_implemented (* TODO *)
-  | Coq_builtin_define_own_prop_proxy    -> Coq_result_not_yet_implemented (* TODO *)
+  | Coq_builtin_define_own_prop_proxy    -> ordinary_object_internal_define_own_property s o p desc
 
 (** Function to dispatch calls to O.[[HasProperty]](P) *)
 and object_internal_has_property s o p =
-  let%some b = (run_object_method object_has_prop_ s o) in
+  let%some b = run_object_method object_has_prop_ s o in
   match b with
-  | Coq_builtin_has_prop_default -> ordinary_has_property s o p
-  | Coq_builtin_has_prop_proxy   -> Coq_result_not_yet_implemented (* TODO *)
+  | Coq_builtin_has_prop_default -> ordinary_object_internal_has_property s o p
+  | Coq_builtin_has_prop_proxy   -> proxy_object_internal_has_property s o p
 
 (** Function to dispatch calls to O.[[Get]](P, receiver) *)
 and object_internal_get s o p receiver =
   let%some internal_method = (run_object_method object_get_ s o) in
-  let dispatch_es5 _ =
-    match p with
-    (* FIXME: ES5 HACK CONTEXT *)
-    | Coq_value_string x -> object_get_builtin s (execution_ctx_initial true) internal_method (Coq_value_object o) o x
-    | _ -> assert false
-  in match internal_method with
-  (* FIXME: Dispatch to new versions of functions *)
+  match internal_method with
   | Coq_builtin_get_default  -> ordinary_object_internal_get s o p receiver
-  | Coq_builtin_get_function -> dispatch_es5 ()
-  | Coq_builtin_get_args_obj -> dispatch_es5 ()
-  | Coq_builtin_get_proxy    -> Coq_result_not_yet_implemented
+  | Coq_builtin_get_function -> Coq_result_not_yet_implemented
+  | Coq_builtin_get_args_obj -> Coq_result_not_yet_implemented
+  | Coq_builtin_get_proxy    -> proxy_object_internal_get s o p receiver
 
 (** Function to dispatch calls to O.[[Set]](P, V, Receiver) *)
 and object_internal_set s o p v receiver =
   let%some internal_method = (run_object_method object_set_ s o) in
   match internal_method with
   | Coq_builtin_set_default -> ordinary_object_internal_set s o p v receiver
-  | Coq_builtin_set_proxy   -> Coq_result_not_yet_implemented
+  | Coq_builtin_set_proxy   -> proxy_object_internal_set s o p v receiver
 
-(** @deprecated In favour of potentially the same [object_internal_set] ES6 method *)
+(** @deprecated FIXME: In favour of potentially the same [object_internal_set] ES6 method *)
 and object_put s c l p v str = object_internal_set s l (Coq_value_string p) v (Coq_value_object l)
 
 (** Function to dispatch calls to O.[[Delete]](P) *)
@@ -377,10 +373,10 @@ and object_internal_delete s o p =
   let%some internal_method = run_object_method object_delete_ s o in
   match internal_method with
   | Coq_builtin_delete_default  -> ordinary_object_internal_delete s o p
-  | Coq_builtin_delete_args_obj -> assert false
-  | Coq_builtin_delete_proxy    -> Coq_result_not_yet_implemented
+  | Coq_builtin_delete_args_obj -> Coq_result_not_yet_implemented
+  | Coq_builtin_delete_proxy    -> proxy_object_internal_delete s o p
 
-(** @deprecated ES5 *)
+(** @deprecated FIXME: ES5 *)
 and object_delete_default s c l x str =
   let%bool s, b = ordinary_object_internal_delete s l (Coq_value_string x) in
   if str && (not b) then
@@ -388,16 +384,35 @@ and object_delete_default s c l x str =
   else
     res_ter s (res_val (Coq_value_bool b))
 
+(** Function to dispatch calls to O.[[OwnPropertyKeys]]() *)
 and object_internal_own_property_keys s o =
   let%some internal_method = run_object_method object_own_property_keys_ s o in
   match internal_method with
   | Coq_builtin_own_property_keys_default -> ordinary_object_internal_own_property_keys s o
-  | Coq_builtin_own_property_keys_proxy   -> Coq_result_not_yet_implemented
+  | Coq_builtin_own_property_keys_proxy   -> proxy_object_internal_own_property_keys s o
 
 (** Function to dispatch calls to O.[[Call]](thisArgument, argumentsList) *)
 and object_internal_call s o thisArgument argumentsList =
-  (* FIXME: ES5 HACK CONTEXT *)
-  run_call s (execution_ctx_initial true) o thisArgument argumentsList
+  let%some internal_method = run_object_method object_call_ s o in
+  let%some internal_method = internal_method in
+  match internal_method with
+  (* FIXME: ES5 hacks *)
+  | Coq_call_default    -> run_call s (execution_ctx_initial true) o thisArgument argumentsList
+  | Coq_call_after_bind -> run_call s (execution_ctx_initial true) o thisArgument argumentsList
+  | Coq_call_prealloc _ -> run_call s (execution_ctx_initial true) o thisArgument argumentsList
+  | Coq_call_proxy      -> proxy_object_internal_call s o thisArgument argumentsList
+
+(** Function to dispatch calls to O.[[Construct]](argumentsList, newTarget) *)
+and object_internal_construct s o argumentsList newTarget =
+  let%some internal_method = run_object_method object_construct_ s o in
+  let%some internal_method = internal_method in
+  match internal_method with
+  (* FIXME: ES5 hacks *)
+  | Coq_construct_default    -> run_construct s (execution_ctx_initial true) internal_method o argumentsList
+  | Coq_construct_after_bind -> run_construct s (execution_ctx_initial true) internal_method o argumentsList
+  | Coq_construct_prealloc _ -> run_construct s (execution_ctx_initial true) internal_method o argumentsList
+  | Coq_construct_proxy      -> proxy_object_internal_construct s o argumentsList newTarget
+
 
 (** {3 The Reference Specification Type}
     @essec 6.2.4
@@ -536,6 +551,52 @@ and is_generic_descriptor desc =
   | Descriptor_undef -> false
   | Descriptor _ -> (not (is_accessor_descriptor desc)) && (not (is_data_descriptor desc))
 
+(** @essec 6.2.5.4
+    @esid sec-frompropertydescriptor *)
+and from_property_descriptor s desc =
+  if desc === Descriptor_undef then res_ter s (res_val Coq_value_undef)
+  else
+  let desc = descriptor_get_defined desc in
+  let%value s, obj = object_create s (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_proto)) None in
+  let%assert _ = type_of obj === Coq_type_object in (* TODO: is extensible with no own properties *)
+  let%ret s = if is_some desc.descriptor_value then
+    let%bool_ret s, result = create_data_property s obj (Coq_value_string "value") (unsome_error desc.descriptor_value) in
+    let%assert_ret _ = result in
+    Continue s
+    else Continue s
+
+  in let%ret s = if is_some desc.descriptor_writable then
+    let%bool_ret s, result = create_data_property s obj (Coq_value_string "writable") (Coq_value_bool (unsome_error desc.descriptor_writable)) in
+    let%assert_ret _ = result in
+    Continue s
+    else Continue s
+
+  in let%ret s = if is_some desc.descriptor_get then
+    let%bool_ret s, result = create_data_property s obj (Coq_value_string "get") (unsome_error desc.descriptor_get) in
+    let%assert_ret _ = result in
+    Continue s
+    else Continue s
+
+  in let%ret s = if is_some desc.descriptor_set then
+    let%bool_ret s, result = create_data_property s obj (Coq_value_string "set") (unsome_error desc.descriptor_set) in
+    let%assert_ret _ = result in
+    Continue s
+    else Continue s
+
+  in let%ret s = if is_some desc.descriptor_enumerable then
+    let%bool_ret s, result = create_data_property s obj (Coq_value_string "enumerable") (Coq_value_bool (unsome_error desc.descriptor_enumerable)) in
+    let%assert_ret _ = result in
+    Continue s
+    else Continue s
+
+  in let%ret s = if is_some desc.descriptor_configurable then
+    let%bool_ret s, result = create_data_property s obj (Coq_value_string "configurable") (Coq_value_bool (unsome_error desc.descriptor_configurable)) in
+    let%assert_ret _ = result in
+    Continue s
+    else Continue s
+  (* The bulk CreateDataProperty returns true assertion of step 10 has been placed into each individual operation *)
+  in res_ter s (res_val obj)
+
 (** @esid sec-topropertydescriptor
     @essec 6.2.5.5 *)
 and to_property_descriptor s _foo_ =
@@ -603,9 +664,16 @@ and to_property_descriptor s _foo_ =
     else res_spec s desc
   | _ -> throw_result (run_error_no_c s Coq_native_error_type)
 
-(** @essec 6.2.5.6
-    @esid sec-completepropertydescriptor *)
-and complete_property_descriptor s desc =
+(** Completes a property descriptor by setting default fields.
+
+  FIXME: This implementation treats Property Descriptors as value types
+  instead of as reference types as the specification intends. This method
+  is used in the spec as "Call CompletePropertyDescriptor(Desc)" expecting
+  that Desc will be mutated.
+
+  @essec 6.2.5.6
+  @esid sec-completepropertydescriptor *)
+and complete_property_descriptor desc =
   let desc = descriptor_get_defined desc in
   let like = { descriptor_value        = Some Coq_value_undef;
                descriptor_writable     = Some false;
@@ -1064,7 +1132,7 @@ and ordinary_object_internal_prevent_extensions s o =
     @esid sec-ordinarypreventextensions *)
 and ordinary_prevent_extensions s o =
   let%some s' = run_object_set_internal object_set_extensible s o false in
-  res_spec s (res_val (Coq_value_bool true))
+  res_ter s (res_val (Coq_value_bool true))
 
 (** @essec 9.1.5
     @esid sec-ordinary-object-internal-methods-and-internal-slots-getownproperty-p *)
@@ -1364,28 +1432,24 @@ and ordinary_own_property_keys s o =
   (* FIXME: Precise key ordering is to be implemented here! *)
   res_spec s keys
 
+(** @essec 9.1.12
+    @esid sec-objectcreate *)
+and object_create s proto internalSlotsList =
+  let internalSlotsList = unsome_default [] internalSlotsList in
+  (* FIXME: Do something with internalSlotsList *)
+  (* TODO: Draw this definition closer to the spec language *)
+  let obj = object_new proto "" in
+  let l, s = object_alloc s obj in
+  res_ter s (res_val (Coq_value_object l))
+
 (** {2 Proxy Object Internal Methods and Internal Slots}
     @essec 9.5
     @esid sec-proxy-object-internal-methods-and-internal-slots *)
 
-(*
-  outline implementation:
-
-(** @essec 9.5.
-    @esid  *)
-and proxy_object_internal_ s o =
-  let%some handler = run_object_method object_proxy_handler_ s o in
-  let%some handler = handler in
-  (** Note: this check also implies that [target] is not null *)
-  if handler === Coq_value_null then run_error_no_c s Coq_native_error_type
-  else
-  let%assert _ = (type_of handler) === Coq_type_object in
-  let%some target = run_object_method object_proxy_target_ s o in
-  let%some target = target in
-  let%value s, trap = get_method s handler (Coq_value_string "") in
-  if trap === Coq_value_undef then
-
-*)
+(** {3 Specification text helper functions} *)
+(** Implements the specification text "If [l] is a Proxy exotic object" *)
+and is_proxy_exotic_object s l =
+  object_has_internal_slot s l object_proxy_handler_
 
 (** @essec 9.5.1
     @esid sec-proxy-object-internal-methods-and-internal-slots-getprototypeof *)
@@ -1489,6 +1553,334 @@ and proxy_object_internal_prevent_extensions s o =
   in
   res_ter s (res_val (Coq_value_bool booleanTrapResult))
 
+(** @essec 9.5.5
+    @esid  sec-proxy-object-internal-methods-and-internal-slots-getownproperty-p *)
+and proxy_object_internal_get_own_property s o p =
+  let%assert _ = is_property_key p in
+  let%some handler = run_object_method object_proxy_handler_ s o in
+  let%some handler = handler in
+  (** Note: this check also implies that [target] is not null *)
+  if handler === Coq_value_null then run_error_no_c s Coq_native_error_type
+  else
+  let%assert _ = (type_of handler) === Coq_type_object in
+  let%some target = run_object_method object_proxy_target_ s o in
+  let%some target = target in
+  let%value s, trap = get_method s handler (Coq_value_string "getOwnPropertyDescriptor") in
+  if trap === Coq_value_undef then
+    object_internal_get_own_property s o p
+  else
+  let%value s, trapResultObj = call s trap handler (Some [target; p]) in
+  if not ((type_of trapResultObj === Coq_type_object) || (trapResultObj === Coq_value_undef)) then
+    throw_result (run_error_no_c s Coq_native_error_type)
+  else
+  let%spec s, targetDesc = object_internal_get_own_property s (loc_of_value target) p in
+  if trapResultObj === Coq_value_undef then
+    if targetDesc === Descriptor_undef then
+      res_spec s Descriptor_undef
+    else
+      let targetDesc = descriptor_get_defined targetDesc in
+      if descriptor_configurable targetDesc === Some false then
+        throw_result (run_error_no_c s Coq_native_error_type)
+      else
+        let%bool s, extensibleTarget = is_extensible s target in
+        if not extensibleTarget then
+          throw_result (run_error_no_c s Coq_native_error_type)
+        else
+          res_spec s Descriptor_undef
+  else
+  let%bool s, extensibleTarget = is_extensible s target in
+  let%spec s, resultDesc = to_property_descriptor s trapResultObj in
+  let resultDesc = complete_property_descriptor (Descriptor resultDesc) in (* FIXME: See note in [complete_property_descriptor] *)
+  let%bool s, valid = is_compatible_property_descriptor s extensibleTarget resultDesc targetDesc in
+  if not valid then
+    run_error_no_c s Coq_native_error_type
+  else if descriptor_configurable resultDesc === Some true &&
+    (targetDesc === Descriptor_undef || (descriptor_configurable (descriptor_get_defined targetDesc) === Some true)) then
+      run_error_no_c s Coq_native_error_type
+  else
+    res_spec s (Descriptor resultDesc)
+
+(** @essec 9.5.6
+    @esid  sec-proxy-object-internal-methods-and-internal-slots-defineownproperty-p-desc *)
+and proxy_object_internal_define_own_property s o p desc =
+  let%assert _ = is_property_key p in
+  let%some handler = run_object_method object_proxy_handler_ s o in
+  let%some handler = handler in
+  (** Note: this check also implies that [target] is not null *)
+  if handler === Coq_value_null then run_error_no_c s Coq_native_error_type
+  else
+  let%assert _ = (type_of handler) === Coq_type_object in
+  let%some target = run_object_method object_proxy_target_ s o in
+  let%some target = target in
+  let%value s, trap = get_method s handler (Coq_value_string "defineProperty") in
+  if trap === Coq_value_undef then
+    object_internal_define_own_property s (loc_of_value target) p desc
+  else
+  let%value s, descObj = from_property_descriptor s (Descriptor desc) in
+  let%value s, tempVar = call s trap handler (Some [target; p; descObj]) in
+  let booleanTrapResult = to_boolean tempVar in
+  if not booleanTrapResult then
+    res_ter s (res_val (Coq_value_bool false))
+  else
+  let%spec s, targetDesc = object_internal_get_own_property s (loc_of_value target) p in
+  let%bool s, extensibleTarget = is_extensible s target in
+  let settingConfigFalse = (is_some desc.descriptor_configurable) && (desc.descriptor_configurable === Some false) in
+  let%ret s =
+    if targetDesc === Descriptor_undef then
+      if not extensibleTarget then Return (run_error_no_c s Coq_native_error_type)
+      else if settingConfigFalse then Return (run_error_no_c s Coq_native_error_type)
+      else Continue s
+    else
+      let%bool_ret s, tempVal = is_compatible_property_descriptor s extensibleTarget desc targetDesc in
+      let targetDesc = descriptor_get_defined targetDesc in
+      if not tempVal then
+        Return (run_error_no_c s Coq_native_error_type)
+      else if settingConfigFalse && targetDesc.descriptor_configurable === (Some true) then
+        Return (run_error_no_c s Coq_native_error_type)
+      else Continue s
+  in
+  res_ter s (res_val (Coq_value_bool true))
+
+
+(** @essec 9.5.7
+    @esid  sec-proxy-object-internal-methods-and-internal-slots-hasproperty-p *)
+and proxy_object_internal_has_property s o p =
+  let%assert _ = is_property_key p in
+  let%some handler = run_object_method object_proxy_handler_ s o in
+  let%some handler = handler in
+  (** Note: this check also implies that [target] is not null *)
+  if handler === Coq_value_null then run_error_no_c s Coq_native_error_type
+  else
+  let%assert _ = (type_of handler) === Coq_type_object in
+  let%some target = run_object_method object_proxy_target_ s o in
+  let%some target = target in
+  let%value s, trap = get_method s handler (Coq_value_string "has") in
+  if trap === Coq_value_undef then
+    object_internal_has_property s (loc_of_value target) p
+  else
+  let%value s, tempVar = call s trap handler (Some [target; p]) in
+  let booleanTrapResult = to_boolean tempVar in
+  let%ret s =
+  if not booleanTrapResult then
+    let%spec_ret s, targetDesc = object_internal_get_own_property s (loc_of_value target) p in
+    if not (targetDesc === Descriptor_undef) then
+      let targetDesc = descriptor_get_defined targetDesc in
+      if targetDesc.descriptor_configurable === Some false then
+        Return (run_error_no_c s Coq_native_error_type)
+      else
+      let%bool_ret s, extensibleTarget = is_extensible s target in
+      if not extensibleTarget then Return (run_error_no_c s Coq_native_error_type)
+      else Continue s
+    else Continue s
+  else Continue s
+  in res_ter s (res_val (Coq_value_bool booleanTrapResult))
+
+(** @essec 9.5.8
+    @esid  sec-proxy-object-internal-methods-and-internal-slots-get-p-receiver *)
+and proxy_object_internal_get s o p receiver =
+  let%assert _ = is_property_key p in
+  let%some handler = run_object_method object_proxy_handler_ s o in
+  let%some handler = handler in
+  (** Note: this check also implies that [target] is not null *)
+  if handler === Coq_value_null then run_error_no_c s Coq_native_error_type
+  else
+  let%assert _ = (type_of handler) === Coq_type_object in
+  let%some target = run_object_method object_proxy_target_ s o in
+  let%some target = target in
+  let%value s, trap = get_method s handler (Coq_value_string "get") in
+  if trap === Coq_value_undef then
+    object_internal_get s (loc_of_value target) p receiver
+  else
+  let%value s, trapResult = call s trap handler (Some [target; p; receiver]) in
+  let%spec s, targetDesc = object_internal_get_own_property s (loc_of_value target) p in
+
+  let%ret s =
+  if not (targetDesc === Descriptor_undef) then
+    let targetDesc' = descriptor_get_defined targetDesc in
+
+    let%ret_ret s =
+    if is_data_descriptor targetDesc && targetDesc'.descriptor_configurable === Some false && targetDesc'.descriptor_writable === Some false then
+      if not (same_value trapResult (unsome_error targetDesc'.descriptor_value)) then
+        Return (run_error_no_c s Coq_native_error_type)
+      else Continue s
+    else Continue s
+
+    in let%ret_ret s =
+    if is_accessor_descriptor targetDesc && targetDesc'.descriptor_configurable === Some false && targetDesc'.descriptor_get === Some Coq_value_undef then
+      if not (trapResult === Coq_value_undef) then
+        Return (run_error_no_c s Coq_native_error_type)
+      else Continue s
+    else Continue s
+
+    in Continue s
+  else Continue s
+
+  in res_ter s (res_val trapResult)
+
+(** @essec 9.5.9
+    @esid  sec-proxy-object-internal-methods-and-internal-slots-set-p-v-receiver *)
+and proxy_object_internal_set s o p v receiver =
+  let%assert _ = is_property_key p in
+  let%some handler = run_object_method object_proxy_handler_ s o in
+  let%some handler = handler in
+  (** Note: this check also implies that [target] is not null *)
+  if handler === Coq_value_null then run_error_no_c s Coq_native_error_type
+  else
+  let%assert _ = (type_of handler) === Coq_type_object in
+  let%some target = run_object_method object_proxy_target_ s o in
+  let%some target = target in
+  let%value s, trap = get_method s handler (Coq_value_string "set") in
+  if trap === Coq_value_undef then
+    object_internal_set s (loc_of_value target) p v receiver
+  else
+  let%value s, tempVar = call s trap handler (Some [target; p; v; receiver]) in
+  let booleanTrapResult = to_boolean tempVar in
+  if not booleanTrapResult then res_ter s (res_val (Coq_value_bool false))
+  else
+  let%spec s, targetDesc = object_internal_get_own_property s (loc_of_value target) p in
+  let%ret s =
+  if not (targetDesc === Descriptor_undef) then
+    let targetDesc' = descriptor_get_defined targetDesc in
+    let%ret_ret s =
+    if is_data_descriptor targetDesc && targetDesc'.descriptor_configurable === Some false && targetDesc'.descriptor_writable === Some false then
+      if not (same_value v (unsome_error targetDesc'.descriptor_value)) then
+        Return (run_error_no_c s Coq_native_error_type)
+      else Continue s
+    else Continue s
+
+    in let%ret_ret s =
+    if is_accessor_descriptor targetDesc && targetDesc'.descriptor_configurable === Some false then
+      if targetDesc'.descriptor_set === Some Coq_value_undef then
+        Return (run_error_no_c s Coq_native_error_type)
+      else Continue s
+    else Continue s
+
+    in Continue s
+  else Continue s
+  in res_ter s (res_val (Coq_value_bool true))
+
+(** @essec 9.5.10
+    @esid  sec-proxy-object-internal-methods-and-internal-slots-delete-p *)
+and proxy_object_internal_delete s o p =
+  let%assert _ = is_property_key p in
+  let%some handler = run_object_method object_proxy_handler_ s o in
+  let%some handler = handler in
+  (** Note: this check also implies that [target] is not null *)
+  if handler === Coq_value_null then run_error_no_c s Coq_native_error_type
+  else
+  let%assert _ = (type_of handler) === Coq_type_object in
+  let%some target = run_object_method object_proxy_target_ s o in
+  let%some target = target in
+  let%value s, trap = get_method s handler (Coq_value_string "deleteProperty") in
+  if trap === Coq_value_undef then
+    object_internal_delete s (loc_of_value target) p
+  else
+  let%value s, tempVar = call s trap handler (Some [target; p]) in
+  let booleanTrapResult = to_boolean tempVar in
+  if not booleanTrapResult then res_ter s (res_val (Coq_value_bool false))
+  else
+  let%spec s, targetDesc = object_internal_get_own_property s (loc_of_value target) p in
+  if targetDesc === Descriptor_undef then res_ter s (res_val (Coq_value_bool true))
+  else
+  let targetDesc = descriptor_get_defined targetDesc in
+  if targetDesc.descriptor_configurable === Some false then run_error_no_c s Coq_native_error_type
+  else res_ter s (res_val (Coq_value_bool true))
+
+(** @essec 9.5.11
+    @esid  sec-proxy-object-internal-methods-and-internal-slots-ownpropertykeys *)
+and proxy_object_internal_own_property_keys s o =
+  Coq_result_not_yet_implemented (* FIXME *)
+
+(** @essec 9.5.12
+    @esid  sec-proxy-object-internal-methods-and-internal-slots-call-thisargument-argumentslist *)
+and proxy_object_internal_call s o thisArgument argumentsList =
+  Coq_result_not_yet_implemented (* FIXME *)
+
+(** @essec 9.5.13
+    @esid  sec-proxy-object-internal-methods-and-internal-slots-construct-argumentslist-newtarget *)
+and proxy_object_internal_construct s o argumentsList newTarget =
+  Coq_result_not_yet_implemented (* FIXME *)
+
+(** @essec 9.5.14
+    @esid  sec-proxycreate *)
+and proxy_create s target handler =
+  if not (type_of target === Coq_type_object) then
+    run_error_no_c s Coq_native_error_type
+  else if is_proxy_exotic_object s (loc_of_value target)
+       && ((run_object_method object_proxy_handler_ s (loc_of_value target)) === Some (Some Coq_value_null)) then
+    run_error_no_c s Coq_native_error_type
+  else if not (type_of handler === Coq_type_object) then
+    run_error_no_c s Coq_native_error_type
+  else if is_proxy_exotic_object s (loc_of_value handler)
+       && ((run_object_method object_proxy_handler_ s (loc_of_value handler)) === Some (Some Coq_value_null)) then
+    run_error_no_c s Coq_native_error_type
+  else
+  let p, s = proxy_object_new s in
+  let%ret s =
+  if is_callable s target then
+    let%some_ret s = run_object_set_internal object_set_call s p Coq_call_proxy in
+    if object_has_internal_method s (loc_of_value target) object_construct_ then
+      let%some_ret s = run_object_set_internal object_set_construct s p Coq_construct_proxy in
+      Continue s
+    else Continue s
+  else Continue s
+  in
+  let%some s = run_object_set_internal object_set_proxy_target s p target in
+  let%some s = run_object_set_internal object_set_proxy_handler s p handler in
+  res_ter s (res_val (Coq_value_object p))
+
+(** {1 Reflection}
+    @essec 26
+    @esid sec-reflection *)
+(** {2 Proxy Objects}
+    @essec 26.2
+    @esid sec-proxy-objects *)
+(** {3 The Proxy Constructor}
+
+    The [%Proxy%] intrinsic object, initial value of the [Proxy] property of the global object.
+
+    @essec 26.2.1
+    @esid sec-proxy-constructor *)
+(** @essec 26.2.1.1
+    @esid sec-proxy-target-handler *)
+and proxy_constructor_steps s c f this newTarget target handler =
+  if newTarget === Coq_value_undef then
+    run_error_no_c s Coq_native_error_type
+  else
+    proxy_create s target handler
+
+(** {3 Properties of the Proxy Constructor}
+    @essec 26.2.2
+    @esid sec-properties-of-the-proxy-constructor *)
+(** [%Proxy%.[[Prototype]] = %FunctionPrototype%] *)
+
+(** @essec 26.2.2.1
+    @esid sec-proxy.revocable *)
+and proxy_revocable_steps s c f this newTarget target handler =
+  let%value s, p = proxy_create s target handler in
+  let%object s, revoker = proxy_revocation_function_create s in
+  let%some s = run_object_set_internal object_set_revocable_proxy s revoker p in
+  let%value s, result = object_create s (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_proto)) None in
+  let%bool s, _ = create_data_property s result (Coq_value_string "proxy") p in
+  let%bool s, _ = create_data_property s result (Coq_value_string "revoke") (Coq_value_object revoker) in
+  res_ter s (res_val result)
+
+(** @essec 26.2.2.2.1.1
+    @esid sec-proxy-revocation-functions *)
+and proxy_revocation_function_create s =
+  Coq_result_not_yet_implemented (* FIXME *)
+
+and proxy_revocation_function_steps s c f this newTarget =
+  let%some p = run_object_method object_revocable_proxy_ s f in
+  let%some p = p in
+  if p === Coq_value_null then res_ter s (res_val Coq_value_undef)
+  else
+  let p = loc_of_value p in
+  let%some s = run_object_set_internal object_set_revocable_proxy s f Coq_value_null in
+  let%assert _ = is_proxy_exotic_object s p in
+  let%some s = run_object_set_internal object_set_proxy_target s p Coq_value_null in
+  let%some s = run_object_set_internal object_set_proxy_handler s p Coq_value_null in
+  res_ter s (res_val Coq_value_undef)
 
 (******** UNCHECKED ES5 IMPLEMENTATION CONTINUES BELOW ***********)
 

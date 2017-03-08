@@ -41,7 +41,7 @@ let attrib_constant v =
     value -> class_name -> object_properties_type -> coq_object **)
 
 let object_create_builtin vproto sclass p =
-  object_create vproto sclass true p
+  object_create_default_record vproto sclass true p
 
 (** val object_create_prealloc_call_or_construct :
     value -> object_properties_type -> coq_object **)
