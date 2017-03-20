@@ -36,6 +36,10 @@ val neg : number -> number
 val sign : number -> number
 val absolute : number -> number
 
+val min : number -> number -> number
+val max : number -> number -> number
+val pow : number -> number -> number
+
 val modulo_32 : number -> number
 
 val fmod : number -> number -> number

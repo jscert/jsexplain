@@ -20,28 +20,6 @@ open Shared
 
 (*------------JS preliminary -----------*)
 
-(** val convert_prim_to_number : prim -> number **)
-
-let convert_prim_to_number _foo_ = match _foo_ with
-| Coq_value_undef -> JsNumber.nan
-| Coq_value_null -> JsNumber.zero
-| Coq_value_bool b -> if b then JsNumber.one else JsNumber.zero
-| Coq_value_number n -> n
-| Coq_value_string s -> JsNumber.from_string s
-| _ -> assert false
-
-(** val convert_number_to_integer : number -> number **)
-
-let convert_number_to_integer n =
-  if JsNumber.isnan n
-  then JsNumber.zero
-  else if   (JsNumber.isposzero n)
-         || (JsNumber.isnegzero n)
-         || (n === JsNumber.infinity)
-         || (n === JsNumber.neg_infinity)
-       then n
-       else  (JsNumber.sign n) *. (JsNumber.floor (JsNumber.absolute n))
-
 
 (** val equality_test_for_same_type : coq_type -> value -> value -> bool **)
 
@@ -129,40 +107,6 @@ let rec inequality_test_string s1 s2 =
 *)
 let inequality_test_string s1 s2 = string_lt s1 s2
 
-
-(** val inequality_test_primitive : prim -> prim -> prim **)
-
-let inequality_test_primitive w1 w2 =
-  match w1 with
-  | Coq_value_undef ->
-    inequality_test_number (convert_prim_to_number w1)
-      (convert_prim_to_number w2)
-  | Coq_value_null ->
-    inequality_test_number (convert_prim_to_number w1)
-      (convert_prim_to_number w2)
-  | Coq_value_bool b ->
-    inequality_test_number (convert_prim_to_number w1)
-      (convert_prim_to_number w2)
-  | Coq_value_number n ->
-    inequality_test_number (convert_prim_to_number w1)
-      (convert_prim_to_number w2)
-  | Coq_value_string s1 ->
-    (match w2 with
-     | Coq_value_undef ->
-       inequality_test_number (convert_prim_to_number w1)
-         (convert_prim_to_number w2)
-     | Coq_value_null ->
-       inequality_test_number (convert_prim_to_number w1)
-         (convert_prim_to_number w2)
-     | Coq_value_bool b ->
-       inequality_test_number (convert_prim_to_number w1)
-         (convert_prim_to_number w2)
-     | Coq_value_number n ->
-       inequality_test_number (convert_prim_to_number w1)
-         (convert_prim_to_number w2)
-     | Coq_value_string s2 -> Coq_value_bool (inequality_test_string s1 s2)
-     | _ -> assert false)
-  | _ -> assert false
 
 (** val typeof_prim : prim -> string **)
 
@@ -711,8 +655,7 @@ and to_primitive s input preferredType =
 
 (** @essec 7.1.2
     @esid sec-toboolean *)
-(* FIXME: _foo_ = argument *)
-and to_boolean _foo_ = match _foo_ with
+and to_boolean argument = match argument with
 | Coq_value_undef -> false
 | Coq_value_null -> false
 | Coq_value_bool b -> b
@@ -722,6 +665,40 @@ and to_boolean _foo_ = match _foo_ with
 | Coq_value_string s -> if string_eq s "" then false else true
 (* | Coq_value_symbol s -> true *)
 | Coq_value_object o -> true
+
+(** @essed 7.1.3
+    @esid sec-tonumber *)
+and to_number s argument = match argument with
+(** @esid table-11 *)
+| Coq_value_undef    -> res_ter s (res_val (Coq_value_number JsNumber.nan))
+| Coq_value_null     -> res_ter s (res_val (Coq_value_number JsNumber.zero))
+| Coq_value_bool b   ->
+    if b then res_ter s (res_val (Coq_value_number JsNumber.one))
+    else res_ter s (res_val (Coq_value_number JsNumber.zero))
+| Coq_value_number n -> res_ter s (res_val (Coq_value_number n))
+| Coq_value_string x -> res_ter s (res_val (Coq_value_number (to_number_string x)))
+(* TODO: | Coq_value_symbol _ -> run_error_no_c s Coq_native_error_type *)
+| Coq_value_object l ->
+  let%value s, primValue = to_primitive s argument (Some Coq_preftype_number) in
+  to_number s primValue
+
+(** TODO: ES6-ify
+    @essec 7.1.3.1
+    @esid sec-tonumber-applied-to-the-string-type *)
+and to_number_string s = JsNumber.from_string s
+
+(** @essec 7.1.4
+    @esid sec-tointeger *)
+and to_integer s argument =
+  let%number s, number = to_number s argument in
+  if JsNumber.isnan number then
+    res_ter s (res_val (Coq_value_number JsNumber.zero))
+  else if (JsNumber.isposzero number) || (JsNumber.isnegzero number) ||
+          (number === JsNumber.infinity) || (number === JsNumber.neg_infinity) then
+    res_ter s (res_val (Coq_value_number number))
+  else
+    res_ter s (res_val (Coq_value_number ((JsNumber.sign number) *. (JsNumber.floor (JsNumber.absolute number)))))
+
 
 (** @essec 7.1.12
     @esid sec-tostring *)
@@ -744,6 +721,13 @@ and to_string s argument =
     @esid sec-tostring-applied-to-the-number-type *)
 and to_string_number = JsNumber.to_string
 
+(** @essec 7.1.15
+    @esid sec-tolength *)
+and to_length s argument =
+  let%number s, len = to_integer s argument in
+  if len <= 0. then res_ter s (res_val (Coq_value_number 0.))
+  else res_ter s (res_val (Coq_value_number (JsNumber.min len ((JsNumber.pow 2. 53.)-.1.))))
+
 (** {2 Testing and Comparison Operations }
     @essec 7.2
     @esid sec-testing-and-comparison-operations *)
@@ -764,9 +748,14 @@ and require_object_coercible s argument =
 (** @essec 7.2.3
     @esid sec-iscallable *)
 and is_callable s argument =
-  match argument with
-  | Coq_value_object l -> object_has_internal_method s l object_call_
-  | _ -> false
+  if not (type_of argument === Coq_type_object) then false
+  else object_has_internal_method s (loc_of_value argument) object_call_
+
+(** @essec 7.2.4
+    @esid sec-isconstructor *)
+and is_constructor s argument =
+  if not (type_of argument === Coq_type_object) then false
+  else object_has_internal_method s (loc_of_value argument) object_construct_
 
 (** @essec 7.2.5
     @esid sec-isextensible-o *)
@@ -905,6 +894,15 @@ and call s f v argumentList =
     | _ -> assert false
   )
 
+(** @essec 7.3.13
+    @esid sec-construct *)
+and construct s f argumentsList newTarget =
+  let newTarget = unsome_default f newTarget in
+  let argumentsList = unsome_default [] argumentsList in
+  let%assert _ = is_constructor s f in
+  let%assert _ = is_constructor s newTarget in
+  object_internal_construct s (loc_of_value f) argumentsList newTarget
+
 (** @essec 7.3.14
     @esid sec-setintegritylevel *)
 and set_integrity_level s o level =
@@ -936,6 +934,45 @@ and test_integrity_level s o level =
   let%spec s, keys = object_internal_own_property_keys s (loc_of_value o) in
   (* FIXME: repeat for k in keys *)
   Coq_result_not_yet_implemented
+
+(** @essec 7.3.16
+    @esid sec-createarrayfromlist *)
+and create_array_from_list s elements =
+  (* first assertion is implicit through type signature *)
+  let%value s, array = array_create s (Coq_value_number 0.) None in
+  let n = 0. in
+  let%ret (s, n) = iterate elements (s, n) (fun e acc ->
+      let s, n = acc in
+      let%VALUE_ret s, tempVar = to_string s (Coq_value_number n) in
+      let%BOOL_ret s, status = create_data_property s array tempVar e in
+      let%assert_ret _ = status in
+      Continue (s, n +. 1.)) in
+  res_out s (res_val array)
+
+(** @essec 7.3.17
+    @esid sec-createlistfromarraylike *)
+and create_list_from_array_like s obj elementTypes =
+  let elementTypes = unsome_default
+      [Coq_type_undef; Coq_type_null; Coq_type_bool; Coq_type_string;
+       (* TODO: Symbols Coq_type_symbol; *) Coq_type_number; Coq_type_object]
+      elementTypes in
+  let%assert _ = (type_of obj) === Coq_type_object in
+  let%value s, tempVar = get s obj (Coq_value_string "length") in
+  let%number s, len = to_length s tempVar in
+  let list = [] in
+  let index = 0. in
+  let%ret (s, index, list) = repeat (fun acc -> let _, index, _ = acc in index < len) (s, index, list) (fun acc ->
+      let s, index, list = acc in
+      let%VALUE_ret s, indexName = to_string s (Coq_value_number index) in
+      let%value_ret s, next = get s obj indexName in
+      if not (mem_decide (===) (type_of next) elementTypes) then
+        Return (run_error_no_c s Coq_native_error_type)
+      else
+      let list = append list [next] in
+      let index = index +. 1. in
+      Continue (s, index, list)) in
+  res_spec s list
+
 
 (** {1 Executable Code and Execution Contexts}
     @essec 8
@@ -1498,6 +1535,7 @@ and ordinary_object_internal_own_property_keys s o =
 and ordinary_own_property_keys s o =
   let%some keys = object_properties_keys_as_list_option s o in
   (* FIXME: Precise key ordering is to be implemented here! *)
+  let keys = LibList.map (fun key -> Coq_value_string key) keys in
   res_spec s keys
 
 (** @essec 9.1.12
@@ -1509,6 +1547,15 @@ and object_create s proto internalSlotsList =
   let obj = object_new proto "" in
   let l, s = object_alloc s obj in
   res_ter s (res_val (Coq_value_object l))
+
+(** {2 Array Exotic Objects}
+    @essec 9.4.2
+    @esid sec-array-exotic-objects *)
+(** @essec 9.4.2.2
+    @esid sec-arraycreate *)
+and array_create s length proto =
+  (* FIXME: ES5 HACK *)
+  run_construct_prealloc s (execution_ctx_initial true) Coq_prealloc_array [length]
 
 (** {2 Proxy Object Internal Methods and Internal Slots}
     @essec 9.5
@@ -1857,17 +1904,98 @@ and proxy_object_internal_delete s o p =
 (** @essec 9.5.11
     @esid  sec-proxy-object-internal-methods-and-internal-slots-ownpropertykeys *)
 and proxy_object_internal_own_property_keys s o =
-  Coq_result_not_yet_implemented (* FIXME *)
+  let%some handler = run_object_method object_proxy_handler_ s o in
+  let%some handler = handler in
+  (** Note: this check also implies that [target] is not null *)
+  if handler === Coq_value_null then run_error_no_c s Coq_native_error_type
+  else
+  let%assert _ = (type_of handler) === Coq_type_object in
+  let%some target = run_object_method object_proxy_target_ s o in
+  let%some target = target in
+  let%value s, trap = get_method s handler (Coq_value_string "ownKeys") in
+  if trap === Coq_value_undef then
+    object_internal_own_property_keys s (loc_of_value target)
+  else
+  let%value s, trapResultArray = call s trap handler (Some [target]) in
+  let%spec s, trapResult = create_list_from_array_like s trapResultArray (Some [Coq_type_string(*TODO: ; Coq_type_symbol*)]) in
+  let%bool s, extensibleTarget = is_extensible s target in
+  let%spec s, targetKeys = object_internal_own_property_keys s (loc_of_value target) in
+  (* Assert that [targetKeys : (Coq_type_string | Coq_type_symbol) list *)
+  let targetConfigurableKeys = [] in
+  let targetNonconfigurableKeys = [] in
+  let%ret (s, targetConfigurableKeys, targetNonconfigurableKeys)  =
+      iterate targetKeys (s, targetConfigurableKeys, targetNonconfigurableKeys)
+      (fun key acc -> let (s, targetConfigurableKeys, targetNonconfigurableKeys) = acc in
+        let%spec_ret s, desc = object_internal_get_own_property s (loc_of_value target) key in
+        if (not (desc === Descriptor_undef)) && ((descriptor_get_defined desc).descriptor_configurable === Some false) then
+          Continue (s, targetConfigurableKeys, append targetNonconfigurableKeys [key])
+        else
+          Continue (s, append targetConfigurableKeys [key], targetNonconfigurableKeys)
+      )
+  in
+  if extensibleTarget && is_empty targetNonconfigurableKeys then
+    res_spec s trapResult
+  else
+  let uncheckedResultKeys = trapResult in
+  let%ret s, uncheckedResultKeys = iterate targetNonconfigurableKeys (s, uncheckedResultKeys) (fun key acc ->
+      let s, uncheckedResultKeys = acc in
+      if not (mem_decide (===) key uncheckedResultKeys) then
+        Return (run_error_no_c s Coq_native_error_type)
+      else
+        Continue (s, filter (fun x -> not (x === key)) uncheckedResultKeys)
+    )
+  in
+  if extensibleTarget then res_spec s trapResult
+  else
+  let%ret s, uncheckedResultKeys = iterate targetConfigurableKeys (s, uncheckedResultKeys) (fun key acc ->
+      let s, uncheckedResultKeys = acc in
+      if not (mem_decide (===) key uncheckedResultKeys) then
+        Return (run_error_no_c s Coq_native_error_type)
+      else
+        Continue (s, filter (fun x -> not (x === key)) uncheckedResultKeys)
+    )
+  in
+  if not (is_empty uncheckedResultKeys) then run_error_no_c s Coq_native_error_type
+  else res_spec s trapResult
 
 (** @essec 9.5.12
     @esid  sec-proxy-object-internal-methods-and-internal-slots-call-thisargument-argumentslist *)
 and proxy_object_internal_call s o thisArgument argumentsList =
-  Coq_result_not_yet_implemented (* FIXME *)
+  let%some handler = run_object_method object_proxy_handler_ s o in
+  let%some handler = handler in
+  (** Note: this check also implies that [target] is not null *)
+  if handler === Coq_value_null then run_error_no_c s Coq_native_error_type
+  else
+  let%assert _ = (type_of handler) === Coq_type_object in
+  let%some target = run_object_method object_proxy_target_ s o in
+  let%some target = target in
+  let%value s, trap = get_method s handler (Coq_value_string "apply") in
+  if trap === Coq_value_undef then
+    call s target thisArgument (Some argumentsList)
+  else
+  let%value s, argArray = create_array_from_list s argumentsList in
+  call s trap handler (Some [target; thisArgument; argArray])
 
 (** @essec 9.5.13
     @esid  sec-proxy-object-internal-methods-and-internal-slots-construct-argumentslist-newtarget *)
 and proxy_object_internal_construct s o argumentsList newTarget =
-  Coq_result_not_yet_implemented (* FIXME *)
+  let%some handler = run_object_method object_proxy_handler_ s o in
+  let%some handler = handler in
+  (** Note: this check also implies that [target] is not null *)
+  if handler === Coq_value_null then run_error_no_c s Coq_native_error_type
+  else
+  let%assert _ = (type_of handler) === Coq_type_object in
+  let%some target = run_object_method object_proxy_target_ s o in
+  let%some target = target in
+  let%value s, trap = get_method s handler (Coq_value_string "construct") in
+  if trap === Coq_value_undef then
+    let%assert _ = object_has_internal_method s (loc_of_value target) object_construct_ in
+    construct s target (Some argumentsList) (Some newTarget)
+  else
+  let%value s, argArray = create_array_from_list s argumentsList in
+  let%value s, newObj = call s trap handler (Some [target; argArray; newTarget]) in
+  if not (type_of newObj === Coq_type_object) then run_error_no_c s Coq_native_error_type
+  else res_ter s (res_val newObj)
 
 (** @essec 9.5.14
     @esid  sec-proxycreate *)
@@ -2162,35 +2290,17 @@ and object_default_value s c l prefo =
         let lmeth = method_of_preftype lpref in
         sub0 s_2 lmeth (fun s_3 -> run_error s_3 c Coq_native_error_type))
 
-(** val to_number :
-    state -> execution_ctx -> value -> result **)
-
-and to_number s c _foo_ = match _foo_ with
-  | Coq_value_object l ->
-    let%prim (s1, w) = (to_primitive s (Coq_value_object l) (Some Coq_preftype_number)) in
-    res_ter s1 (res_val (Coq_value_number (convert_prim_to_number w)))
-  | _ ->
-    res_out s (res_val (Coq_value_number (convert_prim_to_number _foo_)))
-
-(** val to_integer :
-    state -> execution_ctx -> value -> result **)
-
-and to_integer s c v =
-  let%number (s1, n) = to_number s c v in
-  res_ter s1
-    (res_val (Coq_value_number (convert_number_to_integer n)))
-
 (** val to_int32 :
     state -> execution_ctx -> value -> float specres **)
 
 and to_int32 s c v =
-  let%number (s_2, n) = to_number s c v in res_spec s_2 (JsNumber.to_int32 n)
+  let%number (s_2, n) = to_number s v in res_spec s_2 (JsNumber.to_int32 n)
 
 (** val to_uint32 :
     state -> execution_ctx -> value -> float specres **)
 
 and to_uint32 s c v =
-  let%number (s_2, n) = to_number s c v in res_spec s_2 (JsNumber.to_uint32 n)
+  let%number (s_2, n) = to_number s v in res_spec s_2 (JsNumber.to_uint32 n)
 
 (** val run_object_define_own_prop_array_loop :
     state -> execution_ctx -> object_loc -> float -> float ->
@@ -2255,13 +2365,14 @@ and object_define_own_prop s c l x desc throwcont =
                   "Spec asserts length of array is number.";
                 Coq_result_impossible)
              | _ ->
-               let oldLen0 = (JsNumber.to_uint32 (convert_prim_to_number oldLen)) in
+               let%number s0, oldLen = to_number s0 oldLen in
+               let oldLen0 = (JsNumber.to_uint32 oldLen) in
                let descValueOpt = (desc.descriptor_value) in
                if string_eq x ("length")
                then (match descValueOpt with
                    | Some descValue ->
                      let%spec (s1, newLen) = (to_uint32 s0 c descValue) in
-                     let%number (s2, newLenN) = to_number s1 c descValue in
+                     let%number (s2, newLenN) = to_number s1 descValue in
                      if not (newLen === newLenN)
                      then run_error s2 c Coq_native_error_range
                      else let newLenDesc =
@@ -2644,7 +2755,7 @@ and run_construct_prealloc s c b args =
     then follow s (Coq_value_number JsNumber.zero)
     else
       let v = get_arg 0 args in
-      let%number (x, x0) = (to_number s c v) in
+      let%number (x, x0) = (to_number s v) in
       follow x (Coq_value_number x0)
   | Coq_prealloc_array ->
     let o_2 = (object_new (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_array_proto))
@@ -3369,7 +3480,7 @@ and from_prop_descriptor s c _foo_ = match _foo_ with
     state -> execution_ctx -> value -> value -> result **)
 
 and run_equal s c v1 v2 =
-  let conv_number = fun s0 v -> to_number s0 c v in
+  let conv_number = fun s0 v -> to_number s0 v in
   let conv_primitive = fun s0 v -> to_primitive s0 v None in
   let checkTypesThen = (fun s0 v3 v4 k ->
     let ty1 = type_of v3 in
@@ -3422,7 +3533,7 @@ and convert_twice_primitive s c v1 v2 =
     (number * number) specres **)
 
 and convert_twice_number s c v1 v2 =
-  convert_twice ifx_number (fun s0 v -> to_number s0 c v) s v1 v2
+  convert_twice ifx_number (fun s0 v -> to_number s0 v) s v1 v2
 
 (** val convert_twice_string :
     state -> execution_ctx -> value -> value ->
@@ -3464,12 +3575,21 @@ and run_binary_op_bitwise mathop s c v1 v2 =
   let%spec (s2, k2) = (to_int32 s1 c v2) in
   res_ter s2 (res_val (Coq_value_number (mathop k1 k2)))
 
+(** TODO: ES6ify
+    @essec 7.2.12 *)
 and run_binary_op_compare b_swap b_neg s c v1 v2 =
   let%spec (s1, ww) = convert_twice_primitive s c v1 v2 in
   let (w1, w2) = ww in
   let p = if b_swap then (w2, w1) else (w1, w2) in
   let (wa, wb) = p in
-  let wr = inequality_test_primitive wa wb in
+  let%ret s, wr =
+    if (type_of wa === Coq_type_string) && (type_of wb === Coq_type_string) then
+      Continue (s, Coq_value_bool (inequality_test_string (string_of_value wb) (string_of_value wb)))
+    else
+      let%number_ret s, nx = to_number s1 wa in
+      let%number_ret s, ny = to_number s wb in
+      Continue (s, inequality_test_number nx ny)
+  in
   if value_compare wr Coq_value_undef then res_out s1 (res_val (Coq_value_bool false))
   else if (b_neg) && (value_compare wr (Coq_value_bool true))
   then res_out s1 (res_val (Coq_value_bool false))
@@ -3561,7 +3681,7 @@ and run_unary_op s c op e =
   then
     let%success (s1, rv1)= run_expr s c e in
     let%spec (s2, v2) = ref_get_value s1 c rv1 in
-    let%number (s3, n1) = to_number s2 c v2 in
+    let%number (s3, n1) = to_number s2 v2 in
     let%some po = run_prepost_op op in
     let (number_op, is_pre) = po in
     let n2 = number_op n1 in
@@ -3616,9 +3736,9 @@ and run_unary_op s c op e =
             match op with
             | Coq_unary_op_void ->
               res_ter s1 (res_val Coq_value_undef)
-            | Coq_unary_op_add -> to_number s1 c v
+            | Coq_unary_op_add -> to_number s1 v
             | Coq_unary_op_neg ->
-              let%number (s2, n) = (to_number s1 c v) in
+              let%number (s2, n) = (to_number s1 v) in
                   res_ter s2
                     (res_val (Coq_value_number (JsNumber.neg n)))
             | Coq_unary_op_bitwise_not ->
@@ -4571,11 +4691,11 @@ and run_call_prealloc s c b vthis args =
   match b with
   | Coq_prealloc_global_is_finite ->
     let  v = (get_arg 0 args) in
-    let%number (s0, n) = (to_number s c v) in
+    let%number (s0, n) = (to_number s v) in
     res_ter s0 (res_val (Coq_value_bool (not ((JsNumber.isnan n) || (n === JsNumber.infinity) || (n === JsNumber.neg_infinity)))))
   | Coq_prealloc_global_is_nan ->
     let  v = (get_arg 0 args) in
-        let%number (s0, n) = (to_number s c v) in
+        let%number (s0, n) = (to_number s v) in
             res_ter s0
               (res_val (Coq_value_bool (JsNumber.isnan n)))
   | Coq_prealloc_object ->
@@ -4849,7 +4969,7 @@ and run_call_prealloc s c b vthis args =
   | Coq_prealloc_number ->
     if list_eq_nil_decidable args
     then res_out s (res_val (Coq_value_number JsNumber.zero))
-    else let v = get_arg 0 args in to_number s c v
+    else let v = get_arg 0 args in to_number s v
   | Coq_prealloc_number_proto_value_of ->
     (match vthis with
      | Coq_value_undef -> run_error s c Coq_native_error_type

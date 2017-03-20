@@ -279,25 +279,29 @@ let if_object w k = if_object2 w k (fun x -> x)
 (** val if_string :
     result -> (state -> string -> 'a1 specres) -> 'a1 specres **)
 
-let if_string w k =
-  if_value w (fun s v ->
+let if_string2 w k kfail =
+  if_value2 w (fun s v ->
     match v with
     | Coq_value_string s0 -> k s s0
     | _ ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-        s ("[if_string] called on a non-string value."))
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
+        s ("[if_string] called on a non-string value.")) kfail
+
+let if_string w k = if_string2 w k (fun x -> x)
 
 (** val if_number :
     result -> (state -> number -> 'a1 specres) -> 'a1 specres **)
 
-let if_number w k =
-  if_value w (fun s v ->
+let if_number2 w k kfail =
+  if_value2 w (fun s v ->
     match v with
     | Coq_value_number n -> k s n
     | _ ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
         s
-        ("[if_number] called with non-number value."))
+        ("[if_number] called with non-number value.")) kfail
+
+let if_number w k = if_number2 w k (fun x -> x)
 
 (** val if_prim : result -> (state -> prim -> 'a1 specres) -> 'a1 specres **)
 
@@ -370,8 +374,14 @@ let if_success_ret w k =
 let if_value_ret w k =
   if_value2 w k (fun x -> Return x)
 
+let assert_value_ret w k =
+  if_value2 w k (fun x -> Return (spec_assertion_failure ()))
+
 let if_object_ret w k =
   if_object2 w k (fun x -> Return x)
+
+let if_number_ret w k =
+  if_number2 w k (fun x -> Return x)
 
 let if_bool_ret w k =
   if_bool2 w k (fun x -> Return x)
@@ -381,6 +391,18 @@ let assert_object w k =
 
 let assert_object_ret w k =
   if_object2 w k (fun x -> Return (spec_assertion_failure ()))
+
+let assert_bool w k =
+  if_bool2 w k (fun x -> spec_assertion_failure ())
+
+let assert_bool_ret w k =
+  if_bool2 w k (fun x -> Return (spec_assertion_failure ()))
+
+let assert_string w k =
+  if_string2 w k (fun x -> spec_assertion_failure ())
+
+let assert_string_ret w k =
+  if_string2 w k (fun x -> Return (spec_assertion_failure ()))
 
 let check_assert_ret b k =
   if b then k () else Return (spec_assertion_failure ())
@@ -396,3 +418,15 @@ let ifx_some_or_default v d f = if_some_or_default v d f
 let ifx_success_or_return a b c = if_success_or_return a b c
 let ifx_empty_label a b c = if_empty_label a b c
 let ifx_any_or_throw a b c = if_any_or_throw a b c
+
+let rec iterate l acc f = iterate' l (Continue acc) f
+and iterate' l acc f = match l with
+| []      -> acc
+| x :: l' -> let_ret_ret acc (fun v -> iterate' l' (f x v) f)
+
+let rec repeat condition acc f = repeat' condition (Continue acc) f
+and repeat' condition acc f =
+  let_ret_ret acc (fun v ->
+    if condition v then repeat' condition (f v) f
+    else acc)
+
