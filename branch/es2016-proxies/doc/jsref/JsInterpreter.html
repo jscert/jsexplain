@@ -43,6 +43,7 @@
 <link title="Run_js" rel="Chapter" href="Run_js.html"><link title="Abstract Operations " rel="Section" href="#1_AbstractOperations">
 <link title="Executable Code and Execution Contexts" rel="Section" href="#1_ExecutableCodeandExecutionContexts">
 <link title="Ordinary and Exotic Objects Behaviours " rel="Section" href="#1_OrdinaryandExoticObjectsBehaviours">
+<link title="Fundamental Objects" rel="Section" href="#1_FundamentalObjects">
 <link title="Reflection" rel="Section" href="#1_Reflection">
 <link title="Type Conversion " rel="Subsection" href="#2_TypeConversion">
 <link title="Testing and Comparison Operations " rel="Subsection" href="#2_TestingandComparisonOperations">
@@ -51,6 +52,7 @@
 <link title="Execution Contexts" rel="Subsection" href="#2_ExecutionContexts">
 <link title="Ordinary Object Internal Methods and Internal Slots " rel="Subsection" href="#2_OrdinaryObjectInternalMethodsandInternalSlots">
 <link title="Proxy Object Internal Methods and Internal Slots" rel="Subsection" href="#2_ProxyObjectInternalMethodsandInternalSlots">
+<link title="Object Objects" rel="Subsection" href="#2_ObjectObjects">
 <link title="Proxy Objects" rel="Subsection" href="#2_ProxyObjects">
 <title>JsInterpreter</title>
 </head>
@@ -268,6 +270,9 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#
 <br>
 <h2 id="2_TestingandComparisonOperations">Testing and Comparison Operations </h2><br>
 
+<pre><span id="VALrequire_object_coercible"><span class="keyword">val</span> require_object_coercible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-requireobjectcoercible">7.2.1</a></div>
+
 <pre><span id="VALis_callable"><span class="keyword">val</span> is_callable</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-iscallable">7.2.3</a></div>
 
@@ -305,6 +310,12 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#
 
 <pre><span id="VALcall"><span class="keyword">val</span> call</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list option -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-call">7.3.12</a></div>
+
+<pre><span id="VALset_integrity_level"><span class="keyword">val</span> set_integrity_level</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> string -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-setintegritylevel">7.3.14</a></div>
+
+<pre><span id="VALtest_integrity_level"><span class="keyword">val</span> test_integrity_level</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> string -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-testintegritylevel">7.3.15</a></div>
 <br>
 <h1 id="1_ExecutableCodeandExecutionContexts">Executable Code and Execution Contexts</h1><br>
 <br>
@@ -475,6 +486,41 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#
 <pre><span id="VALproxy_create"><span class="keyword">val</span> proxy_create</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxycreate">9.5.14</a></div>
 <br>
+<h1 id="1_FundamentalObjects">Fundamental Objects</h1><br>
+<br>
+<h2 id="2_ObjectObjects">Object Objects</h2><br>
+<br>
+<h3 id="3_PropertiesoftheObjectContructor">Properties of the Object Contructor</h3><br>
+
+<pre><span id="VALbuiltin_object_freeze"><span class="keyword">val</span> builtin_object_freeze</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       'b -><br>       'c -><br>       'd -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'e <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+TODO: Hook into ES5 run_prealloc once <code class="code">set_integrity_level</code> fully implemented.<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.freeze">19.1.2.6</a></div>
+
+<pre><span id="VALbuiltin_object_get_prototype_of"><span class="keyword">val</span> builtin_object_get_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       unit -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.getprototypeof">19.1.2.11</a></div>
+
+<pre><span id="VALbuiltin_object_is_extensible"><span class="keyword">val</span> builtin_object_is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       unit -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.isextensible">19.1.2.13</a></div>
+
+<pre><span id="VALbuiltin_object_is_frozen"><span class="keyword">val</span> builtin_object_is_frozen</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       'b -><br>       'c -><br>       'd -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'e <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+TODO: Hook into ES5 run_prealloc once <code class="code">test_integrity_level</code> fully implemented.<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.isfrozen">19.1.2.14</a></div>
+
+<pre><span id="VALbuiltin_object_is_sealed"><span class="keyword">val</span> builtin_object_is_sealed</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       'b -><br>       'c -><br>       'd -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'e <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+TODO: Hook into ES5 run_prealloc once <code class="code">test_integrity_level</code> fully implemented.<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.issealed">19.1.2.15</a></div>
+
+<pre><span id="VALbuiltin_object_prevent_extensions"><span class="keyword">val</span> builtin_object_prevent_extensions</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       unit -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.preventextensions">19.1.2.17</a></div>
+
+<pre><span id="VALbuiltin_object_seal"><span class="keyword">val</span> builtin_object_seal</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       'b -><br>       'c -><br>       'd -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'e <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+TODO: Hook into ES5 run_prealloc once <code class="code">set_integrity_level</code> fully implemented.<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.seal">19.1.2.19</a></div>
+
+<pre><span id="VALbuiltin_object_set_prototype_of"><span class="keyword">val</span> builtin_object_set_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       'b -><br>       'c -><br>       'd -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'e <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+TODO: Hook into prealloc object code.<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.setprototypeof">19.1.2.20</a></div>
+<br>
 <h1 id="1_Reflection">Reflection</h1><br>
 <br>
 <h2 id="2_ProxyObjects">Proxy Objects</h2><br>
@@ -484,20 +530,20 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#
 
     The <code class="code">%Proxy%</code> intrinsic object, initial value of the <code class="code">Proxy</code> property of the global object.<br>
 
-<pre><span id="VALproxy_constructor_steps"><span class="keyword">val</span> proxy_constructor_steps</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       'b -><br>       'c -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'd <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<pre><span id="VALbuiltin_proxy_constructor"><span class="keyword">val</span> builtin_proxy_constructor</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       'b -><br>       'c -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'd <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-target-handler">26.2.1.1</a></div>
 <br>
 <h3 id="3_PropertiesoftheProxyConstructor">Properties of the Proxy Constructor</h3><br>
 <br>
 <code class="code">%Proxy%.[[Prototype]] = %FunctionPrototype%</code><br>
 
-<pre><span id="VALproxy_revocable_steps"><span class="keyword">val</span> proxy_revocable_steps</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       'b -><br>       'c -><br>       'd -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'e <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<pre><span id="VALbuiltin_proxy_revocable"><span class="keyword">val</span> builtin_proxy_revocable</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       'b -><br>       'c -><br>       'd -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'e <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy.revocable">26.2.2.1</a></div>
 
 <pre><span id="VALproxy_revocation_function_create"><span class="keyword">val</span> proxy_revocation_function_create</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-revocation-functions">26.2.2.2.1.1</a></div>
 
-<pre><span id="VALproxy_revocation_function_steps"><span class="keyword">val</span> proxy_revocation_function_steps</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       'b -> 'c -> 'd <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALbuiltin_proxy_revocation_function"><span class="keyword">val</span> builtin_proxy_revocation_function</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       'b -> 'c -> 'd <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
 <pre><span id="VALobject_has_prop"><span class="keyword">val</span> object_has_prop</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 <span class="warning">Deprecated.</span>Compatibility wrapper for ES5 code to ES6
                 implementation use <code class="code">has_property</code> instead<br>

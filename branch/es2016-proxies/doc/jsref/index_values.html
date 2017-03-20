@@ -186,6 +186,53 @@ Updates a given attribute with values from the given descriptor.
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALbuild_error">build_error</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_object_freeze">builtin_object_freeze</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+TODO: Hook into ES5 run_prealloc once <code class="code">set_integrity_level</code> fully implemented.
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_object_get_prototype_of">builtin_object_get_prototype_of</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_object_is_extensible">builtin_object_is_extensible</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_object_is_frozen">builtin_object_is_frozen</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+TODO: Hook into ES5 run_prealloc once <code class="code">test_integrity_level</code> fully implemented.
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_object_is_sealed">builtin_object_is_sealed</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+TODO: Hook into ES5 run_prealloc once <code class="code">test_integrity_level</code> fully implemented.
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_object_prevent_extensions">builtin_object_prevent_extensions</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_object_seal">builtin_object_seal</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+TODO: Hook into ES5 run_prealloc once <code class="code">set_integrity_level</code> fully implemented.
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_object_set_prototype_of">builtin_object_set_prototype_of</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+TODO: Hook into prealloc object code.
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_proxy_constructor">builtin_proxy_constructor</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_proxy_revocable">builtin_proxy_revocable</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_proxy_revocation_function">builtin_proxy_revocation_function</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
 <tr><td align="left"><br>C</td></tr>
 <tr><td><a href="JsInterpreter.html#VALcall">call</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
@@ -1335,10 +1382,6 @@ Given a properties Heap, a property name, updates the given property attributes 
 <td></td></tr>
 <tr><td><a href="JsCommon.html#VALprovide_this_true">provide_this_true</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALproxy_constructor_steps">proxy_constructor_steps</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td><div class="info">
-</div>
-</td></tr>
 <tr><td><a href="JsInterpreter.html#VALproxy_create">proxy_create</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
@@ -1399,16 +1442,10 @@ Given a properties Heap, a property name, updates the given property attributes 
 </td></tr>
 <tr><td><a href="JsCommon.html#VALproxy_object_new">proxy_object_new</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALproxy_revocable_steps">proxy_revocable_steps</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td><div class="info">
-</div>
-</td></tr>
 <tr><td><a href="JsInterpreter.html#VALproxy_revocation_function_create">proxy_revocation_function_create</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
 </td></tr>
-<tr><td><a href="JsInterpreter.html#VALproxy_revocation_function_steps">proxy_revocation_function_steps</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
 <tr><td><a href="Prheap.html#VALprref">prref</a> [<a href="Prheap.html">Prheap</a>]</td>
 <td></td></tr>
 <tr><td><a href="Prheap.html#VALprresvalue">prresvalue</a> [<a href="Prheap.html">Prheap</a>]</td>
@@ -1493,6 +1530,10 @@ PutValue(V,W)
 <td></td></tr>
 <tr><td><a href="StdMap.html#VALremove_min_binding">remove_min_binding</a> [<a href="StdMap.html">StdMap</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALrequire_object_coercible">require_object_coercible</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsSyntax.html#VALres_break">res_break</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsSyntax.html#VALres_continue">res_continue</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
@@ -1725,6 +1766,10 @@ Fetches a given object slot value (using proj) from the object l in state s
 <td><div class="info">
 </div>
 </td></tr>
+<tr><td><a href="JsInterpreter.html#VALset_integrity_level">set_integrity_level</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALset_mutable_binding">set_mutable_binding</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsNumber.html#VALsign">sign</a> [<a href="JsNumber.html">JsNumber</a>]</td>
@@ -1794,6 +1839,10 @@ Convenience functions to unpack JS Value types to natives
 <tr><td align="left"><br>T</td></tr>
 <tr><td><a href="LibList.html#VALtake_drop_last">take_drop_last</a> [<a href="LibList.html">LibList</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALtest_integrity_level">test_integrity_level</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsCommon.html#VALthrow_false">throw_false</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsCommon.html#VALthrow_irrelevant">throw_irrelevant</a> [<a href="JsCommon.html">JsCommon</a>]</td>
