@@ -9429,10 +9429,10 @@ var get_value = function (s, v) {
                                                         (function () {
                                                           log_event("JsInterpreter.js", 715, ctx_100, "call");
                                                           var _return_332 = 
-                                                          ((function () {
-                                                            log_event("JsInterpreter.js", 711, ctx_100, "call");
-                                                            var _return_330 = 
-                                                            !((function () {
+                                                          !((function () {
+                                                              log_event("JsInterpreter.js", 713, ctx_100, "call");
+                                                              var _return_331 = 
+                                                              ((function () {
                                                                 log_event("JsInterpreter.js", 709, ctx_100, "call");
                                                                 var _return_329 = 
                                                                 _compare_JsSyntax_value(
@@ -9441,20 +9441,20 @@ var get_value = function (s, v) {
                                                                     ));
                                                                 log_event("JsInterpreter.js", 708, ctx_push(ctx_100, [{key: "#RETURN_VALUE#", val: _return_329}]), "return");
                                                                 return (_return_329); 
+                                                              }())
+                                                              || (function () {
+                                                                log_event("JsInterpreter.js", 711, ctx_100, "call");
+                                                                var _return_330 = 
+                                                                _compare_JsSyntax_value(
+                                                                  base,
+                                                                  Coq_value_null(
+                                                                    ));
+                                                                log_event("JsInterpreter.js", 710, ctx_push(ctx_100, [{key: "#RETURN_VALUE#", val: _return_330}]), "return");
+                                                                return (_return_330); 
                                                               }()));
-                                                            log_event("JsInterpreter.js", 710, ctx_push(ctx_100, [{key: "#RETURN_VALUE#", val: _return_330}]), "return");
-                                                            return (_return_330); 
-                                                          }())
-                                                          || (function () {
-                                                            log_event("JsInterpreter.js", 713, ctx_100, "call");
-                                                            var _return_331 = 
-                                                            _compare_JsSyntax_value(
-                                                              base,
-                                                              Coq_value_null(
-                                                                ));
-                                                            log_event("JsInterpreter.js", 712, ctx_push(ctx_100, [{key: "#RETURN_VALUE#", val: _return_331}]), "return");
-                                                            return (_return_331); 
-                                                          }()));
+                                                              log_event("JsInterpreter.js", 712, ctx_push(ctx_100, [{key: "#RETURN_VALUE#", val: _return_331}]), "return");
+                                                              return (_return_331); 
+                                                            }()));
                                                           log_event("JsInterpreter.js", 714, ctx_push(ctx_100, [{key: "#RETURN_VALUE#", val: _return_332}]), "return");
                                                           return (_return_332); 
                                                         }()),
