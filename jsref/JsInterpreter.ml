@@ -460,7 +460,7 @@ and get_value s v =
       let base = value_of_ref_base_type base in
       let%ret (s, base) =
         if has_primitive_base v then
-          let%assert_ret _ = not (base === Coq_value_undef) || (base === Coq_value_null) in
+          let%assert_ret _ = not (base === Coq_value_undef || base === Coq_value_null) in
           let%OBJECT_ret (s, base) = to_object s base in
           Continue (s, base)
         else
