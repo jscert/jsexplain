@@ -725,6 +725,19 @@ and to_boolean _foo_ = match _foo_ with
     @essec 7.2
     @esid sec-testing-and-comparison-operations *)
 
+(** @essec 7.2.1
+    @esid sec-requireobjectcoercible *)
+and require_object_coercible s argument =
+  match argument with
+  (** @esid table-14 *)
+  | Coq_value_undef -> run_error_no_c s Coq_native_error_type
+  | Coq_value_null  -> run_error_no_c s Coq_native_error_type
+  | Coq_value_bool   _ -> res_ter s (res_val argument)
+  | Coq_value_number _ -> res_ter s (res_val argument)
+  | Coq_value_string _ -> res_ter s (res_val argument)
+  (* | Coq_value_symbol  _ -> res_ter s (res_val argument) *)
+  | Coq_value_object _ -> res_ter s (res_val argument)
+
 (** @essec 7.2.3
     @esid sec-iscallable *)
 and is_callable s argument =
@@ -868,6 +881,38 @@ and call s f v argumentList =
     | Coq_value_object l -> object_internal_call s l v argumentList
     | _ -> assert false
   )
+
+(** @essec 7.3.14
+    @esid sec-setintegritylevel *)
+and set_integrity_level s o level =
+  let%assert _ = type_of o === Coq_type_object in
+  let o = loc_of_value o in
+  let%assert _ = level === "sealed" || level === "frozen" in
+  let%bool s, status = object_internal_prevent_extensions s o in
+  if not status then res_ter s (res_val (Coq_value_bool false))
+  else
+  let%spec s, keys = object_internal_own_property_keys s o in
+  let%ret s =
+  if level === "sealed" then
+    (* FIXME: repeat for k in keys *)
+    Return Coq_result_not_yet_implemented
+  else
+    (* FIXME: repeat for k in keys *)
+    Return Coq_result_not_yet_implemented
+  in
+  res_ter s (res_val (Coq_value_bool true))
+
+(** @essec 7.3.15
+    @esid sec-testintegritylevel *)
+and test_integrity_level s o level =
+  let%assert _ = type_of o === Coq_type_object in
+  let%assert _ = level === "sealed" || level === "frozen" in
+  let%bool s, status = is_extensible s o in
+  if status then res_ter s (res_val (Coq_value_bool false))
+  else
+  let%spec s, keys = object_internal_own_property_keys s (loc_of_value o) in
+  (* FIXME: repeat for k in keys *)
+  Coq_result_not_yet_implemented
 
 (** {1 Executable Code and Execution Contexts}
     @essec 8
@@ -1829,6 +1874,83 @@ and proxy_create s target handler =
   let%some s = run_object_set_internal object_set_proxy_handler s p handler in
   res_ter s (res_val (Coq_value_object p))
 
+(** {1 Fundamental Objects}
+    @essec 19
+    @esid  sec-fundamental-objects *)
+(** {2 Object Objects}
+    @essec 19.1
+    @esid  sec-object-objects *)
+(** {3 Properties of the Object Contructor}
+    @essec 19.1.2
+    @esid  sec-properties-of-the-object-constructor *)
+
+(** TODO: Hook into ES5 run_prealloc once [set_integrity_level] fully implemented.
+    @esid sec-object.freeze
+    @essec 19.1.2.6 *)
+and builtin_object_freeze s c f this newTarget o =
+  if not (type_of o === Coq_type_object) then res_ter s (res_val o)
+  else
+  let%bool s, status = set_integrity_level s o "frozen" in
+  if not status then run_error_no_c s Coq_native_error_type
+  else res_ter s (res_val o)
+
+(** @esid sec-object.getprototypeof
+    @essec 19.1.2.11 *)
+and builtin_object_get_prototype_of s c f this newTarget o =
+  let%object s, obj = to_object s o in
+  object_internal_get_prototype_of s obj
+
+(** @esid sec-object.isextensible
+    @essec 19.1.2.13 *)
+and builtin_object_is_extensible s c f this newTarget o =
+  if not (type_of o === Coq_type_object) then res_ter s (res_val (Coq_value_bool false))
+  else is_extensible s o
+
+(** TODO: Hook into ES5 run_prealloc once [test_integrity_level] fully implemented.
+    @esid sec-object.isfrozen
+    @essec 19.1.2.14 *)
+and builtin_object_is_frozen s c f this newTarget o =
+  if not (type_of o === Coq_type_object) then res_ter s (res_val (Coq_value_bool true))
+  else test_integrity_level s o "frozen"
+
+(** TODO: Hook into ES5 run_prealloc once [test_integrity_level] fully implemented.
+    @esid sec-object.issealed
+    @essec 19.1.2.15 *)
+and builtin_object_is_sealed s c f this newTarget o =
+  if not (type_of o === Coq_type_object) then res_ter s (res_val (Coq_value_bool true))
+  else test_integrity_level s o "sealed"
+
+(** @esid sec-object.preventextensions
+    @essec 19.1.2.17 *)
+and builtin_object_prevent_extensions s c f this newTarget o =
+  if not (type_of o === Coq_type_object) then res_ter s (res_val o)
+  else
+  let%bool s, status = object_internal_prevent_extensions s (loc_of_value o) in
+  if not status then run_error_no_c s Coq_native_error_type
+  else res_ter s (res_val o)
+
+(** TODO: Hook into ES5 run_prealloc once [set_integrity_level] fully implemented.
+    @esid sec-object.seal
+    @essec 19.1.2.19 *)
+and builtin_object_seal s c f this newTarget o =
+  if not (type_of o === Coq_type_object) then res_ter s (res_val o)
+  else
+  let%bool s, status = set_integrity_level s o "sealed" in
+  if not status then run_error_no_c s Coq_native_error_type
+  else res_ter s (res_val o)
+
+(** TODO: Hook into prealloc object code.
+    @esid sec-object.setprototypeof
+    @essec 19.1.2.20 *)
+and builtin_object_set_prototype_of s c f this newTarget o proto =
+  let%value s, o = require_object_coercible s o in
+  if not (type_of proto === Coq_type_object || proto === Coq_value_null) then run_error_no_c s Coq_native_error_type
+  else if not (type_of o === Coq_type_object) then res_ter s (res_val o)
+  else
+  let%bool s, status = object_internal_set_prototype_of s (loc_of_value o) proto in
+  if not status then run_error_no_c s Coq_native_error_type
+  else res_ter s (res_val o)
+
 (** {1 Reflection}
     @essec 26
     @esid sec-reflection *)
@@ -1843,7 +1965,7 @@ and proxy_create s target handler =
     @esid sec-proxy-constructor *)
 (** @essec 26.2.1.1
     @esid sec-proxy-target-handler *)
-and proxy_constructor_steps s c f this newTarget target handler =
+and builtin_proxy_constructor s c f this newTarget target handler =
   if newTarget === Coq_value_undef then
     run_error_no_c s Coq_native_error_type
   else
@@ -1856,7 +1978,7 @@ and proxy_constructor_steps s c f this newTarget target handler =
 
 (** @essec 26.2.2.1
     @esid sec-proxy.revocable *)
-and proxy_revocable_steps s c f this newTarget target handler =
+and builtin_proxy_revocable s c f this newTarget target handler =
   let%value s, p = proxy_create s target handler in
   let%object s, revoker = proxy_revocation_function_create s in
   let%some s = run_object_set_internal object_set_revocable_proxy s revoker p in
@@ -1870,7 +1992,7 @@ and proxy_revocable_steps s c f this newTarget target handler =
 and proxy_revocation_function_create s =
   Coq_result_not_yet_implemented (* FIXME *)
 
-and proxy_revocation_function_steps s c f this newTarget =
+and builtin_proxy_revocation_function s c f this newTarget =
   let%some p = run_object_method object_revocable_proxy_ s f in
   let%some p = p in
   if p === Coq_value_null then res_ter s (res_val Coq_value_undef)
@@ -4464,13 +4586,8 @@ and run_call_prealloc s c b vthis args =
         | Coq_value_object o -> to_object s value0
     end
   | Coq_prealloc_object_get_proto_of ->
-    let  v = (get_arg 0 args) in begin
-        match v with
-        | Coq_value_object l ->
-          let%some proto = (run_object_method object_proto_ s l) in
-          res_ter s (res_val proto)
-        | _ -> run_error s c Coq_native_error_type
-    end
+    let  v = (get_arg 0 args) in
+    builtin_object_get_prototype_of s c () vthis () v
   | Coq_prealloc_object_get_own_prop_descriptor ->
     let  v = (get_arg 0 args) in begin
       match v with
@@ -4509,15 +4626,8 @@ and run_call_prealloc s c b vthis args =
       | _ -> run_error s c Coq_native_error_type
     end
   | Coq_prealloc_object_prevent_extensions ->
-    let  v = (get_arg 0 args) in begin
-      match v with
-      | Coq_value_object l ->
-        let%some o = (object_binds_option s l) in
-        let o1 = object_with_extension o false in
-        let s_2 = object_write s l o1 in
-        res_ter s_2 (res_val (Coq_value_object l))
-      | _ -> run_error s c Coq_native_error_type
-    end
+    let  v = (get_arg 0 args) in
+    builtin_object_prevent_extensions s c () vthis () v
   | Coq_prealloc_object_is_sealed ->
     let  v = (get_arg 0 args) in begin
       match v with
@@ -4533,13 +4643,8 @@ and run_call_prealloc s c b vthis args =
       | _ -> run_error s c Coq_native_error_type
     end
   | Coq_prealloc_object_is_extensible ->
-    let  v = (get_arg 0 args) in begin
-      match v with
-      | Coq_value_object l ->
-        let%some r = (run_object_method object_extensible_ s l) in
-        res_ter s (res_val (Coq_value_bool r))
-      | _ -> run_error s c Coq_native_error_type
-    end
+    let  v = (get_arg 0 args) in
+    builtin_object_is_extensible s c () vthis () v
   | Coq_prealloc_object_proto_to_string ->
     (match vthis with
      | Coq_value_undef ->
