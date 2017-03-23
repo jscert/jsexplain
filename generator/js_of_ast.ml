@@ -738,23 +738,34 @@ let combine_list_output args =
    let (strs,bss) = List.split args in
    (show_list "@,@," strs), (List.flatten bss)
 
+let mapiopt f =
+  let rec aux i = function
+    | [] -> []
+    | hd :: tl ->
+      let ro = f i hd in begin
+        match ro with
+        | Some r -> r :: aux (i+1) tl
+        | None -> aux (i+1) tl
+      end
+  in
+  aux 0
+
 (* returns a pair (x,e), where [x] in the name in [pat]
    and where [e] is the access to "stupleobj[index]" *)
-let tuple_component_bind stupleobj index pat = 
+let tuple_component_bind stupleobj index pat =
    let loc = pat.pat_loc in
    match pat.pat_desc with
-   | Tpat_var (id, _) -> 
+   | Tpat_var (id, _) ->
        let sid = ppf_ident id in
-       (sid, Printf.sprintf "%s[%d]" stupleobj index)
-   | Tpat_any -> out_of_scope loc "Underscore pattern in let-tuple"
+       Some (sid, Printf.sprintf "%s[%d]" stupleobj index)
+   | Tpat_any -> None
    | _ -> out_of_scope loc "Nested pattern matching"
 
 (* returns a list of pairs of the form (x,e), corresponding
    to the bindings to be performed for decomposing [stupleobj]
     as the tuple of patterns [pl]. *)
 let tuple_binders stupleobj pl =
-   List.mapi (tuple_component_bind stupleobj) pl
-
+   mapiopt (tuple_component_bind stupleobj) pl
 
 (****************************************************************)
 (* TRANSLATION *)
