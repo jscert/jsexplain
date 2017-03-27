@@ -2847,6 +2847,8 @@ and run_construct_prealloc s c b args =
     let  v = (get_arg 0 args) in
         build_error s c (Coq_value_object (Coq_object_loc_prealloc
                                            (Coq_prealloc_native_error_proto ne))) v
+  | Coq_prealloc_proxy -> builtin_proxy_constructor s c () () (Coq_value_object (Coq_object_loc_prealloc
+                                                                                   Coq_prealloc_proxy)) (get_arg 0 args) (get_arg 1 args)
   | _ ->
     (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_not_yet_implemented)
       (strappend
@@ -5090,6 +5092,8 @@ and run_call_prealloc s c b vthis args =
     build_error s c (Coq_value_object (Coq_object_loc_prealloc
                                        (Coq_prealloc_native_error_proto ne))) v
   | Coq_prealloc_throw_type_error -> run_error s c Coq_native_error_type
+  | Coq_prealloc_proxy -> builtin_proxy_constructor s c () () Coq_value_undef (get_arg 0 args) (get_arg 1 args)
+  | Coq_prealloc_proxy_revocable -> builtin_proxy_revocable s c () () () (get_arg 0 args) (get_arg 1 args)
   | _ ->
     (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_not_yet_implemented)
       (strappend ("Call prealloc_") (strappend (string_of_prealloc b) (" not yet implemented")))
