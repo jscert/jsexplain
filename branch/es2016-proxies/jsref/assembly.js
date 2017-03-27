@@ -6049,20 +6049,6 @@ var object_prealloc_json = object_create_builtin(
                                  Coq_prealloc_object_proto())), "JSON",
                              Heap.empty);
 
-var object_prealloc_proxy = (function () {
-  var p = write_constant(Heap.empty, "revocable",
-            Coq_value_object(
-              Coq_object_loc_prealloc(Coq_prealloc_proxy_revocable())));
-  return (
-    object_create_prealloc_constructor(Coq_prealloc_proxy(),
-      Coq_value_number(2.0), p));
-}())
-;
-
-var proxy_revocable_function_object = object_create_prealloc_call(
-                                        Coq_prealloc_proxy_revocable(),
-                                        Coq_value_number(2.0), Heap.empty);
-
 
 
 var throw_type_error_object = (function () {
@@ -6464,8 +6450,6 @@ return {
   object_prealloc_native_error: object_prealloc_native_error, 
   object_prealloc_native_error_proto: object_prealloc_native_error_proto, 
   object_prealloc_json: object_prealloc_json, 
-  object_prealloc_proxy: object_prealloc_proxy, 
-  proxy_revocable_function_object: proxy_revocable_function_object, 
   throw_type_error_object: throw_type_error_object, 
   object_prealloc_proxy: object_prealloc_proxy, 
   object_prealloc_proxy_revocable: object_prealloc_proxy_revocable, 
