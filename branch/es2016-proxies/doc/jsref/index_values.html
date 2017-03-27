@@ -58,6 +58,10 @@
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALarray_args_map_loop">array_args_map_loop</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALarray_create">array_create</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInit.html#VALarray_is_array_function_object">array_is_array_function_object</a> [<a href="JsInit.html">JsInit</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInit.html#VALarray_proto_join_function_object">array_proto_join_function_object</a> [<a href="JsInit.html">JsInit</a>]</td>
@@ -68,9 +72,19 @@
 <td></td></tr>
 <tr><td><a href="JsInit.html#VALarray_proto_to_string_function_object">array_proto_to_string_function_object</a> [<a href="JsInit.html">JsInit</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALassert_bool">assert_bool</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALassert_bool_ret">assert_bool_ret</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALassert_object">assert_object</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALassert_object_ret">assert_object_ret</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALassert_string">assert_string</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALassert_string_ret">assert_string_ret</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALassert_value_ret">assert_value_ret</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInit.html#VALattrib_constant">attrib_constant</a> [<a href="JsInit.html">JsInit</a>]</td>
 <td></td></tr>
@@ -257,17 +271,13 @@ Completes a property descriptor by setting default fields.
 </td></tr>
 <tr><td><a href="LibList.html#VALconcat">concat</a> [<a href="LibList.html">LibList</a>]</td>
 <td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALconvert_bool_to_string">convert_bool_to_string</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALconstruct">construct</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsCommon.html#VALconvert_literal_to_prim">convert_literal_to_prim</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALconvert_number_to_integer">convert_number_to_integer</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALconvert_option_attributes">convert_option_attributes</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
-<td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALconvert_prim_to_number">convert_prim_to_number</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALconvert_prim_to_string">convert_prim_to_string</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALconvert_twice">convert_twice</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
@@ -281,7 +291,15 @@ Completes a property descriptor by setting default fields.
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALcreate_arguments_object">create_arguments_object</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALcreate_array_from_list">create_array_from_list</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALcreate_data_property">create_data_property</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALcreate_list_from_array_like">create_list_from_array_like</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
 </td></tr>
@@ -603,6 +621,10 @@ GetValue(V)
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_number">if_number</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALif_number2">if_number2</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALif_number_ret">if_number_ret</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_object">if_object</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_object2">if_object2</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
@@ -640,6 +662,8 @@ Unpacks a Coq_specret_val (specification return value), returns an abrupt Coq_sp
 <tr><td><a href="JsInterpreterMonads.html#VALif_spec_ret">if_spec_ret</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_string">if_string</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALif_string2">if_string2</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_success">if_success</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
@@ -702,8 +726,6 @@ This method is equivalent to the <code class="code">!</code> operator of section
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALinequality_test_number">inequality_test_number</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALinequality_test_primitive">inequality_test_primitive</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALinequality_test_string">inequality_test_string</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsNumber.html#VALinfinity">infinity</a> [<a href="JsNumber.html">JsNumber</a>]</td>
@@ -744,11 +766,17 @@ This method is equivalent to the <code class="code">!</code> operator of section
 <td><div class="info">
 </div>
 </td></tr>
+<tr><td><a href="JsInterpreter.html#VALis_constructor">is_constructor</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALis_data_descriptor">is_data_descriptor</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
 </td></tr>
 <tr><td><a href="StdMap.html#VALis_empty">is_empty</a> [<a href="StdMap.html">StdMap</a>]</td>
+<td></td></tr>
+<tr><td><a href="LibList.html#VALis_empty">is_empty</a> [<a href="LibList.html">LibList</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALis_extensible">is_extensible</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
@@ -786,6 +814,10 @@ Implements the specification text "If <code class="code">l</code> is a Proxy exo
 <tr><td><a href="JsNumber.html#VALisposzero">isposzero</a> [<a href="JsNumber.html">JsNumber</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALissome">issome</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALiterate">iterate</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALiterate'">iterate'</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>L</td></tr>
 <tr><td><a href="JsSyntaxAux.html#VALlabel_compare">label_compare</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
@@ -843,6 +875,8 @@ Executes the continuation with state s of a <code class="code">Continue s</code>
 <td></td></tr>
 <tr><td><a href="JsSyntaxAux.html#VALmathop_compare">mathop_compare</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsNumber.html#VALmax">max</a> [<a href="JsNumber.html">JsNumber</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsNumber.html#VALmax_value">max_value</a> [<a href="JsNumber.html">JsNumber</a>]</td>
 <td></td></tr>
 <tr><td><a href="StdMap.html#VALmem">mem</a> [<a href="StdMap.html">StdMap</a>]</td>
@@ -852,6 +886,8 @@ Executes the continuation with state s of a <code class="code">Continue s</code>
 <tr><td><a href="StdMap.html#VALmerge">merge</a> [<a href="StdMap.html">StdMap</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsCommon.html#VALmethod_of_preftype">method_of_preftype</a> [<a href="JsCommon.html">JsCommon</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsNumber.html#VALmin">min</a> [<a href="JsNumber.html">JsNumber</a>]</td>
 <td></td></tr>
 <tr><td><a href="StdMap.html#VALmin_binding">min_binding</a> [<a href="StdMap.html">StdMap</a>]</td>
 <td></td></tr>
@@ -1349,6 +1385,8 @@ Update an object's property given the location, property name and new attributes
 <td></td></tr>
 <tr><td><a href="JsNumber.html#VALpi">pi</a> [<a href="JsNumber.html">JsNumber</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsNumber.html#VALpow">pow</a> [<a href="JsNumber.html">JsNumber</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsSyntaxAux.html#VALprealloc_cmp">prealloc_cmp</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsSyntaxAux.html#VALprealloc_compare">prealloc_compare</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
@@ -1530,6 +1568,10 @@ PutValue(V,W)
 <td></td></tr>
 <tr><td><a href="StdMap.html#VALremove_min_binding">remove_min_binding</a> [<a href="StdMap.html">StdMap</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALrepeat">repeat</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALrepeat'">repeat'</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALrequire_object_coercible">require_object_coercible</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
@@ -1591,7 +1633,10 @@ PutValue(V,W)
 <tr><td><a href="JsInterpreter.html#VALrun_binary_op_bitwise">run_binary_op_bitwise</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_binary_op_compare">run_binary_op_compare</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
+<td><div class="info">
+TODO: ES6ify
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_binary_op_in">run_binary_op_in</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_binary_op_instanceof">run_binary_op_instanceof</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
@@ -1867,7 +1912,13 @@ if_ter, repacking the specret_out to erase the polymorphic type associated with 
 <tr><td><a href="JsNumber.html#VALto_int32">to_int32</a> [<a href="JsNumber.html">JsNumber</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALto_integer">to_integer</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALto_length">to_length</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="HeapObj.html#VALto_list">to_list</a> [<a href="HeapObj.html">HeapObj</a>]</td>
 <td></td></tr>
 <tr><td><a href="HeapList.html#VALto_list">to_list</a> [<a href="HeapList.html">HeapList</a>]</td>
@@ -1879,19 +1930,34 @@ if_ter, repacking the specret_out to erase the polymorphic type associated with 
 <tr><td><a href="Heap.html#VALto_list">to_list</a> [<a href="Heap.html">Heap</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALto_number">to_number</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALto_number_string">to_number_string</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+TODO: ES6-ify
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALto_object">to_object</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALto_primitive">to_primitive</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALto_property_descriptor">to_property_descriptor</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
 </td></tr>
 <tr><td><a href="JsInterpreter.html#VALto_string">to_string</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsNumber.html#VALto_string">to_string</a> [<a href="JsNumber.html">JsNumber</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreter.html#VALto_string_number">to_string_number</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALto_uint32">to_uint32</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsNumber.html#VALto_uint32">to_uint32</a> [<a href="JsNumber.html">JsNumber</a>]</td>
