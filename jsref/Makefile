@@ -113,7 +113,7 @@ ALL_LINEOF := $(DISPLAYED:.ml=.token.js) $(DISPLAYED:.ml=.mlloc.js) $(DISPLAYED:
 ##### Rule for cmi
 # Ordering of these rules is important, mli rule must be first.
 %.cmi: %.mli
-	ocamlc $(REPLACE_STDLIB) $<
+	ocamlc $(REPLACE_STDLIB) $(OCAMLCFLAGS) $<
 
 %.cmi: %.ml $(MLTOJS_BIN)
 	$(MLTOJS) -mode cmi -I $(STDLIB_DIR) $<
@@ -186,6 +186,8 @@ clean_jsjsref:
 ###############################################################
 # ML-JSRef
 
+OCAMLCFLAGS=
+
 # Strip all extensions of $(ASSEMBLY_JS) and replace with .cmo
 ASSEMBLY_ML_FILES := \
 	$(addsuffix .cmo,$(basename $(basename $(ASSEMBLY_JS_FILES)))) \
@@ -197,22 +199,25 @@ ASSEMBLY_ML := \
 
 mljsref: main.byte
 
+mljsref_debug: OCAMLCFLAGS+=-g
+mljsref_debug: mljsref
+
 main.byte: $(ASSEMBLY_ML)
-	ocamlfind ocamlc -linkpkg -package JS_Parser -o $@ $^
+	ocamlfind ocamlc -linkpkg -package JS_Parser -o $@ $(OCAMLCFLAGS) $^
 
 Run_js.cmo: Run_js.ml Run_js.mli Run_js.cmi
-	ocamlfind ocamlc -c -package JS_Parser $<
+	ocamlfind ocamlc -c -package JS_Parser $(OCAMLCFLAGS) $<
 
 Translate_syntax.cmo: Translate_syntax.ml Translate_syntax.mli Translate_syntax.cmi
-	ocamlfind ocamlc -c -package JS_Parser $<
+	ocamlfind ocamlc -c -package JS_Parser $(OCAMLCFLAGS) $<
 
 # Ordering of the .cmo rules is important. mli dependency forces "standard" compilation
 %.cmo: %.ml %.mli %.cmi $(PPX_BIN)
-	ocamlc -c $(PPX_FLAG) $<
+	ocamlc -c $(PPX_FLAG) $(OCAMLCFLAGS) $<
 
 # Standalone .ml files
 %.cmo: %.ml %.cmi $(PPX_BIN)
-	ocamlc -c $(REPLACE_STDLIB) $(PPX_FLAG) $<
+	ocamlc -c $(REPLACE_STDLIB) $(PPX_FLAG) $(OCAMLCFLAGS) $<
 
 clean_mljsref:
 	sh -c "rm -f $(ML_FRONTEND_SRC)/*.mli"
