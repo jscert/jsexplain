@@ -1177,7 +1177,7 @@ and ordinary_object_internal_get_prototype_of s o =
     @esid sec-ordinarygetprototypeof *)
 and ordinary_get_prototype_of s o =
   let%some v = run_object_method object_proto_ s o in
-  res_spec s (res_val v)
+  res_out s (res_val v)
 
 (** [[SetPrototypeOf]](V)
     @essec 9.1.2
@@ -1193,8 +1193,8 @@ and ordinary_set_prototype_of s o v =
   let%some extensible = run_object_method object_extensible_ s o in
   let%some current = run_object_method object_prototype_ s o in
   let sv = same_value v current in
-  if sv then res_spec s (res_val (Coq_value_bool true))
-  else if not extensible then res_spec s (res_val (Coq_value_bool false))
+  if sv then res_out s (res_val (Coq_value_bool true))
+  else if not extensible then res_out s (res_val (Coq_value_bool false))
   else
     let rec repeat p done_ = begin
       if not done_ then
@@ -1202,7 +1202,7 @@ and ordinary_set_prototype_of s o v =
         | Coq_value_null -> repeat p true
         | Coq_value_object p_l ->
           if same_value p (Coq_value_object o)
-          then res_spec s (res_val (Coq_value_bool false))
+          then res_out s (res_val (Coq_value_bool false))
           else
             let%some gpo = run_object_method object_get_prototype_of_ s p_l in
             (match gpo with
@@ -2619,11 +2619,14 @@ and env_record_set_mutable_binding s c l x v str =
             if not (mutability_compare mu Coq_mutability_immutable)
             then res_void (env_record_write_decl_env s l x mu v)
             else out_error_or_void s c str Coq_native_error_type
-      | Coq_env_record_object (l0, pt) -> object_put s c l0 x v str
+      | Coq_env_record_object (l0, pt) ->
+        let%success s, _ = object_put s c l0 x v str in
+        res_void s
 
 (** @deprecated ES5 *)
 and ref_put_value s c rv v =
-  put_value s c (res_ter s (res_normal rv)) (res_ter s (res_val v))
+  let%success s, _ = put_value s c (res_ter s (res_normal rv)) (res_ter s (res_val v))
+  in res_void s
 
 (** val env_record_create_mutable_binding :
     state -> execution_ctx -> env_loc -> prop_name -> bool
