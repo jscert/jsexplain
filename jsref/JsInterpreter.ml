@@ -1483,7 +1483,7 @@ and ordinary_set s o p v receiver =
   if is_data_descriptor ownDesc then begin
     let ownDesc = descriptor_get_defined ownDesc in
     let%some writable = ownDesc.descriptor_writable in
-    if writable then res_ter s (res_val (Coq_value_bool false))
+    if not writable then res_ter s (res_val (Coq_value_bool false))
     else if not (type_of receiver === Coq_type_object) then res_ter s (res_val (Coq_value_bool false))
     else
       let receiver = loc_of_value receiver in
