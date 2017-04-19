@@ -34,8 +34,8 @@ val raise : exn -> 'a
 (**{6 Boolean operations }*)
 (** Note: Both OCaml and JS implement lazy evaluation for boolean operators. *)
 val not : bool -> bool
-val ( && ) : bool -> bool -> bool
-val ( || ) : bool -> bool -> bool
+external ( && ) : bool -> bool -> bool = "%sequand";;
+external ( || ) : bool -> bool -> bool = "%sequor";;
 
 (**{6 Debugging }*)
 external __LOC__ : string = "%loc_LOC"
