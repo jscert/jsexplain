@@ -192,6 +192,9 @@ and run_error_no_c : 'a. state -> native_error -> 'a specret resultof =
   let (l, s_2) = object_alloc s o in
   res_out s_2 (res_throw (Coq_resvalue_value (Coq_value_object l)))
 
+(* FIXME: ES5 HACK for where a context is required *)
+and some_context = execution_ctx_initial true
+
 (*****************************************************************************)
 (*****************************************************************************)
 (************* START OF THE BIG RECURSIVE INTERPRETER FUNCTION ***************)
@@ -326,9 +329,9 @@ and object_internal_call s o thisArgument argumentsList =
   let%some internal_method = internal_method in
   match internal_method with
   (* FIXME: ES5 hacks *)
-  | Coq_call_default    -> run_call s (execution_ctx_initial true) o thisArgument argumentsList
-  | Coq_call_after_bind -> run_call s (execution_ctx_initial true) o thisArgument argumentsList
-  | Coq_call_prealloc _ -> run_call s (execution_ctx_initial true) o thisArgument argumentsList
+  | Coq_call_default    -> run_call s some_context o thisArgument argumentsList
+  | Coq_call_after_bind -> run_call s some_context o thisArgument argumentsList
+  | Coq_call_prealloc _ -> run_call s some_context o thisArgument argumentsList
   | Coq_call_proxy      -> proxy_object_internal_call s o thisArgument argumentsList
 
 (** Function to dispatch calls to O.[[Construct]](argumentsList, newTarget) *)
@@ -337,9 +340,9 @@ and object_internal_construct s o argumentsList newTarget =
   let%some internal_method = internal_method in
   match internal_method with
   (* FIXME: ES5 hacks *)
-  | Coq_construct_default    -> run_construct s (execution_ctx_initial true) internal_method o argumentsList
-  | Coq_construct_after_bind -> run_construct s (execution_ctx_initial true) internal_method o argumentsList
-  | Coq_construct_prealloc _ -> run_construct s (execution_ctx_initial true) internal_method o argumentsList
+  | Coq_construct_default    -> run_construct s some_context internal_method o argumentsList
+  | Coq_construct_after_bind -> run_construct s some_context internal_method o argumentsList
+  | Coq_construct_prealloc _ -> run_construct s some_context internal_method o argumentsList
   | Coq_construct_proxy      -> proxy_object_internal_construct s o argumentsList newTarget
 
 
@@ -649,7 +652,7 @@ and to_primitive s input preferredType =
   (* | Coq_value_symbol _ -> res_out s (res_val input) *)
   | Coq_value_object l ->
     (* TODO: ES5 HACK! *)
-    let%prim s0, r = object_default_value s (execution_ctx_initial true) l preferredType in
+    let%prim s0, r = object_default_value s some_context l preferredType in
     res_ter s0 (res_val r)
 
 
@@ -1555,7 +1558,7 @@ and object_create s proto internalSlotsList =
     @esid sec-arraycreate *)
 and array_create s length proto =
   (* FIXME: ES5 HACK *)
-  run_construct_prealloc s (execution_ctx_initial true) Coq_prealloc_array [length]
+  run_construct_prealloc s some_context Coq_prealloc_array [length]
 
 (** {2 Proxy Object Internal Methods and Internal Slots}
     @essec 9.5
