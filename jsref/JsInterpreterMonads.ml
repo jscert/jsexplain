@@ -154,13 +154,11 @@ let if_void w k =
     match rv with
     | Coq_resvalue_empty -> k s
     | Coq_resvalue_value v ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-        s
-        ("[if_void called] with non-void result value.")
+        (Debug.impossible_resvalue __LOC__ rv "[if_void called] with non-void result value.";
+        Coq_result_impossible)
     | Coq_resvalue_ref r ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-        s
-        ("[if_void called] with non-void result value."))
+        (Debug.impossible_resvalue __LOC__ rv "[if_void called] with non-void result value.";
+        Coq_result_impossible))
 
 (** val if_not_throw : result -> (state -> res -> result) -> result **)
 

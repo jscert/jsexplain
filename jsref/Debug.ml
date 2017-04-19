@@ -12,6 +12,9 @@ let impossible_because loc s =
 let impossible_with_heap_because loc s message =
   print_endline (loc ^ ": Stuck!\nState:  " ^ Prheap.prstate true s ^ "\nMessage:\t" ^ Prheap.string_of_char_list message)
 
+let impossible_resvalue loc rv message =
+  print_endline (loc ^ ": Stuck!\nrv:  " ^ Prheap.prresvalue rv ^ "\nMessage:\t" ^ Prheap.string_of_char_list message)
+
 (* Inserted into JsInterpreter by patching in Makefile functions named after the appropriate insertion *)
 
 let ref_get_value r =
