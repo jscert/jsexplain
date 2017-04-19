@@ -51,6 +51,7 @@
 <link title="Lexical Environments" rel="Subsection" href="#2_LexicalEnvironments">
 <link title="Execution Contexts" rel="Subsection" href="#2_ExecutionContexts">
 <link title="Ordinary Object Internal Methods and Internal Slots " rel="Subsection" href="#2_OrdinaryObjectInternalMethodsandInternalSlots">
+<link title="Built-in Function Objects" rel="Subsection" href="#2_BuiltinFunctionObjects">
 <link title="Array Exotic Objects" rel="Subsection" href="#2_ArrayExoticObjects">
 <link title="Proxy Object Internal Methods and Internal Slots" rel="Subsection" href="#2_ProxyObjectInternalMethodsandInternalSlots">
 <link title="Object Objects" rel="Subsection" href="#2_ObjectObjects">
@@ -107,7 +108,8 @@ val run_object_heap_set_extensible :
 <pre><span id="VALrun_object_heap_set_extensible"><span class="keyword">val</span> run_object_heap_set_extensible</span> : <code class="type">bool -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> option</code></pre>
 <pre><span id="VALbuild_error"><span class="keyword">val</span> build_error</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
 <pre><span id="VALrun_error"><span class="keyword">val</span> run_error</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEnative_error">JsSyntax.native_error</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
-<pre><span id="VALrun_error_no_c"><span class="keyword">val</span> run_error_no_c</span> : <code class="type">'a.<br>         <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>         <a href="JsSyntax.html#TYPEnative_error">JsSyntax.native_error</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+<pre><span id="VALrun_error_no_c"><span class="keyword">val</span> run_error_no_c</span> : <code class="type">'a.<br>         <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>         <a href="JsSyntax.html#TYPEnative_error">JsSyntax.native_error</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALsome_context"><span class="keyword">val</span> some_context</span> : <code class="type"><a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a></code></pre><br>
 New ES6 Spec functions here, writting in the specification in CamelCase()
     will all be prefixed with spec_<br>
 <br>
@@ -385,7 +387,7 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#
 <code class="code">[GetPrototypeOf]</code>()<br>
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-getprototypeof">9.1.1</a></div>
 
-<pre><span id="VALordinary_get_prototype_of"><span class="keyword">val</span> ordinary_get_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<pre><span id="VALordinary_get_prototype_of"><span class="keyword">val</span> ordinary_get_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinarygetprototypeof">9.1.1.1</a></div>
 
 <pre><span id="VALordinary_object_internal_set_prototype_of"><span class="keyword">val</span> ordinary_object_internal_set_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
@@ -455,6 +457,8 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#
 
 <pre><span id="VALobject_create"><span class="keyword">val</span> object_create</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       'a list option -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-objectcreate">9.1.12</a></div>
+<br>
+<h2 id="2_BuiltinFunctionObjects">Built-in Function Objects</h2><br>
 <br>
 <h2 id="2_ArrayExoticObjects">Array Exotic Objects</h2><br>
 
