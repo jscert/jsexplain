@@ -1551,6 +1551,10 @@ and object_create s proto internalSlotsList =
   let l, s = object_alloc s obj in
   res_ter s (res_val (Coq_value_object l))
 
+(** {2 Built-in Function Objects}
+    @essec 9.3
+    @esid sec-built-in-function-objects *)
+
 (** {2 Array Exotic Objects}
     @essec 9.4.2
     @esid sec-array-exotic-objects *)
@@ -3238,14 +3242,13 @@ and binding_inst_var_decls s c l vds bconfig str =
   match vds with
   | [] -> res_void s
   | vd :: vds_2 ->
-    let  bivd = (fun s0 ->
-        binding_inst_var_decls s0 c l vds_2 bconfig str) in
-        let%bool (s1, has) = (env_record_has_binding s c l vd) in
-            if has
-            then bivd s1
-            else let%void
-                 s2 = (env_record_create_set_mutable_binding s1 c l vd (Some
-                                                                    bconfig) Coq_value_undef str) in  bivd s2
+    let  bivd = (fun s0 -> binding_inst_var_decls s0 c l vds_2 bconfig str) in
+    let%bool (s1, has) = (env_record_has_binding s c l vd) in
+    if has then
+      bivd s1
+    else
+      let%void s2 = env_record_create_set_mutable_binding s1 c l vd (Some bconfig) Coq_value_undef str in
+      bivd s2
 
 (** val execution_ctx_binding_inst :
     state -> execution_ctx -> codetype -> object_loc option ->
@@ -3259,66 +3262,55 @@ and execution_ctx_binding_inst s c ct funco p args =
       ("Empty [execution_ctx_variable_env] in [execution_ctx_binding_inst].")
   | l :: l0 ->
     let  str = (prog_intro_strictness p) in
-        let  follow = (fun s_2 names ->
-            let
-              bconfig = (codetype_compare ct Coq_codetype_eval) in
-                 let  fds = (prog_funcdecl p) in
-                     let%void
-
-                       s1= (binding_inst_function_decls s_2 c l fds str bconfig) in
-                          let%bool
-
-                            (s2, bdefined) = (env_record_has_binding s1 c l
-                               ("arguments")) in
-                               let
-                                 follow2 = (fun s10 ->
-                                   let vds = prog_vardecl p in
-                                   binding_inst_var_decls s10 c l vds bconfig str) in
-                                    match ct with
-                                    | Coq_codetype_func ->
-                                      (match funco with
-                                       | Some func ->
-                                         if bdefined
-                                         then follow2 s2
-                                         else let%void
-                                              s3 = (binding_inst_arg_obj s2 c func p names
-                                                args l) in  follow2 s3
-                                       | None ->
-                                         if bdefined
-                                         then follow2 s2
-                                         else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                                             s2
-                                             ("Weird `arguments\' object in [execution_ctx_binding_inst]."))
-                                    | Coq_codetype_global -> follow2 s2
-                                    | Coq_codetype_eval -> follow2 s2) in
-            match ct with
-            | Coq_codetype_func ->
-              (match funco with
-               | Some func ->
-                 let%some
-                   nameso = (run_object_method object_formal_parameters_ s func) in
-                      let%some names = (nameso) in
-                          let%void
-
-                            s_2 = (binding_inst_formal_params s c l args names str) in  follow s_2 names
-               | None ->
-                 (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                   s
-                   ("Non coherent functionnal code type in [execution_ctx_binding_inst]."))
-            | Coq_codetype_global ->
-              (match funco with
-               | Some o ->
-                 (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                   s
-                   ("Non coherent non-functionnal code type in [execution_ctx_binding_inst].")
-               | None -> follow s [])
-            | Coq_codetype_eval ->
-              (match funco with
-               | Some o ->
-                 (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                   s
-                   ("Non coherent non-functionnal code type in [execution_ctx_binding_inst].")
-               | None -> follow s [])
+    let  follow = (fun s_2 names ->
+        let bconfig = (codetype_compare ct Coq_codetype_eval) in
+        let  fds = (prog_funcdecl p) in
+        let%void s1= (binding_inst_function_decls s_2 c l fds str bconfig) in
+        let%bool (s2, bdefined) = (env_record_has_binding s1 c l ("arguments")) in
+        let follow2 = (fun s10 ->
+            let vds = prog_vardecl p in
+            binding_inst_var_decls s10 c l vds bconfig str) in
+        match ct with
+        | Coq_codetype_func ->
+          (match funco with
+           | Some func ->
+             if bdefined
+             then follow2 s2
+             else let%void s3 = (binding_inst_arg_obj s2 c func p names args l) in  follow2 s3
+           | None ->
+             if bdefined
+             then follow2 s2
+             else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+                 s2
+                 ("Weird `arguments\' object in [execution_ctx_binding_inst]."))
+        | Coq_codetype_global -> follow2 s2
+        | Coq_codetype_eval -> follow2 s2) in
+    match ct with
+    | Coq_codetype_func ->
+      (match funco with
+       | Some func ->
+         let%some nameso = (run_object_method object_formal_parameters_ s func) in
+         let%some names = (nameso) in
+         let%void s_2 = (binding_inst_formal_params s c l args names str) in
+         follow s_2 names
+       | None ->
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+           s
+           ("Non coherent functionnal code type in [execution_ctx_binding_inst]."))
+    | Coq_codetype_global ->
+      (match funco with
+       | Some o ->
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+           s
+           ("Non coherent non-functionnal code type in [execution_ctx_binding_inst].")
+       | None -> follow s [])
+    | Coq_codetype_eval ->
+      (match funco with
+       | Some o ->
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+           s
+           ("Non coherent non-functionnal code type in [execution_ctx_binding_inst].")
+       | None -> follow s [])
 
 (** val entering_func_code :
     state -> execution_ctx -> object_loc -> value -> value list
