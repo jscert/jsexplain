@@ -2603,7 +2603,9 @@ and ref_get_value s c _foo_ =
 
 (** @deprecated ES5 *)
 and run_expr_get_value s c e =
-  let%value s, v = get_value s (run_expr s c e) in
+  let result = run_expr s c e in
+  let%ter s, _ = result in
+  let%value s, v = get_value s result in
   res_spec s v
 
 (** val env_record_set_mutable_binding :
