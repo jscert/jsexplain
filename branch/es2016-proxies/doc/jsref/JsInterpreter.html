@@ -51,6 +51,7 @@
 <link title="Lexical Environments" rel="Subsection" href="#2_LexicalEnvironments">
 <link title="Execution Contexts" rel="Subsection" href="#2_ExecutionContexts">
 <link title="Ordinary Object Internal Methods and Internal Slots " rel="Subsection" href="#2_OrdinaryObjectInternalMethodsandInternalSlots">
+<link title="ECMAScript Function Objects" rel="Subsection" href="#2_ECMAScriptFunctionObjects">
 <link title="Built-in Function Objects" rel="Subsection" href="#2_BuiltinFunctionObjects">
 <link title="Array Exotic Objects" rel="Subsection" href="#2_ArrayExoticObjects">
 <link title="Proxy Object Internal Methods and Internal Slots" rel="Subsection" href="#2_ProxyObjectInternalMethodsandInternalSlots">
@@ -315,6 +316,9 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#
 <pre><span id="VALcreate_data_property"><span class="keyword">val</span> create_data_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-createdataproperty">7.3.4</a></div>
 
+<pre><span id="VALdefine_property_or_throw"><span class="keyword">val</span> define_property_or_throw</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-definepropertyorthrow">7.3.7</a></div>
+
 <pre><span id="VALget_method"><span class="keyword">val</span> get_method</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-getmethod">7.3.9</a></div>
 
@@ -457,6 +461,15 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#
 
 <pre><span id="VALobject_create"><span class="keyword">val</span> object_create</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       'a list option -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-objectcreate">9.1.12</a></div>
+<br>
+<h2 id="2_ECMAScriptFunctionObjects">ECMAScript Function Objects</h2><br>
+
+<pre><span id="VALadd_restricted_function_properties"><span class="keyword">val</span> add_restricted_function_properties</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+TODO: Realm support<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-addrestrictedfunctionproperties">9.2.7</a></div>
+
+<pre><span id="VALbuiltin_throw_type_error"><span class="keyword">val</span> builtin_throw_type_error</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -> unit -> unit -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-%throwtypeerror%">9.2.7.1</a></div>
 <br>
 <h2 id="2_BuiltinFunctionObjects">Built-in Function Objects</h2><br>
 <br>
