@@ -114,7 +114,6 @@ let prhas_instance = function
 
 let prget = function
   | Coq_builtin_get_default -> "Coq_builtin_get_default"
-  | Coq_builtin_get_function -> "Coq_builtin_get_function"
   | Coq_builtin_get_proxy -> "Coq_builtin_get_proxy"
   | Coq_builtin_get_args_obj -> "Coq_builtin_get_args_obj"
 

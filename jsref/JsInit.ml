@@ -922,12 +922,10 @@ let object_prealloc_json =
   object_create_builtin (Coq_value_object (Coq_object_loc_prealloc
     Coq_prealloc_object_proto)) ("JSON") Heap.empty
 
-(** val throw_type_error_object : coq_object **)
-
+(** @essec 9.2.7.1
+    @esid sec-%throwtypeerror% *)
 let throw_type_error_object =
-  let o =
-    object_create_prealloc_call Coq_prealloc_throw_type_error (Coq_value_number 0.0) Heap.empty
-  in
+  let o = object_create_prealloc_call Coq_prealloc_throw_type_error (Coq_value_number 0.0) Heap.empty in
   let o0 = object_with_scope o (Some lexical_env_initial) in
   let o1 = object_with_formal_params o0 (Some []) in
   object_set_extensible o1 false

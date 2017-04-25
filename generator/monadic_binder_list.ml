@@ -11,6 +11,7 @@ let monad_mapping = [
     ("BOOL", "assert_bool");
     ("void", "if_void");
     ("success", "if_success");
+    ("SUCCESS", "assert_success");
     ("not_throw", "if_not_throw");
     ("ter", "if_ter");
     ("break", "if_break");

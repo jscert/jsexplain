@@ -147,6 +147,9 @@ let if_success2 w k kfail =
 let if_success w k =
   if_success2 w k (fun x -> x)
 
+let assert_success w k =
+  if_success2 w k (fun x -> spec_assertion_failure ())
+
 (** val if_void : result_void -> (state -> result) -> result **)
 
 let if_void w k =

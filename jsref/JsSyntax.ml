@@ -248,7 +248,6 @@ type builtin_has_instance =
 
 type builtin_get =
 | Coq_builtin_get_default
-| Coq_builtin_get_function
 | Coq_builtin_get_args_obj
 | Coq_builtin_get_proxy
 

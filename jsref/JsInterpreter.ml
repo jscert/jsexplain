@@ -286,7 +286,6 @@ and object_internal_get s o p receiver =
   let%some internal_method = (run_object_method object_get_ s o) in
   match internal_method with
   | Coq_builtin_get_default  -> ordinary_object_internal_get s o p receiver
-  | Coq_builtin_get_function -> Coq_result_not_yet_implemented
   | Coq_builtin_get_args_obj -> Coq_result_not_yet_implemented
   | Coq_builtin_get_proxy    -> proxy_object_internal_get s o p receiver
 
@@ -862,6 +861,18 @@ and create_data_property s o p v =
   let%assert _ = is_property_key p in
   let newDesc = descriptor_intro_data v true true true in
   object_internal_define_own_property s o p newDesc
+
+(** @essec 7.3.7
+    @esid sec-definepropertyorthrow *)
+and define_property_or_throw s o p desc =
+  let%assert _ = type_of o === Coq_type_object in
+  let o = loc_of_value o in
+  let%assert _ = is_property_key p in
+  let%bool s, success = object_internal_define_own_property s o p desc in
+  if not success then
+    run_error_no_c s Coq_native_error_type
+  else
+    res_ter s (res_val (Coq_value_bool success))
 
 (** @essec 7.3.9
     @esid sec-getmethod *)
@@ -1551,6 +1562,39 @@ and object_create s proto internalSlotsList =
   let l, s = object_alloc s obj in
   res_ter s (res_val (Coq_value_object l))
 
+(** {2 ECMAScript Function Objects}
+    @essec 9.2
+    @esid sec-ecmascript-function-objects *)
+
+(** TODO: Realm support
+    @essec 9.2.7
+    @esid sec-addrestrictedfunctionproperties
+*)
+and add_restricted_function_properties s f realm =
+  (* Assert ... *)
+  let thrower = Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_throw_type_error) in
+  let%SUCCESS s, _ = define_property_or_throw s f (Coq_value_string "caller") {
+      descriptor_intro_empty with
+      descriptor_get = Some thrower;
+      descriptor_set = Some thrower;
+      descriptor_enumerable = Some false;
+      descriptor_configurable = Some true;
+    } in
+  let%SUCCESS s, rv = define_property_or_throw s f (Coq_value_string "arguments") {
+      descriptor_intro_empty with
+      descriptor_get = Some thrower;
+      descriptor_set = Some thrower;
+      descriptor_enumerable = Some false;
+      descriptor_configurable = Some true;
+    } in
+  res_ter s (res_normal rv)
+
+
+(** @essec 9.2.7.1
+    @esid sec-%throwtypeerror% *)
+and builtin_throw_type_error s c thisArgument argumentsList newTarget =
+  run_error s c Coq_native_error_type
+
 (** {2 Built-in Function Objects}
     @essec 9.3
     @esid sec-built-in-function-objects *)
@@ -2215,7 +2259,6 @@ and object_get_builtin s c b vthis l x =
     else res_ter s_2 (res_val v) in
   match b with
   | Coq_builtin_get_default -> def s l
-  | Coq_builtin_get_function -> function0 s
   | Coq_builtin_get_args_obj -> (
     let%some lmapo = (run_object_method object_parameter_map_ s l) in
     let%some lmap = (lmapo) in
@@ -2961,8 +3004,7 @@ and creating_function_object s c names bd x str =
      o = (object_new (Coq_value_object (Coq_object_loc_prealloc
                                      Coq_prealloc_function_proto))
        ("Function")) in
-        let  o1 = (object_with_get o Coq_builtin_get_function) in
-            let o2 = (object_with_invokation o1 (Some Coq_construct_default) (Some
+            let o2 = (object_with_invokation o (Some Coq_construct_default) (Some
                                                                          Coq_call_default) (Some Coq_builtin_has_instance_function)) in
              let o3 = (object_with_details o2 (Some x) (Some names) (Some bd) None None None None) in
              let p = (object_alloc s o3) in
@@ -4874,7 +4916,7 @@ and run_call_prealloc s c b vthis args =
       | Coq_value_object thisobj ->
         let (vthisArg, a) = get_arg_first_and_rest args in
         let o1 = (object_new (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_proto)) ("Object")) in
-        let o2 = (object_with_get o1 Coq_builtin_get_function) in
+        let o2 = o1 in
         let o3 = (object_with_details o2 None None None (Some thisobj) (Some vthisArg) (Some a) None) in
         let o4 = (object_set_class o3 ("Function")) in
         let o5 = (object_set_proto o4 (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_function_proto))) in
@@ -5091,7 +5133,7 @@ and run_call_prealloc s c b vthis args =
     let  v = (get_arg 0 args) in
     build_error s c (Coq_value_object (Coq_object_loc_prealloc
                                        (Coq_prealloc_native_error_proto ne))) v
-  | Coq_prealloc_throw_type_error -> run_error s c Coq_native_error_type
+  | Coq_prealloc_throw_type_error -> builtin_throw_type_error s c () () ()
   | Coq_prealloc_proxy -> builtin_proxy_constructor s c () () Coq_value_undef (get_arg 0 args) (get_arg 1 args)
   | Coq_prealloc_proxy_revocable -> builtin_proxy_revocable s c () () () (get_arg 0 args) (get_arg 1 args)
   | _ ->
