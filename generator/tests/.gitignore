@@ -1,2 +1,6 @@
 *.log.js
 *.unlog.js
+*.cmo
+*.cmi
+*.token.js
+*.mlloc.js
