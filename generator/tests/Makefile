@@ -6,3 +6,6 @@ test: ../monad_ppx.byte let.ml
 
 %.log.js: %.ml ../main.byte ../monad_ppx.byte
 	../main.byte -mode log -ppx ../monad_ppx.byte -I ../stdlib_ml $<
+
+%.token.js: %.ml ../main.byte ../monad_ppx.byte
+	../main.byte -mode token -ppx ../monad_ppx.byte -I ../stdlib_ml $<
