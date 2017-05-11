@@ -5,4 +5,4 @@ parse.byte: syntaxConv.ml parse.ml
 	../generator/main.byte -mode unlog -ppx ../generator/monad_ppx.byte -I ../generator/stdlib_ml $<
 
 parse.js: syntax.unlog.js parse.byte
-	js_of_ocaml jsSyntax.js parse.byte
+	js_of_ocaml parse.byte
