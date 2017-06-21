@@ -120,9 +120,11 @@ let is_infix f args = match args with
   | _ :: [] | [] -> false
   | x :: xs ->
      let open Location in
-     let f_loc = (f.exp_loc.loc_start, f.exp_loc.loc_end) in
-     let args_loc = (x.exp_loc.loc_start, x.exp_loc.loc_end) in
-     if fst args_loc < fst f_loc then true else false
+     let open Lexing in
+     if f.exp_loc.loc_ghost then false else
+     if x.exp_loc.loc_ghost then false else
+       x.exp_loc.loc_end.pos_lnum < f.exp_loc.loc_start.pos_lnum ||
+       x.exp_loc.loc_end.pos_cnum < f.exp_loc.loc_start.pos_cnum
 
 exception Map_fields_elements_mismatch_number_args
 
