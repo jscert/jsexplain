@@ -389,7 +389,7 @@ var nth_def = function (d, n, l) {
       if (int_eq(n, 0)) {
         return (x);
       } else {
-        return (nth_def(d, -(n, 1), l$));
+        return (nth_def(d, (n - 1), l$));
       }
   }
   
@@ -17446,7 +17446,7 @@ var arguments_object_map_loop = function (s, c, l, xs, len, args, x, str, lmap, 
                                var _return_1375 = fS((function () {
                                                       log_event("JsInterpreter.js", 3171, ctx_585, "call");
                                                       var _return_1374 = 
-                                                      -(n, 1);
+                                                      (n - 1);
                                                       log_event("JsInterpreter.js", 3170, ctx_push(ctx_585, [{key: "#RETURN_VALUE#", val: _return_1374}]), "return");
                                                       return (_return_1374); 
                                                     }()));
