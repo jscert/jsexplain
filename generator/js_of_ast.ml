@@ -123,8 +123,9 @@ let is_infix f args = match args with
      let open Lexing in
      if f.exp_loc.loc_ghost then false else
      if x.exp_loc.loc_ghost then false else
-       x.exp_loc.loc_end.pos_lnum < f.exp_loc.loc_start.pos_lnum ||
-       x.exp_loc.loc_end.pos_cnum < f.exp_loc.loc_start.pos_cnum
+       x.exp_loc.loc_start.pos_lnum < f.exp_loc.loc_start.pos_lnum ||
+       (x.exp_loc.loc_start.pos_lnum = f.exp_loc.loc_start.pos_lnum &&
+        x.exp_loc.loc_start.pos_cnum < f.exp_loc.loc_start.pos_cnum)
 
 exception Map_fields_elements_mismatch_number_args
 
