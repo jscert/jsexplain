@@ -434,6 +434,9 @@ and to_primitive s c v prefo =
     let%prim (s0, r) = (object_default_value s c l prefo) in
     res_ter s0 (res_val (Coq_value_prim r))
 
+and to_primitive_def s c v =
+  to_primitive s c v None
+
 (** val to_number :
     state -> execution_ctx -> value -> result **)
 
@@ -2409,6 +2412,7 @@ and issome : 'a1 . 'a1 option -> bool = fun _foo_ ->
   | Some t -> true
   | None -> false
 
+(* OLD
 and run_binary_op_add s c v1 v2 =
   let%run (s1, (w1, w2)) = (convert_twice_primitive s c v1 v2) in
   if  (type_compare (type_of (Coq_value_prim w1)) Coq_type_string)
@@ -2417,6 +2421,19 @@ and run_binary_op_add s c v1 v2 =
     res_out (Coq_out_ter (s2, (res_val (Coq_value_prim (Coq_prim_string (strappend str1 str2))))))
   else let%run (s2, (n1, n2)) = (convert_twice_number s1 c (Coq_value_prim w1) (Coq_value_prim w2)) in
     res_out (Coq_out_ter (s2, (res_val (Coq_value_prim (Coq_prim_number (n1 +. n2))))))
+*)
+
+and run_binary_op_add s0 c v1 v2 =
+  let%run (s1, w1) = to_primitive_def s0 c v1 in
+  let%run (s2, w2) = to_primitive_def s1 c v2 in
+  if  (type_compare (type_of (Coq_value_prim w1)) Coq_type_string)
+   || (type_compare (type_of (Coq_value_prim w2)) Coq_type_string)
+  then let%string (s3, str1) = to_string s2 c (Coq_value_prim w1) in
+       let%string (s4, str2) = to_string s3 c (Coq_value_prim w2) in
+    res_out (Coq_out_ter (s4, (res_val (Coq_value_prim (Coq_prim_string (strappend str1 str2))))))
+  else let%number (s3, n1) = to_number s2 c (Coq_value_prim w1) in
+       let%number (s4, n2) = to_number s3 c (Coq_value_prim w2) in
+    res_out (Coq_out_ter (s4, (res_val (Coq_value_prim (Coq_prim_number (n1 +. n2))))))
 
 and run_binary_op_arith mathop s c v1 v2 =
   let%run (s1, nn) = (convert_twice_number s c v1 v2) in
