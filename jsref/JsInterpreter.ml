@@ -435,7 +435,7 @@ and to_primitive s c v prefo =
     res_ter s0 (res_val (Coq_value_prim r))
 
 and to_primitive_def s c v =
-  to_primitive s c v None
+  let%prim (s1,w) = to_primitive s c v None in res_spec s1 w
 
 (** val to_number :
     state -> execution_ctx -> value -> result **)
