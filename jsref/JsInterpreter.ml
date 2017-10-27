@@ -435,7 +435,7 @@ and to_primitive s c v prefo =
     res_ter s0 (res_val (Coq_value_prim r))
 
 and to_primitive_def s c v =
-  let%prim (s1,w) = to_primitive s c v None in res_spec s1 w
+  to_primitive s c v None
 
 (** val to_number :
     state -> execution_ctx -> value -> result **)
@@ -2424,8 +2424,8 @@ and run_binary_op_add s c v1 v2 =
 *)
 
 and run_binary_op_add s0 c v1 v2 =
-  let%run (s1, w1) = to_primitive_def s0 c v1 in
-  let%run (s2, w2) = to_primitive_def s1 c v2 in
+  let%prim (s1, w1) = to_primitive_def s0 c v1 in
+  let%prim (s2, w2) = to_primitive_def s1 c v2 in
   if  (type_compare (type_of (Coq_value_prim w1)) Coq_type_string)
    || (type_compare (type_of (Coq_value_prim w2)) Coq_type_string)
   then let%string (s3, str1) = to_string s2 c (Coq_value_prim w1) in
