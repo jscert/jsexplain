@@ -384,11 +384,19 @@ let ppf_pat_array id_list array_expr =
 let ppf_field_access expr field =
   Printf.sprintf "%s.%s" expr field
 
+(* List of JavaScript keywords that cannot be used as identifiers *)
+let js_keywords =
+  ["await"; "break"; "case"; "catch"; "class"; "const"; "continue"; "debugger"; "default"; "delete"; "do"; "else";
+  "export"; "extends"; "finally"; "for"; "function"; "if"; "import"; "in"; "instanceof"; "new"; "return"; "super";
+  "switch"; "this"; "throw"; "try"; "typeof"; "var"; "void"; "while"; "with"; "yield"; "enum"]
+
 let ppf_ident_name x =
-  if List.mem x ["arguments"; "eval"; "caller"]
-    then unsupported ("use of reserved keyword: " ^ x);
-    (* TODO: complete the list *)
-  Str.global_replace (Str.regexp "'") "$" x
+  if List.mem x js_keywords then
+    (* Variable name clashes with JS keyword: prefix with a \mathbb{V} character (\u1d54d) *)
+    "\xf0\x9d\x95\x8d" ^ x
+  else
+    (* Variable name contains ' (not supported by JS): replace with unicode prime symbol (\u02b9) *)
+    Str.global_replace (Str.regexp "'") "\xca\xb9" x
 
 let ppf_ident i =
   i |> Ident.name |> ppf_ident_name
