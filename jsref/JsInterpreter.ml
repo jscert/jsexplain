@@ -979,7 +979,7 @@ and create_list_from_array_like s obj elementTypes =
       let s, index, list = acc in
       let%VALUE_ret s, indexName = to_string s (Coq_value_number index) in
       let%value_ret s, next = get s obj indexName in
-      if not (mem_decide (===) (type_of next) elementTypes) then
+      if not (mem_decide (fun x y -> x === y) (type_of next) elementTypes) then
         Return (run_error_no_c s Coq_native_error_type)
       else
       let list = append list [next] in
@@ -1533,7 +1533,7 @@ and ordinary_delete s o p =
     res_ter s (res_val (Coq_value_bool true))
   else
   let desc = descriptor_get_defined desc in
-  if some_compare (===) (descriptor_configurable desc) (Some true) then
+  if some_compare bool_eq (descriptor_configurable desc) (Some true) then
     let p = string_of_value p in
     let%some s = run_object_heap_map_properties s o (fun props -> HeapStr.rem props p)  in
     res_ter s (res_val (Coq_value_bool true))
@@ -1990,7 +1990,7 @@ and proxy_object_internal_own_property_keys s o =
   let uncheckedResultKeys = trapResult in
   let%ret s, uncheckedResultKeys = iterate targetNonconfigurableKeys (s, uncheckedResultKeys) (fun key acc ->
       let s, uncheckedResultKeys = acc in
-      if not (mem_decide (===) key uncheckedResultKeys) then
+      if not (mem_decide (fun x y -> x === y) key uncheckedResultKeys) then
         Return (run_error_no_c s Coq_native_error_type)
       else
         Continue (s, filter (fun x -> not (x === key)) uncheckedResultKeys)
@@ -2000,7 +2000,7 @@ and proxy_object_internal_own_property_keys s o =
   else
   let%ret s, uncheckedResultKeys = iterate targetConfigurableKeys (s, uncheckedResultKeys) (fun key acc ->
       let s, uncheckedResultKeys = acc in
-      if not (mem_decide (===) key uncheckedResultKeys) then
+      if not (mem_decide (fun x y -> x === y) key uncheckedResultKeys) then
         Return (run_error_no_c s Coq_native_error_type)
       else
         Continue (s, filter (fun x -> not (x === key)) uncheckedResultKeys)
