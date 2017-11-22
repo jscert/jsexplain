@@ -51,12 +51,13 @@ let rename_constructor s =
 let report_shadowing = 
   !current_mode = Mode_cmi
 
+let do_check_shadowing env id =
+  try ignore (Env.lookup_value (Longident.Lident id) env); true
+  with Not_found -> false
+
 let check_shadowing ?loc env id =
   if report_shadowing then begin
-     let is_shadowing =
-       try ignore (Env.lookup_value (Longident.Lident id) env); true
-       with Not_found -> false
-       in
+     let is_shadowing = do_check_shadowing env id in
      if is_shadowing 
        then warning ?loc:loc (" !!!!! shadowing of variable: " ^ id);
   end
@@ -666,14 +667,14 @@ let generate_logged_return loc ctx sbody =
 type dest = 
   | Dest_ignore
   | Dest_return
-  | Dest_assign of string
+  | Dest_assign of string * bool (* bool indicates shadowing *)
   | Dest_inline
 
 let apply_dest loc ctx dest sbody =
   match dest with
   | Dest_ignore -> sbody
   | Dest_return -> generate_logged_return loc ctx sbody
-  | Dest_assign id -> Printf.sprintf "var %s = %s;" id sbody
+  | Dest_assign (id,s) -> Printf.sprintf "%s%s = %s;" (if s then "" else "var ") id sbody
   | Dest_inline -> sbody
 
 (* LATER: pull out the "var" out of switch *)
@@ -881,7 +882,7 @@ and js_of_expression_naming_argument_if_non_variable ctx obj name_prefix =
         "", (js_of_path_longident path ident)
     | _ ->  (* generate  var id = sexp;  *)
         let id = id_fresh name_prefix in
-        let sintro = js_of_expression ctx (Dest_assign id) obj in
+        let sintro = js_of_expression ctx (Dest_assign (id, false)) obj in
         (sintro ^ "@,"), id
   end
 
@@ -1308,7 +1309,7 @@ and js_of_let_pattern ctx pat expr =
       (*  error ~loc:pat.pat_loc "let can't deconstruct values"  *)
     in
   check_shadowing ~loc:pat.pat_loc pat.pat_env id;
-  (id, js_of_expression ctx (Dest_assign id) expr)
+  (id, js_of_expression ctx (Dest_assign (id, do_check_shadowing pat.pat_env id)) expr)
 
   (* LATER: for   let (x,y) = e,  encode as  translate(e,assign z); x = z[0]; y=z[1] 
     | Tpat_tuple (pat_l)
