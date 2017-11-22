@@ -48,8 +48,8 @@ let rename_constructor s =
 (****************************************************************)
 (* SHADOWING CHECKER *)
 
-let report_shadowing = 
-  !current_mode = Mode_cmi
+let report_shadowing = true
+  (* !current_mode = Mode_cmi *)
 
 let do_check_shadowing env id =
   try ignore (Env.lookup_value (Longident.Lident id) env); true
@@ -1308,7 +1308,6 @@ and js_of_let_pattern ctx pat expr =
     | Tpat_lazy _ -> out_of_scope pat.pat_loc "lazy"
       (*  error ~loc:pat.pat_loc "let can't deconstruct values"  *)
     in
-  check_shadowing ~loc:pat.pat_loc pat.pat_env id;
   (id, js_of_expression ctx (Dest_assign (id, do_check_shadowing pat.pat_env id)) expr)
 
   (* LATER: for   let (x,y) = e,  encode as  translate(e,assign z); x = z[0]; y=z[1] 
