@@ -8976,7 +8976,7 @@ var get_value = function (s, v) {
                           log_event("JsInterpreter.js", 591, ctx_push(ctx_79, [{key: "#RETURN_VALUE#", val: _return_273}]), "return");
                           return (_return_273); 
                         } else {
-                          var v = (function () {
+                          v = (function () {
                             log_event("JsInterpreter.js", 530, ctx_79, "call");
                             var _return_241 = ref_of_resvalue(vʹ);
                             log_event("JsInterpreter.js", 529, ctx_push(ctx_79, [{key: "#RETURN_VALUE#", val: _return_241}]), "return");
@@ -9023,7 +9023,7 @@ var get_value = function (s, v) {
                             ;
                             log_event("JsInterpreter.js", 584, ctx_81, "if");
                             if (_if_arg_245) {
-                              var base = (function () {
+                              base = (function () {
                                 log_event("JsInterpreter.js", 548, ctx_81, "call");
                                 var _return_252 = value_of_ref_base_type(
                                                     base);
@@ -9150,7 +9150,7 @@ var get_value = function (s, v) {
                               return (_return_270); 
                               
                             } else {
-                              var base = (function () {
+                              base = (function () {
                                 log_event("JsInterpreter.js", 538, ctx_81, "call");
                                 var _return_247 = env_loc_of_ref_base_type(
                                                     base);
@@ -9244,7 +9244,7 @@ var put_value = function (s, c, v, w) {
                                                 log_event("JsInterpreter.js", 695, ctx_push(ctx_89, [{key: "#RETURN_VALUE#", val: _return_327}]), "return");
                                                 return (_return_327); 
                                               } else {
-                                                var v = (function () {
+                                                v = (function () {
                                                   log_event("JsInterpreter.js", 605, ctx_89, "call");
                                                   var _return_280 = ref_of_resvalue(
                                                                     v);
@@ -9339,7 +9339,7 @@ var put_value = function (s, c, v, w) {
                                                   ;
                                                   log_event("JsInterpreter.js", 675, ctx_91, "if");
                                                   if (_if_arg_284) {
-                                                    var base = (function () {
+                                                    base = (function () {
                                                       log_event("JsInterpreter.js", 623, ctx_91, "call");
                                                       var _return_291 = 
                                                       value_of_ref_base_type(
@@ -9529,7 +9529,7 @@ var put_value = function (s, c, v, w) {
                                                     return (_return_317); 
                                                     
                                                   } else {
-                                                    var base = (function () {
+                                                    base = (function () {
                                                       log_event("JsInterpreter.js", 613, ctx_91, "call");
                                                       var _return_286 = 
                                                       env_loc_of_ref_base_type(
@@ -9775,7 +9775,7 @@ var from_property_descriptor = function (s, desc) {
     log_event("JsInterpreter.js", 909, ctx_push(ctx_106, [{key: "#RETURN_VALUE#", val: _return_428}]), "return");
     return (_return_428); 
   } else {
-    var desc = (function () {
+    desc = (function () {
       log_event("JsInterpreter.js", 766, ctx_106, "call");
       var _return_360 = descriptor_get_defined(desc);
       log_event("JsInterpreter.js", 765, ctx_push(ctx_106, [{key: "#RETURN_VALUE#", val: _return_360}]), "return");
@@ -10960,7 +10960,7 @@ var to_property_descriptor = function (s, _foo_) {
 var complete_property_descriptor = function (desc) {
   var ctx_152 = ctx_push(ctx_empty, [{key: "desc", val: desc}]);
   log_event("JsInterpreter.js", 1127, ctx_152, "enter");
-  var desc = (function () {
+  desc = (function () {
     log_event("JsInterpreter.js", 1105, ctx_152, "call");
     var _return_510 = descriptor_get_defined(desc);
     log_event("JsInterpreter.js", 1104, ctx_push(ctx_152, [{key: "#RETURN_VALUE#", val: _return_510}]), "return");
@@ -10998,16 +10998,16 @@ var complete_property_descriptor = function (desc) {
   ;
   log_event("JsInterpreter.js", 1114, ctx_154, "if");
   if (_if_arg_511) {
-    var desc = descriptor_with_value(desc, like.descriptor_value);
+    desc = descriptor_with_value(desc, like.descriptor_value);
     var ctx_156 = ctx_push(ctx_154, [{key: "desc", val: desc}]);
     log_event("JsInterpreter.js", 1113, ctx_156, "let");
-    var desc = descriptor_with_writable(desc, like.descriptor_writable);
+    desc = descriptor_with_writable(desc, like.descriptor_writable);
     
   } else {
-    var desc = descriptor_with_get(desc, like.descriptor_get);
+    desc = descriptor_with_get(desc, like.descriptor_get);
     var ctx_155 = ctx_push(ctx_154, [{key: "desc", val: desc}]);
     log_event("JsInterpreter.js", 1112, ctx_155, "let");
-    var desc = descriptor_with_set(desc, like.descriptor_set);
+    desc = descriptor_with_set(desc, like.descriptor_set);
     
   }
   var ctx_157 = ctx_push(ctx_154, [{key: "desc", val: desc}]);
@@ -11022,9 +11022,9 @@ var complete_property_descriptor = function (desc) {
   ;
   log_event("JsInterpreter.js", 1117, ctx_157, "if");
   if (_if_arg_515) {
-    var desc = descriptor_with_enumerable(desc, like.descriptor_enumerable);
+    desc = descriptor_with_enumerable(desc, like.descriptor_enumerable);
   } else {
-    var desc = desc;
+    desc = desc;
   }
   var ctx_158 = ctx_push(ctx_157, [{key: "desc", val: desc}]);
   log_event("JsInterpreter.js", 1123, ctx_158, "let");
@@ -11038,10 +11038,9 @@ var complete_property_descriptor = function (desc) {
   ;
   log_event("JsInterpreter.js", 1120, ctx_158, "if");
   if (_if_arg_517) {
-    var desc = descriptor_with_configurable(desc,
-                 like.descriptor_configurable);
+    desc = descriptor_with_configurable(desc, like.descriptor_configurable);
   } else {
-    var desc = desc;
+    desc = desc;
   }
   var ctx_159 = ctx_push(ctx_158, [{key: "desc", val: desc}]);
   log_event("JsInterpreter.js", 1122, ctx_159, "let");
@@ -12275,7 +12274,7 @@ var create_data_property = function (s, o, p, v) {
                         
                         var ctx_218 = ctx_push(ctx_217, []);
                         log_event("JsInterpreter.js", 1538, ctx_218, "let");
-                        var o = loc_of_value(o);
+                        o = loc_of_value(o);
                         var ctx_219 = ctx_push(ctx_218, [{key: "o", val: o}]);
                         log_event("JsInterpreter.js", 1535, ctx_219, "let");
                         var _return_708 = check_assert((function () {
@@ -12338,7 +12337,7 @@ var define_property_or_throw = function (s, o, p, desc) {
                         
                         var ctx_223 = ctx_push(ctx_222, []);
                         log_event("JsInterpreter.js", 1567, ctx_223, "let");
-                        var o = loc_of_value(o);
+                        o = loc_of_value(o);
                         var ctx_224 = ctx_push(ctx_223, [{key: "o", val: o}]);
                         log_event("JsInterpreter.js", 1564, ctx_224, "let");
                         var _return_722 = check_assert((function () {
@@ -12642,7 +12641,7 @@ var call = function (s, f, v, argumentList) {
 var construct = function (s, f, argumentsList, newTarget) {
   var ctx_239 = ctx_push(ctx_empty, [{key: "s", val: s}, {key: "f", val: f}, {key: "argumentsList", val: argumentsList}, {key: "newTarget", val: newTarget}]);
   log_event("JsInterpreter.js", 1663, ctx_239, "enter");
-  var newTarget = (function () {
+  newTarget = (function () {
     log_event("JsInterpreter.js", 1643, ctx_239, "call");
     var _return_758 = unsome_default(f, newTarget);
     log_event("JsInterpreter.js", 1642, ctx_push(ctx_239, [{key: "#RETURN_VALUE#", val: _return_758}]), "return");
@@ -12651,7 +12650,7 @@ var construct = function (s, f, argumentsList, newTarget) {
   ;
   var ctx_240 = ctx_push(ctx_239, [{key: "newTarget", val: newTarget}]);
   log_event("JsInterpreter.js", 1662, ctx_240, "let");
-  var argumentsList = (function () {
+  argumentsList = (function () {
     log_event("JsInterpreter.js", 1645, ctx_240, "call");
     var _return_759 = unsome_default(mk_nil(), argumentsList);
     log_event("JsInterpreter.js", 1644, ctx_push(ctx_240, [{key: "#RETURN_VALUE#", val: _return_759}]), "return");
@@ -12720,7 +12719,7 @@ var set_integrity_level = function (s, o, level) {
                         
                         var ctx_245 = ctx_push(ctx_244, []);
                         log_event("JsInterpreter.js", 1707, ctx_245, "let");
-                        var o = loc_of_value(o);
+                        o = loc_of_value(o);
                         var ctx_246 = ctx_push(ctx_245, [{key: "o", val: o}]);
                         log_event("JsInterpreter.js", 1704, ctx_246, "let");
                         var _return_787 = check_assert((function () {
@@ -13071,7 +13070,7 @@ var create_array_from_list = function (s, elements) {
 var create_list_from_array_like = function (s, obj, elementTypes) {
   var ctx_265 = ctx_push(ctx_empty, [{key: "s", val: s}, {key: "obj", val: obj}, {key: "elementTypes", val: elementTypes}]);
   log_event("JsInterpreter.js", 1852, ctx_265, "enter");
-  var elementTypes = (function () {
+  elementTypes = (function () {
     log_event("JsInterpreter.js", 1781, ctx_265, "call");
     var _return_819 = unsome_default(
                         mk_cons(Coq_type_undef(),
@@ -13256,7 +13255,7 @@ var create_list_from_array_like = function (s, obj, elementTypes) {
                                                                     log_event("JsInterpreter.js", 1818, ctx_push(ctx_277, [{key: "#RETURN_VALUE#", val: _return_838}]), "return");
                                                                     return (_return_838); 
                                                                     } else {
-                                                                    var list = (function () {
+                                                                    list = (function () {
                                                                     log_event("JsInterpreter.js", 1810, ctx_277, "call");
                                                                     var _return_834 = 
                                                                     append(
@@ -13270,7 +13269,7 @@ var create_list_from_array_like = function (s, obj, elementTypes) {
                                                                     ;
                                                                     var ctx_279 = ctx_push(ctx_277, [{key: "list", val: list}]);
                                                                     log_event("JsInterpreter.js", 1815, ctx_279, "let");
-                                                                    var index = (function () {
+                                                                    index = (function () {
                                                                     log_event("JsInterpreter.js", 1812, ctx_279, "call");
                                                                     var _return_835 = 
                                                                     (index
@@ -13475,7 +13474,7 @@ var decl_env_record_create_mutable_binding = function (s, l, envRec, nʹ, d) {
   var n = string_of_value(nʹ);
   var ctx_295 = ctx_push(ctx_294, [{key: "n", val: n}]);
   log_event("JsInterpreter.js", 1914, ctx_295, "let");
-  var d = bool_of_value(d);
+  d = bool_of_value(d);
   var ctx_296 = ctx_push(ctx_295, [{key: "d", val: d}]);
   log_event("JsInterpreter.js", 1913, ctx_296, "let");
   var _return_873 = check_assert((function () {
@@ -13491,7 +13490,7 @@ var decl_env_record_create_mutable_binding = function (s, l, envRec, nʹ, d) {
                         
                         var ctx_297 = ctx_push(ctx_296, []);
                         log_event("JsInterpreter.js", 1911, ctx_297, "let");
-                        var s = (function () {
+                        s = (function () {
                           log_event("JsInterpreter.js", 1904, ctx_297, "call");
                           var _return_869 = env_record_write_decl_env(s, l,
                                               n, (function () {
@@ -13551,7 +13550,7 @@ var decl_env_record_initialize_binding = function (s, l, envRec, nʹ, v) {
                                               
                                               var ctx_303 = ctx_push(ctx_302, []);
                                               log_event("JsInterpreter.js", 1928, ctx_303, "let");
-                                              var s = (function () {
+                                              s = (function () {
                                                 log_event("JsInterpreter.js", 1921, ctx_303, "call");
                                                 var _return_876 = env_record_write_decl_env(
                                                                     s, l, n,
@@ -13589,7 +13588,7 @@ var decl_env_record_set_mutable_binding = function (s, l, envRec, nʹ, v, str) {
   var n = string_of_value(nʹ);
   var ctx_306 = ctx_push(ctx_305, [{key: "n", val: n}]);
   log_event("JsInterpreter.js", 1993, ctx_306, "let");
-  var str = bool_of_value(str);
+  str = bool_of_value(str);
   var ctx_307 = ctx_push(ctx_306, [{key: "str", val: str}]);
   log_event("JsInterpreter.js", 1992, ctx_307, "let");
   var _if_arg_882 = (function () {
@@ -13765,7 +13764,7 @@ var decl_env_record_set_mutable_binding = function (s, l, envRec, nʹ, v, str) {
 var decl_env_record_get_binding_value = function (s, envRec, n, str) {
   var ctx_313 = ctx_push(ctx_empty, [{key: "s", val: s}, {key: "envRec", val: envRec}, {key: "n", val: n}, {key: "str", val: str}]);
   log_event("JsInterpreter.js", 2014, ctx_313, "enter");
-  var n = string_of_value(n);
+  n = string_of_value(n);
   var ctx_314 = ctx_push(ctx_313, [{key: "n", val: n}]);
   log_event("JsInterpreter.js", 2013, ctx_314, "let");
   var _return_919 = check_assert((function () {
@@ -14093,7 +14092,7 @@ var ordinary_set_prototype_of = function (s, o, v) {
                                                                     log_event("JsInterpreter.js", 2137, ctx_push(ctx_334, [{key: "#RETURN_VALUE#", val: _return_975}]), "return");
                                                                     return (_return_975); 
                                                                     } else {
-                                                                    var repeat = function (p, done_) {
+                                                                    repeat = function (p, done_) {
                                                                     var ctx_335 = ctx_push(ctx_334, [{key: "p", val: p}, {key: "done_", val: done_}]);
                                                                     log_event("JsInterpreter.js", 2132, ctx_335, "enter");
                                                                     var _if_arg_955 = (function () {
@@ -14389,7 +14388,7 @@ var ordinary_get_own_property = function (s, o, p) {
                          
                          var ctx_352 = ctx_push(ctx_351, []);
                          log_event("JsInterpreter.js", 2224, ctx_352, "let");
-                         var p = string_of_value(p);
+                         p = string_of_value(p);
                          var ctx_353 = ctx_push(ctx_352, [{key: "p", val: p}]);
                          log_event("JsInterpreter.js", 2221, ctx_353, "let");
                          var _if_arg_997 = (function () {
@@ -14430,60 +14429,56 @@ var ordinary_get_own_property = function (s, o, p) {
                                                       var x = x.value;var ctx_356 = ctx_push(ctx_355, [{key: "x", val: x}]);
                                                     log_event("JsInterpreter.js", 2203, ctx_356, "case");
                                                     
-                                                      var d = Object.assign(
-                                                                {}, d, {
-                                                                  descriptor_value: 
-                                                                  Some(
-                                                                    x.attributes_data_value),
-                                                                  descriptor_writable: 
-                                                                  Some(
-                                                                    x.attributes_data_writable)
-                                                                });
+                                                      d = Object.assign({},
+                                                            d, {
+                                                              descriptor_value: 
+                                                              Some(
+                                                                x.attributes_data_value),
+                                                              descriptor_writable: 
+                                                              Some(
+                                                                x.attributes_data_writable)
+                                                            });
                                                       break;
                                                     case "Coq_attributes_accessor_of":
                                                       var x = x.value;var ctx_357 = ctx_push(ctx_355, [{key: "x", val: x}]);
                                                     log_event("JsInterpreter.js", 2204, ctx_357, "case");
                                                     
-                                                      var d = Object.assign(
-                                                                {}, d, {
-                                                                  descriptor_get: 
-                                                                  Some(
-                                                                    x.attributes_accessor_get),
-                                                                  descriptor_set: 
-                                                                  Some(
-                                                                    x.attributes_accessor_set)
-                                                                });
+                                                      d = Object.assign({},
+                                                            d, {
+                                                              descriptor_get: 
+                                                              Some(
+                                                                x.attributes_accessor_get),
+                                                              descriptor_set: 
+                                                              Some(
+                                                                x.attributes_accessor_set)
+                                                            });
                                                       break;
                                                   }
                                                   
                                                   var ctx_358 = ctx_push(ctx_355, [{key: "d", val: d}]);
                                                   log_event("JsInterpreter.js", 2213, ctx_358, "let");
-                                                  var d = Object.assign({},
-                                                            d, {
-                                                              descriptor_enumerable: 
-                                                              Some(
-                                                                (function () {
-                                                                  log_event("JsInterpreter.js", 2207, ctx_358, "call");
-                                                                  var _return_1001 = 
-                                                                  attributes_enumerable(
-                                                                    x);
-                                                                  log_event("JsInterpreter.js", 2206, ctx_push(ctx_358, [{key: "#RETURN_VALUE#", val: _return_1001}]), "return");
-                                                                  return (_return_1001); 
-                                                                }()))});
+                                                  d = Object.assign({}, d, {
+                                                          descriptor_enumerable: 
+                                                          Some((function () {
+                                                              log_event("JsInterpreter.js", 2207, ctx_358, "call");
+                                                              var _return_1001 = 
+                                                              attributes_enumerable(
+                                                                x);
+                                                              log_event("JsInterpreter.js", 2206, ctx_push(ctx_358, [{key: "#RETURN_VALUE#", val: _return_1001}]), "return");
+                                                              return (_return_1001); 
+                                                            }()))});
                                                   var ctx_359 = ctx_push(ctx_358, [{key: "d", val: d}]);
                                                   log_event("JsInterpreter.js", 2212, ctx_359, "let");
-                                                  var d = Object.assign({},
-                                                            d, {
-                                                              descriptor_configurable: 
-                                                              Some(
-                                                                (function () {
-                                                                  log_event("JsInterpreter.js", 2209, ctx_359, "call");
-                                                                  var _return_1002 = 
-                                                                  attributes_configurable(
-                                                                    x);
-                                                                  log_event("JsInterpreter.js", 2208, ctx_push(ctx_359, [{key: "#RETURN_VALUE#", val: _return_1002}]), "return");
-                                                                  return (_return_1002); 
-                                                                }()))});
+                                                  d = Object.assign({}, d, {
+                                                          descriptor_configurable: 
+                                                          Some((function () {
+                                                              log_event("JsInterpreter.js", 2209, ctx_359, "call");
+                                                              var _return_1002 = 
+                                                              attributes_configurable(
+                                                                x);
+                                                              log_event("JsInterpreter.js", 2208, ctx_push(ctx_359, [{key: "#RETURN_VALUE#", val: _return_1002}]), "return");
+                                                              return (_return_1002); 
+                                                            }()))});
                                                   var ctx_360 = ctx_push(ctx_359, [{key: "d", val: d}]);
                                                   log_event("JsInterpreter.js", 2211, ctx_360, "let");
                                                   var _return_1003 = 
@@ -14597,7 +14592,7 @@ var validate_and_apply_property_descriptor = function (s, o, p, extensible, desc
                          
                          var ctx_367 = ctx_push(ctx_366, []);
                          log_event("JsInterpreter.js", 2479, ctx_367, "let");
-                         var p = string_of_value(p);
+                         p = string_of_value(p);
                          var ctx_368 = ctx_push(ctx_367, [{key: "p", val: p}]);
                          log_event("JsInterpreter.js", 2476, ctx_368, "let");
                          log_event("JsInterpreter.js", 2475, ctx_368, "switch");
@@ -14985,7 +14980,7 @@ var validate_and_apply_property_descriptor = function (s, o, p, extensible, desc
                                                                     ;
                                                                     log_event("JsInterpreter.js", 2436, ctx_375, "if");
                                                                     if (_if_arg_1119) {
-                                                                    var s = (function () {
+                                                                    s = (function () {
                                                                     log_event("JsInterpreter.js", 2433, ctx_375, "call");
                                                                     var _return_1129 = 
                                                                     unsome_default(
@@ -15030,7 +15025,7 @@ var validate_and_apply_property_descriptor = function (s, o, p, extensible, desc
                                                                     return (_return_1130); 
                                                                     
                                                                     } else {
-                                                                    var s = (function () {
+                                                                    s = (function () {
                                                                     log_event("JsInterpreter.js", 2422, ctx_375, "call");
                                                                     var _return_1124 = 
                                                                     unsome_default(
@@ -15729,8 +15724,8 @@ var ordinary_get = function (s, o, p, receiver) {
                                                         log_event("JsInterpreter.js", 2569, ctx_push(ctx_398, [{key: "#RETURN_VALUE#", val: _return_1191}]), "return");
                                                         return (_return_1191); 
                                                       } else {
-                                                        var parent = 
-                                                        loc_of_value(parent);
+                                                        parent = loc_of_value(
+                                                                   parent);
                                                         var ctx_399 = ctx_push(ctx_398, [{key: "parent", val: parent}]);
                                                         log_event("JsInterpreter.js", 2568, ctx_399, "let");
                                                         var _return_1190 = (function () {
@@ -15761,7 +15756,7 @@ var ordinary_get = function (s, o, p, receiver) {
                                                   ;
                                                   log_event("JsInterpreter.js", 2560, ctx_392, "if");
                                                   if (_if_arg_1171) {
-                                                    var desc = (function () {
+                                                    desc = (function () {
                                                       log_event("JsInterpreter.js", 2553, ctx_392, "call");
                                                       var _return_1183 = 
                                                       descriptor_get_defined(
@@ -15803,7 +15798,7 @@ var ordinary_get = function (s, o, p, receiver) {
                                                         
                                                         var ctx_393 = ctx_push(ctx_392, []);
                                                         log_event("JsInterpreter.js", 2550, ctx_393, "let");
-                                                        var desc = (function () {
+                                                        desc = (function () {
                                                           log_event("JsInterpreter.js", 2535, ctx_393, "call");
                                                           var _return_1174 = 
                                                           descriptor_get_defined(
@@ -15960,7 +15955,7 @@ var ordinary_set = function (s, o, p, v, receiver) {
                                                                     ;
                                                                     log_event("JsInterpreter.js", 2607, ctx_404, "if");
                                                                     if (_if_arg_1204) {
-                                                                    var parent = 
+                                                                    parent = 
                                                                     loc_of_value(
                                                                     parent);
                                                                     var ctx_405 = ctx_push(ctx_404, [{key: "parent", val: parent}]);
@@ -16031,7 +16026,7 @@ var ordinary_set = function (s, o, p, v, receiver) {
                                                                     ;
                                                                     log_event("JsInterpreter.js", 2692, ctx_406, "if");
                                                                     if (_if_arg_1211) {
-                                                                    var ownDesc = (function () {
+                                                                    ownDesc = (function () {
                                                                     log_event("JsInterpreter.js", 2640, ctx_406, "call");
                                                                     var _return_1225 = 
                                                                     descriptor_get_defined(
@@ -16105,7 +16100,7 @@ var ordinary_set = function (s, o, p, v, receiver) {
                                                                     log_event("JsInterpreter.js", 2683, ctx_push(ctx_412, [{key: "#RETURN_VALUE#", val: _return_1249}]), "return");
                                                                     return (_return_1249); 
                                                                     } else {
-                                                                    var receiver = 
+                                                                    receiver = 
                                                                     loc_of_value(
                                                                     receiver);
                                                                     var ctx_413 = ctx_push(ctx_412, [{key: "receiver", val: receiver}]);
@@ -16167,7 +16162,7 @@ var ordinary_set = function (s, o, p, v, receiver) {
                                                                     log_event("JsInterpreter.js", 2675, ctx_push(ctx_414, [{key: "#RETURN_VALUE#", val: _return_1247}]), "return");
                                                                     return (_return_1247); 
                                                                     } else {
-                                                                    var existingDescriptor = (function () {
+                                                                    existingDescriptor = (function () {
                                                                     log_event("JsInterpreter.js", 2661, ctx_414, "call");
                                                                     var _return_1240 = 
                                                                     descriptor_get_defined(
@@ -16272,7 +16267,7 @@ var ordinary_set = function (s, o, p, v, receiver) {
                                                                     
                                                                     var ctx_407 = ctx_push(ctx_406, []);
                                                                     log_event("JsInterpreter.js", 2637, ctx_407, "let");
-                                                                    var ownDesc = (function () {
+                                                                    ownDesc = (function () {
                                                                     log_event("JsInterpreter.js", 2618, ctx_407, "call");
                                                                     var _return_1214 = 
                                                                     descriptor_get_defined(
@@ -16417,7 +16412,7 @@ var ordinary_delete = function (s, o, p) {
                                                   log_event("JsInterpreter.js", 2735, ctx_push(ctx_421, [{key: "#RETURN_VALUE#", val: _return_1271}]), "return");
                                                   return (_return_1271); 
                                                 } else {
-                                                  var desc = (function () {
+                                                  desc = (function () {
                                                     log_event("JsInterpreter.js", 2717, ctx_421, "call");
                                                     var _return_1262 = 
                                                     descriptor_get_defined(
@@ -16440,8 +16435,7 @@ var ordinary_delete = function (s, o, p) {
                                                   ;
                                                   log_event("JsInterpreter.js", 2733, ctx_422, "if");
                                                   if (_if_arg_1263) {
-                                                    var p = string_of_value(
-                                                              p);
+                                                    p = string_of_value(p);
                                                     var ctx_423 = ctx_push(ctx_422, [{key: "p", val: p}]);
                                                     log_event("JsInterpreter.js", 2732, ctx_423, "let");
                                                     var _return_1270 = 
@@ -16531,7 +16525,7 @@ var ordinary_own_property_keys = function (s, o) {
                          
                          var ctx_429 = ctx_push(ctx_428, [{key: "keys", val: keys}]);
                          log_event("JsInterpreter.js", 2764, ctx_429, "let");
-                         var keys = (function () {
+                         keys = (function () {
                            log_event("JsInterpreter.js", 2759, ctx_429, "call");
                            var _return_1280 = LibList.map(function (key) {
                                                   var ctx_430 = ctx_push(ctx_429, [{key: "key", val: key}]);
@@ -16559,7 +16553,7 @@ var ordinary_own_property_keys = function (s, o) {
 var object_create = function (s, proto, internalSlotsList) {
   var ctx_432 = ctx_push(ctx_empty, [{key: "s", val: s}, {key: "proto", val: proto}, {key: "internalSlotsList", val: internalSlotsList}]);
   log_event("JsInterpreter.js", 2777, ctx_432, "enter");
-  var internalSlotsList = (function () {
+  internalSlotsList = (function () {
     log_event("JsInterpreter.js", 2768, ctx_432, "call");
     var _return_1283 = unsome_default(mk_nil(), internalSlotsList);
     log_event("JsInterpreter.js", 2767, ctx_push(ctx_432, [{key: "#RETURN_VALUE#", val: _return_1283}]), "return");
@@ -18160,7 +18154,7 @@ var proxy_object_internal_get_own_property = function (s, o, p) {
                                                                     log_event("JsInterpreter.js", 3241, ctx_push(ctx_495, [{key: "#RETURN_VALUE#", val: _return_1504}]), "return");
                                                                     return (_return_1504); 
                                                                     } else {
-                                                                    var targetDesc = (function () {
+                                                                    targetDesc = (function () {
                                                                     log_event("JsInterpreter.js", 3216, ctx_495, "call");
                                                                     var _return_1490 = 
                                                                     descriptor_get_defined(
@@ -18301,7 +18295,7 @@ var proxy_object_internal_get_own_property = function (s, o, p) {
                                                                     
                                                                     var ctx_497 = ctx_push(ctx_496, [{key: "s", val: s}, {key: "resultDesc", val: resultDesc}]);
                                                                     log_event("JsInterpreter.js", 3207, ctx_497, "let");
-                                                                    var resultDesc = (function () {
+                                                                    resultDesc = (function () {
                                                                     log_event("JsInterpreter.js", 3174, ctx_497, "call");
                                                                     var _return_1469 = 
                                                                     complete_property_descriptor(
@@ -18840,7 +18834,7 @@ var proxy_object_internal_define_own_property = function (s, o, p, desc) {
                                                                     
                                                                     var ctx_516 = ctx_push(ctx_515, [{key: "s", val: s}, {key: "tempVal", val: tempVal}]);
                                                                     log_event("JsInterpreter.js", 3353, ctx_516, "let");
-                                                                    var targetDesc = (function () {
+                                                                    targetDesc = (function () {
                                                                     log_event("JsInterpreter.js", 3334, ctx_516, "call");
                                                                     var _return_1546 = 
                                                                     descriptor_get_defined(
@@ -19211,7 +19205,7 @@ var proxy_object_internal_has_property = function (s, o, p) {
                                                                     ;
                                                                     log_event("JsInterpreter.js", 3481, ctx_529, "if");
                                                                     if (_if_arg_1601) {
-                                                                    var targetDesc = (function () {
+                                                                    targetDesc = (function () {
                                                                     log_event("JsInterpreter.js", 3460, ctx_529, "call");
                                                                     var _return_1605 = 
                                                                     descriptor_get_defined(
@@ -20599,7 +20593,7 @@ var proxy_object_internal_delete = function (s, o, p) {
                                                                     log_event("JsInterpreter.js", 3835, ctx_push(ctx_572, [{key: "#RETURN_VALUE#", val: _return_1786}]), "return");
                                                                     return (_return_1786); 
                                                                     } else {
-                                                                    var targetDesc = (function () {
+                                                                    targetDesc = (function () {
                                                                     log_event("JsInterpreter.js", 3826, ctx_572, "call");
                                                                     var _return_1780 = 
                                                                     descriptor_get_defined(
@@ -22762,7 +22756,7 @@ var builtin_proxy_revocation_function = function (s, c, f, 𝕍this, newTarget) 
                                                   log_event("JsInterpreter.js", 4517, ctx_push(ctx_652, [{key: "#RETURN_VALUE#", val: _return_2108}]), "return");
                                                   return (_return_2108); 
                                                 } else {
-                                                  var p = loc_of_value(p);
+                                                  p = loc_of_value(p);
                                                   var ctx_653 = ctx_push(ctx_652, [{key: "p", val: p}]);
                                                   log_event("JsInterpreter.js", 4516, ctx_653, "let");
                                                   var _return_2107 = 
