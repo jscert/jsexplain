@@ -1,3 +1,4 @@
 B _build
 PKG str
 PKG compiler-libs.common
+PKG ocaml-migrate-parsetree
