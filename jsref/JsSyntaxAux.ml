@@ -433,46 +433,11 @@ let prealloc_compare bl1 bl2 = (bl1:prealloc) === bl2
 
 (** val object_loc_compare : object_loc -> object_loc -> bool **)
 
-let object_loc_compare l1 l2 =
-  match l1 with
-  | Coq_object_loc_normal ln1 ->
-    (match l2 with
-     | Coq_object_loc_normal ln2 -> nat_eq ln1 ln2
-     | Coq_object_loc_prealloc p -> false)
-  | Coq_object_loc_prealloc bl1 ->
-    (match l2 with
-     | Coq_object_loc_normal n -> false
-     | Coq_object_loc_prealloc bl2 -> prealloc_compare bl1 bl2)
-
+let object_loc_compare l1 l2 = (l1:object_loc) === l2
 
 (** val value_compare : value -> value -> bool **)
 
-let value_compare v1 v2 =
-  match v1 with
-  | Coq_value_undef ->
-    (match v2 with
-     | Coq_value_undef -> true
-     | _ -> false)
-  | Coq_value_null ->
-    (match v2 with
-     | Coq_value_null -> true
-     | _ -> false)
-  | Coq_value_bool b1 ->
-    (match v2 with
-     | Coq_value_bool b2 -> bool_eq b1 b2
-     | _ -> false)
-  | Coq_value_number n1 ->
-    (match v2 with
-     | Coq_value_number n2 -> n1 === n2
-     | _ -> false)
-  | Coq_value_string s1 ->
-    (match v2 with
-     | Coq_value_string s2 -> string_eq s1 s2
-     | _ -> false)
-  | Coq_value_object l1 ->
-    (match v2 with
-     | Coq_value_object l2 -> object_loc_compare l1 l2
-     | _ -> false )
+let value_compare v1 v2 = (v1:value) === v2
 
 (** val mutability_compare : mutability -> mutability -> bool **)
 
