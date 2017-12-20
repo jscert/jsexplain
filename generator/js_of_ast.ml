@@ -303,8 +303,9 @@ let ppf_match_case c =
 
 let ppf_match_binders binders =
   if binders = [] then "" else
-  let binds = show_list ",@ " (List.map (fun (id,se) -> Printf.sprintf "%s = %s" id se) binders) in
-  Printf.sprintf "@[<hov 2>var %s;@]" binds
+    let binds = show_list "@," (List.map
+      (fun (id,se,shadows) -> Printf.sprintf "%s%s = %s;" (if shadows then "" else "var ") id se) binders) in
+  Printf.sprintf "@[<hov 2>%s@]" binds
 
 let ppf_let_tuple ids sbody =
   assert (ids <> []);
@@ -516,7 +517,7 @@ let generate_logged_if loc ctx sintro sarg siftrue siffalse =
 (*--------- match ---------*)
 
 let generate_logged_case loc spat binders ctx newctx sbody need_break =
-  (* Note: binders is a list of pairs of id *)
+  (* Note: binders is a list of triples of id, shadowing flag *)
   (* Note: if binders = [], then newctx = ctx *)
   let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
   let sbinders_common () = 
@@ -525,7 +526,7 @@ let generate_logged_case loc spat binders ctx newctx sbody need_break =
     match !current_mode with
     | Mode_cmi -> assert false
     | Mode_pseudo _ ->
-        let args = List.map fst binders in
+        let args = List.map fst3 binders in
         let spat = (* LATER: use a cleaner separation with Case of (cstr,args) | Default *)
           if spat = "case ::" then begin
             let (x,y) = match args with [x;y] -> (x,y) | _ -> assert false in
@@ -539,7 +540,7 @@ let generate_logged_case loc spat binders ctx newctx sbody need_break =
     | Mode_unlogged _ ->
         (token_start, spat, sbinders_common(), token_stop)
     | Mode_logged ->
-      let ids = List.map fst binders in
+      let ids = List.map fst3 binders in
       let mk_binding x =
         Printf.sprintf "{key: \"%s\", val: %s}" x x
       in
@@ -769,7 +770,7 @@ let tuple_component_bind stupleobj index pat =
    match pat.pat_desc with
    | Tpat_var (id, _) ->
        let sid = ppf_ident id in
-       Some (sid, Printf.sprintf "%s[%d]" stupleobj index)
+       Some (sid, Printf.sprintf "%s[%d]" stupleobj index, do_check_shadowing pat.pat_env sid)
    | Tpat_any -> None
    | _ -> out_of_scope loc "Nested pattern matching"
 
@@ -907,7 +908,7 @@ and js_of_expression ctx dest e =
       | [ { vb_pat = { pat_desc = Tpat_tuple pl }; vb_expr = obj } ] -> (* binding tuples *)
           let (sintro, stupleobj) = js_of_expression_naming_argument_if_non_variable ctx obj "_tuple_arg_" in     
           let binders = tuple_binders stupleobj pl in
-          let ids = List.map fst binders in
+          let ids = List.map fst3 binders in
           let sdecl =
             if is_mode_pseudo() then begin
               ppf_let_tuple ids stupleobj 
@@ -915,7 +916,8 @@ and js_of_expression ctx dest e =
               ppf_match_binders binders
             end in
           (ids, sintro ^ sdecl)
-      | [ { vb_pat = { pat_desc = Tpat_record (args, closed_flag) }; vb_expr = obj } ] -> (* binding records --- TODO: this code does not seem to be used *)
+      | [ { vb_pat = { pat_desc = Tpat_record (args, closed_flag) }; vb_expr = obj } ] ->
+          (* binding records -- used in JsCommon.ml *)
           (* args : (Longident.t loc * label_description * pattern) list *)
          let (sintro, seobj) = js_of_expression_naming_argument_if_non_variable ctx obj "_record_arg_" in     
          let bind (arg_loc,label_descr,pat) = 
@@ -923,12 +925,12 @@ and js_of_expression ctx dest e =
             match pat.pat_desc with
             | Tpat_var (id, _) -> 
                 let sid = ppf_ident id in
-                (sid, Printf.sprintf "%s.%s" seobj name)
+                (sid, Printf.sprintf "%s.%s" seobj name, do_check_shadowing pat.pat_env sid)
             | Tpat_any -> out_of_scope e.exp_loc "Underscore pattern in let-record"
             | _ -> out_of_scope e.exp_loc "Nested pattern matching"
             in
           let binders = List.map bind args in
-          let ids = List.map fst binders in
+          let ids = List.map fst3 binders in
           let sdecl =
             if is_mode_pseudo() then begin
               ppf_let_record ids seobj 
@@ -1021,7 +1023,7 @@ and js_of_expression ctx dest e =
          | Tpat_tuple pl -> 
             let a = id_fresh "_tuple_arg_" in
             let binders = tuple_binders a pl in
-            let xs = List.map fst binders in
+            let xs = List.map fst3 binders in
             if is_mode_pseudo() then begin
                (* the name [a] is ignored in this case *)
                let arg = Printf.sprintf "(%s)" (show_list ",@ " xs) in
@@ -1339,8 +1341,9 @@ and js_of_pattern pat obj =
       if is_sbool c || is_mode_pseudo() then ppf_match_case c else ppf_match_case ("\"" ^ c ^ "\"") in
      let bind field var = 
         match var.pat_desc with
-        | Tpat_var (id, _) -> 
-            Some (ppf_ident id, Printf.sprintf "%s.%s" obj field)
+        | Tpat_var (id, _) ->
+            let sid = ppf_ident id in
+            Some (sid, Printf.sprintf "%s.%s" obj field, do_check_shadowing var.pat_env sid)
         | Tpat_any -> None
         | _ -> out_of_scope var.pat_loc "Nested pattern matching"
         in
