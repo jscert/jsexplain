@@ -200,14 +200,14 @@ return {};
 var Datatypes = (function() {
 
 var fst = function (p) {
-  var x = p[0], y = p[1];
+  var x = p[0];var y = p[1];
   return (x);
 };
 
 
 
 var snd = function (p) {
-  var x = p[0], y = p[1];
+  var x = p[0];var y = p[1];
   return (y);
 };
 
@@ -252,7 +252,7 @@ var hd = function (d, l) {
     case "[]":
       return (d);
     case "::":
-      var x = l.head, l0 = l.tail;
+      var x = l.head;var l0 = l.tail;
       return (x);
   }
   
@@ -265,7 +265,7 @@ var tl = function (l) {
     case "[]":
       return (mk_nil());
     case "::":
-      var a = l.head, m = l.tail;
+      var a = l.head;var m = l.tail;
       return (m);
   }
   
@@ -278,7 +278,7 @@ var list_eq_nil_decidable = function (l) {
     case "[]":
       return (true);
     case "::":
-      var a = l.head, l0 = l.tail;
+      var a = l.head;var l0 = l.tail;
       return (false);
   }
   
@@ -293,7 +293,7 @@ var fold_right = function (f, acc, l) {
     case "[]":
       return (acc);
     case "::":
-      var x = l.head, lʹ = l.tail;
+      var x = l.head;var lʹ = l.tail;
       return (f(x, fold_right(f, acc, lʹ)));
   }
   
@@ -306,7 +306,7 @@ var fold_left = function (f, acc, l) {
     case "[]":
       return (acc);
     case "::":
-      var x = l.head, lʹ = l.tail;
+      var x = l.head;var lʹ = l.tail;
       return (fold_left(f, f(x, acc), lʹ));
   }
   
@@ -365,14 +365,14 @@ var take_drop_last = function (l) {
     case "[]":
       return (raise(Not_found()));
     case "::":
-      var x = l.head, lʹ = l.tail;
+      var x = l.head;var lʹ = l.tail;
       switch (lʹ.tag) {
         case "[]":
           return ([mk_nil(), x]);
         case "::":
-          var a = lʹ.head, l1 = lʹ.tail;
+          var a = lʹ.head;var l1 = lʹ.tail;
           var _tuple_arg_1 = take_drop_last(lʹ);
-          var t = _tuple_arg_1[0], y = _tuple_arg_1[1];
+          var t = _tuple_arg_1[0];var y = _tuple_arg_1[1];
           return ([mk_cons(x, t), y]);
       }
       
@@ -387,7 +387,7 @@ var nth_def = function (d, n, l) {
     case "[]":
       return (d);
     case "::":
-      var x = l.head, lʹ = l.tail;
+      var x = l.head;var lʹ = l.tail;
       if (int_eq(n, 0)) {
         return (x);
       } else {
@@ -404,7 +404,7 @@ var mem_decide = function (h, x, l) {
     case "[]":
       return (false);
     case "::":
-      var y = l.head, lʹ = l.tail;
+      var y = l.head;var lʹ = l.tail;
       if (h(x, y)) {
         return (true);
       } else {
@@ -541,8 +541,8 @@ return {
 var LibProd = (function() {
 
 var prod_compare = function (h, h0, x, y) {
-  var x1 = x[0], x2 = x[1];
-  var y1 = y[0], y2 = y[1];
+  var x1 = x[0];var x2 = x[1];
+  var y1 = y[0];var y2 = y[1];
   return ((h(x1, y1) && h0(x2, y2)));
 };
 
@@ -563,8 +563,8 @@ var height = function (_fun_arg_) {
     case "Empty":
       return (0);
     case "Node":
-      var l = _fun_arg_.l, x = _fun_arg_.x, d = _fun_arg_.d, r = _fun_arg_.r,
-        h = _fun_arg_.h;
+      var l = _fun_arg_.l;var x = _fun_arg_.x;var d = _fun_arg_.d;
+        var r = _fun_arg_.r;var h = _fun_arg_.h;
       return (h);
   }
   
@@ -612,7 +612,7 @@ var bal = function (l, x, d, r) {
       case "Empty":
         throw false;
       case "Node":
-        var ll = l.l, lv = l.x, ld = l.d, lr = l.r;
+        var ll = l.l;var lv = l.x;var ld = l.d;var lr = l.r;
         if (int_ge(height(ll), height(lr))) {
           return (create(ll, lv, ld, create(lr, x, d, r)));
         } else {
@@ -620,7 +620,7 @@ var bal = function (l, x, d, r) {
             case "Empty":
               throw false;
             case "Node":
-              var lrl = lr.l, lrv = lr.x, lrd = lr.d, lrr = lr.r;
+              var lrl = lr.l;var lrv = lr.x;var lrd = lr.d;var lrr = lr.r;
               return (
                 create(create(ll, lv, ld, lrl), lrv, lrd,
                   create(lrr, x, d, r)));
@@ -635,7 +635,7 @@ var bal = function (l, x, d, r) {
         case "Empty":
           throw false;
         case "Node":
-          var rl = r.l, rv = r.x, rd = r.d, rr = r.r;
+          var rl = r.l;var rv = r.x;var rd = r.d;var rr = r.r;
           if (int_ge(height(rr), height(rl))) {
             return (create(create(l, x, d, rl), rv, rd, rr));
           } else {
@@ -643,7 +643,7 @@ var bal = function (l, x, d, r) {
               case "Empty":
                 throw false;
               case "Node":
-                var rll = rl.l, rlv = rl.x, rld = rl.d, rlr = rl.r;
+                var rll = rl.l;var rlv = rl.x;var rld = rl.d;var rlr = rl.r;
                 return (
                   create(create(l, x, d, rll), rlv, rld,
                     create(rlr, rv, rd, rr)));
@@ -681,7 +681,7 @@ var add = function (compare, x, data, s) {
     case "Empty":
       return (Node(Empty(), x, data, Empty(), 1));
     case "Node":
-      var l = s.l, v = s.x, d = s.d, r = s.r, h = s.h;
+      var l = s.l;var v = s.x;var d = s.d;var r = s.r;var h = s.h;
       var c = compare(x, v);
       if (int_eq(c, 0)) {
         return (Node(l, x, data, r, h));
@@ -701,7 +701,7 @@ var find = function (compare, x, s) {
     case "Empty":
       throw false;
     case "Node":
-      var l = s.l, v = s.x, d = s.d, r = s.r;
+      var l = s.l;var v = s.x;var d = s.d;var r = s.r;
       var c = compare(x, v);
       if (int_eq(c, 0)) {
         return (d);
@@ -723,7 +723,7 @@ var find_option = function (compare, x, s) {
     case "Empty":
       return (None());
     case "Node":
-      var l = s.l, v = s.x, d = s.d, r = s.r;
+      var l = s.l;var v = s.x;var d = s.d;var r = s.r;
       var c = compare(x, v);
       if (int_eq(c, 0)) {
         return (Some(d));
@@ -745,7 +745,7 @@ var mem = function (compare, x, s) {
     case "Empty":
       return (false);
     case "Node":
-      var l = s.l, v = s.x, d = s.d, r = s.r;
+      var l = s.l;var v = s.x;var d = s.d;var r = s.r;
       var c = compare(x, v);
       return (
         (int_eq(c, 0)
@@ -764,7 +764,7 @@ var min_binding = function (s) {
     case "Empty":
       return (raise(Not_found()));
     case "Node":
-      var l = s.l, x = s.x, d = s.d, r = s.r;
+      var l = s.l;var x = s.x;var d = s.d;var r = s.r;
       switch (l.tag) {
         case "Empty":
           return ([x, d]);
@@ -781,7 +781,7 @@ var remove_min_binding = function (s) {
     case "Empty":
       throw false;
     case "Node":
-      var l = s.l, x = s.x, d = s.d, r = s.r;
+      var l = s.l;var x = s.x;var d = s.d;var r = s.r;
       switch (l.tag) {
         case "Empty":
           return (r);
@@ -803,7 +803,7 @@ var merge = function (t1, t2) {
           return (t1);
         default:
           var _tuple_arg_1 = min_binding(t2);
-          var x = _tuple_arg_1[0], d = _tuple_arg_1[1];
+          var x = _tuple_arg_1[0];var d = _tuple_arg_1[1];
           return (bal(t1, x, d, remove_min_binding(t2)));
       }
       
@@ -816,7 +816,7 @@ var remove = function (compare, x, s) {
     case "Empty":
       return (Empty());
     case "Node":
-      var l = s.l, v = s.x, d = s.d, r = s.r, h = s.h;
+      var l = s.l;var v = s.x;var d = s.d;var r = s.r;var h = s.h;
       var c = compare(x, v);
       if (int_eq(c, 0)) {
         return (merge(l, r));
@@ -836,7 +836,7 @@ var fold = function (f, m, accu) {
     case "Empty":
       return (accu);
     case "Node":
-      var l = m.l, v = m.x, d = m.d, r = m.r;
+      var l = m.l;var v = m.x;var d = m.d;var r = m.r;
       return (fold(f, r, f(v, d, fold(f, l, accu))));
   }
   
@@ -1013,8 +1013,8 @@ var read = function (h, l, k) {
     case "[]":
       return (raise(Not_found()));
     case "::":
-      var p = l.head, lʹ = l.tail;
-      var x = p[0], v = p[1];
+      var p = l.head;var lʹ = l.tail;
+      var x = p[0];var v = p[1];
       if (int_eq(h(x, k), 0)) {
         return (v);
       } else {
@@ -1050,8 +1050,8 @@ var read_option = function (h, l, k) {
       case "[]":
         return (None());
       case "::":
-        var p = l.head, lʹ = l.tail;
-        var x = p[0], v = p[1];
+        var p = l.head;var lʹ = l.tail;
+        var x = p[0];var v = p[1];
         if (int_eq(h(x, k), 0)) {
           return (Some(v));
         } else {
@@ -1070,8 +1070,8 @@ var indom_dec = function (h1, l, k) {
     case "[]":
       return (false);
     case "::":
-      var p = l.head, lʹ = l.tail;
-      var x = p[0], y = p[1];
+      var p = l.head;var lʹ = l.tail;
+      var x = p[0];var y = p[1];
       return ((int_eq(h1(x, k), 0) || indom_dec(h1, lʹ, k)));
   }
   
@@ -1084,7 +1084,7 @@ var to_list = function (h, l) {
     case "[]":
       return (mk_nil());
     case "::":
-      var p = l.head, lʹ = l.tail;
+      var p = l.head;var lʹ = l.tail;
       return (mk_cons(p, to_list(h, rem(h, lʹ, fst(p)))));
   }
   
@@ -3368,7 +3368,7 @@ var binary_op_compare = function (op1, op2) {
 var prog_intro_strictness = function (p) {
   switch (p.tag) {
     case "Coq_prog_intro":
-      var str = p.strictness, els = p.elements;
+      var str = p.strictness;var els = p.elements;
       return (str);
   }
   
@@ -3379,7 +3379,7 @@ var prog_intro_strictness = function (p) {
 var prog_elements = function (p) {
   switch (p.tag) {
     case "Coq_prog_intro":
-      var str = p.strictness, els = p.elements;
+      var str = p.strictness;var els = p.elements;
       return (els);
   }
   
@@ -3390,7 +3390,7 @@ var prog_elements = function (p) {
 var funcbody_prog = function (fb) {
   switch (fb.tag) {
     case "Coq_funcbody_intro":
-      var p = fb.prog, s = fb.source;
+      var p = fb.prog;var s = fb.source;
       return (p);
   }
   
@@ -3401,10 +3401,10 @@ var funcbody_prog = function (fb) {
 var funcbody_is_strict = function (fb) {
   switch (fb.tag) {
     case "Coq_funcbody_intro":
-      var p = fb.prog, s = fb.source;
+      var p = fb.prog;var s = fb.source;
       switch (p.tag) {
         case "Coq_prog_intro":
-          var b_strict = p.strictness, l = p.elements;
+          var b_strict = p.strictness;var l = p.elements;
           return (b_strict);
       }
       
@@ -3952,8 +3952,8 @@ var object_write = function (s, l, o) {
 
 
 var object_alloc = function (s, o) {
-  var cells = s.state_object_heap, bindings = s.state_env_record_heap,
-    state_fresh_locations0 = s.state_fresh_locations;
+  var cells = s.state_object_heap;var bindings = s.state_env_record_heap;
+    var state_fresh_locations0 = s.state_fresh_locations;
   var n = state_fresh_locations0;
   var alloc = (state_fresh_locations0 + 1);
   var l = Coq_object_loc_normal(n);
@@ -4147,9 +4147,9 @@ var mutability_of_bool = function (_foo_) {
 
 
 var state_with_env_record_heap = function (s, new_env_heap) {
-  var object_heap = s.state_object_heap,
-    old_env_heap = s.state_env_record_heap,
-    fresh_locs = s.state_fresh_locations;
+  var object_heap = s.state_object_heap;
+    var old_env_heap = s.state_env_record_heap;
+    var fresh_locs = s.state_fresh_locations;
   return (
     {
       state_object_heap: object_heap,
@@ -4175,8 +4175,8 @@ var env_record_write = function (s, l, e) {
 
 
 var env_record_alloc = function (s, e) {
-  var cells = s.state_object_heap, bindings = s.state_env_record_heap,
-    state_fresh_locations0 = s.state_fresh_locations;
+  var cells = s.state_object_heap;var bindings = s.state_env_record_heap;
+    var state_fresh_locations0 = s.state_fresh_locations;
   var l = state_fresh_locations0;
   var alloc = (state_fresh_locations0 + 1);
   var bindingsʹ = HeapInt.write(bindings, l, e);
@@ -4228,7 +4228,7 @@ var env_record_write_decl_env = function (s, l, x, mu, v) {
       var envʹ = decl_env_record_write(ed, x, mu, v);
       return (env_record_write(s, l, Coq_env_record_decl(envʹ)));
     case "Coq_env_record_object":
-      var o = _switch_arg_2.value, p = _switch_arg_2.provide_this;
+      var o = _switch_arg_2.value;var p = _switch_arg_2.provide_this;
       return (s);
   }
   
@@ -4238,7 +4238,7 @@ var env_record_write_decl_env = function (s, l, x, mu, v) {
 
 var lexical_env_alloc = function (s, lex, e) {
   var _tuple_arg_3 = env_record_alloc(s, e);
-  var l = _tuple_arg_3[0], sʹ = _tuple_arg_3[1];
+  var l = _tuple_arg_3[0];var sʹ = _tuple_arg_3[1];
   var lexʹ = mk_cons(l, lex);
   return ([lexʹ, sʹ]);
 };
@@ -4271,8 +4271,8 @@ var execution_ctx_intro_same = function (x, lthis, strict) {
 
 
 var execution_ctx_with_lex = function (c, lex) {
-  var x1 = c.execution_ctx_lexical_env, x2 = c.execution_ctx_variable_env,
-    x3 = c.execution_ctx_this_binding, x4 = c.execution_ctx_strict;
+  var x1 = c.execution_ctx_lexical_env;var x2 = c.execution_ctx_variable_env;
+    var x3 = c.execution_ctx_this_binding;var x4 = c.execution_ctx_strict;
   return (
     {
       execution_ctx_lexical_env: lex,
@@ -4285,8 +4285,8 @@ var execution_ctx_with_lex = function (c, lex) {
 
 
 var execution_ctx_with_lex_same = function (c, lex) {
-  var x1 = c.execution_ctx_lexical_env, x2 = c.execution_ctx_variable_env,
-    x3 = c.execution_ctx_this_binding, x4 = c.execution_ctx_strict;
+  var x1 = c.execution_ctx_lexical_env;var x2 = c.execution_ctx_variable_env;
+    var x3 = c.execution_ctx_this_binding;var x4 = c.execution_ctx_strict;
   return (
     {
       execution_ctx_lexical_env: lex,
@@ -4322,7 +4322,8 @@ var element_funcdecl = function (_foo_) {
       var s = _foo_.stat;
       return (mk_nil());
     case "Coq_element_func_decl":
-      var name = _foo_.func_name, args = _foo_.arg_names, bd = _foo_.body;
+      var name = _foo_.func_name;var args = _foo_.arg_names;
+        var bd = _foo_.body;
       return (
         mk_cons({
             funcdecl_name: name,
@@ -4346,7 +4347,7 @@ var stat_vardecl = function (_foo_) {
       var e = _foo_.expr;
       return (mk_nil());
     case "Coq_stat_label":
-      var s0 = _foo_.label, s = _foo_.stat;
+      var s0 = _foo_.label;var s = _foo_.stat;
       return (stat_vardecl(s));
     case "Coq_stat_block":
       var ts = _foo_.stats;
@@ -4355,18 +4356,19 @@ var stat_vardecl = function (_foo_) {
       var nes = _foo_.decls;
       return (LibList.map(fst, nes));
     case "Coq_stat_if":
-      var e = _foo_.cond, s1 = _foo_.then_branch, s2o = _foo_.else_branch;
+      var e = _foo_.cond;var s1 = _foo_.then_branch;
+        var s2o = _foo_.else_branch;
       return (
         append(stat_vardecl(s1),
           unsome_default(mk_nil(), LibOption.map(stat_vardecl, s2o))));
     case "Coq_stat_do_while":
-      var l = _foo_.labels, s = _foo_.body, e = _foo_.cond;
+      var l = _foo_.labels;var s = _foo_.body;var e = _foo_.cond;
       return (stat_vardecl(s));
     case "Coq_stat_while":
-      var l = _foo_.labels, e = _foo_.cond, s = _foo_.body;
+      var l = _foo_.labels;var e = _foo_.cond;var s = _foo_.body;
       return (stat_vardecl(s));
     case "Coq_stat_with":
-      var e = _foo_.obj, s = _foo_.stat;
+      var e = _foo_.obj;var s = _foo_.stat;
       return (stat_vardecl(s));
     case "Coq_stat_throw":
       var e = _foo_.arg;
@@ -4381,8 +4383,8 @@ var stat_vardecl = function (_foo_) {
       var l = _foo_.label;
       return (mk_nil());
     case "Coq_stat_try":
-      var s = _foo_.body, sco = _foo_.catch_stats_opt,
-        sfo = _foo_.finally_opt;
+      var s = _foo_.body;var sco = _foo_.catch_stats_opt;
+        var sfo = _foo_.finally_opt;
       return (
         append(stat_vardecl(s),
           append(
@@ -4391,24 +4393,25 @@ var stat_vardecl = function (_foo_) {
                 sco)),
             unsome_default(mk_nil(), LibOption.map(stat_vardecl, sfo)))));
     case "Coq_stat_for":
-      var l = _foo_.labels, o = _foo_.init, o0 = _foo_.cond, o1 = _foo_.step,
-        s = _foo_.body;
+      var l = _foo_.labels;var o = _foo_.init;var o0 = _foo_.cond;
+        var o1 = _foo_.step;var s = _foo_.body;
       return (stat_vardecl(s));
     case "Coq_stat_for_var":
-      var l = _foo_.labels, nes = _foo_.init, o = _foo_.cond,
-        o0 = _foo_.step, s = _foo_.body;
+      var l = _foo_.labels;var nes = _foo_.init;var o = _foo_.cond;
+        var o0 = _foo_.step;var s = _foo_.body;
       return (append(LibList.map(fst, nes), stat_vardecl(s)));
     case "Coq_stat_for_in":
-      var l = _foo_.labels, e = _foo_.id, e0 = _foo_.obj, s = _foo_.body;
+      var l = _foo_.labels;var e = _foo_.id;var e0 = _foo_.obj;
+        var s = _foo_.body;
       return (stat_vardecl(s));
     case "Coq_stat_for_in_var":
-      var l = _foo_.labels, str = _foo_.id, o = _foo_.init, e = _foo_.obj,
-        s = _foo_.body;
+      var l = _foo_.labels;var str = _foo_.id;var o = _foo_.init;
+        var e = _foo_.obj;var s = _foo_.body;
       return (mk_cons(str, stat_vardecl(s)));
     case "Coq_stat_debugger":
       return (mk_nil());
     case "Coq_stat_switch":
-      var l = _foo_.labels, e = _foo_.arg, sb = _foo_.body;
+      var l = _foo_.labels;var e = _foo_.arg;var sb = _foo_.body;
       return (switchbody_vardecl(sb));
   }
   
@@ -4420,8 +4423,8 @@ var switchbody_vardecl = function (_foo_) {
       var scl = _foo_.clauses;
       return (concat(LibList.map(switchclause_vardecl, scl)));
     case "Coq_switchbody_withdefault":
-      var scl1 = _foo_.clauses_before, sl = _foo_.clause_default,
-        scl2 = _foo_.clauses_after;
+      var scl1 = _foo_.clauses_before;var sl = _foo_.clause_default;
+        var scl2 = _foo_.clauses_after;
       return (
         append(concat(LibList.map(switchclause_vardecl, scl1)),
           append(concat(LibList.map(stat_vardecl, sl)),
@@ -4433,7 +4436,7 @@ var switchbody_vardecl = function (_foo_) {
 var switchclause_vardecl = function (_foo_) {
   switch (_foo_.tag) {
     case "Coq_switchclause_intro":
-      var e = _foo_.arg, sl = _foo_.stats;
+      var e = _foo_.arg;var sl = _foo_.stats;
       return (concat(LibList.map(stat_vardecl, sl)));
   }
   
@@ -4447,7 +4450,8 @@ var element_vardecl = function (_foo_) {
       var t = _foo_.stat;
       return (stat_vardecl(t));
     case "Coq_element_func_decl":
-      var name = _foo_.func_name, args = _foo_.arg_names, bd = _foo_.body;
+      var name = _foo_.func_name;var args = _foo_.arg_names;
+        var bd = _foo_.body;
       return (mk_nil());
   }
   
@@ -4543,31 +4547,33 @@ var is_syntactic_eval = function (_foo_) {
       var l = _foo_.elements;
       return (false);
     case "Coq_expr_function":
-      var o = _foo_.func_name_opt, l = _foo_.arg_names, f = _foo_.body;
+      var o = _foo_.func_name_opt;var l = _foo_.arg_names;var f = _foo_.body;
       return (false);
     case "Coq_expr_access":
-      var e0 = _foo_.obj, e1 = _foo_.field;
+      var e0 = _foo_.obj;var e1 = _foo_.field;
       return (false);
     case "Coq_expr_member":
-      var e0 = _foo_.obj, s = _foo_.field_name;
+      var e0 = _foo_.obj;var s = _foo_.field_name;
       return (false);
     case "Coq_expr_new":
-      var e0 = _foo_.func, l = _foo_.args;
+      var e0 = _foo_.func;var l = _foo_.args;
       return (false);
     case "Coq_expr_call":
-      var e0 = _foo_.func, l = _foo_.args;
+      var e0 = _foo_.func;var l = _foo_.args;
       return (false);
     case "Coq_expr_unary_op":
-      var u = _foo_.op, e0 = _foo_.arg;
+      var u = _foo_.op;var e0 = _foo_.arg;
       return (false);
     case "Coq_expr_binary_op":
-      var e0 = _foo_.arg1, b = _foo_.op, e1 = _foo_.arg2;
+      var e0 = _foo_.arg1;var b = _foo_.op;var e1 = _foo_.arg2;
       return (false);
     case "Coq_expr_conditional":
-      var e0 = _foo_.cond, e1 = _foo_.then_branch, e2 = _foo_.else_branch;
+      var e0 = _foo_.cond;var e1 = _foo_.then_branch;
+        var e2 = _foo_.else_branch;
       return (false);
     case "Coq_expr_assign":
-      var e0 = _foo_.left_expr, o = _foo_.op_opt, e1 = _foo_.right_expr;
+      var e0 = _foo_.left_expr;var o = _foo_.op_opt;
+        var e1 = _foo_.right_expr;
       return (false);
   }
   
@@ -4580,7 +4586,7 @@ var elision_head_count = function (_foo_) {
     case "[]":
       return (0);
     case "::":
-      var o = _foo_.head, olʹ = _foo_.tail;
+      var o = _foo_.head;var olʹ = _foo_.tail;
       switch (o.tag) {
         case "Some":
           var t = o.value;
@@ -4600,7 +4606,7 @@ var elision_head_remove = function (ol) {
     case "[]":
       return (ol);
     case "::":
-      var o = ol.head, olʹ = ol.tail;
+      var o = ol.head;var olʹ = ol.tail;
       switch (o.tag) {
         case "Some":
           var t = o.value;
@@ -4758,12 +4764,12 @@ var same_value_dec = function (v1, v2) {
 
 
 var attributes_data_compare = function (ad1, ad2) {
-  var v1 = ad1.attributes_data_value, w1 = ad1.attributes_data_writable,
-    e1 = ad1.attributes_data_enumerable,
-    c1 = ad1.attributes_data_configurable;
-  var v2 = ad2.attributes_data_value, w2 = ad2.attributes_data_writable,
-    e2 = ad2.attributes_data_enumerable,
-    c2 = ad2.attributes_data_configurable;
+  var v1 = ad1.attributes_data_value;var w1 = ad1.attributes_data_writable;
+    var e1 = ad1.attributes_data_enumerable;
+    var c1 = ad1.attributes_data_configurable;
+  var v2 = ad2.attributes_data_value;var w2 = ad2.attributes_data_writable;
+    var e2 = ad2.attributes_data_enumerable;
+    var c2 = ad2.attributes_data_configurable;
   return (
     (value_compare(v1, v2) && ((w1 === w2) && ((e1 === e2) && (c1 === c2)))));
 };
@@ -4771,12 +4777,12 @@ var attributes_data_compare = function (ad1, ad2) {
 
 
 var attributes_accessor_compare = function (aa1, aa2) {
-  var v1 = aa1.attributes_accessor_get, w1 = aa1.attributes_accessor_set,
-    e1 = aa1.attributes_accessor_enumerable,
-    c1 = aa1.attributes_accessor_configurable;
-  var v2 = aa2.attributes_accessor_get, w2 = aa2.attributes_accessor_set,
-    e2 = aa2.attributes_accessor_enumerable,
-    c2 = aa2.attributes_accessor_configurable;
+  var v1 = aa1.attributes_accessor_get;var w1 = aa1.attributes_accessor_set;
+    var e1 = aa1.attributes_accessor_enumerable;
+    var c1 = aa1.attributes_accessor_configurable;
+  var v2 = aa2.attributes_accessor_get;var w2 = aa2.attributes_accessor_set;
+    var e2 = aa2.attributes_accessor_enumerable;
+    var c2 = aa2.attributes_accessor_configurable;
   return (
     (value_compare(v1, v2)
     && (value_compare(w1, w2) && (bool_eq(e1, e2) && bool_eq(c1, c2)))));
@@ -6549,7 +6555,7 @@ var get_arg_first_and_rest = function (lv) {
         case "[]":
           return (mk_nil());
         case "::":
-          var v = lv.head, rest = lv.tail;
+          var v = lv.head;var rest = lv.tail;
           return (rest);
       }
       
@@ -6564,7 +6570,7 @@ var destr_list = function (l, d, f) {
     case "[]":
       return (d);
     case "::":
-      var a = l.head, l0 = l.tail;
+      var a = l.head;var l0 = l.tail;
       return (f(a));
   }
   
@@ -6651,7 +6657,7 @@ var if_ter2 = function (w, k, kfail) {
     if_result_some2(w, function (sp) {
         switch (sp.tag) {
           case "Coq_specret_out":
-            var s = sp.state, r = sp.res;
+            var s = sp.state;var r = sp.res;
             return (k(s, r));
           default:
             throw false;
@@ -7032,10 +7038,10 @@ var if_spec2 = function (w, k, kfail) {
     if_result_some2(w, function (sp) {
         switch (sp.tag) {
           case "Coq_specret_val":
-            var s0 = sp.state, a = sp.value;
+            var s0 = sp.state;var a = sp.value;
             return (k(s0, a));
           case "Coq_specret_out":
-            var s0 = sp.state, r = sp.res;
+            var s0 = sp.state;var r = sp.res;
             return (
               kfail(
                 if_abort(r, function (_pat_any_9) { return (res_out(s0, r));
@@ -7196,7 +7202,7 @@ var iterateʹ = function (l, acc, f) {
     case "[]":
       return (acc);
     case "::":
-      var x = l.head, lʹ = l.tail;
+      var x = l.head;var lʹ = l.tail;
       return (
         let_ret_ret(acc, function (v) { return (iterateʹ(lʹ, f(x, v), f));
           }));
@@ -7906,7 +7912,7 @@ var build_error = function (s, c, vproto, vmsg) {
     return (_return_96); 
   }())
   ;
-  var l = _tuple_arg_95[0], s_2 = _tuple_arg_95[1];
+  var l = _tuple_arg_95[0];var s_2 = _tuple_arg_95[1];
   var ctx_29 = ctx_push(ctx_28, [{key: "l", val: l}, {key: "s_2", val: s_2}]);
   log_event("JsInterpreter.js", 196, ctx_29, "let");
   var _if_arg_97 = value_compare(vmsg, Coq_value_undef());
@@ -8022,7 +8028,7 @@ var run_error_no_c = function (s, ne) {
     return (_return_110); 
   }())
   ;
-  var l = _tuple_arg_109[0], s_2 = _tuple_arg_109[1];
+  var l = _tuple_arg_109[0];var s_2 = _tuple_arg_109[1];
   var ctx_38 = ctx_push(ctx_37, [{key: "l", val: l}, {key: "s_2", val: s_2}]);
   log_event("JsInterpreter.js", 212, ctx_38, "let");
   var _return_111 = res_out(s_2,
@@ -9125,7 +9131,7 @@ var get_value = function (s, v) {
                                                       return (_return_255); 
                                                     }}()),
                                                   function(_tuple_arg_269) {
-                                                    var s = _tuple_arg_269[0],
+                                                    s = _tuple_arg_269[0];
                                                       base = _tuple_arg_269[1];
                                                     
                                                     var ctx_86 = ctx_push(ctx_83, [{key: "s", val: s}, {key: "base", val: base}]);
@@ -9446,7 +9452,7 @@ var put_value = function (s, c, v, w) {
                                                           return (_return_294); 
                                                         }}()),
                                                       function(_tuple_arg_316) {
-                                                        var s = _tuple_arg_316[0],
+                                                        s = _tuple_arg_316[0];
                                                           base = _tuple_arg_316[1];
                                                         
                                                         var ctx_96 = ctx_push(ctx_93, [{key: "s", val: s}, {key: "base", val: base}]);
@@ -9643,7 +9649,7 @@ var is_accessor_descriptor = function (desc) {
       log_event("JsInterpreter.js", 719, ctx_push(ctx_101, [{key: "#RETURN_VALUE#", val: _return_339}]), "return");
       return (_return_339); 
     case "Descriptor":
-      var desc = desc.descriptor;var ctx_102 = ctx_push(ctx_101, [{key: "desc", val: desc}]);
+      desc = desc.descriptor;var ctx_102 = ctx_push(ctx_101, [{key: "desc", val: desc}]);
     log_event("JsInterpreter.js", 730, ctx_102, "case");
     
       var _return_344 = (function () {
@@ -9689,7 +9695,7 @@ var is_data_descriptor = function (desc) {
       log_event("JsInterpreter.js", 733, ctx_push(ctx_103, [{key: "#RETURN_VALUE#", val: _return_345}]), "return");
       return (_return_345); 
     case "Descriptor":
-      var desc = desc.descriptor;var ctx_104 = ctx_push(ctx_103, [{key: "desc", val: desc}]);
+      desc = desc.descriptor;var ctx_104 = ctx_push(ctx_103, [{key: "desc", val: desc}]);
     log_event("JsInterpreter.js", 744, ctx_104, "case");
     
       var _return_350 = (function () {
@@ -12988,7 +12994,7 @@ var create_array_from_list = function (s, elements) {
                                                                   function (e, acc) {
                                                                     var ctx_259 = ctx_push(ctx_258, [{key: "e", val: e}, {key: "acc", val: acc}]);
                                                                     log_event("JsInterpreter.js", 1766, ctx_259, "enter");
-                                                                    var s = acc[0],
+                                                                    s = acc[0];
                                                                     n = acc[1];
                                                                     var ctx_260 = ctx_push(ctx_259, [{key: "s", val: s}, {key: "n", val: n}]);
                                                                     log_event("JsInterpreter.js", 1765, ctx_260, "let");
@@ -13057,7 +13063,7 @@ var create_array_from_list = function (s, elements) {
                                               log_event("JsInterpreter.js", 1767, ctx_push(ctx_258, [{key: "#RETURN_VALUE#", val: _return_814}]), "return");
                                               return (_return_814); }()),
                                             function(_tuple_arg_816) {
-                                              var s = _tuple_arg_816[0],
+                                              s = _tuple_arg_816[0];
                                                 n = _tuple_arg_816[1];
                                               
                                               var ctx_264 = ctx_push(ctx_258, [{key: "s", val: s}, {key: "n", val: n}]);
@@ -13151,7 +13157,7 @@ var create_list_from_array_like = function (s, obj, elementTypes) {
                                                                     function (acc) {
                                                                     var ctx_272 = ctx_push(ctx_271, [{key: "acc", val: acc}]);
                                                                     log_event("JsInterpreter.js", 1794, ctx_272, "enter");
-                                                                    var index = acc[1];
+                                                                    index = acc[1];
                                                                     var ctx_273 = ctx_push(ctx_272, [{key: "index", val: index}]);
                                                                     log_event("JsInterpreter.js", 1793, ctx_273, "let");
                                                                     var _return_825 = (function () {
@@ -13170,8 +13176,8 @@ var create_list_from_array_like = function (s, obj, elementTypes) {
                                                                     function (acc) {
                                                                     var ctx_274 = ctx_push(ctx_271, [{key: "acc", val: acc}]);
                                                                     log_event("JsInterpreter.js", 1829, ctx_274, "enter");
-                                                                    var s = acc[0],
-                                                                    index = acc[1],
+                                                                    s = acc[0];
+                                                                    index = acc[1];
                                                                     list = acc[2];
                                                                     var ctx_275 = ctx_push(ctx_274, [{key: "s", val: s}, {key: "index", val: index}, {key: "list", val: list}]);
                                                                     log_event("JsInterpreter.js", 1828, ctx_275, "let");
@@ -13308,8 +13314,8 @@ var create_list_from_array_like = function (s, obj, elementTypes) {
                                                                     return (_return_841); 
                                                                     }()),
                                                                     function(_tuple_arg_843) {
-                                                                    var s = _tuple_arg_843[0],
-                                                                    index = _tuple_arg_843[1],
+                                                                    s = _tuple_arg_843[0];
+                                                                    index = _tuple_arg_843[1];
                                                                     list = _tuple_arg_843[2];
                                                                     
                                                                     var ctx_281 = ctx_push(ctx_271, [{key: "s", val: s}, {key: "index", val: index}, {key: "list", val: list}]);
@@ -13350,7 +13356,7 @@ var set_mutable_binding = function (s, l, n, v, str) {
                         log_event("JsInterpreter.js", 1863, ctx_283, "switch");
                         switch (e.tag) {
                           case "Coq_env_record_decl":
-                            var e = e.value;var ctx_284 = ctx_push(ctx_283, [{key: "e", val: e}]);
+                            e = e.value;var ctx_284 = ctx_push(ctx_283, [{key: "e", val: e}]);
                           log_event("JsInterpreter.js", 1858, ctx_284, "case");
                           
                             var _return_851 = (function () {
@@ -13364,7 +13370,7 @@ var set_mutable_binding = function (s, l, n, v, str) {
                             log_event("JsInterpreter.js", 1857, ctx_push(ctx_284, [{key: "#RETURN_VALUE#", val: _return_851}]), "return");
                             return (_return_851); 
                           case "Coq_env_record_object":
-                            var l = e.value, 𝕍this = e.provide_this;var ctx_285 = ctx_push(ctx_283, [{key: "l", val: l}, {key: "𝕍this", val: 𝕍this}]);
+                            l = e.value;var 𝕍this = e.provide_this;var ctx_285 = ctx_push(ctx_283, [{key: "l", val: l}, {key: "𝕍this", val: 𝕍this}]);
                           log_event("JsInterpreter.js", 1862, ctx_285, "case");
                           
                             var _return_853 = (function () {
@@ -13399,7 +13405,7 @@ var get_binding_value = function (s, l, n, str) {
                         log_event("JsInterpreter.js", 1879, ctx_287, "switch");
                         switch (e.tag) {
                           case "Coq_env_record_decl":
-                            var e = e.value;var ctx_288 = ctx_push(ctx_287, [{key: "e", val: e}]);
+                            e = e.value;var ctx_288 = ctx_push(ctx_287, [{key: "e", val: e}]);
                           log_event("JsInterpreter.js", 1874, ctx_288, "case");
                           
                             var _return_857 = (function () {
@@ -13413,7 +13419,7 @@ var get_binding_value = function (s, l, n, str) {
                             log_event("JsInterpreter.js", 1873, ctx_push(ctx_288, [{key: "#RETURN_VALUE#", val: _return_857}]), "return");
                             return (_return_857); 
                           case "Coq_env_record_object":
-                            var l = e.value, 𝕍this = e.provide_this;var ctx_289 = ctx_push(ctx_287, [{key: "l", val: l}, {key: "𝕍this", val: 𝕍this}]);
+                            l = e.value;var 𝕍this = e.provide_this;var ctx_289 = ctx_push(ctx_287, [{key: "l", val: l}, {key: "𝕍this", val: 𝕍this}]);
                           log_event("JsInterpreter.js", 1878, ctx_289, "case");
                           
                             var _return_859 = (function () {
@@ -13437,7 +13443,7 @@ var get_binding_value = function (s, l, n, str) {
 var binding_is_uninitialized = function (binding) {
   var ctx_290 = ctx_push(ctx_empty, [{key: "binding", val: binding}]);
   log_event("JsInterpreter.js", 1887, ctx_290, "enter");
-  var mutability = binding[0], unused = binding[1];
+  var mutability = binding[0];var unused = binding[1];
   var ctx_291 = ctx_push(ctx_290, [{key: "mutability", val: mutability}, {key: "unused", val: unused}]);
   log_event("JsInterpreter.js", 1886, ctx_291, "let");
   var _return_861 = mutability_compare(mutability,
@@ -13450,7 +13456,7 @@ var binding_is_uninitialized = function (binding) {
 var binding_is_mutable = function (binding) {
   var ctx_292 = ctx_push(ctx_empty, [{key: "binding", val: binding}]);
   log_event("JsInterpreter.js", 1896, ctx_292, "enter");
-  var mutability = binding[0], unused = binding[1];
+  var mutability = binding[0];var unused = binding[1];
   var ctx_293 = ctx_push(ctx_292, [{key: "mutability", val: mutability}, {key: "unused", val: unused}]);
   log_event("JsInterpreter.js", 1895, ctx_293, "let");
   var _return_865 = (function () {
@@ -13546,7 +13552,7 @@ var decl_env_record_initialize_binding = function (s, l, envRec, nʹ, v) {
                         
                         var ctx_301 = ctx_push(ctx_300, [{key: "binding", val: binding}]);
                         log_event("JsInterpreter.js", 1933, ctx_301, "let");
-                        var mutability = binding[0], unused = binding[1];
+                        var mutability = binding[0];var unused = binding[1];
                         var ctx_302 = ctx_push(ctx_301, [{key: "mutability", val: mutability}, {key: "unused", val: unused}]);
                         log_event("JsInterpreter.js", 1930, ctx_302, "let");
                         var _return_880 = check_assert((function () {
@@ -13674,7 +13680,8 @@ var decl_env_record_set_mutable_binding = function (s, l, envRec, nʹ, v, str) {
                           
                           var ctx_308 = ctx_push(ctx_307, [{key: "binding", val: binding}]);
                           log_event("JsInterpreter.js", 1970, ctx_308, "let");
-                          var mutability = binding[0], unused = binding[1];
+                          var mutability = binding[0];
+                            var unused = binding[1];
                           var ctx_309 = ctx_push(ctx_308, [{key: "mutability", val: mutability}, {key: "unused", val: unused}]);
                           log_event("JsInterpreter.js", 1967, ctx_309, "let");
                           var _if_arg_886 = (function () {
@@ -13794,8 +13801,8 @@ var decl_env_record_get_binding_value = function (s, envRec, n, str) {
                                               
                                               var ctx_316 = ctx_push(ctx_315, [{key: "binding", val: binding}]);
                                               log_event("JsInterpreter.js", 2007, ctx_316, "let");
-                                              var mutability = binding[0],
-                                                v = binding[1];
+                                              var mutability = binding[0];
+                                                var v = binding[1];
                                               var ctx_317 = ctx_push(ctx_316, [{key: "mutability", val: mutability}, {key: "v", val: v}]);
                                               log_event("JsInterpreter.js", 2004, ctx_317, "let");
                                               var _if_arg_913 = mutability_compare(
@@ -13928,7 +13935,7 @@ var get_global_object = function (s, ctx) {
   log_event("JsInterpreter.js", 2046, ctx_322, "switch");
   switch (e.tag) {
     case "Coq_env_record_object":
-      var l = e.value, 𝕍this = e.provide_this;var ctx_323 = ctx_push(ctx_322, [{key: "l", val: l}, {key: "𝕍this", val: 𝕍this}]);
+      var l = e.value;var 𝕍this = e.provide_this;var ctx_323 = ctx_push(ctx_322, [{key: "l", val: l}, {key: "𝕍this", val: 𝕍this}]);
     log_event("JsInterpreter.js", 2044, ctx_323, "case");
     
       var _return_935 = Coq_value_object(l);
@@ -14435,7 +14442,7 @@ var ordinary_get_own_property = function (s, o, p) {
                                                   log_event("JsInterpreter.js", 2205, ctx_355, "switch");
                                                   switch (x.tag) {
                                                     case "Coq_attributes_data_of":
-                                                      var x = x.value;var ctx_356 = ctx_push(ctx_355, [{key: "x", val: x}]);
+                                                      x = x.value;var ctx_356 = ctx_push(ctx_355, [{key: "x", val: x}]);
                                                     log_event("JsInterpreter.js", 2203, ctx_356, "case");
                                                     
                                                       d = Object.assign({},
@@ -14449,7 +14456,7 @@ var ordinary_get_own_property = function (s, o, p) {
                                                             });
                                                       break;
                                                     case "Coq_attributes_accessor_of":
-                                                      var x = x.value;var ctx_357 = ctx_push(ctx_355, [{key: "x", val: x}]);
+                                                      x = x.value;var ctx_357 = ctx_push(ctx_355, [{key: "x", val: x}]);
                                                     log_event("JsInterpreter.js", 2204, ctx_357, "case");
                                                     
                                                       d = Object.assign({},
@@ -14737,7 +14744,7 @@ var validate_and_apply_property_descriptor = function (s, o, p, extensible, desc
                                return (_return_1037); 
                              }
                            case "Descriptor":
-                             var current = current.descriptor;var ctx_372 = ctx_push(ctx_368, [{key: "current", val: current}]);
+                             current = current.descriptor;var ctx_372 = ctx_push(ctx_368, [{key: "current", val: current}]);
                            log_event("JsInterpreter.js", 2474, ctx_372, "case");
                            
                              var _return_1143 = let_ret((function () {
@@ -16587,7 +16594,7 @@ var object_create = function (s, proto, internalSlotsList) {
     return (_return_1286); 
   }())
   ;
-  var l = _tuple_arg_1285[0], s = _tuple_arg_1285[1];
+  var l = _tuple_arg_1285[0];s = _tuple_arg_1285[1];
   var ctx_435 = ctx_push(ctx_434, [{key: "l", val: l}, {key: "s", val: s}]);
   log_event("JsInterpreter.js", 2774, ctx_435, "let");
   var _return_1287 = res_ter(s, res_val(Coq_value_object(l)));
@@ -20903,8 +20910,8 @@ var proxy_object_internal_own_property_keys = function (s, o) {
                                                                     function (key, acc) {
                                                                     var ctx_587 = ctx_push(ctx_586, [{key: "key", val: key}, {key: "acc", val: acc}]);
                                                                     log_event("JsInterpreter.js", 3931, ctx_587, "enter");
-                                                                    var s = acc[0],
-                                                                    targetConfigurableKeys = acc[1],
+                                                                    s = acc[0];
+                                                                    targetConfigurableKeys = acc[1];
                                                                     targetNonconfigurableKeys = acc[2];
                                                                     var ctx_588 = ctx_push(ctx_587, [{key: "s", val: s}, {key: "targetConfigurableKeys", val: targetConfigurableKeys}, {key: "targetNonconfigurableKeys", val: targetNonconfigurableKeys}]);
                                                                     log_event("JsInterpreter.js", 3930, ctx_588, "let");
@@ -21011,8 +21018,8 @@ var proxy_object_internal_own_property_keys = function (s, o) {
                                                                     return (_return_1828); 
                                                                     }()),
                                                                     function(_tuple_arg_1870) {
-                                                                    var s = _tuple_arg_1870[0],
-                                                                    targetConfigurableKeys = _tuple_arg_1870[1],
+                                                                    s = _tuple_arg_1870[0];
+                                                                    targetConfigurableKeys = _tuple_arg_1870[1];
                                                                     targetNonconfigurableKeys = _tuple_arg_1870[2];
                                                                     
                                                                     var ctx_590 = ctx_push(ctx_586, [{key: "s", val: s}, {key: "targetConfigurableKeys", val: targetConfigurableKeys}, {key: "targetNonconfigurableKeys", val: targetNonconfigurableKeys}]);
@@ -21056,7 +21063,7 @@ var proxy_object_internal_own_property_keys = function (s, o) {
                                                                     function (key, acc) {
                                                                     var ctx_592 = ctx_push(ctx_591, [{key: "key", val: key}, {key: "acc", val: acc}]);
                                                                     log_event("JsInterpreter.js", 3960, ctx_592, "enter");
-                                                                    var s = acc[0],
+                                                                    s = acc[0];
                                                                     uncheckedResultKeys = acc[1];
                                                                     var ctx_593 = ctx_push(ctx_592, [{key: "s", val: s}, {key: "uncheckedResultKeys", val: uncheckedResultKeys}]);
                                                                     log_event("JsInterpreter.js", 3959, ctx_593, "let");
@@ -21148,7 +21155,7 @@ var proxy_object_internal_own_property_keys = function (s, o) {
                                                                     return (_return_1844); 
                                                                     }()),
                                                                     function(_tuple_arg_1867) {
-                                                                    var s = _tuple_arg_1867[0],
+                                                                    s = _tuple_arg_1867[0];
                                                                     uncheckedResultKeys = _tuple_arg_1867[1];
                                                                     
                                                                     var ctx_596 = ctx_push(ctx_591, [{key: "s", val: s}, {key: "uncheckedResultKeys", val: uncheckedResultKeys}]);
@@ -21173,7 +21180,7 @@ var proxy_object_internal_own_property_keys = function (s, o) {
                                                                     function (key, acc) {
                                                                     var ctx_597 = ctx_push(ctx_596, [{key: "key", val: key}, {key: "acc", val: acc}]);
                                                                     log_event("JsInterpreter.js", 3985, ctx_597, "enter");
-                                                                    var s = acc[0],
+                                                                    s = acc[0];
                                                                     uncheckedResultKeys = acc[1];
                                                                     var ctx_598 = ctx_push(ctx_597, [{key: "s", val: s}, {key: "uncheckedResultKeys", val: uncheckedResultKeys}]);
                                                                     log_event("JsInterpreter.js", 3984, ctx_598, "let");
@@ -21265,7 +21272,7 @@ var proxy_object_internal_own_property_keys = function (s, o) {
                                                                     return (_return_1857); 
                                                                     }()),
                                                                     function(_tuple_arg_1864) {
-                                                                    var s = _tuple_arg_1864[0],
+                                                                    s = _tuple_arg_1864[0];
                                                                     uncheckedResultKeys = _tuple_arg_1864[1];
                                                                     
                                                                     var ctx_601 = ctx_push(ctx_596, [{key: "s", val: s}, {key: "uncheckedResultKeys", val: uncheckedResultKeys}]);
@@ -21958,7 +21965,7 @@ var proxy_create = function (s, target, handler) {
             return (_return_1964); 
           }())
           ;
-          var p = _tuple_arg_1963[0], s = _tuple_arg_1963[1];
+          var p = _tuple_arg_1963[0];s = _tuple_arg_1963[1];
           var ctx_621 = ctx_push(ctx_620, [{key: "p", val: p}, {key: "s", val: s}]);
           log_event("JsInterpreter.js", 4265, ctx_621, "let");
           var _return_1981 = let_ret((function () {
@@ -24916,7 +24923,7 @@ var prim_new_object = function (s, _foo_) {
         return (_return_2360); 
       }())
       ;
-      var l = _tuple_arg_2359[0], s1 = _tuple_arg_2359[1];
+      var l = _tuple_arg_2359[0];var s1 = _tuple_arg_2359[1];
       var ctx_765 = ctx_push(ctx_764, [{key: "l", val: l}, {key: "s1", val: s1}]);
       log_event("JsInterpreter.js", 5118, ctx_765, "let");
       var _return_2361 = res_out(s1, res_val(Coq_value_object(l)));
@@ -24951,7 +24958,7 @@ var prim_new_object = function (s, _foo_) {
         return (_return_2364); 
       }())
       ;
-      var l = _tuple_arg_2363[0], s1 = _tuple_arg_2363[1];
+      var l = _tuple_arg_2363[0];var s1 = _tuple_arg_2363[1];
       var ctx_769 = ctx_push(ctx_768, [{key: "l", val: l}, {key: "s1", val: s1}]);
       log_event("JsInterpreter.js", 5127, ctx_769, "let");
       var _return_2365 = res_out(s1, res_val(Coq_value_object(l)));
@@ -24990,7 +24997,7 @@ var prim_new_object = function (s, _foo_) {
         return (_return_2368); 
       }())
       ;
-      var l = _tuple_arg_2367[0], s1 = _tuple_arg_2367[1];
+      var l = _tuple_arg_2367[0];var s1 = _tuple_arg_2367[1];
       var ctx_774 = ctx_push(ctx_773, [{key: "l", val: l}, {key: "s1", val: s1}]);
       log_event("JsInterpreter.js", 5150, ctx_774, "let");
       var _return_2375 = if_some((function () {
@@ -25238,7 +25245,7 @@ var env_record_has_binding = function (s, c, l, x) {
                              log_event("JsInterpreter.js", 5215, ctx_push(ctx_790, [{key: "#RETURN_VALUE#", val: _return_2401}]), "return");
                              return (_return_2401); 
                            case "Coq_env_record_object":
-                             var l0 = e.value, pt = e.provide_this;var ctx_791 = ctx_push(ctx_789, [{key: "l0", val: l0}, {key: "pt", val: pt}]);
+                             var l0 = e.value;var pt = e.provide_this;var ctx_791 = ctx_push(ctx_789, [{key: "l0", val: l0}, {key: "pt", val: pt}]);
                            log_event("JsInterpreter.js", 5220, ctx_791, "case");
                            
                              var _return_2403 = (function () {
@@ -25274,7 +25281,7 @@ var lexical_env_get_identifier_ref = function (s, c, x, x0, str) {
       log_event("JsInterpreter.js", 5229, ctx_push(ctx_792, [{key: "#RETURN_VALUE#", val: _return_2406}]), "return");
       return (_return_2406); 
     case "::":
-      var l = x.head, x_2 = x.tail;var ctx_793 = ctx_push(ctx_792, [{key: "l", val: l}, {key: "x_2", val: x_2}]);
+      var l = x.head;var x_2 = x.tail;var ctx_793 = ctx_push(ctx_792, [{key: "l", val: l}, {key: "x_2", val: x_2}]);
     log_event("JsInterpreter.js", 5244, ctx_793, "case");
     
       var _return_2412 = if_bool((function () {
@@ -25503,7 +25510,7 @@ var env_record_delete_binding = function (s, c, l, x) {
                                  var p = _switch_arg_2431.value;var ctx_806 = ctx_push(ctx_805, [{key: "p", val: p}]);
                                log_event("JsInterpreter.js", 5316, ctx_806, "case");
                                
-                                 var mu = p[0], v = p[1];
+                                 var mu = p[0];var v = p[1];
                                  var ctx_807 = ctx_push(ctx_806, [{key: "mu", val: mu}, {key: "v", val: v}]);
                                  log_event("JsInterpreter.js", 5315, ctx_807, "let");
                                  log_event("JsInterpreter.js", 5314, ctx_807, "switch");
@@ -25573,7 +25580,7 @@ var env_record_delete_binding = function (s, c, l, x) {
                              }
                              
                            case "Coq_env_record_object":
-                             var l0 = e.value, pt = e.provide_this;var ctx_809 = ctx_push(ctx_804, [{key: "l0", val: l0}, {key: "pt", val: pt}]);
+                             var l0 = e.value;var pt = e.provide_this;var ctx_809 = ctx_push(ctx_804, [{key: "l0", val: l0}, {key: "pt", val: pt}]);
                            log_event("JsInterpreter.js", 5324, ctx_809, "case");
                            
                              var _return_2441 = (function () {
@@ -25618,8 +25625,8 @@ var env_record_implicit_this_value = function (s, l) {
                                                       log_event("JsInterpreter.js", 5333, ctx_push(ctx_812, [{key: "#RETURN_VALUE#", val: _return_2444}]), "return");
                                                       return (_return_2444); 
                                                     case "Coq_env_record_object":
-                                                      var l0 = e.value,
-                                                        provide_this = e.provide_this;var ctx_813 = ctx_push(ctx_811, [{key: "l0", val: l0}, {key: "provide_this", val: provide_this}]);
+                                                      var l0 = e.value;
+                                                        var provide_this = e.provide_this;var ctx_813 = ctx_push(ctx_811, [{key: "l0", val: l0}, {key: "provide_this", val: provide_this}]);
                                                     log_event("JsInterpreter.js", 5338, ctx_813, "case");
                                                     
                                                       log_event("JsInterpreter.js", 5337, ctx_813, "if");
@@ -25770,8 +25777,8 @@ var env_record_set_mutable_binding = function (s, c, l, x, v, str) {
                                                     
                                                     var ctx_827 = ctx_push(ctx_826, [{key: "rm", val: rm}]);
                                                     log_event("JsInterpreter.js", 5397, ctx_827, "let");
-                                                    var mu = rm[0],
-                                                      v_old = rm[1];
+                                                    var mu = rm[0];
+                                                      var v_old = rm[1];
                                                     var ctx_828 = ctx_push(ctx_827, [{key: "mu", val: mu}, {key: "v_old", val: v_old}]);
                                                     log_event("JsInterpreter.js", 5394, ctx_828, "let");
                                                     var _if_arg_2465 = (function () {
@@ -25826,7 +25833,7 @@ var env_record_set_mutable_binding = function (s, c, l, x, v, str) {
                              log_event("JsInterpreter.js", 5398, ctx_push(ctx_826, [{key: "#RETURN_VALUE#", val: _return_2472}]), "return");
                              return (_return_2472); 
                            case "Coq_env_record_object":
-                             var l0 = e.value, pt = e.provide_this;var ctx_829 = ctx_push(ctx_825, [{key: "l0", val: l0}, {key: "pt", val: pt}]);
+                             var l0 = e.value;var pt = e.provide_this;var ctx_829 = ctx_push(ctx_825, [{key: "l0", val: l0}, {key: "pt", val: pt}]);
                            log_event("JsInterpreter.js", 5409, ctx_829, "case");
                            
                              var _return_2477 = if_success((function () {
@@ -25982,7 +25989,7 @@ var env_record_create_mutable_binding = function (s, c, l, x, deletable_opt) {
                                
                              }
                            case "Coq_env_record_object":
-                             var l0 = e.value, pt = e.provide_this;var ctx_839 = ctx_push(ctx_835, [{key: "l0", val: l0}, {key: "pt", val: pt}]);
+                             var l0 = e.value;var pt = e.provide_this;var ctx_839 = ctx_push(ctx_835, [{key: "l0", val: l0}, {key: "pt", val: pt}]);
                            log_event("JsInterpreter.js", 5475, ctx_839, "case");
                            
                              var _return_2506 = if_bool((function () {
@@ -26188,7 +26195,7 @@ var env_record_create_immutable_binding = function (s, l, x) {
                                return (_return_2517); 
                              }
                            case "Coq_env_record_object":
-                             var o = e.value, p = e.provide_this;var ctx_850 = ctx_push(ctx_847, [{key: "o", val: o}, {key: "p", val: p}]);
+                             var o = e.value;var p = e.provide_this;var ctx_850 = ctx_push(ctx_847, [{key: "o", val: o}, {key: "p", val: p}]);
                            log_event("JsInterpreter.js", 5518, ctx_850, "case");
                            
                              var _return_2525 = (function () {
@@ -26326,7 +26333,7 @@ var env_record_initialize_immutable_binding = function (s, l, x, v) {
                              log_event("JsInterpreter.js", 5548, ctx_push(ctx_854, [{key: "#RETURN_VALUE#", val: _return_2538}]), "return");
                              return (_return_2538); 
                            case "Coq_env_record_object":
-                             var o = e.value, p = e.provide_this;var ctx_858 = ctx_push(ctx_853, [{key: "o", val: o}, {key: "p", val: p}]);
+                             var o = e.value;var p = e.provide_this;var ctx_858 = ctx_push(ctx_853, [{key: "o", val: o}, {key: "p", val: p}]);
                            log_event("JsInterpreter.js", 5557, ctx_858, "case");
                            
                              var _return_2542 = (function () {
@@ -26397,7 +26404,7 @@ var call_object_new = function (s, c, v) {
       ;
       var ctx_862 = ctx_push(ctx_861, [{key: "p", val: p}]);
       log_event("JsInterpreter.js", 5572, ctx_862, "let");
-      var l = p[0], s_2 = p[1];
+      var l = p[0];var s_2 = p[1];
       var ctx_863 = ctx_push(ctx_862, [{key: "l", val: l}, {key: "s_2", val: s_2}]);
       log_event("JsInterpreter.js", 5571, ctx_863, "let");
       var _return_2548 = res_out(s_2, res_val(Coq_value_object(l)));
@@ -26429,7 +26436,7 @@ var call_object_new = function (s, c, v) {
       ;
       var ctx_865 = ctx_push(ctx_864, [{key: "p", val: p}]);
       log_event("JsInterpreter.js", 5581, ctx_865, "let");
-      var l = p[0], s_2 = p[1];
+      var l = p[0];var s_2 = p[1];
       var ctx_866 = ctx_push(ctx_865, [{key: "l", val: l}, {key: "s_2", val: s_2}]);
       log_event("JsInterpreter.js", 5580, ctx_866, "let");
       var _return_2551 = res_out(s_2, res_val(Coq_value_object(l)));
@@ -26497,7 +26504,7 @@ var array_args_map_loop = function (s, c, l, args, ind) {
       log_event("JsInterpreter.js", 5602, ctx_push(ctx_867, [{key: "#RETURN_VALUE#", val: _return_2560}]), "return");
       return (_return_2560); 
     case "::":
-      var h = args.head, rest = args.tail;var ctx_868 = ctx_push(ctx_867, [{key: "h", val: h}, {key: "rest", val: rest}]);
+      var h = args.head;var rest = args.tail;var ctx_868 = ctx_push(ctx_867, [{key: "h", val: h}, {key: "rest", val: rest}]);
     log_event("JsInterpreter.js", 5623, ctx_868, "case");
     
       var _return_2569 = if_some((function () {
@@ -26631,7 +26638,7 @@ var run_construct_prealloc = function (s, c, b, args) {
       ;
       var ctx_877 = ctx_push(ctx_876, [{key: "p", val: p}]);
       log_event("JsInterpreter.js", 5643, ctx_877, "let");
-      var l = p[0], s_2 = p[1];
+      var l = p[0];var s_2 = p[1];
       var ctx_878 = ctx_push(ctx_877, [{key: "l", val: l}, {key: "s_2", val: s_2}]);
       log_event("JsInterpreter.js", 5642, ctx_878, "let");
       var _return_2577 = res_out(s_2, res_val(Coq_value_object(l)));
@@ -26670,7 +26677,7 @@ var run_construct_prealloc = function (s, c, b, args) {
           return (_return_2580); 
         }())
         ;
-        var l = _tuple_arg_2579[0], s1 = _tuple_arg_2579[1];
+        var l = _tuple_arg_2579[0];var s1 = _tuple_arg_2579[1];
         var ctx_882 = ctx_push(ctx_881, [{key: "l", val: l}, {key: "s1", val: s1}]);
         log_event("JsInterpreter.js", 5654, ctx_882, "let");
         var _return_2581 = res_out(s1, res_val(Coq_value_object(l)));
@@ -26760,7 +26767,7 @@ var run_construct_prealloc = function (s, c, b, args) {
       ;
       var ctx_888 = ctx_push(ctx_887, [{key: "p", val: p}]);
       log_event("JsInterpreter.js", 5819, ctx_888, "let");
-      var l = p[0], s_2 = p[1];
+      var l = p[0];var s_2 = p[1];
       var ctx_889 = ctx_push(ctx_888, [{key: "l", val: l}, {key: "s_2", val: s_2}]);
       log_event("JsInterpreter.js", 5818, ctx_889, "let");
       var follow = function (s_3, length0) {
@@ -27231,7 +27238,7 @@ var run_construct_prealloc = function (s, c, b, args) {
           return (_return_2654); 
         }())
         ;
-        var l = _tuple_arg_2653[0], s2 = _tuple_arg_2653[1];
+        var l = _tuple_arg_2653[0];var s2 = _tuple_arg_2653[1];
         var ctx_918 = ctx_push(ctx_917, [{key: "l", val: l}, {key: "s2", val: s2}]);
         log_event("JsInterpreter.js", 5843, ctx_918, "let");
         var lenDesc = (function () {
@@ -27514,7 +27521,7 @@ var run_construct_default = function (s, c, l, args) {
                          ;
                          var ctx_934 = ctx_push(ctx_933, [{key: "p", val: p}]);
                          log_event("JsInterpreter.js", 5928, ctx_934, "let");
-                         var l_2 = p[0], s2 = p[1];
+                         var l_2 = p[0];var s2 = p[1];
                          var ctx_935 = ctx_push(ctx_934, [{key: "l_2", val: l_2}, {key: "s2", val: s2}]);
                          log_event("JsInterpreter.js", 5927, ctx_935, "let");
                          var _return_2697 = if_value((function () {
@@ -27921,7 +27928,7 @@ var creating_function_object = function (s, c, names, bd, x, str) {
   ;
   var ctx_962 = ctx_push(ctx_961, [{key: "p", val: p}]);
   log_event("JsInterpreter.js", 6079, ctx_962, "let");
-  var l = p[0], s1 = p[1];
+  var l = p[0];var s1 = p[1];
   var ctx_963 = ctx_push(ctx_962, [{key: "l", val: l}, {key: "s1", val: s1}]);
   log_event("JsInterpreter.js", 6078, ctx_963, "let");
   var a1 = {
@@ -28085,7 +28092,7 @@ var binding_inst_formal_params = function (s, c, l, args, names, str) {
       log_event("JsInterpreter.js", 6086, ctx_push(ctx_971, [{key: "#RETURN_VALUE#", val: _return_2755}]), "return");
       return (_return_2755); 
     case "::":
-      var argname = names.head, names_2 = names.tail;var ctx_972 = ctx_push(ctx_971, [{key: "argname", val: argname}, {key: "names_2", val: names_2}]);
+      var argname = names.head;var names_2 = names.tail;var ctx_972 = ctx_push(ctx_971, [{key: "argname", val: argname}, {key: "names_2", val: names_2}]);
     log_event("JsInterpreter.js", 6124, ctx_972, "case");
     
       var v = (function () {
@@ -28213,7 +28220,7 @@ var binding_inst_function_decls = function (s, c, l, fds, str, bconfig) {
       log_event("JsInterpreter.js", 6129, ctx_push(ctx_980, [{key: "#RETURN_VALUE#", val: _return_2771}]), "return");
       return (_return_2771); 
     case "::":
-      var fd = fds.head, fds_2 = fds.tail;var ctx_981 = ctx_push(ctx_980, [{key: "fd", val: fd}, {key: "fds_2", val: fds_2}]);
+      var fd = fds.head;var fds_2 = fds.tail;var ctx_981 = ctx_push(ctx_980, [{key: "fd", val: fd}, {key: "fds_2", val: fds_2}]);
     log_event("JsInterpreter.js", 6228, ctx_981, "case");
     
       var fbd = fd.funcdecl_body;
@@ -28776,7 +28783,7 @@ var arguments_object_map_loop = function (s, c, l, xs, len, args, x, str, lmap, 
                            ;
                            var ctx_1009 = ctx_push(ctx_1008, [{key: "tdl", val: tdl}]);
                            log_event("JsInterpreter.js", 6350, ctx_1009, "let");
-                           var rmlargs = tdl[0], largs = tdl[1];
+                           var rmlargs = tdl[0];var largs = tdl[1];
                            var ctx_1010 = ctx_push(ctx_1009, [{key: "rmlargs", val: rmlargs}, {key: "largs", val: largs}]);
                            log_event("JsInterpreter.js", 6349, ctx_1010, "let");
                            var arguments_object_map_loop_2 = function (s0, xsmap0) {
@@ -29113,7 +29120,7 @@ var create_arguments_object = function (s, c, lf, xs, args, x, str) {
   ;
   var ctx_1028 = ctx_push(ctx_1027, [{key: "p", val: p}]);
   log_event("JsInterpreter.js", 6432, ctx_1028, "let");
-  var l = p[0], s_2 = p[1];
+  var l = p[0];var s_2 = p[1];
   var ctx_1029 = ctx_push(ctx_1028, [{key: "l", val: l}, {key: "s_2", val: s_2}]);
   log_event("JsInterpreter.js", 6431, ctx_1029, "let");
   var a = {
@@ -29373,7 +29380,7 @@ var binding_inst_var_decls = function (s, c, l, vds, bconfig, str) {
       log_event("JsInterpreter.js", 6459, ctx_push(ctx_1044, [{key: "#RETURN_VALUE#", val: _return_2907}]), "return");
       return (_return_2907); 
     case "::":
-      var vd = vds.head, vds_2 = vds.tail;var ctx_1045 = ctx_push(ctx_1044, [{key: "vd", val: vd}, {key: "vds_2", val: vds_2}]);
+      var vd = vds.head;var vds_2 = vds.tail;var ctx_1045 = ctx_push(ctx_1044, [{key: "vd", val: vd}, {key: "vds_2", val: vds_2}]);
     log_event("JsInterpreter.js", 6485, ctx_1045, "case");
     
       var bivd = function (s0) {
@@ -29481,7 +29488,7 @@ var execution_ctx_binding_inst = function (s, c, ct, funco, p, args) {
       log_event("JsInterpreter.js", 6494, ctx_push(ctx_1050, [{key: "#RETURN_VALUE#", val: _return_2922}]), "return");
       return (_return_2922); 
     case "::":
-      var l = _switch_arg_2918.head, l0 = _switch_arg_2918.tail;var ctx_1052 = ctx_push(ctx_1050, [{key: "l", val: l}, {key: "l0", val: l0}]);
+      var l = _switch_arg_2918.head;var l0 = _switch_arg_2918.tail;var ctx_1052 = ctx_push(ctx_1050, [{key: "l", val: l}, {key: "l0", val: l0}]);
     log_event("JsInterpreter.js", 6619, ctx_1052, "case");
     
       var str = prog_intro_strictness(p);
@@ -29935,8 +29942,8 @@ var entering_func_code = function (s, c, lf, vthis, args) {
                                                           ;
                                                           var ctx_1082 = ctx_push(ctx_1081, [{key: "p", val: p}]);
                                                           log_event("JsInterpreter.js", 6641, ctx_1082, "let");
-                                                          var lex_2 = p[0],
-                                                            s1 = p[1];
+                                                          var lex_2 = p[0];
+                                                            var s1 = p[1];
                                                           var ctx_1083 = ctx_push(ctx_1082, [{key: "lex_2", val: lex_2}, {key: "s1", val: s1}]);
                                                           log_event("JsInterpreter.js", 6640, ctx_1083, "let");
                                                           var c_2 = (function () {
@@ -31700,8 +31707,8 @@ var run_binary_op_add = function (s, c, v1, v2) {
                          log_event("JsInterpreter.js", 7158, ctx_push(ctx_1178, [{key: "#RETURN_VALUE#", val: _return_3190}]), "return");
                          return (_return_3190); }()), function(s1,
                        _tuple_arg_3205) {
-                         var w1 = _tuple_arg_3205[0],
-                           w2 = _tuple_arg_3205[1];
+                         var w1 = _tuple_arg_3205[0];
+                           var w2 = _tuple_arg_3205[1];
                          
                          var ctx_1179 = ctx_push(ctx_1178, [{key: "s1", val: s1}, {key: "w1", val: w1}, {key: "w2", val: w2}]);
                          log_event("JsInterpreter.js", 7187, ctx_1179, "let");
@@ -31736,8 +31743,8 @@ var run_binary_op_add = function (s, c, v1, v2) {
                                                   return (_return_3200); }())
                                                 , function(s2,
                                                 _tuple_arg_3203) {
-                                                  var str1 = _tuple_arg_3203[0],
-                                                    str2 = _tuple_arg_3203[1];
+                                                  var str1 = _tuple_arg_3203[0];
+                                                    var str2 = _tuple_arg_3203[1];
                                                   
                                                   var ctx_1181 = ctx_push(ctx_1179, [{key: "s2", val: s2}, {key: "str1", val: str1}, {key: "str2", val: str2}]);
                                                   log_event("JsInterpreter.js", 7182, ctx_1181, "let");
@@ -31768,8 +31775,8 @@ var run_binary_op_add = function (s, c, v1, v2) {
                                                   return (_return_3195); }())
                                                 , function(s2,
                                                 _tuple_arg_3198) {
-                                                  var n1 = _tuple_arg_3198[0],
-                                                    n2 = _tuple_arg_3198[1];
+                                                  var n1 = _tuple_arg_3198[0];
+                                                    var n2 = _tuple_arg_3198[1];
                                                   
                                                   var ctx_1180 = ctx_push(ctx_1179, [{key: "s2", val: s2}, {key: "n1", val: n1}, {key: "n2", val: n2}]);
                                                   log_event("JsInterpreter.js", 7173, ctx_1180, "let");
@@ -31807,7 +31814,7 @@ var run_binary_op_arith = function (mathop, s, c, v1, v2) {
                          
                          var ctx_1183 = ctx_push(ctx_1182, [{key: "s1", val: s1}, {key: "nn", val: nn}]);
                          log_event("JsInterpreter.js", 7198, ctx_1183, "let");
-                         var n1 = nn[0], n2 = nn[1];
+                         var n1 = nn[0];var n2 = nn[1];
                          var ctx_1184 = ctx_push(ctx_1183, [{key: "n1", val: n1}, {key: "n2", val: n2}]);
                          log_event("JsInterpreter.js", 7195, ctx_1184, "let");
                          var _return_3209 = res_out(s1,
@@ -31948,7 +31955,7 @@ var run_binary_op_compare = function (b_swap, b_neg, s, c, v1, v2) {
                          
                          var ctx_1194 = ctx_push(ctx_1193, [{key: "s1", val: s1}, {key: "ww", val: ww}]);
                          log_event("JsInterpreter.js", 7290, ctx_1194, "let");
-                         var w1 = ww[0], w2 = ww[1];
+                         var w1 = ww[0];var w2 = ww[1];
                          var ctx_1195 = ctx_push(ctx_1194, [{key: "w1", val: w1}, {key: "w2", val: w2}]);
                          log_event("JsInterpreter.js", 7287, ctx_1195, "let");
                          log_event("JsInterpreter.js", 7240, ctx_1195, "if");
@@ -31959,7 +31966,7 @@ var run_binary_op_compare = function (b_swap, b_neg, s, c, v1, v2) {
                          }
                          var ctx_1196 = ctx_push(ctx_1195, [{key: "p", val: p}]);
                          log_event("JsInterpreter.js", 7286, ctx_1196, "let");
-                         var wa = p[0], wb = p[1];
+                         var wa = p[0];var wb = p[1];
                          var ctx_1197 = ctx_push(ctx_1196, [{key: "wa", val: wa}, {key: "wb", val: wb}]);
                          log_event("JsInterpreter.js", 7285, ctx_1197, "let");
                          var _return_3249 = let_ret((function () {
@@ -32063,8 +32070,8 @@ var run_binary_op_compare = function (b_swap, b_neg, s, c, v1, v2) {
                                                   return (_return_3236); 
                                                 }}()),
                                               function(_tuple_arg_3248) {
-                                                var s = _tuple_arg_3248[0],
-                                                  wr = _tuple_arg_3248[1];
+                                                s = _tuple_arg_3248[0];
+                                                  var wr = _tuple_arg_3248[1];
                                                 
                                                 var ctx_1200 = ctx_push(ctx_1197, [{key: "s", val: s}, {key: "wr", val: wr}]);
                                                 log_event("JsInterpreter.js", 7283, ctx_1200, "let");
@@ -32738,8 +32745,8 @@ var run_unary_op = function (s, c, op, e) {
                                                           
                                                           var ctx_1236 = ctx_push(ctx_1235, [{key: "po", val: po}]);
                                                           log_event("JsInterpreter.js", 7637, ctx_1236, "let");
-                                                          var number_op = po[0],
-                                                            is_pre = po[1];
+                                                          var number_op = po[0];
+                                                            var is_pre = po[1];
                                                           var ctx_1237 = ctx_push(ctx_1236, [{key: "number_op", val: number_op}, {key: "is_pre", val: is_pre}]);
                                                           log_event("JsInterpreter.js", 7634, ctx_1237, "let");
                                                           var n2 = (function () {
@@ -33267,10 +33274,10 @@ var init_object = function (s, c, l, _foo_) {
       log_event("JsInterpreter.js", 7657, ctx_push(ctx_1242, [{key: "#RETURN_VALUE#", val: _return_3413}]), "return");
       return (_return_3413); 
     case "::":
-      var p = _foo_.head, pds_2 = _foo_.tail;var ctx_1243 = ctx_push(ctx_1242, [{key: "p", val: p}, {key: "pds_2", val: pds_2}]);
+      var p = _foo_.head;var pds_2 = _foo_.tail;var ctx_1243 = ctx_push(ctx_1242, [{key: "p", val: p}, {key: "pds_2", val: pds_2}]);
     log_event("JsInterpreter.js", 7708, ctx_1243, "case");
     
-      var pn = p[0], pb = p[1];
+      var pn = p[0];var pb = p[1];
       var ctx_1244 = ctx_push(ctx_1243, [{key: "pn", val: pn}, {key: "pb", val: pb}]);
       log_event("JsInterpreter.js", 7707, ctx_1244, "let");
       var x = (function () {
@@ -33388,7 +33395,7 @@ var init_object = function (s, c, l, _foo_) {
           log_event("JsInterpreter.js", 7691, ctx_push(ctx_1252, [{key: "#RETURN_VALUE#", val: _return_3426}]), "return");
           return (_return_3426); 
         case "Coq_propbody_set":
-          var args = pb.names, bd = pb.body;var ctx_1255 = ctx_push(ctx_1248, [{key: "args", val: args}, {key: "bd", val: bd}]);
+          var args = pb.names;var bd = pb.body;var ctx_1255 = ctx_push(ctx_1248, [{key: "args", val: args}, {key: "bd", val: bd}]);
         log_event("JsInterpreter.js", 7703, ctx_1255, "case");
         
           var _return_3430 = if_value((function () {
@@ -33444,7 +33451,7 @@ var run_array_element_list = function (s, c, l, oes, n) {
       log_event("JsInterpreter.js", 7711, ctx_push(ctx_1258, [{key: "#RETURN_VALUE#", val: _return_3431}]), "return");
       return (_return_3431); 
     case "::":
-      var o = oes.head, oes_2 = oes.tail;var ctx_1259 = ctx_push(ctx_1258, [{key: "o", val: o}, {key: "oes_2", val: oes_2}]);
+      var o = oes.head;var oes_2 = oes.tail;var ctx_1259 = ctx_push(ctx_1258, [{key: "o", val: o}, {key: "oes_2", val: oes_2}]);
     log_event("JsInterpreter.js", 7771, ctx_1259, "case");
     
       log_event("JsInterpreter.js", 7770, ctx_1259, "switch");
@@ -33846,10 +33853,10 @@ var run_var_decl = function (s, c, _foo_) {
       log_event("JsInterpreter.js", 7838, ctx_push(ctx_1284, [{key: "#RETURN_VALUE#", val: _return_3475}]), "return");
       return (_return_3475); 
     case "::":
-      var y = _foo_.head, xeos_2 = _foo_.tail;var ctx_1285 = ctx_push(ctx_1284, [{key: "y", val: y}, {key: "xeos_2", val: xeos_2}]);
+      var y = _foo_.head;var xeos_2 = _foo_.tail;var ctx_1285 = ctx_push(ctx_1284, [{key: "y", val: y}, {key: "xeos_2", val: xeos_2}]);
     log_event("JsInterpreter.js", 7850, ctx_1285, "case");
     
-      var x = y[0], eo = y[1];
+      var x = y[0];var eo = y[1];
       var ctx_1286 = ctx_push(ctx_1285, [{key: "x", val: x}, {key: "eo", val: eo}]);
       log_event("JsInterpreter.js", 7849, ctx_1286, "let");
       var _return_3479 = if_value((function () {
@@ -33894,7 +33901,7 @@ var run_list_expr = function (s1, c, vs, _foo_) {
       log_event("JsInterpreter.js", 7855, ctx_push(ctx_1288, [{key: "#RETURN_VALUE#", val: _return_3481}]), "return");
       return (_return_3481); 
     case "::":
-      var e = _foo_.head, es_2 = _foo_.tail;var ctx_1289 = ctx_push(ctx_1288, [{key: "e", val: e}, {key: "es_2", val: es_2}]);
+      var e = _foo_.head;var es_2 = _foo_.tail;var ctx_1289 = ctx_push(ctx_1288, [{key: "e", val: e}, {key: "es_2", val: es_2}]);
     log_event("JsInterpreter.js", 7866, ctx_1289, "case");
     
       var _return_3485 = if_spec((function () {
@@ -33933,7 +33940,7 @@ var run_block = function (s, c, _foo_) {
       log_event("JsInterpreter.js", 7869, ctx_push(ctx_1291, [{key: "#RETURN_VALUE#", val: _return_3486}]), "return");
       return (_return_3486); 
     case "::":
-      var t = _foo_.head, ts_rev_2 = _foo_.tail;var ctx_1292 = ctx_push(ctx_1291, [{key: "t", val: t}, {key: "ts_rev_2", val: ts_rev_2}]);
+      var t = _foo_.head;var ts_rev_2 = _foo_.tail;var ctx_1292 = ctx_push(ctx_1291, [{key: "t", val: t}, {key: "ts_rev_2", val: ts_rev_2}]);
     log_event("JsInterpreter.js", 7884, ctx_1292, "case");
     
       var _return_3492 = if_success((function () {
@@ -34428,7 +34435,7 @@ var run_expr_function = function (s, c, fo, args, bd) {
       ;
       var ctx_1324 = ctx_push(ctx_1323, [{key: "p", val: p}]);
       log_event("JsInterpreter.js", 8081, ctx_1324, "let");
-      var lex_2 = p[0], s_2 = p[1];
+      var lex_2 = p[0];var s_2 = p[1];
       var ctx_1325 = ctx_push(ctx_1324, [{key: "lex_2", val: lex_2}, {key: "s_2", val: s_2}]);
       log_event("JsInterpreter.js", 8080, ctx_1325, "let");
       var follow = function (l) {
@@ -34612,7 +34619,7 @@ var entering_eval_code = function (s, c, direct, bd, k) {
   }
   var ctx_1338 = ctx_push(ctx_1337, [{key: "p", val: p}]);
   log_event("JsInterpreter.js", 8115, ctx_1338, "let");
-  var lex = p[0], s_2 = p[1];
+  var lex = p[0];var s_2 = p[1];
   var ctx_1339 = ctx_push(ctx_1338, [{key: "lex", val: lex}, {key: "s_2", val: s_2}]);
   log_event("JsInterpreter.js", 8114, ctx_1339, "let");
   log_event("JsInterpreter.js", 8102, ctx_1339, "if");
@@ -35452,7 +35459,8 @@ var run_stat_with = function (s, c, e1, t2) {
                                                 ;
                                                 var ctx_1387 = ctx_push(ctx_1386, [{key: "p", val: p}]);
                                                 log_event("JsInterpreter.js", 8349, ctx_1387, "let");
-                                                var lex_2 = p[0], s3 = p[1];
+                                                var lex_2 = p[0];
+                                                  var s3 = p[1];
                                                 var ctx_1388 = ctx_push(ctx_1387, [{key: "lex_2", val: lex_2}, {key: "s3", val: s3}]);
                                                 log_event("JsInterpreter.js", 8348, ctx_1388, "let");
                                                 var c_2 = (function () {
@@ -35747,13 +35755,13 @@ var run_stat_switch_end = function (s, c, rv, _foo_) {
       log_event("JsInterpreter.js", 8433, ctx_push(ctx_1401, [{key: "#RETURN_VALUE#", val: _return_3716}]), "return");
       return (_return_3716); 
     case "::":
-      var y = _foo_.head, scs_2 = _foo_.tail;var ctx_1402 = ctx_push(ctx_1401, [{key: "y", val: y}, {key: "scs_2", val: scs_2}]);
+      var y = _foo_.head;var scs_2 = _foo_.tail;var ctx_1402 = ctx_push(ctx_1401, [{key: "y", val: y}, {key: "scs_2", val: scs_2}]);
     log_event("JsInterpreter.js", 8448, ctx_1402, "case");
     
       log_event("JsInterpreter.js", 8447, ctx_1402, "switch");
       switch (y.tag) {
         case "Coq_switchclause_intro":
-          var e = y.arg, ts = y.stats;var ctx_1403 = ctx_push(ctx_1402, [{key: "e", val: e}, {key: "ts", val: ts}]);
+          var e = y.arg;var ts = y.stats;var ctx_1403 = ctx_push(ctx_1402, [{key: "e", val: e}, {key: "ts", val: ts}]);
         log_event("JsInterpreter.js", 8446, ctx_1403, "case");
         
           var _return_3722 = (function () {
@@ -35806,13 +35814,13 @@ var run_stat_switch_no_default = function (s, c, vi, rv, _foo_) {
       log_event("JsInterpreter.js", 8451, ctx_push(ctx_1405, [{key: "#RETURN_VALUE#", val: _return_3723}]), "return");
       return (_return_3723); 
     case "::":
-      var y = _foo_.head, scs_2 = _foo_.tail;var ctx_1406 = ctx_push(ctx_1405, [{key: "y", val: y}, {key: "scs_2", val: scs_2}]);
+      var y = _foo_.head;var scs_2 = _foo_.tail;var ctx_1406 = ctx_push(ctx_1405, [{key: "y", val: y}, {key: "scs_2", val: scs_2}]);
     log_event("JsInterpreter.js", 8479, ctx_1406, "case");
     
       log_event("JsInterpreter.js", 8478, ctx_1406, "switch");
       switch (y.tag) {
         case "Coq_switchclause_intro":
-          var e = y.arg, ts = y.stats;var ctx_1407 = ctx_push(ctx_1406, [{key: "e", val: e}, {key: "ts", val: ts}]);
+          var e = y.arg;var ts = y.stats;var ctx_1407 = ctx_push(ctx_1406, [{key: "e", val: e}, {key: "ts", val: ts}]);
         log_event("JsInterpreter.js", 8477, ctx_1407, "case");
         
           var _return_3733 = if_spec((function () {
@@ -35942,13 +35950,13 @@ var run_stat_switch_with_default_B = function (s, c, vi, rv, ts0, scs) {
       log_event("JsInterpreter.js", 8496, ctx_push(ctx_1413, [{key: "#RETURN_VALUE#", val: _return_3740}]), "return");
       return (_return_3740); 
     case "::":
-      var y = scs.head, scs_2 = scs.tail;var ctx_1414 = ctx_push(ctx_1413, [{key: "y", val: y}, {key: "scs_2", val: scs_2}]);
+      var y = scs.head;var scs_2 = scs.tail;var ctx_1414 = ctx_push(ctx_1413, [{key: "y", val: y}, {key: "scs_2", val: scs_2}]);
     log_event("JsInterpreter.js", 8524, ctx_1414, "case");
     
       log_event("JsInterpreter.js", 8523, ctx_1414, "switch");
       switch (y.tag) {
         case "Coq_switchclause_intro":
-          var e = y.arg, ts = y.stats;var ctx_1415 = ctx_push(ctx_1414, [{key: "e", val: e}, {key: "ts", val: ts}]);
+          var e = y.arg;var ts = y.stats;var ctx_1415 = ctx_push(ctx_1414, [{key: "e", val: e}, {key: "ts", val: ts}]);
         log_event("JsInterpreter.js", 8522, ctx_1415, "case");
         
           var _return_3750 = if_spec((function () {
@@ -36062,13 +36070,13 @@ var run_stat_switch_with_default_A = function (s, c, found, vi, rv, scs1, ts0, s
         return (_return_3752); 
       }
     case "::":
-      var y = scs1.head, scs_2 = scs1.tail;var ctx_1420 = ctx_push(ctx_1419, [{key: "y", val: y}, {key: "scs_2", val: scs_2}]);
+      var y = scs1.head;var scs_2 = scs1.tail;var ctx_1420 = ctx_push(ctx_1419, [{key: "y", val: y}, {key: "scs_2", val: scs_2}]);
     log_event("JsInterpreter.js", 8570, ctx_1420, "case");
     
       log_event("JsInterpreter.js", 8569, ctx_1420, "switch");
       switch (y.tag) {
         case "Coq_switchclause_intro":
-          var e = y.arg, ts = y.stats;var ctx_1421 = ctx_push(ctx_1420, [{key: "e", val: e}, {key: "ts", val: ts}]);
+          var e = y.arg;var ts = y.stats;var ctx_1421 = ctx_push(ctx_1420, [{key: "e", val: e}, {key: "ts", val: ts}]);
         log_event("JsInterpreter.js", 8568, ctx_1421, "case");
         
           var follow = function (s0) {
@@ -36261,9 +36269,9 @@ var run_stat_switch = function (s, c, labs, e, sb) {
                              log_event("JsInterpreter.js", 8593, ctx_push(ctx_1433, [{key: "#RETURN_VALUE#", val: _return_3779}]), "return");
                              return (_return_3779); 
                            case "Coq_switchbody_withdefault":
-                             var scs1 = sb.clauses_before,
-                               ts = sb.clause_default,
-                               scs2 = sb.clauses_after;var ctx_1434 = ctx_push(ctx_1432, [{key: "scs1", val: scs1}, {key: "ts", val: ts}, {key: "scs2", val: scs2}]);
+                             var scs1 = sb.clauses_before;
+                               var ts = sb.clause_default;
+                               var scs2 = sb.clauses_after;var ctx_1434 = ctx_push(ctx_1432, [{key: "scs1", val: scs1}, {key: "ts", val: ts}, {key: "scs2", val: scs2}]);
                            log_event("JsInterpreter.js", 8600, ctx_1434, "case");
                            
                              var _return_3782 = (function () {
@@ -36500,7 +36508,7 @@ var run_stat_try = function (s, c, t1, t2o, t3o) {
                                var y = t2o.value;var ctx_1448 = ctx_push(ctx_1447, [{key: "y", val: y}]);
                              log_event("JsInterpreter.js", 8702, ctx_1448, "case");
                              
-                               var x = y[0], t2 = y[1];
+                               var x = y[0];var t2 = y[1];
                                var ctx_1449 = ctx_push(ctx_1448, [{key: "x", val: x}, {key: "t2", val: t2}]);
                                log_event("JsInterpreter.js", 8701, ctx_1449, "let");
                                var lex = c.execution_ctx_lexical_env;
@@ -36516,7 +36524,7 @@ var run_stat_try = function (s, c, t1, t2o, t3o) {
                                ;
                                var ctx_1451 = ctx_push(ctx_1450, [{key: "p", val: p}]);
                                log_event("JsInterpreter.js", 8699, ctx_1451, "let");
-                               var lex_2 = p[0], s_2 = p[1];
+                               var lex_2 = p[0];var s_2 = p[1];
                                var ctx_1452 = ctx_push(ctx_1451, [{key: "lex_2", val: lex_2}, {key: "s_2", val: s_2}]);
                                log_event("JsInterpreter.js", 8698, ctx_1452, "let");
                                log_event("JsInterpreter.js", 8697, ctx_1452, "switch");
@@ -36552,7 +36560,8 @@ var run_stat_try = function (s, c, t1, t2o, t3o) {
                                    log_event("JsInterpreter.js", 8676, ctx_push(ctx_1452, [{key: "#RETURN_VALUE#", val: _return_3816}]), "return");
                                    return (_return_3816); 
                                  case "::":
-                                   var l = lex_2.head, oldlex = lex_2.tail;var ctx_1454 = ctx_push(ctx_1452, [{key: "l", val: l}, {key: "oldlex", val: oldlex}]);
+                                   var l = lex_2.head;
+                                     var oldlex = lex_2.tail;var ctx_1454 = ctx_push(ctx_1452, [{key: "l", val: l}, {key: "oldlex", val: oldlex}]);
                                  log_event("JsInterpreter.js", 8696, ctx_1454, "case");
                                  
                                    var _return_3823 = if_void((function () {
@@ -37093,8 +37102,8 @@ var run_expr = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8864, ctx_push(ctx_1488, [{key: "#RETURN_VALUE#", val: _return_3889}]), "return");
       return (_return_3889); 
     case "Coq_expr_function":
-      var fo = _term_.func_name_opt, args = _term_.arg_names,
-        bd = _term_.body;var ctx_1490 = ctx_push(ctx_1482, [{key: "fo", val: fo}, {key: "args", val: args}, {key: "bd", val: bd}]);
+      var fo = _term_.func_name_opt;var args = _term_.arg_names;
+        var bd = _term_.body;var ctx_1490 = ctx_push(ctx_1482, [{key: "fo", val: fo}, {key: "args", val: args}, {key: "bd", val: bd}]);
     log_event("JsInterpreter.js", 8869, ctx_1490, "case");
     
       var _return_3891 = (function () {
@@ -37107,7 +37116,7 @@ var run_expr = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8868, ctx_push(ctx_1490, [{key: "#RETURN_VALUE#", val: _return_3891}]), "return");
       return (_return_3891); 
     case "Coq_expr_access":
-      var e1 = _term_.obj, e2 = _term_.field;var ctx_1491 = ctx_push(ctx_1482, [{key: "e1", val: e1}, {key: "e2", val: e2}]);
+      var e1 = _term_.obj;var e2 = _term_.field;var ctx_1491 = ctx_push(ctx_1482, [{key: "e1", val: e1}, {key: "e2", val: e2}]);
     log_event("JsInterpreter.js", 8873, ctx_1491, "case");
     
       var _return_3893 = (function () {
@@ -37120,7 +37129,7 @@ var run_expr = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8872, ctx_push(ctx_1491, [{key: "#RETURN_VALUE#", val: _return_3893}]), "return");
       return (_return_3893); 
     case "Coq_expr_member":
-      var e1 = _term_.obj, f = _term_.field_name;var ctx_1492 = ctx_push(ctx_1482, [{key: "e1", val: e1}, {key: "f", val: f}]);
+      var e1 = _term_.obj;var f = _term_.field_name;var ctx_1492 = ctx_push(ctx_1482, [{key: "e1", val: e1}, {key: "f", val: f}]);
     log_event("JsInterpreter.js", 8877, ctx_1492, "case");
     
       var _return_3895 = (function () {
@@ -37135,7 +37144,7 @@ var run_expr = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8876, ctx_push(ctx_1492, [{key: "#RETURN_VALUE#", val: _return_3895}]), "return");
       return (_return_3895); 
     case "Coq_expr_new":
-      var e1 = _term_.func, e2s = _term_.args;var ctx_1493 = ctx_push(ctx_1482, [{key: "e1", val: e1}, {key: "e2s", val: e2s}]);
+      var e1 = _term_.func;var e2s = _term_.args;var ctx_1493 = ctx_push(ctx_1482, [{key: "e1", val: e1}, {key: "e2s", val: e2s}]);
     log_event("JsInterpreter.js", 8881, ctx_1493, "case");
     
       var _return_3897 = (function () {
@@ -37148,7 +37157,7 @@ var run_expr = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8880, ctx_push(ctx_1493, [{key: "#RETURN_VALUE#", val: _return_3897}]), "return");
       return (_return_3897); 
     case "Coq_expr_call":
-      var e1 = _term_.func, e2s = _term_.args;var ctx_1494 = ctx_push(ctx_1482, [{key: "e1", val: e1}, {key: "e2s", val: e2s}]);
+      var e1 = _term_.func;var e2s = _term_.args;var ctx_1494 = ctx_push(ctx_1482, [{key: "e1", val: e1}, {key: "e2s", val: e2s}]);
     log_event("JsInterpreter.js", 8885, ctx_1494, "case");
     
       var _return_3899 = (function () {
@@ -37161,7 +37170,7 @@ var run_expr = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8884, ctx_push(ctx_1494, [{key: "#RETURN_VALUE#", val: _return_3899}]), "return");
       return (_return_3899); 
     case "Coq_expr_unary_op":
-      var op = _term_.op, e0 = _term_.arg;var ctx_1495 = ctx_push(ctx_1482, [{key: "op", val: op}, {key: "e0", val: e0}]);
+      var op = _term_.op;var e0 = _term_.arg;var ctx_1495 = ctx_push(ctx_1482, [{key: "op", val: op}, {key: "e0", val: e0}]);
     log_event("JsInterpreter.js", 8889, ctx_1495, "case");
     
       var _return_3901 = (function () {
@@ -37174,7 +37183,7 @@ var run_expr = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8888, ctx_push(ctx_1495, [{key: "#RETURN_VALUE#", val: _return_3901}]), "return");
       return (_return_3901); 
     case "Coq_expr_binary_op":
-      var e1 = _term_.arg1, op = _term_.op, e2 = _term_.arg2;var ctx_1496 = ctx_push(ctx_1482, [{key: "e1", val: e1}, {key: "op", val: op}, {key: "e2", val: e2}]);
+      var e1 = _term_.arg1;var op = _term_.op;var e2 = _term_.arg2;var ctx_1496 = ctx_push(ctx_1482, [{key: "e1", val: e1}, {key: "op", val: op}, {key: "e2", val: e2}]);
     log_event("JsInterpreter.js", 8893, ctx_1496, "case");
     
       var _return_3903 = (function () {
@@ -37187,7 +37196,8 @@ var run_expr = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8892, ctx_push(ctx_1496, [{key: "#RETURN_VALUE#", val: _return_3903}]), "return");
       return (_return_3903); 
     case "Coq_expr_conditional":
-      var e1 = _term_.cond, e2 = _term_.then_branch, e3 = _term_.else_branch;var ctx_1497 = ctx_push(ctx_1482, [{key: "e1", val: e1}, {key: "e2", val: e2}, {key: "e3", val: e3}]);
+      var e1 = _term_.cond;var e2 = _term_.then_branch;
+        var e3 = _term_.else_branch;var ctx_1497 = ctx_push(ctx_1482, [{key: "e1", val: e1}, {key: "e2", val: e2}, {key: "e3", val: e3}]);
     log_event("JsInterpreter.js", 8897, ctx_1497, "case");
     
       var _return_3905 = (function () {
@@ -37200,7 +37210,8 @@ var run_expr = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8896, ctx_push(ctx_1497, [{key: "#RETURN_VALUE#", val: _return_3905}]), "return");
       return (_return_3905); 
     case "Coq_expr_assign":
-      var e1 = _term_.left_expr, opo = _term_.op_opt, e2 = _term_.right_expr;var ctx_1498 = ctx_push(ctx_1482, [{key: "e1", val: e1}, {key: "opo", val: opo}, {key: "e2", val: e2}]);
+      var e1 = _term_.left_expr;var opo = _term_.op_opt;
+        var e2 = _term_.right_expr;var ctx_1498 = ctx_push(ctx_1482, [{key: "e1", val: e1}, {key: "opo", val: opo}, {key: "e2", val: e2}]);
     log_event("JsInterpreter.js", 8901, ctx_1498, "case");
     
       var _return_3907 = (function () {
@@ -37240,7 +37251,7 @@ var run_stat = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8910, ctx_push(ctx_1500, [{key: "#RETURN_VALUE#", val: _return_3910}]), "return");
       return (_return_3910); 
     case "Coq_stat_label":
-      var lab = _term_.label, t0 = _term_.stat;var ctx_1502 = ctx_push(ctx_1499, [{key: "lab", val: lab}, {key: "t0", val: t0}]);
+      var lab = _term_.label;var t0 = _term_.stat;var ctx_1502 = ctx_push(ctx_1499, [{key: "lab", val: lab}, {key: "t0", val: t0}]);
     log_event("JsInterpreter.js", 8915, ctx_1502, "case");
     
       var _return_3912 = (function () {
@@ -37283,8 +37294,8 @@ var run_stat = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8924, ctx_push(ctx_1504, [{key: "#RETURN_VALUE#", val: _return_3917}]), "return");
       return (_return_3917); 
     case "Coq_stat_if":
-      var e1 = _term_.cond, t2 = _term_.then_branch,
-        to0 = _term_.else_branch;var ctx_1505 = ctx_push(ctx_1499, [{key: "e1", val: e1}, {key: "t2", val: t2}, {key: "to0", val: to0}]);
+      var e1 = _term_.cond;var t2 = _term_.then_branch;
+        var to0 = _term_.else_branch;var ctx_1505 = ctx_push(ctx_1499, [{key: "e1", val: e1}, {key: "t2", val: t2}, {key: "to0", val: to0}]);
     log_event("JsInterpreter.js", 8929, ctx_1505, "case");
     
       var _return_3919 = (function () {
@@ -37297,7 +37308,7 @@ var run_stat = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8928, ctx_push(ctx_1505, [{key: "#RETURN_VALUE#", val: _return_3919}]), "return");
       return (_return_3919); 
     case "Coq_stat_do_while":
-      var ls = _term_.labels, t1 = _term_.body, e2 = _term_.cond;var ctx_1506 = ctx_push(ctx_1499, [{key: "ls", val: ls}, {key: "t1", val: t1}, {key: "e2", val: e2}]);
+      var ls = _term_.labels;var t1 = _term_.body;var e2 = _term_.cond;var ctx_1506 = ctx_push(ctx_1499, [{key: "ls", val: ls}, {key: "t1", val: t1}, {key: "e2", val: e2}]);
     log_event("JsInterpreter.js", 8933, ctx_1506, "case");
     
       var _return_3921 = (function () {
@@ -37311,7 +37322,7 @@ var run_stat = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8932, ctx_push(ctx_1506, [{key: "#RETURN_VALUE#", val: _return_3921}]), "return");
       return (_return_3921); 
     case "Coq_stat_while":
-      var ls = _term_.labels, e1 = _term_.cond, t2 = _term_.body;var ctx_1507 = ctx_push(ctx_1499, [{key: "ls", val: ls}, {key: "e1", val: e1}, {key: "t2", val: t2}]);
+      var ls = _term_.labels;var e1 = _term_.cond;var t2 = _term_.body;var ctx_1507 = ctx_push(ctx_1499, [{key: "ls", val: ls}, {key: "e1", val: e1}, {key: "t2", val: t2}]);
     log_event("JsInterpreter.js", 8937, ctx_1507, "case");
     
       var _return_3923 = (function () {
@@ -37325,7 +37336,7 @@ var run_stat = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8936, ctx_push(ctx_1507, [{key: "#RETURN_VALUE#", val: _return_3923}]), "return");
       return (_return_3923); 
     case "Coq_stat_with":
-      var e1 = _term_.obj, t2 = _term_.stat;var ctx_1508 = ctx_push(ctx_1499, [{key: "e1", val: e1}, {key: "t2", val: t2}]);
+      var e1 = _term_.obj;var t2 = _term_.stat;var ctx_1508 = ctx_push(ctx_1499, [{key: "e1", val: e1}, {key: "t2", val: t2}]);
     log_event("JsInterpreter.js", 8941, ctx_1508, "case");
     
       var _return_3925 = (function () {
@@ -37378,8 +37389,8 @@ var run_stat = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8952, ctx_push(ctx_1512, [{key: "#RETURN_VALUE#", val: _return_3931}]), "return");
       return (_return_3931); 
     case "Coq_stat_try":
-      var t1 = _term_.body, t2o = _term_.catch_stats_opt,
-        t3o = _term_.finally_opt;var ctx_1513 = ctx_push(ctx_1499, [{key: "t1", val: t1}, {key: "t2o", val: t2o}, {key: "t3o", val: t3o}]);
+      var t1 = _term_.body;var t2o = _term_.catch_stats_opt;
+        var t3o = _term_.finally_opt;var ctx_1513 = ctx_push(ctx_1499, [{key: "t1", val: t1}, {key: "t2o", val: t2o}, {key: "t3o", val: t3o}]);
     log_event("JsInterpreter.js", 8957, ctx_1513, "case");
     
       var _return_3933 = (function () {
@@ -37392,8 +37403,8 @@ var run_stat = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8956, ctx_push(ctx_1513, [{key: "#RETURN_VALUE#", val: _return_3933}]), "return");
       return (_return_3933); 
     case "Coq_stat_for":
-      var ls = _term_.labels, eo1 = _term_.init, eo2 = _term_.cond,
-        eo3 = _term_.step, s0 = _term_.body;var ctx_1514 = ctx_push(ctx_1499, [{key: "ls", val: ls}, {key: "eo1", val: eo1}, {key: "eo2", val: eo2}, {key: "eo3", val: eo3}, {key: "s0", val: s0}]);
+      var ls = _term_.labels;var eo1 = _term_.init;var eo2 = _term_.cond;
+        var eo3 = _term_.step;var s0 = _term_.body;var ctx_1514 = ctx_push(ctx_1499, [{key: "ls", val: ls}, {key: "eo1", val: eo1}, {key: "eo2", val: eo2}, {key: "eo3", val: eo3}, {key: "s0", val: s0}]);
     log_event("JsInterpreter.js", 8961, ctx_1514, "case");
     
       var _return_3935 = (function () {
@@ -37406,8 +37417,8 @@ var run_stat = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8960, ctx_push(ctx_1514, [{key: "#RETURN_VALUE#", val: _return_3935}]), "return");
       return (_return_3935); 
     case "Coq_stat_for_var":
-      var ls = _term_.labels, ds = _term_.init, eo2 = _term_.cond,
-        eo3 = _term_.step, s0 = _term_.body;var ctx_1515 = ctx_push(ctx_1499, [{key: "ls", val: ls}, {key: "ds", val: ds}, {key: "eo2", val: eo2}, {key: "eo3", val: eo3}, {key: "s0", val: s0}]);
+      var ls = _term_.labels;var ds = _term_.init;var eo2 = _term_.cond;
+        var eo3 = _term_.step;var s0 = _term_.body;var ctx_1515 = ctx_push(ctx_1499, [{key: "ls", val: ls}, {key: "ds", val: ds}, {key: "eo2", val: eo2}, {key: "eo3", val: eo3}, {key: "s0", val: s0}]);
     log_event("JsInterpreter.js", 8965, ctx_1515, "case");
     
       var _return_3937 = (function () {
@@ -37420,8 +37431,8 @@ var run_stat = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8964, ctx_push(ctx_1515, [{key: "#RETURN_VALUE#", val: _return_3937}]), "return");
       return (_return_3937); 
     case "Coq_stat_for_in":
-      var ls = _term_.labels, e1 = _term_.id, e2 = _term_.obj,
-        s0 = _term_.body;var ctx_1516 = ctx_push(ctx_1499, [{key: "ls", val: ls}, {key: "e1", val: e1}, {key: "e2", val: e2}, {key: "s0", val: s0}]);
+      var ls = _term_.labels;var e1 = _term_.id;var e2 = _term_.obj;
+        var s0 = _term_.body;var ctx_1516 = ctx_push(ctx_1499, [{key: "ls", val: ls}, {key: "e1", val: e1}, {key: "e2", val: e2}, {key: "s0", val: s0}]);
     log_event("JsInterpreter.js", 8973, ctx_1516, "case");
     
       var _return_3941 = (function () {
@@ -37448,8 +37459,8 @@ var run_stat = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8972, ctx_push(ctx_1516, [{key: "#RETURN_VALUE#", val: _return_3941}]), "return");
       return (_return_3941); 
     case "Coq_stat_for_in_var":
-      var ls = _term_.labels, x = _term_.id, e1o = _term_.init,
-        e2 = _term_.obj, s0 = _term_.body;var ctx_1518 = ctx_push(ctx_1499, [{key: "ls", val: ls}, {key: "x", val: x}, {key: "e1o", val: e1o}, {key: "e2", val: e2}, {key: "s0", val: s0}]);
+      var ls = _term_.labels;var x = _term_.id;var e1o = _term_.init;
+        var e2 = _term_.obj;var s0 = _term_.body;var ctx_1518 = ctx_push(ctx_1499, [{key: "ls", val: ls}, {key: "x", val: x}, {key: "e1o", val: e1o}, {key: "e2", val: e2}, {key: "s0", val: s0}]);
     log_event("JsInterpreter.js", 8981, ctx_1518, "case");
     
       var _return_3945 = (function () {
@@ -37481,7 +37492,7 @@ var run_stat = function (s, c, _term_) {
       log_event("JsInterpreter.js", 8982, ctx_push(ctx_1499, [{key: "#RETURN_VALUE#", val: _return_3946}]), "return");
       return (_return_3946); 
     case "Coq_stat_switch":
-      var labs = _term_.labels, e = _term_.arg, sb = _term_.body;var ctx_1520 = ctx_push(ctx_1499, [{key: "labs", val: labs}, {key: "e", val: e}, {key: "sb", val: sb}]);
+      var labs = _term_.labels;var e = _term_.arg;var sb = _term_.body;var ctx_1520 = ctx_push(ctx_1499, [{key: "labs", val: labs}, {key: "e", val: e}, {key: "sb", val: sb}]);
     log_event("JsInterpreter.js", 8987, ctx_1520, "case");
     
       var _return_3948 = (function () {
@@ -37508,7 +37519,7 @@ var run_elements = function (s, c, _foo_) {
       log_event("JsInterpreter.js", 8990, ctx_push(ctx_1521, [{key: "#RETURN_VALUE#", val: _return_3949}]), "return");
       return (_return_3949); 
     case "::":
-      var el = _foo_.head, els_rev_2 = _foo_.tail;var ctx_1522 = ctx_push(ctx_1521, [{key: "el", val: el}, {key: "els_rev_2", val: els_rev_2}]);
+      var el = _foo_.head;var els_rev_2 = _foo_.tail;var ctx_1522 = ctx_push(ctx_1521, [{key: "el", val: el}, {key: "els_rev_2", val: els_rev_2}]);
     log_event("JsInterpreter.js", 9012, ctx_1522, "case");
     
       var _return_3956 = if_success((function () {
@@ -37556,8 +37567,8 @@ var run_elements = function (s, c, _foo_) {
                                  log_event("JsInterpreter.js", 9003, ctx_push(ctx_1524, [{key: "#RETURN_VALUE#", val: _return_3954}]), "return");
                                  return (_return_3954); 
                                case "Coq_element_func_decl":
-                                 var name = el.func_name,
-                                   args = el.arg_names, bd = el.body;var ctx_1527 = ctx_push(ctx_1523, [{key: "name", val: name}, {key: "args", val: args}, {key: "bd", val: bd}]);
+                                 var name = el.func_name;
+                                   var args = el.arg_names;var bd = el.body;var ctx_1527 = ctx_push(ctx_1523, [{key: "name", val: name}, {key: "args", val: args}, {key: "bd", val: bd}]);
                                log_event("JsInterpreter.js", 9006, ctx_1527, "case");
                                
                                  var _return_3955 = res_ter(s0,
@@ -37579,7 +37590,7 @@ var run_prog = function (s, c, _term_) {
   log_event("JsInterpreter.js", 9021, ctx_1528, "switch");
   switch (_term_.tag) {
     case "Coq_prog_intro":
-      var str = _term_.strictness, els = _term_.elements;var ctx_1529 = ctx_push(ctx_1528, [{key: "str", val: str}, {key: "els", val: els}]);
+      var str = _term_.strictness;var els = _term_.elements;var ctx_1529 = ctx_push(ctx_1528, [{key: "str", val: str}, {key: "els", val: els}]);
     log_event("JsInterpreter.js", 9020, ctx_1529, "case");
     
       var _return_3959 = (function () {
@@ -37628,7 +37639,7 @@ var push = function (s, c, l, args, ilen) {
       log_event("JsInterpreter.js", 9029, ctx_push(ctx_1531, [{key: "#RETURN_VALUE#", val: _return_3962}]), "return");
       return (_return_3962); 
     case "::":
-      var v = args.head, vs = args.tail;var ctx_1533 = ctx_push(ctx_1531, [{key: "v", val: v}, {key: "vs", val: vs}]);
+      var v = args.head;var vs = args.tail;var ctx_1533 = ctx_push(ctx_1531, [{key: "v", val: v}, {key: "vs", val: vs}]);
     log_event("JsInterpreter.js", 9048, ctx_1533, "case");
     
       var _return_3969 = if_string((function () {
@@ -37712,7 +37723,7 @@ var run_object_is_sealed = function (s, c, l, _foo_) {
       log_event("JsInterpreter.js", 9060, ctx_push(ctx_1536, [{key: "#RETURN_VALUE#", val: _return_3973}]), "return");
       return (_return_3973); 
     case "::":
-      var x = _foo_.head, xs_2 = _foo_.tail;var ctx_1538 = ctx_push(ctx_1536, [{key: "x", val: x}, {key: "xs_2", val: xs_2}]);
+      var x = _foo_.head;var xs_2 = _foo_.tail;var ctx_1538 = ctx_push(ctx_1536, [{key: "x", val: x}, {key: "xs_2", val: xs_2}]);
     log_event("JsInterpreter.js", 9085, ctx_1538, "case");
     
       var _return_3984 = if_spec((function () {
@@ -37821,7 +37832,7 @@ var run_object_seal = function (s, c, l, _foo_) {
       log_event("JsInterpreter.js", 9094, ctx_push(ctx_1542, [{key: "#RETURN_VALUE#", val: _return_3987}]), "return");
       return (_return_3987); 
     case "::":
-      var x = _foo_.head, xs_2 = _foo_.tail;var ctx_1544 = ctx_push(ctx_1542, [{key: "x", val: x}, {key: "xs_2", val: xs_2}]);
+      var x = _foo_.head;var xs_2 = _foo_.tail;var ctx_1544 = ctx_push(ctx_1542, [{key: "x", val: x}, {key: "xs_2", val: xs_2}]);
     log_event("JsInterpreter.js", 9130, ctx_1544, "case");
     
       var _return_4001 = if_spec((function () {
@@ -37971,7 +37982,7 @@ var run_object_freeze = function (s, c, l, _foo_) {
       log_event("JsInterpreter.js", 9139, ctx_push(ctx_1551, [{key: "#RETURN_VALUE#", val: _return_4004}]), "return");
       return (_return_4004); 
     case "::":
-      var x = _foo_.head, xs_2 = _foo_.tail;var ctx_1553 = ctx_push(ctx_1551, [{key: "x", val: x}, {key: "xs_2", val: xs_2}]);
+      var x = _foo_.head;var xs_2 = _foo_.tail;var ctx_1553 = ctx_push(ctx_1551, [{key: "x", val: x}, {key: "xs_2", val: xs_2}]);
     log_event("JsInterpreter.js", 9186, ctx_1553, "case");
     
       var _return_4023 = if_spec((function () {
@@ -38176,7 +38187,7 @@ var run_object_is_frozen = function (s, c, l, _foo_) {
       log_event("JsInterpreter.js", 9197, ctx_push(ctx_1562, [{key: "#RETURN_VALUE#", val: _return_4027}]), "return");
       return (_return_4027); 
     case "::":
-      var x = _foo_.head, xs_2 = _foo_.tail;var ctx_1564 = ctx_push(ctx_1562, [{key: "x", val: x}, {key: "xs_2", val: xs_2}]);
+      var x = _foo_.head;var xs_2 = _foo_.tail;var ctx_1564 = ctx_push(ctx_1562, [{key: "x", val: x}, {key: "xs_2", val: xs_2}]);
     log_event("JsInterpreter.js", 9237, ctx_1564, "case");
     
       var _return_4045 = if_spec((function () {
@@ -39997,7 +40008,7 @@ var run_call_prealloc = function (s, c, b, vthis, args) {
               return (_return_4271); 
             }())
             ;
-            var thisArg = _tuple_arg_4270[0], a = _tuple_arg_4270[1];
+            var thisArg = _tuple_arg_4270[0];var a = _tuple_arg_4270[1];
             var ctx_1667 = ctx_push(ctx_1666, [{key: "thisArg", val: thisArg}, {key: "a", val: a}]);
             log_event("JsInterpreter.js", 9811, ctx_1667, "let");
             var _return_4273 = (function () {
@@ -40073,7 +40084,7 @@ var run_call_prealloc = function (s, c, b, vthis, args) {
               return (_return_4283); 
             }())
             ;
-            var vthisArg = _tuple_arg_4282[0], a = _tuple_arg_4282[1];
+            var vthisArg = _tuple_arg_4282[0];var a = _tuple_arg_4282[1];
             var ctx_1670 = ctx_push(ctx_1669, [{key: "vthisArg", val: vthisArg}, {key: "a", val: a}]);
             log_event("JsInterpreter.js", 9910, ctx_1670, "let");
             var o1 = (function () {
@@ -40121,7 +40132,7 @@ var run_call_prealloc = function (s, c, b, vthis, args) {
               return (_return_4286); 
             }())
             ;
-            var l = _tuple_arg_4285[0], s_2 = _tuple_arg_4285[1];
+            var l = _tuple_arg_4285[0];var s_2 = _tuple_arg_4285[1];
             var ctx_1678 = ctx_push(ctx_1677, [{key: "l", val: l}, {key: "s_2", val: s_2}]);
             log_event("JsInterpreter.js", 9902, ctx_1678, "let");
             var vlength = if_some((function () {
@@ -42711,7 +42722,7 @@ var get_value_ref = function (state, r) {
                         JsSyntax.Coq_resvalue_ref(r));
   switch (_switch_arg_1.tag) {
     case "Coq_result_some":
-      var r = _switch_arg_1.value;
+      r = _switch_arg_1.value;
       switch (r.tag) {
         case "Coq_specret_val":
           var v = r.value;
