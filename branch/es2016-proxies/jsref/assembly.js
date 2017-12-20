@@ -186,6 +186,8 @@ var substring = function(n, m, s) {
   return s.slice(n, n+m);
 };
 
+var console_int = console.log;
+
 /* --------------------- BinNums.unlog.js --------------------- */
 
 var BinNums = (function() {
