@@ -182,3 +182,5 @@ var substring = function(n, m, s) {
     throw "strlength invalid arguments";
   return s.slice(n, n+m);
 };
+
+var console_int = console.log;

@@ -22,3 +22,14 @@ let shadower2 n =
 ;;
 
 shadower2 (Shadow 1)  (* Expected return value: 2 *)
+;;
+
+let f _ =
+  let x = 1 in
+  let y n =
+    let x = x + n in
+    x in
+  y (y x)
+;;
+
+console_int (f ()) (* Expected return value: 3 *)
