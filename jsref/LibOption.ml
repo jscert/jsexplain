@@ -35,9 +35,9 @@ match o1 with
 | Some v1 ->
   (match o2 with
    | Some v2 -> h v1 v2
-   | None -> assert false)
-| None -> assert false
+   | None -> failwith "some_compare with None")
+| None -> failwith "some_compare with None"
 
 let unsome_error o = match o with
 | Some x -> x
-| None -> assert false
+| None -> failwith "unsome_error with None"

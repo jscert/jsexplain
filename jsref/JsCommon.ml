@@ -44,7 +44,7 @@ let type_of_resvalue r = match r with
 
 let ref_of_resvalue r = match r with
 | Coq_resvalue_ref ref -> ref
-| _ -> assert false
+| _ -> failwith "Pre-checked safe type conversion failed"
 
 (** Default vales for data property attributes.
     @esid table-4
@@ -80,7 +80,7 @@ let attributes_accessor_of_attributes_data a =
       attributes_accessor_set = attributes_accessor_default.attributes_accessor_set;
       attributes_accessor_enumerable = ad.attributes_data_enumerable;
       attributes_accessor_configurable = ad.attributes_data_configurable }
-  | _ -> assert false
+  | _ -> failwith "Pre-checked safe type conversion failed"
 
 (** Convert an accessor attribute into a data attribute.
 
@@ -98,7 +98,7 @@ let attributes_data_of_attributes_accessor a =
         attributes_data_writable = attributes_data_default.attributes_data_writable;
         attributes_data_enumerable = aa.attributes_accessor_enumerable;
         attributes_data_configurable = aa.attributes_accessor_configurable }
-  | _ -> assert false
+  | _ -> failwith "Pre-checked safe type conversion failed"
 
 (** Updates a given data attribute with values from the given descriptor *)
 let attributes_data_update ad desc =
@@ -279,11 +279,11 @@ let ref_kind_of r =
 
 let value_of_ref_base_type r = match r with
 | Coq_ref_base_type_value v -> v
-| _ -> assert false
+| _ -> failwith "Pre-checked safe type conversion failed"
 
 let env_loc_of_ref_base_type r = match r with
 | Coq_ref_base_type_env_loc l -> l
-| _ -> assert false
+| _ -> failwith "Pre-checked safe type conversion failed"
 
 (** val ref_create_value : value -> prop_name -> bool -> ref **)
 

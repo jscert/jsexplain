@@ -1241,11 +1241,6 @@ and js_of_expression ctx dest e =
       let sexp = ppf_field_access (inline_of_wrap exp) lbl.lbl_name in
       apply_dest' ctx dest sexp
 
-  | Texp_assert      e                -> 
-      let sexp = inline_of_wrap e in
-      Printf.sprintf "throw %s;" sexp
-      (* TODO: what about apply_dest? *)
-
   | Texp_function (Nolabel, cases, Total) ->
       let mk_pat pat_des =
         { pat_desc = pat_des;
@@ -1275,6 +1270,7 @@ and js_of_expression ctx dest e =
       let exp = mk_exp (Texp_function (Nolabel, [thecase], Total)) in
       js_of_expression ctx dest exp
 
+  | Texp_assert      _                -> out_of_scope loc "assert (please use assert ppx syntax)"
   | Texp_match      (_,_,_, Partial)  -> out_of_scope loc "partial matching"
   | Texp_match      (_,_,_,_)         -> out_of_scope loc "matching with exception branches"
   | Texp_try        (_,_)             -> out_of_scope loc "exceptions"

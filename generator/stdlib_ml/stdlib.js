@@ -30,6 +30,7 @@ var mk_cons = function(head, tail) {
 
 // val raise : exn -> 'a
 var raise = function(x) { throw "Not_found"; };
+var failwith = function(str) { throw str; };
 
 //----------------------------------------------------------------------------
 // Boolean operations

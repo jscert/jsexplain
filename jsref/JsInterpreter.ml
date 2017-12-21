@@ -116,7 +116,7 @@ let typeof_prim _foo_ = match _foo_ with
 | Coq_value_bool b -> "boolean"
 | Coq_value_number n -> "number"
 | Coq_value_string s -> "string"
-| _ -> assert false
+| _ -> failwith "typeof_prim: recieved an object"
 
 (** val string_of_propname : propname -> prop_name **)
 
@@ -213,7 +213,7 @@ and some_context = execution_ctx_initial true
 and object_has_internal_slot : 'a. state -> object_loc -> (coq_object -> 'a option) -> bool =
   fun s l prj ->
   match run_object_method prj s l with
-  | None -> assert false
+  | None -> failwith "object_has_internal_slot failed"
   | Some a -> is_some a
 
 (** Function to implement the specification text of "O has a [[X]] internal method" *)
@@ -446,7 +446,7 @@ and put_value s c v w =
 (** @esid sec-getthisvalue
     @essec 6.2.4.3 *)
 and get_this_value v =
-  let asrt = assert (is_property_reference v) in
+  let%assert _ = (is_property_reference v) in
   if is_super_reference v then
     ref_this_value v
   else
@@ -765,7 +765,7 @@ and is_extensible s o =
   let%assert _ = match type_of o with Coq_type_object -> true | _ -> false in
   match o with
   | Coq_value_object l -> object_internal_is_extensible s l
-  | _ -> assert false
+  | _ -> failwith "is_extensible received non-object"
 
 (** @essec 7.2.7
     @esid sec-ispropertykey *)
@@ -787,37 +787,37 @@ and same_value x y =
         else if (JsNumber.isposzero n_x) && (JsNumber.isnegzero n_y) then true
         else if (JsNumber.isnegzero n_x) && (JsNumber.isposzero n_y) then true
         else n_x === n_y
-      | _ -> assert false)
-    | _ -> assert false)
+      | _ -> failwith "impossible")
+    | _ -> failwith "impossible")
   | _ -> same_value_non_number x y
 
 (** @essec 7.2.11
     @esid sec-samevaluenonnumber *)
 and same_value_non_number x y =
-  let (*%assert*) asrt = assert (not (type_compare (type_of x) Coq_type_number)) in
-  let (*%assert*) asrt = assert (type_compare (type_of x) (type_of y)) in
+  let%assert _ = not (type_compare (type_of x) Coq_type_number) in
+  let%assert _ = type_compare (type_of x) (type_of y) in
   match x with
   | Coq_value_undef      -> true
   | Coq_value_null       -> true
   | Coq_value_string s_x ->
     (match y with
     | Coq_value_string s_y -> string_eq s_x s_y
-    | _ -> assert false)
+    | _ -> spec_assertion_failure ())
   | Coq_value_bool b_x   ->
     (match y with
      | Coq_value_bool b_y -> bool_eq b_x b_y
-     | _ -> assert false)
+     | _ -> spec_assertion_failure ())
   (* FIXME: Symbol
   | Coq_value_symbol s_x ->
      (match y with
      | Coq_value_symbol s_y -> symbol_compare s_x s_y
-     | _ -> assert false)
+     | _ -> spec_assertion_failure ())
   *)
   | Coq_value_object l_x ->
     (match y with
     | Coq_value_object l_y -> object_loc_compare l_x l_y
-    | _ -> assert false)
-  | _ -> assert false
+    | _ -> spec_assertion_failure ())
+  | _ -> spec_assertion_failure ()
 
 (** {2 Operations on Objects }
     @essec 7.3
@@ -828,9 +828,8 @@ and same_value_non_number x y =
 and get s o p =
   let%assert _ = (type_of o) === Coq_type_object in
   let%assert _ = is_property_key p in
-  match o with
-  | Coq_value_object l -> object_internal_get s l p o
-  | _ -> assert false
+  let l = loc_of_value o in
+  object_internal_get s l p o
 
 (** @essec 7.3.2
     @esid sec-getv *)
@@ -893,9 +892,8 @@ and get_method s v p =
 and has_property s o p =
   let%assert _ = (type_of o) === Coq_type_object in
   let%assert _ = is_property_key p in
-  match o with
-  | Coq_value_object l -> object_internal_has_property s l p
-  | _ -> assert false
+  let l = loc_of_value o in
+  object_internal_has_property s l p
 
 (** @essec 7.3.12
     @esid sec-call *)
@@ -903,9 +901,9 @@ and call s f v argumentList =
   if_some_or_apply_default argumentList [] (fun argumentList ->
     let callable = is_callable s f in
     if not callable then run_error_no_c s Coq_native_error_type
-    else match f with
-    | Coq_value_object l -> object_internal_call s l v argumentList
-    | _ -> assert false
+    else
+    let l = loc_of_value f in
+    object_internal_call s l v argumentList
   )
 
 (** @essec 7.3.13
@@ -1166,7 +1164,7 @@ and get_global_object s ctx =
   let e = unsome_error (env_record_binds_option s env_loc_global_env_record) in
   match e with
   | Coq_env_record_object (l, this) -> Coq_value_object l
-  |  _ -> assert false
+  |  _ -> failwith "get_global_object e not a env_record_object"
 
 (** {1 Ordinary and Exotic Objects Behaviours }
     @essec 9
@@ -1221,7 +1219,7 @@ and ordinary_set_prototype_of s o v =
               let%some prototype = run_object_method object_prototype_ s p_l in
               repeat prototype false)
             | _ -> repeat p true)
-        | _ -> assert false)
+        | _ -> failwith "ordinary_set_prototype_of, p is not object or null")
       else
         (* Set the value of the [[Prototype]] internal slot of O to V *)
         let%some s' = run_object_set_internal object_set_proto s o v in

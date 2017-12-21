@@ -603,16 +603,16 @@ let codetype_compare ct1 ct2 = (ct1:codetype) === ct2
     Intended for use after explicit typechecks in the spec. *)
 let string_of_value v = match v with
 | Coq_value_string s -> s
-| _ -> assert false
+| _ -> failwith "Pre-checked safe type conversion failed"
 
 let bool_of_value v = match v with
 | Coq_value_bool b -> b
-| _ -> assert false
+| _ -> failwith "Pre-checked safe type conversion failed"
 
 let number_of_value v = match v with
 | Coq_value_number n -> n
-| _ -> assert false
+| _ -> failwith "Pre-checked safe type conversion failed"
 
 let loc_of_value v = match v with
 | Coq_value_object l -> l
-| _ -> assert false
+| _ -> failwith "Pre-checked safe type conversion failed"

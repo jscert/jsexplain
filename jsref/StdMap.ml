@@ -20,25 +20,25 @@ let bal l x d r =
   let hr = match r with Empty -> 0 | Node(_,_,_,_,h) -> h in
   if int_gt hl (hr + 2) then begin
     match l with
-      Empty -> assert false
+      Empty -> failwith "StdMap.bal failure"
     | Node(ll, lv, ld, lr, _) ->
         if int_ge (height ll) (height lr) then
           create ll lv ld (create lr x d r)
         else begin
           match lr with
-            Empty -> assert false
+            Empty -> failwith "StdMap.bal failure"
           | Node(lrl, lrv, lrd, lrr, _)->
               create (create ll lv ld lrl) lrv lrd (create lrr x d r)
         end
   end else if int_gt hr (hl + 2) then begin
     match r with
-      Empty -> assert false
+      Empty -> failwith "StdMap.bal failure"
     | Node(rl, rv, rd, rr, _) ->
         if int_ge (height rr) (height rl) then
           create (create l x d rl) rv rd rr
         else begin
           match rl with
-            Empty -> assert false
+            Empty -> failwith "StdMap.bal failure"
           | Node(rll, rlv, rld, rlr, _) ->
               create (create l x d rll) rlv rld (create rlr rv rd rr)
         end
@@ -67,8 +67,7 @@ let rec add compare x data s =
 
 let rec find compare x s =
   match s with
-    Empty -> assert false
-      (* raise Not_found *)
+    Empty -> raise Not_found
   | Node(l, v, d, r, _) ->
       let c = compare x v in
       if int_eq c 0 then d
@@ -107,7 +106,7 @@ let rec min_binding s =
 
 let rec remove_min_binding s = 
   match s with
-    Empty -> assert false
+    Empty -> failwith "StdMap.remove_min_binding fail"
   | Node(l, x, d, r, _) -> 
       match l with 
       Empty -> r

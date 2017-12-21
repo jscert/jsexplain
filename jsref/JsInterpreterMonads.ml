@@ -34,10 +34,21 @@ let res_ter s r =
 let res_void s =
   res_out s res_empty
 
-(** Call when a spec assertion fails *)
+(** Call when a spec assertion fails
+
+    Spec assertions are not required to be executed by implementations at runtime. If they fail, the spec is
+    self-inconsistent. They are useful for us to include, execute, and eventually theorem prove against.
+
+    They often consist of type checks, which we include explicitly, even though are guaranteed safe in our typed ML.
+
+    This function will not return, but terminate execution immediately. (hopefully in such a way that the execution
+    environment can handle cleanly).
+
+    [failwith msg] is preferred in situations where the failure is generic.
+    Use something else when the specification {i could} assert this, but presently doesn't.
+*)
 let spec_assertion_failure _ =
-  Debug.impossible_because __LOC__ "spec assertion failed";
-  Coq_result_impossible
+  Debug.impossible_because __LOC__ "spec assertion failed"
 
 (** val get_arg : int -> value list -> value **)
 
@@ -106,7 +117,7 @@ let if_ter2 w k kfail =
   if_result_some2 w (fun sp ->
     match sp with
     | Coq_specret_out (s, r) -> k s r
-    | _ -> assert false
+    | _ -> failwith "if_ter2 failed: not a Coq_specret_out"
   ) kfail
 
 let if_ter w k = if_ter2 w k (fun x -> x)
@@ -148,7 +159,7 @@ let if_success w k =
   if_success2 w k (fun x -> x)
 
 let assert_success w k =
-  if_success2 w k (fun x -> spec_assertion_failure ())
+  if_success2 w k spec_assertion_failure
 
 (** val if_void : result_void -> (state -> result) -> result **)
 
@@ -376,7 +387,7 @@ let if_value_ret w k =
   if_value2 w k (fun x -> Return x)
 
 let assert_value_ret w k =
-  if_value2 w k (fun x -> Return (spec_assertion_failure ()))
+  if_value2 w k spec_assertion_failure
 
 let if_object_ret w k =
   if_object2 w k (fun x -> Return x)
@@ -388,25 +399,25 @@ let if_bool_ret w k =
   if_bool2 w k (fun x -> Return x)
 
 let assert_object w k =
-  if_object2 w k (fun x -> spec_assertion_failure ())
+  if_object2 w k spec_assertion_failure
 
 let assert_object_ret w k =
-  if_object2 w k (fun x -> Return (spec_assertion_failure ()))
+  if_object2 w k spec_assertion_failure
 
 let assert_bool w k =
-  if_bool2 w k (fun x -> spec_assertion_failure ())
+  if_bool2 w k spec_assertion_failure
 
 let assert_bool_ret w k =
-  if_bool2 w k (fun x -> Return (spec_assertion_failure ()))
+  if_bool2 w k spec_assertion_failure
 
 let assert_string w k =
-  if_string2 w k (fun x -> spec_assertion_failure ())
+  if_string2 w k spec_assertion_failure
 
 let assert_string_ret w k =
-  if_string2 w k (fun x -> Return (spec_assertion_failure ()))
+  if_string2 w k spec_assertion_failure
 
 let check_assert_ret b k =
-  if b then k () else Return (spec_assertion_failure ())
+  if b then k () else spec_assertion_failure ()
 
 let if_spec_ret w k =
   if_spec2 w k (fun x -> Return x)

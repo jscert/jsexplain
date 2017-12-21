@@ -19,7 +19,7 @@ let if_some_then_same x y d =
 
 
 (* FIXME: To be replaced with same_value *)
-let same_value_dec v1 v2 = assert false
+let same_value_dec v1 v2 = failwith "FIXME: To be replaced with same_value"
 
 (** val attributes_data_compare :
     attributes_data -> attributes_data -> bool **)
@@ -169,7 +169,7 @@ let attributes_is_data_dec a = match a with
     and IsDataDescriptor tests. *)
 let descriptor_get_defined desc =
   match desc with
-  | Descriptor_undef -> assert false
+  | Descriptor_undef -> failwith "Pre-checked safe type conversion failed"
   | Descriptor d -> d
 
 (** Function to test if d0 is contained within d1.
