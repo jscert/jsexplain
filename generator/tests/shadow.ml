@@ -1,14 +1,17 @@
 (* `make shadow.unlog.js` and test resulting function in node
    add a print_int to the shadower line and `ocamlc shadow.ml` to validate ml *)
 
+(** Inner-most scope should not hide outermost, incorrect JS behaviour would be to execute undefined + 1 **)
 let shadower n =
   let f _ =
-    let n = n+1 in
+    let (n, z) = n+1, () in
     n+1 in
   f () ;;
 
 shadower 1;;            (* Expected return value: 3 *)
 
+
+(** As previous, but using a pattern binder instead of let **)
 
 type shadow =
 | Shadow of int [@f num]
@@ -32,4 +35,13 @@ let f _ =
   y (y x)
 ;;
 
-console_int (f ()) (* Expected return value: 3 *)
+f () (* Expected return value: 3 *)
+;;
+
+(** Things we want to be able to do, for example: **)
+let x = 10 in
+let x = x + x in
+let x = x + x + x in
+x
+
+;;

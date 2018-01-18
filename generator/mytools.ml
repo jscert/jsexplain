@@ -40,12 +40,7 @@ let bool_of_option xo =
 let rec list_make n v =
    if n = 0 then [] else v::(list_make (n-1) v)
   
-let list_mapi f l =
-  let rec aux i = function
-    | [] -> []
-    | h::t -> (f i h)::(aux (i+1) t)
-    in
-  aux 0 l
+let list_mapi f l = List.mapi
 
 let range i j =
   let rec aux j acc =
@@ -64,6 +59,40 @@ let rec filter_somes = function
   | [] -> []
   | None :: l -> filter_somes l
   | (Some x) :: l -> x :: filter_somes l
+
+let map_opt f l = filter_somes @@ List.map f l
+let map_opt2 f l1 l2 = filter_somes @@ List.map2 f l1 l2
+
+(* A list map with left-fold for state update propagation *)
+let rec map_state f st l = match l with
+  | []      -> (st, [])
+  | i :: l' ->
+      let (st', i') = f st i in
+      let (st'', l'') = map_state f st' l' in
+      (st'', i' :: l'')
+
+(* A list map with left-fold for state update propagation, removing any None results *)
+let rec map_opt_state f st l = match l with
+  | []       -> (st, [])
+  | i :: l' -> begin
+      match f st i with
+      | None           -> map_opt_state f st l'
+      | Some (st', i') ->
+        let (st'', rl) = map_opt_state f st' l' in
+        (st'', i' :: rl)
+    end
+
+(* A 2 list version of map_opt_state *)
+let rec map_opt_state2 f st l1 l2 = match (l1, l2) with
+  | [], []               -> (st, [])
+  | i1 :: l1', i2 :: l2' -> begin
+      match f st i1 i2 with
+      | None          -> map_opt_state2 f st l1' l2'
+      | Some (st', r) ->
+        let (st'', rl) = map_opt_state2 f st' l1' l2' in
+        (st'', r :: rl)
+    end
+  | _ -> raise (Invalid_argument "map_opt_state2 called with lists of differing lengths")
 
 let list_unique l =
    let rec aux acc = function

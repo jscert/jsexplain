@@ -48,20 +48,21 @@ let rename_constructor s =
 (****************************************************************)
 (* SHADOWING CHECKER *)
 
-let report_shadowing = true
-  (* !current_mode = Mode_cmi *)
+module ShadowMapM = Map406.Make(String)
+type shadow_map = int ShadowMapM.t
+let increment_sm sm id =
+  ShadowMapM.update id (option_app (Some 0) (fun i -> Some (i+1))) sm
 
-let do_check_shadowing env id =
-  try ignore (Env.lookup_value (Longident.Lident id) env); true
+(* Checks if ident is defined in env, and thus would shadow if redefined. *)
+let ident_is_shadowing env str_ident =
+  try ignore (Env.lookup_value (Longident.Lident str_ident) env);
+    true
   with Not_found -> false
 
-let check_shadowing ?loc env id =
-  if report_shadowing then begin
-     let is_shadowing = do_check_shadowing env id in
-     if is_shadowing 
-       then warning ?loc:loc (" !!!!! shadowing of variable: " ^ id);
-  end
-
+(* If the identifier is shadowing another, then update shadow map *)
+let update_shadow_map sm env id =
+  let str_id = Ident.name id in
+  if ident_is_shadowing env str_id then increment_sm sm str_id else sm
 
 (****************************************************************)
 (* STRING UTILITIES *)
@@ -128,30 +129,11 @@ let is_infix f args = match args with
        (x.exp_loc.loc_start.pos_lnum = f.exp_loc.loc_start.pos_lnum &&
         x.exp_loc.loc_start.pos_cnum < f.exp_loc.loc_start.pos_cnum)
 
-exception Map_fields_elements_mismatch_number_args
-
-(* here, bind is the function to be applied to a field and an element,
-   and it returns an option, with None when the entry should be ignored,
-   and with a result otherwise, to be added to the list of results *)
-
-let map_filter_fields_elements bind fields elements =
-  let rec aux = function
-    | [], [] -> []
-    | f :: fs, e :: es ->
-      let res = aux (fs,es) in
-      begin match bind f e with
-        | None -> res
-        | Some p -> p :: res  (* p is a pair identifier, code to be bound *)
-      end
-    | _ -> raise Map_fields_elements_mismatch_number_args
-  in aux (fields, elements)
-
-let map_cstr_fields ?loc bind (cstr : constructor_description) elements =
+let map_cstr_fields ?loc (sm : shadow_map) bind cstr elements =
   let fields = extract_cstr_attrs cstr in
-  try map_filter_fields_elements bind fields elements 
-  with   Map_fields_elements_mismatch_number_args -> 
+  try map_opt_state2 bind sm fields elements
+  with Invalid_argument _ ->
      error ?loc ("Insufficient fieldnames for arguments to " ^ cstr.cstr_name)
-  
 
 (** Decomposition of functions *)
 
@@ -301,10 +283,11 @@ let ppf_apply_infix f arg1 arg2 =
 let ppf_match_case c =
   Printf.sprintf "case %s" c
 
+(* FIXME: shadows now a sm, always should introduce a var *)
 let ppf_match_binders binders =
   if binders = [] then "" else
     let binds = show_list "@," (List.map
-      (fun (id,se,shadows) -> Printf.sprintf "%s%s = %s;" (if shadows then "" else "var ") id se) binders) in
+      (fun (id,se) -> Printf.sprintf "var %s = %s;" id se) binders) in
   Printf.sprintf "@[<hov 2>%s@]" binds
 
 let ppf_let_tuple ids sbody =
@@ -349,10 +332,6 @@ let ppf_for id start ed flag body =
 let ppf_cstr tag value =
   Some (Printf.sprintf "%s: %s" tag value)
 
-(* deprecated:
-  let expanded_constructors = map_cstr_fields (*~loc*) ppf_cstr cd args in
-*)
-
 let ppf_cstrs styp cstr_name rest =
   let comma = if rest = "" then "" else "," in
   let styp_full =
@@ -395,16 +374,34 @@ let js_keywords =
   "export"; "extends"; "finally"; "for"; "function"; "if"; "import"; "in"; "instanceof"; "new"; "return"; "super";
   "switch"; "this"; "throw"; "try"; "typeof"; "var"; "void"; "while"; "with"; "yield"; "enum"]
 
-let ppf_ident_name x =
-  if List.mem x js_keywords then
-    (* Variable name clashes with JS keyword: prefix with a \mathbb{V} character (\u1d54d) *)
-    "\xf0\x9d\x95\x8d" ^ x
-  else
-    (* Variable name contains ' (not supported by JS): replace with unicode prime symbol (\u02b9) *)
-    Str.global_replace (Str.regexp "'") "\xca\xb9" x
+(** Conversion between integers and unicode \mathbb strings *)
+(* 0-9 as unicode \mathbb{d} multibyte character strings *)
+let ustr_bb_digits = Array.init 10 (fun i -> Printf.sprintf "\xf0\x9d\x9F%c" (char_of_int (0x98 + i)))
 
-let ppf_ident i =
-  i |> Ident.name |> ppf_ident_name
+(** Converts an integer into an array of decimal digits *)
+let int_to_array = function
+| 0 -> [0]
+| i -> let rec f i acc = if i = 0 then acc else f (i/10) (i mod 10 :: acc) in f i []
+
+(** Converts an integer i into a unicode string representation of \mathbb{i} *)
+let int_to_bb_ustr i = String.concat "" (List.map (fun d -> ustr_bb_digits.(d)) (int_to_array i))
+
+(* On with the variable name mangling *)
+
+let ppf_ident_name x sm =
+  let x' =
+    if List.mem x js_keywords then
+      (* Variable name clashes with JS keyword: prefix with a \mathbb{V} character (\u1d54d) *)
+      "\xf0\x9d\x95\x8d" ^ x
+    else
+      (* Variable name contains ' (not supported by JS): replace with unicode prime symbol (\u02b9) *)
+      Str.global_replace (Str.regexp "'") "\xca\xb9" x
+  in (* Append digits to handle non-shadowed ML variables that become shadowed in JS scopes *)
+  option_app x' (fun i -> x' ^ (int_to_bb_ustr i)) (ShadowMapM.find_opt x sm)
+
+(** Returns the JS version of the Ident name *)
+ let ppf_ident id sm =
+  ppf_ident_name (Ident.name id) sm
 
 let ppf_path =
   Path.name
@@ -517,7 +514,6 @@ let generate_logged_if loc ctx sintro sarg siftrue siffalse =
 (*--------- match ---------*)
 
 let generate_logged_case loc spat binders ctx newctx sbody need_break =
-  (* Note: binders is a list of triples of id, shadowing flag *)
   (* Note: if binders = [], then newctx = ctx *)
   let (token_start, token_stop, token_loc) = token_fresh !current_mode loc in
   let sbinders_common () = 
@@ -526,7 +522,7 @@ let generate_logged_case loc spat binders ctx newctx sbody need_break =
     match !current_mode with
     | Mode_cmi -> assert false
     | Mode_pseudo _ ->
-        let args = List.map fst3 binders in
+        let args = List.map fst binders in
         let spat = (* LATER: use a cleaner separation with Case of (cstr,args) | Default *)
           if spat = "case ::" then begin
             let (x,y) = match args with [x;y] -> (x,y) | _ -> assert false in
@@ -540,7 +536,7 @@ let generate_logged_case loc spat binders ctx newctx sbody need_break =
     | Mode_unlogged _ ->
         (token_start, spat, sbinders_common(), token_stop)
     | Mode_logged ->
-      let ids = List.map fst3 binders in
+      let ids = List.map fst binders in
       let mk_binding x =
         Printf.sprintf "{key: \"%s\", val: %s}" x x
       in
@@ -665,7 +661,7 @@ let generate_logged_return loc ctx sbody =
 
 (** Destination-style translation of expressions *)
 
-type dest = 
+type dest =
   | Dest_ignore
   | Dest_return
   | Dest_assign of string * bool (* bool indicates shadowing *)
@@ -699,7 +695,7 @@ and js_of_constant = function
   | Const_int64     n     -> Int64.to_string n
   | Const_nativeint n     -> Nativeint.to_string n
 
-let js_of_path_longident path ident =
+let js_of_path_longident sm path ident =
   match String.concat "." @@ Longident.flatten ident.txt with
   (* for unit: *)
   | "()"  -> unit_repr
@@ -724,61 +720,56 @@ let js_of_path_longident path ident =
   | "/"  -> "/"
   (* for string *)
   | "^"   -> "+" (* !!TODO: we want to claim ability to type our sublanguage, so we should not use this *)
-  | res   -> 
-      let res = if !generate_qualified_names && (Path.head path).Ident.name <> "Stdlib" 
+  | res   ->
+      let res = if !generate_qualified_names && (Path.head path).Ident.name <> "Stdlib"
                    then ppf_path path else res in
-      ppf_ident_name res
+      ppf_ident_name res sm
 
-let is_triple_equal_comparison e =
+let is_triple_equal_comparison e sm =
    match e.exp_desc with
    | Texp_ident (path, ident,  _) ->
-      let sexp = js_of_path_longident path ident in
+      let sexp = js_of_path_longident sm path ident in
       sexp = "==="
       (* TODO: this text could be optimized *)
    | _ -> false
 
-let ident_of_pat pat = match pat.pat_desc with
-  | Tpat_var (id, _) -> ppf_ident id
+let str_ident_of_pat sm pat = match pat.pat_desc with
+  | Tpat_var (id, _) -> Ident.name id
+  | Tpat_any         -> id_fresh "_pat_any_"
+  | _ -> error ~loc:pat.pat_loc "functions can't deconstruct values"
+
+let ppf_ident_of_pat sm pat = match pat.pat_desc with
+  | Tpat_var (id, _) -> ppf_ident id sm
   | Tpat_any         -> id_fresh "_pat_any_"
   | _ -> error ~loc:pat.pat_loc "functions can't deconstruct values"
 
 
-(* takes a list of pairs made of: list of strings, and list of strings, 
+(* takes a list of pairs made of: list of strings, and list of strings,
    and return a pair of a string (the string concat with newlines of the fst strings),
    and a list of strings (the list flatten of the snd strings) *)
 
-let combine_list_output args = 
+let combine_list_output args =
    let (strs,bss) = List.split args in
    (show_list "@,@," strs), (List.flatten bss)
 
-let mapiopt f =
-  let rec aux i = function
-    | [] -> []
-    | hd :: tl ->
-      let ro = f i hd in begin
-        match ro with
-        | Some r -> r :: aux (i+1) tl
-        | None -> aux (i+1) tl
-      end
-  in
-  aux 0
-
 (* returns a pair (x,e), where [x] in the name in [pat]
    and where [e] is the access to "stupleobj[index]" *)
-let tuple_component_bind stupleobj index pat =
+let tuple_component_bind stupleobj (result, index, sm) pat =
    let loc = pat.pat_loc in
    match pat.pat_desc with
    | Tpat_var (id, _) ->
-       let sid = ppf_ident id in
-       Some (sid, Printf.sprintf "%s[%d]" stupleobj index, do_check_shadowing pat.pat_env sid)
-   | Tpat_any -> None
+       let sm = update_shadow_map sm pat.pat_env id in
+       let sid = ppf_ident id sm in
+       ((sid, Printf.sprintf "%s[%d]" stupleobj index)::result, index+1, sm)
+   | Tpat_any -> (result, index+1, sm)
    | _ -> out_of_scope loc "Nested pattern matching"
 
 (* returns a list of pairs of the form (x,e), corresponding
    to the bindings to be performed for decomposing [stupleobj]
     as the tuple of patterns [pl]. *)
-let tuple_binders stupleobj pl =
-   mapiopt (tuple_component_bind stupleobj) pl
+let tuple_binders stupleobj sm pl =
+  let (result, _, sm) = List.fold_left (tuple_component_bind stupleobj) ([], 0, sm) pl in
+  (result, sm)
 
 (****************************************************************)
 (* TRANSLATION *)
@@ -796,20 +787,18 @@ let rec js_of_structure s =
    let postfix = List.fold_left (fun str path -> str ^ "@,}// end of with " ^ ppf_path path) "" open_paths in
    (prefix ^ "@," ^ contents ^ postfix, namesbound)
 
-and show_value_binding ctx vb = (* dest is Ignore *)
-  js_of_let_pattern ctx vb.vb_pat vb.vb_expr
-
 and js_of_structure_item s =
   let loc = s.str_loc in
   match s.str_desc with
   | Tstr_eval (e, _)     -> 
-     let str = Printf.sprintf "%s" @@ js_of_expression ctx_initial Dest_ignore e in
+     let str = Printf.sprintf "%s" @@ js_of_expression ShadowMapM.empty ctx_initial Dest_ignore e in
      (str, [])
-  | Tstr_value (_, vb_l) -> 
-     combine_list_output (~~ List.map vb_l (fun vb -> 
-        let id = ident_of_pat vb.vb_pat in
-        check_shadowing ~loc:loc s.str_env id;
-        let sbody = js_of_expression_inline_or_wrap ctx_initial vb.vb_expr in
+  | Tstr_value (_, vb_l) ->
+     combine_list_output (~~ List.map vb_l (fun vb ->
+        let id = str_ident_of_pat ShadowMapM.empty vb.vb_pat in
+        if ident_is_shadowing s.str_env id then error ~loc "Variable shadowing not permitted at toplevel"
+        else
+        let sbody = js_of_expression_inline_or_wrap ShadowMapM.empty ctx_initial vb.vb_expr in
         let s = Printf.sprintf "@[<v 0>var %s = %s;@]" id sbody in
         (s, [id])))
   | Tstr_type (rec_flag, decls) ->
@@ -821,7 +810,7 @@ and js_of_structure_item s =
               let cstr_name = cd.Types.cd_id.Ident.name in
               let fields = extract_cstr_attrs_basic cstr_name cd.cd_attributes in
               let sargs = show_list ", " fields in
-              let sbindings = map_filter_fields_elements ppf_cstr fields fields in
+              let sbindings = map_opt2 (fun x y -> ppf_cstr x y) fields fields in (* FIXME: twice fields, really?! *)
               let rest = show_list ", " sbindings in
               let cstr_name = rename_constructor cstr_name in
               let sobj = ppf_cstrs styp cstr_name rest in 
@@ -844,43 +833,45 @@ and js_of_structure_item s =
       if l.txt = "ocaml.doc" || l.txt = "ocaml.text" then ("",[])
       else out_of_scope loc "attributes"
 
-and js_of_branch ctx dest b eobj =
-  let spat, binders = js_of_pattern b.c_lhs eobj in
+(* Translates each pattern/subexpression pair branch of a match expression *)
+and js_of_branch sm ctx dest b eobj =
+  let spat, binders, sm = js_of_pattern sm b.c_lhs eobj in
   let newctx = if binders = [] then ctx else ctx_fresh() in
-  let sbody = js_of_expression newctx dest b.c_rhs in
+  let sbody = js_of_expression sm newctx dest b.c_rhs in
   let need_break = (dest <> Dest_return) in
-  generate_logged_case b.c_lhs.pat_loc spat binders ctx newctx sbody need_break 
-     
-and js_of_expression_inline_or_wrap ctx e = 
+  generate_logged_case b.c_lhs.pat_loc spat binders ctx newctx sbody need_break
+  (* there is no need to propagate the updated [sm] back up the tree, as pattern bound only in [sbody] *)
+
+and js_of_expression_inline_or_wrap sm ctx e =
   try 
-    js_of_expression ctx Dest_inline e
+    js_of_expression sm ctx Dest_inline e
   with Not_good_for_dest_inline ->
-    js_of_expression_wrapped ctx e
+    js_of_expression_wrapped sm ctx e
 
-and js_of_expression_wrapped ctx e = (* dest = Dest_return *)
-  ppf_lambda_wrap (js_of_expression ctx Dest_return e)
+and js_of_expression_wrapped sm ctx e = (* dest = Dest_return *)
+  ppf_lambda_wrap (js_of_expression sm ctx Dest_return e)
 
-and js_of_expression_naming_argument_if_non_variable ctx obj name_prefix = 
+and js_of_expression_naming_argument_if_non_variable sm ctx obj name_prefix =
   if is_mode_pseudo() then begin
-    "", js_of_expression ctx Dest_ignore obj
+    "", js_of_expression sm ctx Dest_ignore obj
   end else begin
     match obj.exp_desc with
     | Texp_ident (path, ident,  _) -> 
-        "", (js_of_path_longident path ident)
+        "", (js_of_path_longident sm path ident)
     | _ ->  (* generate  var id = sexp;  *)
         let id = id_fresh name_prefix in
-        let sintro = js_of_expression ctx (Dest_assign (id, false)) obj in
+        let sintro = js_of_expression sm ctx (Dest_assign (id, false)) obj in
         (sintro ^ "@,"), id
   end
 
-and js_of_expression ctx dest e =
-  let inline_of_wrap = js_of_expression_inline_or_wrap ctx in (* shorthand *)
+and js_of_expression (sm : shadow_map) ctx dest e =
+  let inline_of_wrap = js_of_expression_inline_or_wrap sm ctx in (* shorthand *)
   let loc = e.exp_loc in
   let apply_dest' = apply_dest loc in
   match e.exp_desc with
 
   | Texp_ident (path, ident,  _) -> 
-      let sexp = js_of_path_longident path ident in
+      let sexp = js_of_path_longident sm path ident in
       let sexp = if sexp = "not" then "!" else sexp in (* hack for renaming "not" on the fly *)
       apply_dest' ctx dest sexp
 
@@ -889,48 +880,57 @@ and js_of_expression ctx dest e =
       apply_dest' ctx dest sexp
 
   | Texp_let (_, vb_l, e) ->
+    (* [vb_l] is a list of value bindings, corresponding to each term of a [let vb_0 and vb_1 and vb_2] *)
+    (* TODO: Handle mixed tuple/record/standard vbs let expressions *)
     reject_inline dest;
-    let (ids, sdecl) = begin match vb_l with  
+    let (ids, sdecl, sm') = begin match vb_l with
       | [ { vb_pat = { pat_desc = Tpat_tuple pl }; vb_expr = obj } ] -> (* binding tuples *)
-          let (sintro, stupleobj) = js_of_expression_naming_argument_if_non_variable ctx obj "_tuple_arg_" in     
-          let binders = tuple_binders stupleobj pl in
-          let ids = List.map fst3 binders in
+          let (sintro, stupleobj) = js_of_expression_naming_argument_if_non_variable sm ctx obj "_tuple_arg_" in
+          let (binders, sm') = tuple_binders stupleobj sm pl in
+          let ids = List.map fst binders in
           let sdecl =
             if is_mode_pseudo() then begin
-              ppf_let_tuple ids stupleobj 
+              ppf_let_tuple ids stupleobj
             end else begin
               ppf_match_binders binders
             end in
-          (ids, sintro ^ sdecl)
+          (ids, sintro ^ sdecl, sm')
       | [ { vb_pat = { pat_desc = Tpat_record (args, closed_flag) }; vb_expr = obj } ] ->
           (* binding records -- used in JsCommon.ml *)
           (* args : (Longident.t loc * label_description * pattern) list *)
-         let (sintro, seobj) = js_of_expression_naming_argument_if_non_variable ctx obj "_record_arg_" in     
-         let bind (arg_loc,label_descr,pat) = 
+         let (sintro, seobj) = js_of_expression_naming_argument_if_non_variable sm ctx obj "_record_arg_" in
+         let bind sm' (arg_loc,label_descr,pat) =
             let name = label_descr.lbl_name in
             match pat.pat_desc with
             | Tpat_var (id, _) -> 
-                let sid = ppf_ident id in
-                (sid, Printf.sprintf "%s.%s" seobj name, do_check_shadowing pat.pat_env sid)
+                let sm' = update_shadow_map sm' pat.pat_env id in
+                let sid = ppf_ident id sm' in
+                (sm', (sid, Printf.sprintf "%s.%s" seobj name))
             | Tpat_any -> out_of_scope e.exp_loc "Underscore pattern in let-record"
             | _ -> out_of_scope e.exp_loc "Nested pattern matching"
             in
-          let binders = List.map bind args in
-          let ids = List.map fst3 binders in
+          let sm', binders = map_state bind sm args in
+          let ids = List.map fst binders in
           let sdecl =
             if is_mode_pseudo() then begin
               ppf_let_record ids seobj 
             end else begin
               ppf_match_binders binders
             end in
-          (ids, sintro ^ sdecl)
+          (ids, sintro ^ sdecl, sm')
       | _ -> (* other cases *)
-        let (ids,sdecls) = List.split (List.map (fun vb -> show_value_binding ctx vb) @@ vb_l) in
-        let sdecl = String.concat lin1 @@ sdecls in
-        (ids, sdecl)
+        (* vb subexpressions are in the context of overall expression: use constant sm for this,
+           but fold over a changing new_sm for the created bindings *)
+        let folder vb (sids, jsexprs, new_sm) =
+          let (sid, jsexpr, new_sm) = js_of_let_pattern sm new_sm ctx vb in
+          (sid::sids, jsexpr::jsexprs, new_sm)
+        in
+        let (ids, sdecls, new_sm) = List.fold_right folder vb_l ([], [], sm) in
+        let sdecl = String.concat lin1 sdecls in
+        (ids, sdecl, new_sm)
       end in
+    let sbody = js_of_expression sm' ctx dest e in
     let newctx = ctx_fresh() in
-    let sbody = js_of_expression newctx dest e in
     let sexp = generate_logged_let loc ids ctx newctx sdecl sbody in
     sexp
 
@@ -938,7 +938,7 @@ and js_of_expression ctx dest e =
     let pats, body = function_get_args_and_body e 
       (* DEPRECATED: function_get_args_and_body e  [c.c_lhs] c.c_rhs *) in
     let pats_clean = List.filter (fun pat -> is_mode_not_pseudo() || not (is_hidden_type pat.pat_type)) pats in
-    let arg_ids = List.map ident_of_pat pats_clean in
+    let arg_ids = List.map (ppf_ident_of_pat sm) pats_clean in
        (* FUTURE USE: (for function taking tuples as args)
        let arg_idss, tuplebindingss = List.split (List.map (fun pat ->
          match pat.pat_desc with
@@ -972,7 +972,7 @@ and js_of_expression ctx dest e =
        *)
     let stuplebindings = "" in
     let newctx = ctx_fresh() in
-    let sbody = js_of_expression newctx Dest_return body in
+    let sbody = js_of_expression sm newctx Dest_return body in
     let sexp = generate_logged_enter body.exp_loc arg_ids ctx newctx sbody in
     apply_dest' ctx dest (stuplebindings ^ sexp)
 
@@ -999,17 +999,18 @@ and js_of_expression ctx dest e =
       let sexp1 = inline_of_wrap e1 in
       let pats,body = function_get_args_and_body e2 in
       let newctx = ctx_fresh() in
-      let sbody = js_of_expression newctx Dest_return body in
+      let sbody = js_of_expression sm newctx Dest_return body in
       let pats_clean = List.filter (fun pat -> is_mode_not_pseudo() || not (is_hidden_type pat.pat_type)) pats in
       (* OLD let arg_ids = List.map ident_of_pat pats_clean in*)
       let arg_idss, bound_idss, tuplebindingss = list_split3 (List.map (fun pat ->
+            (* FIXME: todo later *)
          match pat.pat_desc with
-         | Tpat_var (id, _) -> let x = ppf_ident id in [x], [x], []
+         | Tpat_var (id, _) -> let x = ppf_ident id sm in [x], [x], []
          | Tpat_any         -> let x = id_fresh "_pat_any_" in [x], [], [] 
          | Tpat_tuple pl -> 
             let a = id_fresh "_tuple_arg_" in
-            let binders = tuple_binders a pl in
-            let xs = List.map fst3 binders in
+            let binders, sm = tuple_binders a sm pl in
+            let xs = List.map fst binders in
             if is_mode_pseudo() then begin
                (* the name [a] is ignored in this case *)
                let arg = Printf.sprintf "(%s)" (show_list ",@ " xs) in
@@ -1094,7 +1095,7 @@ and js_of_expression ctx dest e =
 
      let se = inline_of_wrap f in
      let sexp = 
-        if is_triple_equal_comparison f then begin
+        if is_triple_equal_comparison f sm then begin
           if (List.length exp_l <> 2) 
             then out_of_scope loc "=== should be applied to 2 arguments";
           let typ = (List.hd sl_clean).exp_type in
@@ -1140,8 +1141,8 @@ and js_of_expression ctx dest e =
 
   | Texp_match (obj, l, [], Total) ->
      reject_inline dest;
-     let (sintro, sarg) = js_of_expression_naming_argument_if_non_variable ctx obj "_switch_arg_" in     
-     let sbranches = String.concat "@," (List.map (fun b -> js_of_branch ctx dest b sarg) l) in
+     let (sintro, sarg) = js_of_expression_naming_argument_if_non_variable sm ctx obj "_switch_arg_" in
+     let sbranches = String.concat "@," (List.map (fun b -> js_of_branch sm ctx dest b sarg) l) in
      let arg_is_constant = exp_type_is_constant obj in
      generate_logged_match loc ctx sintro sarg sbranches arg_is_constant
 
@@ -1194,13 +1195,13 @@ and js_of_expression ctx dest e =
      let (sintro, se1) = 
        match !current_mode with
        | Mode_logged -> 
-           let (sintro, sobj) = js_of_expression_naming_argument_if_non_variable ctx e1 "_if_arg_" in 
+           let (sintro, sobj) = js_of_expression_naming_argument_if_non_variable sm ctx e1 "_if_arg_" in
            (sintro, sobj)
        | _ ->  ("", inline_of_wrap e1)
        in
-     generate_logged_if loc ctx sintro se1 (js_of_expression ctx dest e2) (js_of_expression ctx dest e3)
+     generate_logged_if loc ctx sintro se1 (js_of_expression sm ctx dest e2) (js_of_expression sm ctx dest e3)
   | Texp_sequence (e1, e2) -> 
-     ppf_sequence (inline_of_wrap e1) (js_of_expression ctx dest e2)
+     ppf_sequence (inline_of_wrap e1) (js_of_expression sm ctx dest e2)
   | Texp_while      (cd, body)        -> out_of_scope loc "while"
     (* ppf_while (js_of_expression cd) (js_of_expression body) *)
   | Texp_for        (id, _, st, ed, fl, body) -> out_of_scope loc "for"
@@ -1254,7 +1255,7 @@ and js_of_expression ctx dest e =
            c_rhs = mk_exp (Texp_match (thearg, cases, [], Total));
           } in
       let exp = mk_exp (Texp_function (Nolabel, [thecase], Total)) in
-      js_of_expression ctx dest exp
+      js_of_expression sm ctx dest exp
 
   | Texp_assert      _                -> out_of_scope loc "assert (please use assert ppx syntax)"
   | Texp_match      (_,_,_, Partial)  -> out_of_scope loc "partial matching"
@@ -1273,13 +1274,14 @@ and js_of_expression ctx dest e =
   | Texp_lazy        _                -> out_of_scope loc "lazy expressions"
   | Texp_object     (_,_)             -> out_of_scope loc "objects"
   | Texp_pack        _                -> out_of_scope loc "packing"
-  | _                                 -> out_of_scope loc "ADD ME"
+  | _                                 -> out_of_scope loc "Unknown js_of_expression Texp value"
 
 (* returns the name bound and the code that assigns a value to this name *)
-and js_of_let_pattern ctx pat expr =
-  let id = 
+and js_of_let_pattern sm new_sm ctx vb =
+  let { vb_pat = pat; vb_expr = expr } = vb in
+  let id =
     match pat.pat_desc with
-    | Tpat_var (id, _) -> ppf_ident id
+    | Tpat_var (id, _) -> id
     | Tpat_any -> out_of_scope pat.pat_loc "_ in let"
     | Tpat_alias _ -> out_of_scope pat.pat_loc "alias in let"
     | Tpat_constant _ -> out_of_scope pat.pat_loc "constant in let"
@@ -1292,7 +1294,10 @@ and js_of_let_pattern ctx pat expr =
     | Tpat_lazy _ -> out_of_scope pat.pat_loc "lazy"
       (*  error ~loc:pat.pat_loc "let can't deconstruct values"  *)
     in
-  (id, js_of_expression ctx (Dest_assign (id, do_check_shadowing pat.pat_env id)) expr)
+  let new_sm = update_shadow_map new_sm pat.pat_env id in
+  let sid = ppf_ident id new_sm in
+  let js_expr = js_of_expression sm ctx (Dest_assign (sid, false (*FIXME*))) expr in
+  (sid, js_expr, new_sm)
 
   (* LATER: for   let (x,y) = e,  encode as  translate(e,assign z); x = z[0]; y=z[1] 
     | Tpat_tuple (pat_l)
@@ -1310,27 +1315,27 @@ and js_of_let_pattern ctx pat expr =
    and a list of assignements of variables (pairs of identifier and body).
    Nested patterns are not supported.
    It returns a pair: spat (the "case" instruction), binders (the assignements) *)
-and js_of_pattern pat obj = 
+and js_of_pattern sm pat obj =
   let loc = pat.pat_loc in
   match pat.pat_desc with
   | Tpat_any -> 
-     "default", []
+     "default", [], sm
   | Tpat_constant c -> 
-     ppf_match_case (js_of_constant c), []
+     ppf_match_case (js_of_constant c), [], sm
   | Tpat_construct (_, cd, el) ->
      let c = cd.cstr_name in
-     let spat = 
-      if is_sbool c || is_mode_pseudo() then ppf_match_case c else ppf_match_case ("\"" ^ c ^ "\"") in
-     let bind field var = 
+     let spat = if is_sbool c || is_mode_pseudo() then ppf_match_case c else ppf_match_case ("\"" ^ c ^ "\"") in
+     let bind sm field var =
         match var.pat_desc with
         | Tpat_var (id, _) ->
-            let sid = ppf_ident id in
-            Some (sid, Printf.sprintf "%s.%s" obj field, do_check_shadowing var.pat_env sid)
+            let sm = update_shadow_map sm var.pat_env id in
+            let sid = ppf_ident id sm in
+            Some (sm, (sid, Printf.sprintf "%s.%s" obj field))
         | Tpat_any -> None
         | _ -> out_of_scope var.pat_loc "Nested pattern matching"
         in
-      let binders = map_cstr_fields ~loc bind cd el in
-      spat, binders
+     let sm, binders = map_cstr_fields ~loc sm bind cd el in
+     spat, binders, sm
   | Tpat_var (id, _) -> unsupported ~loc "Tpat_var"
   | Tpat_tuple el -> unsupported ~loc "tuple matching, if not in a simple let-binding"
   | Tpat_array el -> unsupported ~loc "array-match"
