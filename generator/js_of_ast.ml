@@ -796,17 +796,6 @@ let rec js_of_structure s =
    let postfix = List.fold_left (fun str path -> str ^ "@,}// end of with " ^ ppf_path path) "" open_paths in
    (prefix ^ "@," ^ contents ^ postfix, namesbound)
 
-and js_of_submodule m =
-  warning "code generation is incorrect for local modules\n"; 
-  let loc = m.mod_loc in
-  match m.mod_desc with
-  | Tmod_structure  s -> ppf_module (fst (*TODO*) (js_of_structure s))
-  | Tmod_functor (id, _, mtyp, mexp) -> ppf_function (ppf_ident id) (js_of_submodule mexp)
-  | Tmod_apply (m1, m2, _) -> ppf_apply (js_of_submodule m1) (js_of_submodule m2)
-  | Tmod_ident (p,_) -> ppf_path p
-  | Tmod_constraint _ -> out_of_scope loc "module constraint"
-  | Tmod_unpack     _ -> out_of_scope loc "module unpack"
-
 and show_value_binding ctx vb = (* dest is Ignore *)
   js_of_let_pattern ctx vb.vb_pat vb.vb_expr
 
@@ -843,10 +832,7 @@ and js_of_structure_item s =
         ))
   | Tstr_open       _  -> ("",[]) (* Handle modules by use of multiple compilation/linking *)
   | Tstr_modtype    _  -> ("",[])
-  | Tstr_module     b  -> 
-     let id = ppf_ident b.mb_id in
-     let sbody = ppf_decl id (js_of_submodule b.mb_expr) in
-     (sbody, [id])
+  | Tstr_module     b  -> out_of_scope loc "modules" (* Partial implementation present in commit e1e6e4b *)
   | Tstr_primitive  _  -> out_of_scope loc "primitive functions"
   | Tstr_typext     _  -> out_of_scope loc "type extensions"
   | Tstr_exception  _  -> out_of_scope loc "exceptions"
