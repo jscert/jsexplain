@@ -9142,9 +9142,9 @@ var get_value = function (s, v) {
                                                     }}()),
                                                   function(_tuple_arg_273) {
                                                     var s = _tuple_arg_273[1];
-                                                      var base = _tuple_arg_273[0];
+                                                      var base𝟙 = _tuple_arg_273[0];
                                                     
-                                                    var ctx_86 = ctx_push(ctx_83, [{key: "s", val: s}, {key: "base", val: base}]);
+                                                    var ctx_86 = ctx_push(ctx_83, [{key: "s", val: s}, {key: "base𝟙", val: base𝟙}]);
                                                     log_event("JsInterpreter.js", 587, ctx_86, "let");
                                                     var _return_272 = (function () {
                                                       log_event("JsInterpreter.js", 583, ctx_86, "call");
@@ -9463,9 +9463,9 @@ var put_value = function (s, c, v, w) {
                                                         }}()),
                                                       function(_tuple_arg_320) {
                                                         var s = _tuple_arg_320[1];
-                                                          var base = _tuple_arg_320[0];
+                                                          var base𝟙 = _tuple_arg_320[0];
                                                         
-                                                        var ctx_96 = ctx_push(ctx_93, [{key: "s", val: s}, {key: "base", val: base}]);
+                                                        var ctx_96 = ctx_push(ctx_93, [{key: "s", val: s}, {key: "base𝟙", val: base𝟙}]);
                                                         log_event("JsInterpreter.js", 678, ctx_96, "let");
                                                         var _return_319 = 
                                                         if_bool(
@@ -11026,23 +11026,24 @@ var complete_property_descriptor = function (desc) {
   ;
   log_event("JsInterpreter.js", 1123, ctx_154, "if");
   if (_if_arg_517) {
-    var desc𝟙 = descriptor_with_value(desc𝟙, like.descriptor_value);
+    var desc𝟙 = descriptor_with_value(desc, like.descriptor_value);
     var ctx_156 = ctx_push(ctx_154, [{key: "desc𝟙", val: desc𝟙}]);
     log_event("JsInterpreter.js", 1122, ctx_156, "let");
-    var desc = descriptor_with_writable(desc, like.descriptor_writable);
+    var desc𝟙 = descriptor_with_writable(desc𝟙,
+                     like.descriptor_writable);
     
   } else {
-    var desc𝟙 = descriptor_with_get(desc𝟙, like.descriptor_get);
+    var desc𝟙 = descriptor_with_get(desc, like.descriptor_get);
     var ctx_155 = ctx_push(ctx_154, [{key: "desc𝟙", val: desc𝟙}]);
     log_event("JsInterpreter.js", 1121, ctx_155, "let");
-    var desc = descriptor_with_set(desc, like.descriptor_set);
+    var desc𝟙 = descriptor_with_set(desc𝟙, like.descriptor_set);
     
   }
-  var ctx_157 = ctx_push(ctx_154, [{key: "desc", val: desc}]);
+  var ctx_157 = ctx_push(ctx_154, [{key: "desc𝟙", val: desc𝟙}]);
   log_event("JsInterpreter.js", 1133, ctx_157, "let");
   var _if_arg_521 = (function () {
     log_event("JsInterpreter.js", 1125, ctx_157, "call");
-    var _return_522 = option_compare(bool_eq, desc.descriptor_enumerable,
+    var _return_522 = option_compare(bool_eq, desc𝟙.descriptor_enumerable,
                         None());
     log_event("JsInterpreter.js", 1124, ctx_push(ctx_157, [{key: "#RETURN_VALUE#", val: _return_522}]), "return");
     return (_return_522); 
@@ -11050,30 +11051,31 @@ var complete_property_descriptor = function (desc) {
   ;
   log_event("JsInterpreter.js", 1126, ctx_157, "if");
   if (_if_arg_521) {
-    var desc = descriptor_with_enumerable(desc, like.descriptor_enumerable);
+    var desc𝟚 = descriptor_with_enumerable(desc𝟙,
+                     like.descriptor_enumerable);
   } else {
-    var desc = desc;
+    var desc𝟚 = desc𝟙;
   }
-  var ctx_158 = ctx_push(ctx_157, [{key: "desc", val: desc}]);
+  var ctx_158 = ctx_push(ctx_157, [{key: "desc𝟚", val: desc𝟚}]);
   log_event("JsInterpreter.js", 1132, ctx_158, "let");
   var _if_arg_523 = (function () {
     log_event("JsInterpreter.js", 1128, ctx_158, "call");
-    var _return_524 = option_compare(bool_eq, desc.descriptor_configurable,
-                        None());
+    var _return_524 = option_compare(bool_eq,
+                        desc𝟚.descriptor_configurable, None());
     log_event("JsInterpreter.js", 1127, ctx_push(ctx_158, [{key: "#RETURN_VALUE#", val: _return_524}]), "return");
     return (_return_524); 
   }())
   ;
   log_event("JsInterpreter.js", 1129, ctx_158, "if");
   if (_if_arg_523) {
-    var desc = descriptor_with_configurable(desc,
-                 like.descriptor_configurable);
+    var desc𝟛 = descriptor_with_configurable(desc𝟚,
+                     like.descriptor_configurable);
   } else {
-    var desc = desc;
+    var desc𝟛 = desc𝟚;
   }
-  var ctx_159 = ctx_push(ctx_158, [{key: "desc", val: desc}]);
+  var ctx_159 = ctx_push(ctx_158, [{key: "desc𝟛", val: desc𝟛}]);
   log_event("JsInterpreter.js", 1131, ctx_159, "let");
-  var _return_525 = desc;
+  var _return_525 = desc𝟛;
   log_event("JsInterpreter.js", 1130, ctx_push(ctx_159, [{key: "#RETURN_VALUE#", val: _return_525}]), "return");
   return (_return_525); 
   
@@ -13339,7 +13341,7 @@ var create_list_from_array_like = function (s, obj, elementTypes) {
                                                                     log_event("JsInterpreter.js", 1848, ctx_push(ctx_277, [{key: "#RETURN_VALUE#", val: _return_862}]), "return");
                                                                     return (_return_862); 
                                                                     } else {
-                                                                    var list = (function () {
+                                                                    var list𝟙 = (function () {
                                                                     log_event("JsInterpreter.js", 1840, ctx_277, "call");
                                                                     var _return_858 = 
                                                                     append(
@@ -13351,9 +13353,9 @@ var create_list_from_array_like = function (s, obj, elementTypes) {
                                                                     return (_return_858); 
                                                                     }())
                                                                     ;
-                                                                    var ctx_279 = ctx_push(ctx_277, [{key: "list", val: list}]);
+                                                                    var ctx_279 = ctx_push(ctx_277, [{key: "list𝟙", val: list𝟙}]);
                                                                     log_event("JsInterpreter.js", 1845, ctx_279, "let");
-                                                                    var index = (function () {
+                                                                    var index𝟙 = (function () {
                                                                     log_event("JsInterpreter.js", 1842, ctx_279, "call");
                                                                     var _return_859 = 
                                                                     (index
@@ -13362,11 +13364,11 @@ var create_list_from_array_like = function (s, obj, elementTypes) {
                                                                     return (_return_859); 
                                                                     }())
                                                                     ;
-                                                                    var ctx_280 = ctx_push(ctx_279, [{key: "index", val: index}]);
+                                                                    var ctx_280 = ctx_push(ctx_279, [{key: "index𝟙", val: index𝟙}]);
                                                                     log_event("JsInterpreter.js", 1844, ctx_280, "let");
                                                                     var _return_860 = 
                                                                     Continue(
-                                                                    [s, index, list]);
+                                                                    [s, index𝟙, list𝟙]);
                                                                     log_event("JsInterpreter.js", 1843, ctx_push(ctx_280, [{key: "#RETURN_VALUE#", val: _return_860}]), "return");
                                                                     return (_return_860); 
                                                                     
@@ -14564,36 +14566,37 @@ var ordinary_get_own_property = function (s, o, p) {
                                                   
                                                   var ctx_358 = ctx_push(ctx_355, [{key: "d", val: d}]);
                                                   log_event("JsInterpreter.js", 2249, ctx_358, "let");
-                                                  var d = Object.assign({},
-                                                            d, {
-                                                              descriptor_enumerable: 
-                                                              Some(
-                                                                (function () {
-                                                                  log_event("JsInterpreter.js", 2243, ctx_358, "call");
-                                                                  var _return_1029 = 
-                                                                  attributes_enumerable(
+                                                  var d𝟙 = Object.assign(
+                                                                {}, d, {
+                                                                  descriptor_enumerable: 
+                                                                  Some(
+                                                                    (function () {
+                                                                    log_event("JsInterpreter.js", 2243, ctx_358, "call");
+                                                                    var _return_1029 = 
+                                                                    attributes_enumerable(
                                                                     x);
-                                                                  log_event("JsInterpreter.js", 2242, ctx_push(ctx_358, [{key: "#RETURN_VALUE#", val: _return_1029}]), "return");
-                                                                  return (_return_1029); 
-                                                                }()))});
-                                                  var ctx_359 = ctx_push(ctx_358, [{key: "d", val: d}]);
+                                                                    log_event("JsInterpreter.js", 2242, ctx_push(ctx_358, [{key: "#RETURN_VALUE#", val: _return_1029}]), "return");
+                                                                    return (_return_1029); 
+                                                                    }()))});
+                                                  var ctx_359 = ctx_push(ctx_358, [{key: "d𝟙", val: d𝟙}]);
                                                   log_event("JsInterpreter.js", 2248, ctx_359, "let");
-                                                  var d = Object.assign({},
-                                                            d, {
-                                                              descriptor_configurable: 
-                                                              Some(
-                                                                (function () {
-                                                                  log_event("JsInterpreter.js", 2245, ctx_359, "call");
-                                                                  var _return_1030 = 
-                                                                  attributes_configurable(
+                                                  var d𝟚 = Object.assign(
+                                                                {}, d𝟙, {
+                                                                  descriptor_configurable: 
+                                                                  Some(
+                                                                    (function () {
+                                                                    log_event("JsInterpreter.js", 2245, ctx_359, "call");
+                                                                    var _return_1030 = 
+                                                                    attributes_configurable(
                                                                     x);
-                                                                  log_event("JsInterpreter.js", 2244, ctx_push(ctx_359, [{key: "#RETURN_VALUE#", val: _return_1030}]), "return");
-                                                                  return (_return_1030); 
-                                                                }()))});
-                                                  var ctx_360 = ctx_push(ctx_359, [{key: "d", val: d}]);
+                                                                    log_event("JsInterpreter.js", 2244, ctx_push(ctx_359, [{key: "#RETURN_VALUE#", val: _return_1030}]), "return");
+                                                                    return (_return_1030); 
+                                                                    }()))});
+                                                  var ctx_360 = ctx_push(ctx_359, [{key: "d𝟚", val: d𝟚}]);
                                                   log_event("JsInterpreter.js", 2247, ctx_360, "let");
                                                   var _return_1031 = 
-                                                  res_spec(s, Descriptor(d));
+                                                  res_spec(s,
+                                                    Descriptor(d𝟚));
                                                   log_event("JsInterpreter.js", 2246, ctx_push(ctx_360, [{key: "#RETURN_VALUE#", val: _return_1031}]), "return");
                                                   return (_return_1031); 
                                                   
