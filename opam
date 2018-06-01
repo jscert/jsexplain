@@ -16,7 +16,11 @@ available: [ocaml-version >= "4.04.0" & ocaml-version < "4.05"]
 build: [
   [make]
 ]
+build-test: [
+  [make test]
+]
 depends: [
   "ocamlfind" {build}
+  "alcotest" {test}
   "JS_Parser" { >= "0.1" & < "0.2" }
 ]

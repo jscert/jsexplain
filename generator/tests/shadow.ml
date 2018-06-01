@@ -1,47 +1,46 @@
-(* `make shadow.unlog.js` and test resulting function in node
-   add a print_int to the shadower line and `ocamlc shadow.ml` to validate ml *)
-
-(** Inner-most scope should not hide outermost, incorrect JS behaviour would be to execute undefined + 1 **)
-let shadower n =
-  let f _ =
-    let (n, z) = n+1, () in
-    n+1 in
-  f () ;;
-
-shadower 1;;            (* Expected return value: 3 *)
-
-
-(** As previous, but using a pattern binder instead of let **)
+open Mocha
 
 type shadow =
 | Shadow of int [@f num]
 
-let shadower2 n =
-  let f _ =
-    match n with
-    | Shadow n -> n+1
-  in
-  f ()
 ;;
 
-shadower2 (Shadow 1)  (* Expected return value: 2 *)
-;;
+describe "shadow.ml" (fun _ ->
+  it "shadower" (fun _ ->
+    let shadower n =
+      let f _ =
+        let (n, z) = n+1, () in
+        n+1 in
+      f () in
+    assert_int (shadower 1) 3 "Inner-most scope should not hide outermost, incorrect JS behaviour would be to execute undefined + 1"
+  );
 
-let f _ =
-  let x = 1 in
-  let y n =
-    let x = x + n in
-    x in
-  y (y x)
-;;
+  it "shadower2" (fun _ ->
 
-f () (* Expected return value: 3 *)
-;;
+    let shadower2 n =
+      let f _ =
+        match n with
+        | Shadow n -> n+1
+      in
+      f () in
+    assert_int (shadower2 (Shadow 1)) 2 "Inner-most scope should not hide outermost, incorrect JS behaviour would be to execute undefined + 1"
+  );
 
-(** Things we want to be able to do, for example: **)
-let x = 10 in
-let x = x + x in
-let x = x + x + x in
-x
+  it "shadower3" (fun _ ->
+    let shadower3 _ =
+      let x = 1 in
+      let y n =
+        let x = x + n in
+        x in
+      y (y x)
+    in
+  assert_int (shadower3 ()) 3 "shadower3 failed?"
+  );
 
-;;
+  it "variable rebinding" (fun _ ->
+    let x = 10 in
+    let x = x + x in
+    let x = x + x + x in
+    assert_int x 60 "x should be able to be redeclared based upon the previous value of x"
+  )
+)

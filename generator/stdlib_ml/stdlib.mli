@@ -186,5 +186,3 @@ val strlength : string -> int (* in JS :  function (x) { return x.length; } *)
 (** Substring extraction. Note different ordering of arguments from String.sub:
 [ substring n m s = String.sub s n m ] *)
 val substring : int -> int -> string -> string  (* function(x) { return x.slice(n, n+m); } *)
-
-val console_int : int -> unit

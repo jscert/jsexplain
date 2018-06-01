@@ -149,5 +149,3 @@ val string_concat : string -> string -> string (* + *)
 
 let strlength = String.length;;
 let substring n m s = String.sub s n m;;
-
-let console_int = Pervasives.print_int;;

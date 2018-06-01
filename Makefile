@@ -25,7 +25,12 @@ test_init:
 	git submodule update --init test/data/test262
 	npm install
 
-test: jsjsref
+test: test_generator test_jsjsref
+
+test_generator:
+	$(MAKE) -C generator test
+
+test_jsjsref: jsjsref
 	node_modules/.bin/mocha
 
 # Documentation
