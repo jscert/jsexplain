@@ -36,9 +36,6 @@ test_jsjsref: jsjsref
 # Documentation
 doc: doc/jsref
 
-opendoc: doc
-	xdg-open doc/jsref/index.html
-
 esdocgen:
 	$(MAKE) -C tools/esdocgen
 
@@ -63,6 +60,13 @@ publish: dist
 
 publish-github: dist
 	tools/upload-github-pages.sh dist
+
+# Open in Browser Stages
+open: jsjsref
+	xdg-open driver.html &
+
+opendoc: doc
+	xdg-open doc/jsref/index.html &
 
 # Clean stages
 clean:
