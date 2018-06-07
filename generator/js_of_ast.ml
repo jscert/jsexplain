@@ -368,6 +368,8 @@ let ppf_pat_array id_list array_expr =
 let ppf_field_access expr field =
   Printf.sprintf "%s.%s" expr field
 
+(****************************************************)
+(* Identifier Rewriting *)
 (* List of JavaScript keywords that cannot be used as identifiers *)
 let js_keywords =
   ["await"; "break"; "case"; "catch"; "class"; "const"; "continue"; "debugger"; "default"; "delete"; "do"; "else";
@@ -733,11 +735,6 @@ let is_triple_equal_comparison e sm =
       (* TODO: this text could be optimized *)
    | _ -> false
 
-let str_ident_of_pat sm pat = match pat.pat_desc with
-  | Tpat_var (id, _) -> Ident.name id
-  | Tpat_any         -> id_fresh "_pat_any_"
-  | _ -> error ~loc:pat.pat_loc "functions can't deconstruct values"
-
 let ppf_ident_of_pat sm pat = match pat.pat_desc with
   | Tpat_var (id, _) -> ppf_ident id sm
   | Tpat_any         -> id_fresh "_pat_any_"
@@ -795,7 +792,7 @@ and js_of_structure_item s =
      (str, [])
   | Tstr_value (_, vb_l) ->
      combine_list_output (~~ List.map vb_l (fun vb ->
-        let id = str_ident_of_pat ShadowMapM.empty vb.vb_pat in
+        let id = ppf_ident_of_pat ShadowMapM.empty vb.vb_pat in
         if ident_is_shadowing s.str_env id then error ~loc "Variable shadowing not permitted at toplevel"
         else
         let sbody = js_of_expression_inline_or_wrap ShadowMapM.empty ctx_initial vb.vb_expr in
