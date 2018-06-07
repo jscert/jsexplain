@@ -32,7 +32,7 @@ function testNegativity(str) {
 
 setImmediate(() => {
   var testDataDir = __dirname + '/../data';
-  var test262path = fs.readlinkSync(testDataDir + '/test262/test/suite');
+  var test262path = fs.readlinkSync(testDataDir + '/test262/test');
   var tests = [];
 
   walk(test262path)

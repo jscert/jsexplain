@@ -3,6 +3,11 @@
 const fs = require('fs');
 // tripwire module is no longer maintained
 //const tripwire = require('tripwire');
+
+
+// Stub logging functions
+['ctx_empty', 'ctx_push', 'log_event'].forEach(f => global[f] = function(){})
+
 const esprima = require('esprima');
 const esprimaToAST = require('../esprima-to-ast.js').esprimaToAST;
 const jsref = require('../jsref/assembly.js');
@@ -11,9 +16,6 @@ const timeout = 5000;
 
 require('./parser.js');
 var test262tests = require('./helpers/test262.js');
-
-// Stub logging functions
-['ctx_empty', 'ctx_push', 'log_event'].forEach(f => global[f] = function(){})
 
 var parse = function(source) {
   return esprimaToAST(esprima.parse(source, {loc: true, range: true}), source);
