@@ -1,7 +1,8 @@
 "use strict";
 
 const fs = require('fs');
-const tripwire = require('tripwire');
+// tripwire module is no longer maintained
+//const tripwire = require('tripwire');
 const esprima = require('esprima');
 const esprimaToAST = require('../esprima-to-ast.js').esprimaToAST;
 const jsref = require('../jsref/assembly.js');
@@ -137,11 +138,11 @@ test262tests.push(args => {
     } catch(e) { return; }
 
     this.timeout(timeout);
-    tripwire.resetTripwire(timeout);
+    //tripwire.resetTripwire(timeout);
 
     var result = jsref.JsInterpreter.run_javascript_from_result(prelude, ast);
 
-    tripwire.clearTripwire();
+    //tripwire.clearTripwire();
 
     testPreludeError(result);
     testResultForException(result, args.negative);

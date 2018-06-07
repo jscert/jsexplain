@@ -73,3 +73,4 @@ clean:
 	rm -Rf dist || true
 
 .PHONY: jsjsref mljsref generator generator-stdlib test_init test doc esdocgen publish publish-github clean
+.NOTPARALLEL:
