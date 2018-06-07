@@ -7189,7 +7189,7 @@ var iterate = function (l, acc, f) {
   return (iterateʹ(l, Continue(acc), f));
 };
 
-var iterate' = function (l, acc, f) {
+var iterateʹ = function (l, acc, f) {
   switch (l.tag) {
     case "[]":
       return (acc);
@@ -7206,7 +7206,7 @@ var repeat = function (condition, acc, f) {
   return (repeatʹ(condition, Continue(acc), f));
 };
 
-var repeat' = function (condition, acc, f) {
+var repeatʹ = function (condition, acc, f) {
   return (
     let_ret_ret(acc, function (v) {
         if (condition(v)) {
@@ -7300,9 +7300,9 @@ return {
   ifx_empty_label: ifx_empty_label, 
   ifx_any_or_throw: ifx_any_or_throw, 
   iterate: iterate, 
-  iterate': iterate', 
+  iterateʹ: iterateʹ, 
   repeat: repeat, 
-  repeat': repeat'};
+  repeatʹ: repeatʹ};
 })();
 
 /* --------------------- JsInterpreter.log.js --------------------- */
