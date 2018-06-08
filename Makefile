@@ -7,6 +7,8 @@ init:
 	opam pin -yn add jsjsref .
 	opam pin -yn add JS_Parser "https://github.com/resource-reasoning/JS_Parser.git#v0.1.0"
 	opam install -y jsjsref --deps-only
+	# Temporary hack until opam can install test dependencies only
+	opam install alcotest
 	@echo
 	@echo 'You now need to execute: eval `opam config env`'
 

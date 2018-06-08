@@ -19,7 +19,7 @@ test_ml: $(LINK_LIBS) $(patsubst %.ml,%.cmo,$(TESTS)) | lib/mocha.cmi
 
 run_test_js: $(TESTS_JS)
 	@echo -e "\n*** Testing JS-generated tests ***\n"
-	@mocha -R list $^
+	@../../node_modules/mocha/bin/mocha -R list $^
 
 test_js: $(TESTS_JS)
 
