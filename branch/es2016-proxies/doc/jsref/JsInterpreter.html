@@ -201,16 +201,16 @@ Function to dispatch calls to O.<code class="code">[Construct]</code>(argumentsL
 <pre><span id="VALhas_primitive_base"><span class="keyword">val</span> has_primitive_base</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
 <pre><span id="VALis_property_reference"><span class="keyword">val</span> is_property_reference</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
 <pre><span id="VALis_unresolvable_reference"><span class="keyword">val</span> is_unresolvable_reference</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
-<pre><span id="VALis_super_reference"><span class="keyword">val</span> is_super_reference</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
-<pre><span id="VALget_value"><span class="keyword">val</span> get_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<pre><span id="VALis_super_reference"><span class="keyword">val</span> is_super_reference</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre><br>
 GetValue(V)
 <p>
 
     Note: Although the type of <code class="code">v</code> is a resultof, its state is disregarded
     and must be explicitly passed to prevent issues with the value being
     computed prior to other state mutations.<br>
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-getvalue">6.2.4.1</a></div>
 
+<pre><span id="VALtest_ret"><span class="keyword">val</span> test_ret</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALget_value"><span class="keyword">val</span> get_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
 <pre><span id="VALput_value"><span class="keyword">val</span> put_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       'c <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 PutValue(V,W)
 <p>
