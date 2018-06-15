@@ -36,3 +36,15 @@ let monad_mapping = [
    ]
 
 let monad_identifiers = List.map (fun (_, f) -> "JsInterpreterMonads." ^ f) monad_mapping
+
+open Ast_helper
+open Asttypes
+open Parsetree
+open Typedtree
+
+let attr_tag = "jsexplain.monad"
+
+let monadic_expr e = Exp.attr e ({ txt = attr_tag; loc = e.pexp_loc }, PStr [])
+let is_monadic_attr ({ txt = a; _ }, _) = a = attr_tag
+let is_monadic_expr e = List.exists is_monadic_attr e.pexp_attributes
+let is_monadic_texpr e = List.exists is_monadic_attr e.exp_attributes

@@ -49,6 +49,12 @@ let range i j =
     
 let list_nat n = (* for n >= 0 *)
   range 0 n
+
+let rec list_split3 = function
+  | []            -> [], [], []
+  | (x, y, z)::ls ->
+    let xs, ys, zs = list_split3 ls in
+    x::xs, y::ys, z::zs
     
 let rec list_separ sep = function 
   | [] -> []
@@ -141,12 +147,6 @@ let list_index k l =
       | x::l -> if x = k then n else aux (n+1) l
       in
    aux 0 l 
-
-let list_split3 l =
-   let l1 = List.map (fun (x,_,_) -> x) l in
-   let l2 = List.map (fun (_,x,_) -> x) l in
-   let l3 = List.map (fun (_,_,x) -> x) l in
-   (l1,l2,l3)
 
 let add_to_list li s =
   li := s :: !li

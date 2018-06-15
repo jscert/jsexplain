@@ -3,8 +3,7 @@ open Ast_helper
 open Asttypes
 open Parsetree
 open Longident
-
-let monad_mapping = Monadic_binder_list.monad_mapping
+open Monadic_binder_list
 
 (* e.g. 
 
@@ -31,7 +30,7 @@ let generate_mapper namesid = function argv ->
         let aux e = mapper.expr mapper e in
         match expr with
         (* Is this an extension node? *)
-        | { pexp_desc = Pexp_extension ({txt = name; loc}, pstr)} ->
+        | { pexp_desc = Pexp_extension ({txt = name; loc }, pstr)} ->
           begin try
             match pstr with
             | PStr [{ pstr_desc = Pstr_eval ({pexp_loc = loc; pexp_desc = extended_expression}, _)}] ->
@@ -52,15 +51,16 @@ let generate_mapper namesid = function argv ->
                         | [p1;p2] -> (p1, (Exp.fun_ ~loc Nolabel None p2 (aux cont)))
                         | _ -> raise (Location.Error (Location.error ~loc:pat.ppat_loc ("let%"^name^" expects exactly 2 variables to bind"))))
                     | _ -> raise (Location.Error (Location.error ~loc:pat.ppat_loc ("unknown pattern type with let%"^name)))
-                  in
-                  Exp.apply ~loc (mk_ident ident) [(Nolabel, aux e); (Nolabel, Exp.fun_ ~loc Nolabel None param body)]
+                  in monadic_expr (Exp.apply ~loc (mk_ident ident) [(Nolabel, aux e); (Nolabel, Exp.fun_ ~loc Nolabel None param body)])
+
                 with
                   | Not_found -> raise (Location.Error (Location.error ~loc ("no let%"^name)))
                 end
 
               | _ -> raise (Location.Error (Location.error ~loc "unable to extend this sort of expression"))
               end
-            | _ -> raise (Location.Error ( Location.error ~loc "Expression extension node containing non-expression"))
+            | _ -> raise (Location.Error (Location.error ~loc "Expression extension node containing non-expression"))
+
             with Location.Error error -> {expr with pexp_desc = Pexp_extension (extension_of_error error)}
           end
         (* Delegate to the default mapper. *)

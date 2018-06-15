@@ -3,6 +3,15 @@ open Mocha
 type shadow =
 | Shadow of int [@f num]
 
+type ('t, 'a) if_ret_type =
+| Return of 't [@f result]
+| Continue of 'a [@f cont]
+
+let let_ret w k =
+  match w with
+  | Continue s -> k s
+  | Return  r -> r
+
 ;;
 
 describe "shadow.ml" (fun _ ->
@@ -34,7 +43,15 @@ describe "shadow.ml" (fun _ ->
         x in
       y (y x)
     in
-  assert_int (shadower3 ()) 3 "shadower3 failed?"
+    assert_int (shadower3 ()) 3 "shadower3 failed?"
+  );
+
+  it "monadic_tuple_shadow" (fun _ ->
+    let monadic_tuple_shadow x s base =
+      let%ret (s, base) = Continue x
+      in (s, base)
+    in
+    assert_struct_eq (monadic_tuple_shadow (1, 2) 0 0) (1, 2) "Tuple rebinding not working."
   );
 
   it "variable rebinding" (fun _ ->

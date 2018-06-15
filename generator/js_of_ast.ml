@@ -22,10 +22,9 @@ open Misc
 open Mytools
 open Types
 open Typedtree
+open Monadic_binder_list
 
 module L = Logged (Token_generator) (struct let size = 256 end)
-
-(* TODO: Field annotations for builtin type constructors *)
 
 let string_of_longident i =
   String.concat "." @@ Longident.flatten @@ i
@@ -244,18 +243,6 @@ let is_coercion_constructor lident =
       ] in 
     (* if (is_mode_pseudo()) then Printf.printf "%s %s\n" x (if b then " [yes]" else ""); *)
     b
-
-
-(* Do not generate events for particular functions *)
-
-let is_monadic_function f =
-  match f.exp_desc with
-  | Texp_ident (path, ident,  _) ->
-      let x = Path.name path in 
-      List.mem x Monadic_binder_list.monad_identifiers
-  | _ -> false
-
-
 
 (****************************************************************)
 (* PPF HELPERS *)
@@ -932,10 +919,9 @@ and js_of_expression (sm : shadow_map) ctx dest e =
     sexp
 
   | Texp_function (_, c :: [], Total) ->
-    let pats, body = function_get_args_and_body e 
-      (* DEPRECATED: function_get_args_and_body e  [c.c_lhs] c.c_rhs *) in
+    let pats, body = function_get_args_and_body e in
     let pats_clean = List.filter (fun pat -> is_mode_not_pseudo() || not (is_hidden_type pat.pat_type)) pats in
-    let arg_ids = List.map (ppf_ident_of_pat sm) pats_clean in
+    let arg_ids = List.map (ppf_ident_of_pat sm) pats_clean in   (******* HERE *******)
        (* FUTURE USE: (for function taking tuples as args)
        let arg_idss, tuplebindingss = List.split (List.map (fun pat ->
          match pat.pat_desc with
@@ -973,7 +959,7 @@ and js_of_expression (sm : shadow_map) ctx dest e =
     let sexp = generate_logged_enter body.exp_loc arg_ids ctx newctx sbody in
     apply_dest' ctx dest (stuplebindings ^ sexp)
 
-  | Texp_apply (f, exp_l) when is_monadic_function f ->
+  | Texp_apply (f, exp_l) when is_monadic_texpr e ->
       let sl_clean = exp_l
               |> List.map (fun (_, eo) -> match eo with 
                                              | None -> out_of_scope loc "optional apply arguments" 
@@ -995,28 +981,24 @@ and js_of_expression (sm : shadow_map) ctx dest e =
         in
       let sexp1 = inline_of_wrap e1 in
       let pats,body = function_get_args_and_body e2 in
-      let newctx = ctx_fresh() in
-      let sbody = js_of_expression sm newctx Dest_return body in
       let pats_clean = List.filter (fun pat -> is_mode_not_pseudo() || not (is_hidden_type pat.pat_type)) pats in
-      (* OLD let arg_ids = List.map ident_of_pat pats_clean in*)
-      let arg_idss, bound_idss, tuplebindingss = list_split3 (List.map (fun pat ->
-            (* FIXME: todo later *)
-         match pat.pat_desc with
-         | Tpat_var (id, _) -> let x = ppf_ident id sm in [x], [x], []
-         | Tpat_any         -> let x = id_fresh "_pat_any_" in [x], [], [] 
-         | Tpat_tuple pl -> 
-            let a = id_fresh "_tuple_arg_" in
-            let binders, sm = tuple_binders a sm pl in
-            let xs = List.map fst binders in
-            if is_mode_pseudo() then begin
-               (* the name [a] is ignored in this case *)
-               let arg = Printf.sprintf "(%s)" (show_list ",@ " xs) in
-               [arg], xs, []
-            end else begin 
-               [a], xs, binders
-            end
-         | _ -> error ~loc:pat.pat_loc "functions can't deconstruct values unless tuple"
-         ) pats_clean) in
+      let sm, bindings = map_state (fun sm pat ->
+        match pat.pat_desc with
+        | Tpat_var (id, _) -> let x = ppf_ident id sm in sm, ([x], [x], [])
+        | Tpat_any         -> let x = id_fresh "_pat_any_" in sm, ([x], [], [])
+        | Tpat_tuple pl ->
+           let a = id_fresh "_tuple_arg_" in
+           let binders, sm = tuple_binders a sm pl in
+           let xs = List.map fst binders in
+           if is_mode_pseudo() then
+             (* the name [a] is ignored in this case *)
+             let arg = Printf.sprintf "(%s)" (show_list ",@ " xs) in
+             sm, ([arg], xs, [])
+           else
+             sm, ([a], xs, binders)
+        | _ -> error ~loc:pat.pat_loc "functions can't deconstruct values unless tuple"
+        ) sm pats_clean in
+      let arg_idss, bound_idss, tuplebindingss = list_split3 bindings in
       let arg_ids = List.concat arg_idss in
       let bound_ids = List.concat bound_idss in
       let tuple_bindings = List.concat tuplebindingss in
@@ -1031,6 +1013,9 @@ and js_of_expression (sm : shadow_map) ctx dest e =
            possibly directly in the tupled form, e.g. "(x,y)", [bound_ids] is
            as before, and [tuplebindings] are empty. *)
       let stuplebindings = ppf_match_binders tuple_bindings in
+
+      let newctx = ctx_fresh() in
+      let sbody = js_of_expression sm newctx Dest_return body in
 
       let (token_start1, token_stop1, _token_loc) = token_fresh !current_mode loc in 
       let (token_start2, token_stop2, _token_loc) = token_fresh !current_mode loc in 
@@ -1258,8 +1243,7 @@ and js_of_expression (sm : shadow_map) ctx dest e =
   | Texp_match      (_,_,_, Partial)  -> out_of_scope loc "partial matching"
   | Texp_match      (_,_,_,_)         -> out_of_scope loc "matching with exception branches"
   | Texp_try        (_,_)             -> out_of_scope loc "exceptions"
-  | Texp_function (_, _, _) -> out_of_scope loc "use of labels"
-
+  | Texp_function (_, _, _)           -> out_of_scope loc "use of labels"
   | Texp_variant    (_,_)             -> out_of_scope loc "polymorphic variant"
   | Texp_setfield   (_,_,_,_)         -> out_of_scope loc "setting field"
   | Texp_send       (_,_,_)           -> out_of_scope loc "objects"

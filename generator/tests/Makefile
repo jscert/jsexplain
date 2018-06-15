@@ -1,5 +1,7 @@
 STDLIB_DIR := ../stdlib_ml
-LIBS := -I lib -I $(STDLIB_DIR)
+PPX := -ppx ../monad_ppx.byte
+LIBDIRS := lib $(STDLIB_DIR)
+LIBS := $(PPX) $(foreach lib,$(LIBDIRS),-I $(lib))
 REPLACE_STDLIB := -nopervasives -nostdlib -open Stdlib
 LINK_LIBS := $(STDLIB_DIR)/stdlib.cmo lib/mocha.cmo
 
@@ -8,6 +10,14 @@ TESTS_JS := $(patsubst %.ml,%.unlog.as.js,$(TESTS))
 
 test: test_ml test_js
 	$(MAKE) -k _run_test
+
+init: .merlin
+
+.merlin:
+	echo "B ." > .merlin
+	echo -n "FLG $(PPX)" >> .merlin
+	echo -en "$(foreach lib,$(LIBDIRS),\nS $(lib))" >> .merlin
+	echo -en "$(foreach lib,$(LIBDIRS),\nB $(lib))" >> .merlin
 
 _run_test: run_test_ml run_test_js
 
@@ -24,13 +34,13 @@ run_test_js: $(TESTS_JS)
 test_js: $(TESTS_JS)
 
 %.unlog.js: %.ml ../main.byte ../monad_ppx.byte
-	../main.byte -mode unlog -ppx ../monad_ppx.byte $(LIBS) $<
+	../main.byte -mode unlog $(LIBS) $<
 
 %.log.js: %.ml ../main.byte ../monad_ppx.byte
-	../main.byte -mode log -ppx ../monad_ppx.byte $(LIBS) $<
+	../main.byte -mode log $(LIBS) $<
 
 %.token.js: %.ml ../main.byte ../monad_ppx.byte
-	../main.byte -mode token -ppx ../monad_ppx.byte $(LIBS) $<
+	../main.byte -mode token $(LIBS) $<
 
 %.as.js: $(patsubst %.cmo,%.js,$(LINK_LIBS)) Compare.js %.js
 	../assembly.byte -o $@ $^
@@ -45,7 +55,7 @@ lib/%.cmo: lib/%.ml lib/%.cmi
 	ocamlc -c -g $(REPLACE_STDLIB) $(LIBS) $< -o $@
 
 clean:
-	rm -rf *.{cmi,cmo} test_ml _build lib/*.{cmi,cmo}
+	rm -rf *.{cmi,cmo} test_ml _build lib/*.{cmi,cmo} .merlin
 
 .PRECIOUS: %.js %.unlog.js
 .NOTPARALLEL:
