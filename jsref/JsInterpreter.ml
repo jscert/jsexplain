@@ -1571,11 +1571,10 @@ and object_create s proto internalSlotsList =
     @essec 9.2
     @esid sec-ecmascript-function-objects *)
 
-(** TODO: Realm support
-    @essec 9.2.7
-    @esid sec-addrestrictedfunctionproperties
-*)
+(** @essec 9.2.7
+    @esid sec-addrestrictedfunctionproperties *)
 and add_restricted_function_properties s f realm =
+  (*  TODO: Realm support *)
   (* Assert ... *)
   let thrower = Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_throw_type_error) in
   let%SUCCESS s, _ = define_property_or_throw s f (Coq_value_string "caller") {
@@ -1603,6 +1602,26 @@ and builtin_throw_type_error s c thisArgument argumentsList newTarget =
 (** {2 Built-in Function Objects}
     @essec 9.3
     @esid sec-built-in-function-objects *)
+
+(** @essec 9.3.3
+    @esid sec-createbuiltinfunction *)
+and create_builtin_function s steps internalSlotsList realm prototype =
+  (* 1. Assert: steps is either a set of algorithm steps or other definition of a function's behaviour provided in this specification. *)
+  (* 2. If realm is not present, set realm to te current Realm Record. *)
+  (* 3. Assert: realm is a Realm Record. *)
+  (* FIXME (realms): 4. If prototype is not present, set prototype to realm.[[Intrinsics]].[[%FunctionPrototype%]]. *)
+  let prototype = unsome_default (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_function_proto)) prototype in
+
+  (* 5. Let func be a new built-in function object that when called performs the action described by steps. The new function
+     object has internal slots whose names are the elements of internalSlotsList. The initial value of each of those
+     internal slots is undefined. *)
+  (* FIXME: 6. Set func.[[Realm]] to realm. *)
+  (* 7. Set func.[[Prototype]] to prototype. *)
+  (* 8. Set func.[[Extensible]] to true. *)
+  (* 9. Set func.[[ScriptOrModule]] to null. *)
+  (* 10. Return func. *)
+  let s, func = builtin_function_new s prototype steps in
+  res_ter s (res_val func)
 
 (** {2 Array Exotic Objects}
     @essec 9.4.2
@@ -2067,7 +2086,7 @@ and proxy_create s target handler =
        && ((run_object_method object_proxy_handler_ s (loc_of_value handler)) === Some (Some Coq_value_null)) then
     run_error_no_c s Coq_native_error_type
   else
-  let p, s = proxy_object_new s in
+  let s, p = proxy_object_new s in
   let%ret s =
   if is_callable s target then
     let%some_ret s = run_object_set_internal object_set_call s p Coq_call_proxy in
@@ -2187,18 +2206,16 @@ and builtin_proxy_constructor s c f this newTarget target handler =
     @esid sec-proxy.revocable *)
 and builtin_proxy_revocable s c f this newTarget target handler =
   let%value s, p = proxy_create s target handler in
-  let%object s, revoker = proxy_revocation_function_create s in
+  let steps = Coq_builtin_proxy_revocation in
+  let%object s, revoker = create_builtin_function s steps (* [ [[RevocableProxy]] ] *) [] None None in
   let%some s = run_object_set_internal object_set_revocable_proxy s revoker p in
   let%value s, result = object_create s (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_proto)) None in
   let%bool s, _ = create_data_property s result (Coq_value_string "proxy") p in
   let%bool s, _ = create_data_property s result (Coq_value_string "revoke") (Coq_value_object revoker) in
   res_ter s (res_val result)
 
-(** @essec 26.2.2.2.1.1
+(** @essec 26.2.2.1.1
     @esid sec-proxy-revocation-functions *)
-and proxy_revocation_function_create s =
-  Coq_result_not_yet_implemented (* FIXME *)
-
 and builtin_proxy_revocation_function s c f this newTarget =
   let%some p = run_object_method object_revocable_proxy_ s f in
   let%some p = p in
@@ -4736,7 +4753,7 @@ and run_array_join_elements s c l k length0 sep sR =
     state -> execution_ctx -> prealloc -> value -> value list ->
     result **)
 
-and run_call_prealloc s c b vthis args =
+and run_call_prealloc s c b l vthis args =
   match b with
   | Coq_prealloc_global_is_finite ->
     let  v = (get_arg 0 args) in
@@ -5066,7 +5083,8 @@ and run_call_prealloc s c b vthis args =
           (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
             s1
             ("Value is callable, but isn\'t an object."))
-    else run_call_prealloc s1 c Coq_prealloc_object_proto_to_string (Coq_value_object array) []
+    else run_call_prealloc s1 c Coq_prealloc_object_proto_to_string
+        (Coq_object_loc_prealloc Coq_prealloc_object_proto_to_string) (Coq_value_object array) []
   | Coq_prealloc_array_proto_join ->
     let  vsep = (get_arg 0 args) in
     let%object (s0, l) = (to_object s vthis) in
@@ -5141,6 +5159,7 @@ and run_call_prealloc s c b vthis args =
   | Coq_prealloc_throw_type_error -> builtin_throw_type_error s c () () ()
   | Coq_prealloc_proxy -> builtin_proxy_constructor s c () () Coq_value_undef (get_arg 0 args) (get_arg 1 args)
   | Coq_prealloc_proxy_revocable -> builtin_proxy_revocable s c () () () (get_arg 0 args) (get_arg 1 args)
+  | Coq_builtin_proxy_revocation -> builtin_proxy_revocation_function s c l () ()
   | _ ->
     (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_not_yet_implemented)
       (strappend ("Call prealloc_") (strappend (string_of_prealloc b) (" not yet implemented")))
@@ -5162,7 +5181,7 @@ and run_call s c l vthis args =
     let%some otrg = run_object_method object_target_function_ s l in
     let%some target = otrg in
     let arguments_ = (LibList.append boundArgs args) in run_call s c target boundThis arguments_
-  | Coq_call_prealloc b -> run_call_prealloc s c b vthis args
+  | Coq_call_prealloc b -> run_call_prealloc s c b l vthis args
   | Coq_call_proxy -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
 
 (** val run_javascript_from_state : state -> prog -> result **)

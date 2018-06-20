@@ -89,6 +89,7 @@ let int_of_prealloc p =
   | Coq_prealloc_json -> 69
   | Coq_prealloc_proxy -> 70
   | Coq_prealloc_proxy_revocable -> 71
+  | Coq_builtin_proxy_revocation -> 72
   | Coq_prealloc_mathop o -> 100 + int_of_mathop o
   | Coq_prealloc_native_error e -> 200 + int_of_native_error e
   | Coq_prealloc_native_error_proto e -> 300 + int_of_native_error e
@@ -230,6 +231,7 @@ let string_of_prealloc prealloc = match prealloc with
   | Coq_prealloc_json -> "json"
   | Coq_prealloc_proxy -> "proxy"
   | Coq_prealloc_proxy_revocable -> "proxy_revocable"
+  | Coq_builtin_proxy_revocation -> "proxy_revocation"
 
 let prealloc_cmp p1 p2 =
   int_compare (int_of_prealloc p1) (int_of_prealloc p2)
@@ -283,12 +285,45 @@ let object_create_default_record vproto sclass bextens p =
     object_proxy_target_ = None;
     object_proxy_handler_ = None }
 
-let proxy_object_create_record p =
+let create_builtin_function_record prototype bi =
+  { object_proto_ = prototype;
+    object_class_ = "Function";
+    object_extensible_ = true;
+    object_prim_value_ = None;
+    object_properties_ = Heap.empty;
+    object_get_prototype_of_ = Coq_builtin_get_prototype_of_default;
+    object_set_prototype_of_ = Coq_builtin_set_prototype_of_default;
+    object_is_extensible_ = Coq_builtin_is_extensible_default;
+    object_prevent_extensions_ = Coq_builtin_prevent_extensions_default;
+    object_get_ = Coq_builtin_get_default;
+    object_get_own_prop_ = Coq_builtin_get_own_prop_default;
+    object_get_prop_ = Coq_builtin_get_prop_default;
+    object_set_ = Coq_builtin_set_default;
+    object_has_prop_ = Coq_builtin_has_prop_default;
+    object_delete_ = Coq_builtin_delete_default;
+    object_default_value_ = Coq_builtin_default_value_default;
+    object_define_own_prop_ = Coq_builtin_define_own_prop_default;
+    object_own_property_keys_ = Coq_builtin_own_property_keys_default;
+    object_construct_ = Some (Coq_construct_prealloc bi);
+    object_call_ = Some (Coq_call_prealloc bi);
+    object_has_instance_ = None;
+    object_scope_ = None;
+    object_formal_parameters_ = None;
+    object_code_ = None;
+    object_target_function_ = None;
+    object_bound_this_ = None;
+    object_bound_args_ = None;
+    object_parameter_map_ = None;
+    object_revocable_proxy_ = None;
+    object_proxy_target_ = None;
+    object_proxy_handler_ = None }
+
+let proxy_object_create_record =
   { object_proto_ = Coq_value_undef;
     object_class_ = "";
     object_extensible_ = false;
     object_prim_value_ = None;
-    object_properties_ = p;
+    object_properties_ = Heap.empty;
     object_get_prototype_of_ = Coq_builtin_get_prototype_of_proxy;
     object_set_prototype_of_ = Coq_builtin_set_prototype_of_proxy;
     object_is_extensible_ = Coq_builtin_is_extensible_proxy;

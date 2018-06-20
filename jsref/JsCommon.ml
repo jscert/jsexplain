@@ -220,7 +220,12 @@ let object_new vproto sclass =
   object_create_default_record vproto sclass true Heap.empty
 
 let proxy_object_new s =
-  object_alloc s (proxy_object_create_record Heap.empty)
+  let loc, s = object_alloc s proxy_object_create_record in
+  s, loc
+
+let builtin_function_new s prototype bi =
+  let loc, s = object_alloc s (create_builtin_function_record prototype bi) in
+  s, Coq_value_object loc
 
 (** val attributes_writable : attributes -> bool **)
 

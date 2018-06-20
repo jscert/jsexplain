@@ -222,6 +222,7 @@ type prealloc =
 | Coq_prealloc_json
 | Coq_prealloc_proxy                                          (** Proxy *)
 | Coq_prealloc_proxy_revocable
+| Coq_builtin_proxy_revocation
 | Coq_prealloc_mathop of mathop [@f mathop]
 | Coq_prealloc_native_error of native_error [@f error]
 | Coq_prealloc_native_error_proto of native_error [@f error]
