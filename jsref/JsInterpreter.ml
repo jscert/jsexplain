@@ -604,10 +604,10 @@ and to_property_descriptor s _foo_ =
 
 (** Completes a property descriptor by setting default fields.
 
-  FIXME: This implementation treats Property Descriptors as value types
+  WARNING: ⚠️ This implementation treats Property Descriptors as value types
   instead of as reference types as the specification intends. This method
   is used in the spec as "Call CompletePropertyDescriptor(Desc)" expecting
-  that Desc will be mutated.
+  that Desc will be mutated. ⚠️
 
   @essec 6.2.5.6
   @esid sec-completepropertydescriptor *)
@@ -1764,6 +1764,7 @@ and proxy_object_internal_get_own_property s o p =
     throw_result (run_error_no_c s Coq_native_error_type)
   else
   let%spec s, targetDesc = object_internal_get_own_property s (loc_of_value target) p in
+  (* targetDesc MUST be a full descriptor or undef, by 6.1.7.3 *)
   if trapResultObj === Coq_value_undef then
     if targetDesc === Descriptor_undef then
       res_spec s Descriptor_undef
