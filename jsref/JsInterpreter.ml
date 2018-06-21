@@ -1770,7 +1770,7 @@ and proxy_object_internal_get_own_property s o p =
       res_spec s Descriptor_undef
     else
       let targetDesc = descriptor_get_defined targetDesc in
-      if descriptor_configurable targetDesc === Some false then
+      if unsome_error (descriptor_configurable targetDesc) === false then
         throw_result (run_error_no_c s Coq_native_error_type)
       else
         let%bool s, extensibleTarget = is_extensible s target in
@@ -1785,8 +1785,8 @@ and proxy_object_internal_get_own_property s o p =
   let%bool s, valid = is_compatible_property_descriptor s extensibleTarget resultDesc targetDesc in
   if not valid then
     run_error_no_c s Coq_native_error_type
-  else if descriptor_configurable resultDesc === Some true &&
-    (targetDesc === Descriptor_undef || (descriptor_configurable (descriptor_get_defined targetDesc) === Some true)) then
+  else if unsome_error (descriptor_configurable resultDesc) === true &&
+    (targetDesc === Descriptor_undef || unsome_error (descriptor_configurable (descriptor_get_defined targetDesc)) === true) then
       run_error_no_c s Coq_native_error_type
   else
     res_spec s (Descriptor resultDesc)
@@ -1815,7 +1815,7 @@ and proxy_object_internal_define_own_property s o p desc =
   else
   let%spec s, targetDesc = object_internal_get_own_property s (loc_of_value target) p in
   let%bool s, extensibleTarget = is_extensible s target in
-  let settingConfigFalse = (is_some desc.descriptor_configurable) && (desc.descriptor_configurable === Some false) in
+  let settingConfigFalse = is_some desc.descriptor_configurable && unsome_error desc.descriptor_configurable === false in
   let%ret s =
     if targetDesc === Descriptor_undef then
       if not extensibleTarget then Return (run_error_no_c s Coq_native_error_type)
@@ -1826,7 +1826,7 @@ and proxy_object_internal_define_own_property s o p desc =
       let targetDesc = descriptor_get_defined targetDesc in
       if not tempVal then
         Return (run_error_no_c s Coq_native_error_type)
-      else if settingConfigFalse && targetDesc.descriptor_configurable === (Some true) then
+      else if settingConfigFalse && unsome_error targetDesc.descriptor_configurable === true then
         Return (run_error_no_c s Coq_native_error_type)
       else Continue s
   in
@@ -1856,7 +1856,7 @@ and proxy_object_internal_has_property s o p =
     let%spec_ret s, targetDesc = object_internal_get_own_property s (loc_of_value target) p in
     if not (targetDesc === Descriptor_undef) then
       let targetDesc = descriptor_get_defined targetDesc in
-      if targetDesc.descriptor_configurable === Some false then
+      if unsome_error targetDesc.descriptor_configurable === false then
         Return (run_error_no_c s Coq_native_error_type)
       else
       let%bool_ret s, extensibleTarget = is_extensible s target in
@@ -1890,14 +1890,14 @@ and proxy_object_internal_get s o p receiver =
     let targetDesc' = descriptor_get_defined targetDesc in
 
     let%ret_ret s =
-    if is_data_descriptor targetDesc && targetDesc'.descriptor_configurable === Some false && targetDesc'.descriptor_writable === Some false then
+    if is_data_descriptor targetDesc && unsome_error targetDesc'.descriptor_configurable === false && unsome_error targetDesc'.descriptor_writable === false then
       if not (same_value trapResult (unsome_error targetDesc'.descriptor_value)) then
         Return (run_error_no_c s Coq_native_error_type)
       else Continue s
     else Continue s
 
     in let%ret_ret s =
-    if is_accessor_descriptor targetDesc && targetDesc'.descriptor_configurable === Some false && targetDesc'.descriptor_get === Some Coq_value_undef then
+    if is_accessor_descriptor targetDesc && unsome_error targetDesc'.descriptor_configurable === false && unsome_error targetDesc'.descriptor_get === Coq_value_undef then
       if not (trapResult === Coq_value_undef) then
         Return (run_error_no_c s Coq_native_error_type)
       else Continue s
@@ -1933,15 +1933,15 @@ and proxy_object_internal_set s o p v receiver =
   if not (targetDesc === Descriptor_undef) then
     let targetDesc' = descriptor_get_defined targetDesc in
     let%ret_ret s =
-    if is_data_descriptor targetDesc && targetDesc'.descriptor_configurable === Some false && targetDesc'.descriptor_writable === Some false then
+    if is_data_descriptor targetDesc && unsome_error targetDesc'.descriptor_configurable === false && unsome_error targetDesc'.descriptor_writable === false then
       if not (same_value v (unsome_error targetDesc'.descriptor_value)) then
         Return (run_error_no_c s Coq_native_error_type)
       else Continue s
     else Continue s
 
     in let%ret_ret s =
-    if is_accessor_descriptor targetDesc && targetDesc'.descriptor_configurable === Some false then
-      if targetDesc'.descriptor_set === Some Coq_value_undef then
+    if is_accessor_descriptor targetDesc && unsome_error targetDesc'.descriptor_configurable === false then
+      if unsome_error targetDesc'.descriptor_set === Coq_value_undef then
         Return (run_error_no_c s Coq_native_error_type)
       else Continue s
     else Continue s
@@ -1974,7 +1974,7 @@ and proxy_object_internal_delete s o p =
   if targetDesc === Descriptor_undef then res_ter s (res_val (Coq_value_bool true))
   else
   let targetDesc = descriptor_get_defined targetDesc in
-  if targetDesc.descriptor_configurable === Some false then run_error_no_c s Coq_native_error_type
+  if unsome_error targetDesc.descriptor_configurable === false then run_error_no_c s Coq_native_error_type
   else res_ter s (res_val (Coq_value_bool true))
 
 (** @essec 9.5.11
@@ -2003,7 +2003,7 @@ and proxy_object_internal_own_property_keys s o =
       iterate targetKeys (s, targetConfigurableKeys, targetNonconfigurableKeys)
       (fun key acc -> let (s, targetConfigurableKeys, targetNonconfigurableKeys) = acc in
         let%spec_ret s, desc = object_internal_get_own_property s (loc_of_value target) key in
-        if (not (desc === Descriptor_undef)) && ((descriptor_get_defined desc).descriptor_configurable === Some false) then
+        if (not (desc === Descriptor_undef)) && unsome_error (descriptor_get_defined desc).descriptor_configurable === false then
           Continue (s, targetConfigurableKeys, append targetNonconfigurableKeys [key])
         else
           Continue (s, append targetConfigurableKeys [key], targetNonconfigurableKeys)
@@ -2079,12 +2079,12 @@ and proxy_create s target handler =
   if not (type_of target === Coq_type_object) then
     run_error_no_c s Coq_native_error_type
   else if is_proxy_exotic_object s (loc_of_value target)
-       && ((run_object_method object_proxy_handler_ s (loc_of_value target)) === Some (Some Coq_value_null)) then
+       && unsome_error (unsome_error (run_object_method object_proxy_handler_ s (loc_of_value target))) === Coq_value_null then
     run_error_no_c s Coq_native_error_type
   else if not (type_of handler === Coq_type_object) then
     run_error_no_c s Coq_native_error_type
   else if is_proxy_exotic_object s (loc_of_value handler)
-       && ((run_object_method object_proxy_handler_ s (loc_of_value handler)) === Some (Some Coq_value_null)) then
+       && unsome_error (unsome_error (run_object_method object_proxy_handler_ s (loc_of_value handler))) === Coq_value_null then
     run_error_no_c s Coq_native_error_type
   else
   let s, p = proxy_object_new s in
