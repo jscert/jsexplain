@@ -379,13 +379,6 @@ and is_super_reference r =
     @esid sec-getvalue
     @essec 6.2.4.1
 *)
-
-and test_ret s v =
-  let f x =
-    let%ret (s, v) = Continue (s, v)
-    in to_object s v
-  in f ()
-
 and get_value s v =
   let%success (_, v') = v in
   if not (type_of_resvalue v' === Type_resvalue_ref) then v
