@@ -1,0 +1,7 @@
+REC
+B .
+S lib
+B lib
+S ../stdlib_ml
+B ../stdlib_ml
+FLG -nopervasives -nostdlib -open Stdlib

@@ -1,13 +1,13 @@
 all: generator mljsref jsjsref
 
 # Init stages
-init:
+init: .merlin
 	opam switch 4.04.2
 	eval `opam config env`
 	opam pin -yn add jsjsref .
 	opam pin -yn add JS_Parser "https://github.com/resource-reasoning/JS_Parser.git#v0.1.0"
 	opam install -y jsjsref --deps-only
-	# Temporary hack until opam can install test dependencies only
+	@# Temporary hack until opam can install test dependencies only
 	opam install alcotest
 	@echo
 	@echo 'You now need to execute: eval `opam config env`'
@@ -63,12 +63,19 @@ publish: dist
 publish-github: dist
 	tools/upload-github-pages.sh dist
 
-# Open in Browser Stages
+.PHONY: publish publish-github
+
+# Development support
 open: jsjsref
 	xdg-open driver.html &
 
 opendoc: doc
 	xdg-open doc/jsref/index.html &
+
+.merlin: FORCE
+	echo "FLG -ppx $(PWD)/generator/monad_ppx.byte" > $@
+
+.PHONY: open opendoc
 
 # Clean stages
 clean:
@@ -78,5 +85,6 @@ clean:
 	rm -Rf doc/jsref || true
 	rm -Rf dist || true
 
-.PHONY: jsjsref mljsref generator generator-stdlib test_init test doc esdocgen publish publish-github clean
+FORCE:
+.PHONY: jsjsref mljsref generator generator-stdlib test_init test doc esdocgen clean
 .NOTPARALLEL:

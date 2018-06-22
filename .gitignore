@@ -11,3 +11,4 @@ doc/jsref
 *.cmx
 *.cmxs
 gh-pages
+/.merlin

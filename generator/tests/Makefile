@@ -11,14 +11,6 @@ TESTS_JS := $(patsubst %.ml,%.unlog.as.js,$(TESTS))
 test: test_ml test_js
 	$(MAKE) -k _run_test
 
-init: .merlin
-
-.merlin:
-	echo "B ." > .merlin
-	echo -n "FLG $(PPX)" >> .merlin
-	echo -en "$(foreach lib,$(LIBDIRS),\nS $(lib))" >> .merlin
-	echo -en "$(foreach lib,$(LIBDIRS),\nB $(lib))" >> .merlin
-
 _run_test: run_test_ml run_test_js
 
 run_test_ml:
@@ -55,7 +47,7 @@ lib/%.cmo: lib/%.ml lib/%.cmi
 	ocamlc -c -g $(REPLACE_STDLIB) $(LIBS) $< -o $@
 
 clean:
-	rm -rf *.{cmi,cmo} test_ml _build lib/*.{cmi,cmo} .merlin
+	rm -rf *.{cmi,cmo} test_ml _build lib/*.{cmi,cmo}
 
 .PRECIOUS: %.js %.unlog.js
 .NOTPARALLEL:
