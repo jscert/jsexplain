@@ -170,7 +170,7 @@ Function to dispatch calls to O.<code class="code">[Set]</code>(P, V, Receiver)<
 </div>
 
 <pre><span id="VALobject_put"><span class="keyword">val</span> object_put</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-<span class="warning">Deprecated.</span>FIXME: In favour of potentially the same <code class="code">object_internal_set</code> ES6 method<br>
+<span class="warning">Deprecated.</span>TODO: Replace in favour of potentially the same <code class="code">object_internal_set</code> ES6 method<br>
 </div>
 
 <pre><span id="VALobject_internal_delete"><span class="keyword">val</span> object_internal_delete</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
@@ -178,7 +178,7 @@ Function to dispatch calls to O.<code class="code">[Delete]</code>(P)<br>
 </div>
 
 <pre><span id="VALobject_delete_default"><span class="keyword">val</span> object_delete_default</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       bool -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-<span class="warning">Deprecated.</span>FIXME: ES5<br>
+<span class="warning">Deprecated.</span>TODO: ES5<br>
 </div>
 
 <pre><span id="VALobject_internal_own_property_keys"><span class="keyword">val</span> object_internal_own_property_keys</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
@@ -201,16 +201,16 @@ Function to dispatch calls to O.<code class="code">[Construct]</code>(argumentsL
 <pre><span id="VALhas_primitive_base"><span class="keyword">val</span> has_primitive_base</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
 <pre><span id="VALis_property_reference"><span class="keyword">val</span> is_property_reference</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
 <pre><span id="VALis_unresolvable_reference"><span class="keyword">val</span> is_unresolvable_reference</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
-<pre><span id="VALis_super_reference"><span class="keyword">val</span> is_super_reference</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre><br>
+<pre><span id="VALis_super_reference"><span class="keyword">val</span> is_super_reference</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
+<pre><span id="VALget_value"><span class="keyword">val</span> get_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 GetValue(V)
 <p>
 
     Note: Although the type of <code class="code">v</code> is a resultof, its state is disregarded
     and must be explicitly passed to prevent issues with the value being
     computed prior to other state mutations.<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-getvalue">6.2.4.1</a></div>
 
-<pre><span id="VALtest_ret"><span class="keyword">val</span> test_ret</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
-<pre><span id="VALget_value"><span class="keyword">val</span> get_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
 <pre><span id="VALput_value"><span class="keyword">val</span> put_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       'c <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 PutValue(V,W)
 <p>
@@ -244,10 +244,10 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#
 Completes a property descriptor by setting default fields.
 <p>
 
-  FIXME: This implementation treats Property Descriptors as value types
+  WARNING: ⚠️ This implementation treats Property Descriptors as value types
   instead of as reference types as the specification intends. This method
   is used in the spec as "Call CompletePropertyDescriptor(Desc)" expecting
-  that Desc will be mutated.<br>
+  that Desc will be mutated. ⚠️<br>
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-completepropertydescriptor">6.2.5.6</a></div>
 <br>
 <h1 id="1_AbstractOperations">Abstract Operations </h1><br>
@@ -465,13 +465,15 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#
 <h2 id="2_ECMAScriptFunctionObjects">ECMAScript Function Objects</h2><br>
 
 <pre><span id="VALadd_restricted_function_properties"><span class="keyword">val</span> add_restricted_function_properties</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-TODO: Realm support<br>
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-addrestrictedfunctionproperties">9.2.7</a></div>
 
 <pre><span id="VALbuiltin_throw_type_error"><span class="keyword">val</span> builtin_throw_type_error</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -> unit -> unit -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-%throwtypeerror%">9.2.7.1</a></div>
 <br>
 <h2 id="2_BuiltinFunctionObjects">Built-in Function Objects</h2><br>
+
+<pre><span id="VALcreate_builtin_function"><span class="keyword">val</span> create_builtin_function</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -><br>       'a list -><br>       'b option -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> option -> 'c <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-createbuiltinfunction">9.3.3</a></div>
 <br>
 <h2 id="2_ArrayExoticObjects">Array Exotic Objects</h2><br>
 
@@ -582,10 +584,9 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#
 <pre><span id="VALbuiltin_proxy_revocable"><span class="keyword">val</span> builtin_proxy_revocable</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       unit -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy.revocable">26.2.2.1</a></div>
 
-<pre><span id="VALproxy_revocation_function_create"><span class="keyword">val</span> proxy_revocation_function_create</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-revocation-functions">26.2.2.2.1.1</a></div>
+<pre><span id="VALbuiltin_proxy_revocation_function"><span class="keyword">val</span> builtin_proxy_revocation_function</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       unit -> unit -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-revocation-functions">26.2.2.1.1</a></div>
 
-<pre><span id="VALbuiltin_proxy_revocation_function"><span class="keyword">val</span> builtin_proxy_revocation_function</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       'b -> 'c -> 'd <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
 <pre><span id="VALobject_has_prop"><span class="keyword">val</span> object_has_prop</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 <span class="warning">Deprecated.</span>Compatibility wrapper for ES5 code to ES6
                 implementation use <code class="code">has_property</code> instead<br>
@@ -1104,7 +1105,7 @@ val run_call_prealloc :
     state -&gt; execution_ctx -&gt; prealloc -&gt; value -&gt; value list -&gt;
     result *<br>
 
-<pre><span id="VALrun_call_prealloc"><span class="keyword">val</span> run_call_prealloc</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+<pre><span id="VALrun_call_prealloc"><span class="keyword">val</span> run_call_prealloc</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
 val run_call :
     state -&gt; execution_ctx -&gt; object_loc -&gt; value -&gt; value list
     -&gt; result *<br>
