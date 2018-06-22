@@ -192,7 +192,7 @@ and run_error_no_c : 'a. state -> native_error -> 'a specret resultof =
   let (l, s_2) = object_alloc s o in
   res_out s_2 (res_throw (Coq_resvalue_value (Coq_value_object l)))
 
-(* FIXME: ES5 HACK for where a context is required *)
+(* TODO: This is a ES5 HACK for where a context is required, remove when possible *)
 and some_context = execution_ctx_initial true
 
 (*****************************************************************************)
@@ -296,7 +296,7 @@ and object_internal_set s o p v receiver =
   | Coq_builtin_set_default -> ordinary_object_internal_set s o p v receiver
   | Coq_builtin_set_proxy   -> proxy_object_internal_set s o p v receiver
 
-(** @deprecated FIXME: In favour of potentially the same [object_internal_set] ES6 method *)
+(** @deprecated TODO: Replace in favour of potentially the same [object_internal_set] ES6 method *)
 and object_put s c l p v str = object_internal_set s l (Coq_value_string p) v (Coq_value_object l)
 
 (** Function to dispatch calls to O.[[Delete]](P) *)
@@ -307,7 +307,7 @@ and object_internal_delete s o p =
   | Coq_builtin_delete_args_obj -> Coq_result_not_yet_implemented
   | Coq_builtin_delete_proxy    -> proxy_object_internal_delete s o p
 
-(** @deprecated FIXME: ES5 *)
+(** @deprecated TODO: ES5 *)
 and object_delete_default s c l x str =
   let%bool s, b = ordinary_object_internal_delete s l (Coq_value_string x) in
   if str && (not b) then
@@ -327,7 +327,7 @@ and object_internal_call s o thisArgument argumentsList =
   let%some internal_method = run_object_method object_call_ s o in
   let%some internal_method = internal_method in
   match internal_method with
-  (* FIXME: ES5 hacks *)
+  (* TODO: ES5 *)
   | Coq_call_default    -> run_call s some_context o thisArgument argumentsList
   | Coq_call_after_bind -> run_call s some_context o thisArgument argumentsList
   | Coq_call_prealloc _ -> run_call s some_context o thisArgument argumentsList
@@ -338,7 +338,7 @@ and object_internal_construct s o argumentsList newTarget =
   let%some internal_method = run_object_method object_construct_ s o in
   let%some internal_method = internal_method in
   match internal_method with
-  (* FIXME: ES5 hacks *)
+  (* TODO: ES5 *)
   | Coq_construct_default    -> run_construct s some_context internal_method o argumentsList
   | Coq_construct_after_bind -> run_construct s some_context internal_method o argumentsList
   | Coq_construct_prealloc _ -> run_construct s some_context internal_method o argumentsList
@@ -770,7 +770,7 @@ and is_extensible s o =
 (** @essec 7.2.7
     @esid sec-ispropertykey *)
 and is_property_key argument =
-  (type_of argument) === Coq_type_string (* FIXME: || (type_of argument) === Coq_type_symbol *)
+  (type_of argument) === Coq_type_string (* TODO: || (type_of argument) === Coq_type_symbol *)
 
 (** @essec 7.2.9
     @esid sec-samevalue *)
@@ -807,7 +807,7 @@ and same_value_non_number x y =
     (match y with
      | Coq_value_bool b_y -> bool_eq b_x b_y
      | _ -> spec_assertion_failure ())
-  (* FIXME: Symbol
+  (* TODO: Symbol
   | Coq_value_symbol s_x ->
      (match y with
      | Coq_value_symbol s_y -> symbol_compare s_x s_y
@@ -927,10 +927,10 @@ and set_integrity_level s o level =
   let%spec s, keys = object_internal_own_property_keys s o in
   let%ret s =
   if level === "sealed" then
-    (* FIXME: repeat for k in keys *)
+    (* TODO: repeat for k in keys *)
     Return Coq_result_not_yet_implemented
   else
-    (* FIXME: repeat for k in keys *)
+    (* TODO: repeat for k in keys *)
     Return Coq_result_not_yet_implemented
   in
   res_ter s (res_val (Coq_value_bool true))
@@ -944,7 +944,7 @@ and test_integrity_level s o level =
   if status then res_ter s (res_val (Coq_value_bool false))
   else
   let%spec s, keys = object_internal_own_property_keys s (loc_of_value o) in
-  (* FIXME: repeat for k in keys *)
+  (* TODO: repeat for k in keys *)
   Coq_result_not_yet_implemented
 
 (** @essec 7.3.16
@@ -1062,7 +1062,7 @@ and with_base_object s e =
     @esid sec-declarative-environment-records
 *)
 
-(* FIXME: Move to a bindings data structure section. Apply to mutable bindings also. *)
+(* TODO: Move to a bindings data structure section. Apply to mutable bindings also. *)
 and binding_is_uninitialized binding =
   let (mutability, unused) = binding in
   mutability_compare mutability Coq_mutability_uninitialized_immutable
@@ -1077,7 +1077,7 @@ and decl_env_record_create_mutable_binding s l envRec n' d =
   let n = string_of_value n' in
   let d = bool_of_value d in
   let%assert _ = not (HeapStr.indom_dec envRec n) in
-  let s = env_record_write_decl_env s l n (mutability_of_bool d) Coq_value_undef in (* FIXME: Uninitialized field *)
+  let s = env_record_write_decl_env s l n (mutability_of_bool d) Coq_value_undef in (* TODO: Uninitialized field *)
   res_void s
 
 (** @essec 8.1.1.1.4
@@ -1106,7 +1106,7 @@ and decl_env_record_set_mutable_binding s l envRec n' v str =
   else
   let%some binding = HeapStr.read_option envRec n in
   let (mutability, unused) = binding in
-  (* FIXME: Implement strictness for bindings: let str = if binding.ref_strict then true else str in *)
+  (* TODO: Implement strictness for bindings: let str = if binding.ref_strict then true else str in *)
   if binding_is_uninitialized binding then
     run_error_no_c s Coq_native_error_ref
   else let%ret s =
@@ -1127,7 +1127,7 @@ and decl_env_record_get_binding_value s envRec n str =
   let%assert _ = HeapStr.indom_dec envRec n in
   let%some binding = HeapStr.read_option envRec n in
   let (mutability, v) = binding in
-  if mutability_compare mutability Coq_mutability_uninitialized_immutable (* FIXME: Need to handle mutable uninitialized also *)
+  if mutability_compare mutability Coq_mutability_uninitialized_immutable (* TODO: Need to handle mutable uninitialized also *)
   then run_error_no_c s Coq_native_error_ref
   else res_ter s (res_val v)
 
@@ -1160,7 +1160,7 @@ and object_env_record_get_binding_value s bindings this n str =
 (** @esid sec-getglobalobject
     @essec 8.3.6 *)
 and get_global_object s ctx =
-  (* FIXME: ES5 hack (realms required) *)
+  (* TODO: ES5 hack (realms required) *)
   let e = unsome_error (env_record_binds_option s env_loc_global_env_record) in
   match e with
   | Coq_env_record_object (l, this) -> Coq_value_object l
@@ -1299,7 +1299,7 @@ and validate_and_apply_property_descriptor s o p extensible desc current =
   (* FIXME: o, p type mismatch, specified as object, property key but undefined passed *)
   (* A -> B === !A || B *)
   let%assert _ = (value_compare o Coq_value_undef) || (is_property_key p) in
-  let p = string_of_value p in (* FIXME: Will break with Symbols *)
+  let p = string_of_value p in (* TODO: Will break with Symbols *)
   match current with
   (* Three types of descriptors: full, attributes: accessor and data...
      Spec assumes one with variable field definitions, move to this? (equiv. our full)
@@ -1546,7 +1546,7 @@ and ordinary_object_internal_own_property_keys s o =
     @esid sec-ordinaryownpropertykeys *)
 and ordinary_own_property_keys s o =
   let%some keys = object_properties_keys_as_list_option s o in
-  (* FIXME: Precise key ordering is to be implemented here! *)
+  (* TODO: Precise key ordering is to be implemented here! *)
   let keys = LibList.map (fun key -> Coq_value_string key) keys in
   res_spec s keys
 
@@ -1554,7 +1554,7 @@ and ordinary_own_property_keys s o =
     @esid sec-objectcreate *)
 and object_create s proto internalSlotsList =
   let internalSlotsList = unsome_default [] internalSlotsList in
-  (* FIXME: Do something with internalSlotsList *)
+  (* TODO: Do something with internalSlotsList *)
   (* TODO: Draw this definition closer to the spec language *)
   let obj = object_new proto "" in
   let l, s = object_alloc s obj in
@@ -1602,13 +1602,13 @@ and create_builtin_function s steps internalSlotsList realm prototype =
   (* 1. Assert: steps is either a set of algorithm steps or other definition of a function's behaviour provided in this specification. *)
   (* 2. If realm is not present, set realm to te current Realm Record. *)
   (* 3. Assert: realm is a Realm Record. *)
-  (* FIXME (realms): 4. If prototype is not present, set prototype to realm.[[Intrinsics]].[[%FunctionPrototype%]]. *)
+  (* TODO (realms): 4. If prototype is not present, set prototype to realm.[[Intrinsics]].[[%FunctionPrototype%]]. *)
   let prototype = unsome_default (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_function_proto)) prototype in
 
   (* 5. Let func be a new built-in function object that when called performs the action described by steps. The new function
      object has internal slots whose names are the elements of internalSlotsList. The initial value of each of those
      internal slots is undefined. *)
-  (* FIXME: 6. Set func.[[Realm]] to realm. *)
+  (* TODO: 6. Set func.[[Realm]] to realm. *)
   (* 7. Set func.[[Prototype]] to prototype. *)
   (* 8. Set func.[[Extensible]] to true. *)
   (* 9. Set func.[[ScriptOrModule]] to null. *)
@@ -1622,7 +1622,7 @@ and create_builtin_function s steps internalSlotsList realm prototype =
 (** @essec 9.4.2.2
     @esid sec-arraycreate *)
 and array_create s length proto =
-  (* FIXME: ES5 HACK *)
+  (* TODO: ES5 HACK *)
   run_construct_prealloc s some_context Coq_prealloc_array [length]
 
 (** {2 Proxy Object Internal Methods and Internal Slots}
@@ -1774,7 +1774,7 @@ and proxy_object_internal_get_own_property s o p =
   else
   let%bool s, extensibleTarget = is_extensible s target in
   let%spec s, resultDesc = to_property_descriptor s trapResultObj in
-  let resultDesc = complete_property_descriptor (Descriptor resultDesc) in (* FIXME: See note in [complete_property_descriptor] *)
+  let resultDesc = complete_property_descriptor (Descriptor resultDesc) in (* TODO: See note in [complete_property_descriptor] *)
   let%bool s, valid = is_compatible_property_descriptor s extensibleTarget resultDesc targetDesc in
   if not valid then
     run_error_no_c s Coq_native_error_type

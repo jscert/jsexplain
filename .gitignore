@@ -10,3 +10,4 @@ doc/jsref
 *.native
 *.cmx
 *.cmxs
+gh-pages
