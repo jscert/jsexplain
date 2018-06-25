@@ -259,10 +259,14 @@ and object_internal_prevent_extensions s o =
 (** Function to dispatch calls to O.[[GetOwnProperty]](P) *)
 and object_internal_get_own_property s o p =
   let%some internal_method = run_object_method object_get_own_prop_ s o in
+  let old_get_own_prop s o p =
+    let%spec (s, desc) = run_object_get_own_prop s some_context o (string_of_value p) (* TODO: ES6 version *)
+    in res_spec s (undef_descriptor_of_full_descriptor desc)
+  in
   match internal_method with
   | Coq_builtin_get_own_prop_default  -> ordinary_object_internal_get_own_property s o p
-  | Coq_builtin_get_own_prop_args_obj -> Coq_result_not_yet_implemented (* TODO *)
-  | Coq_builtin_get_own_prop_string   -> Coq_result_not_yet_implemented (* TODO *)
+  | Coq_builtin_get_own_prop_args_obj -> old_get_own_prop s o p (* TODO: ES6 version *)
+  | Coq_builtin_get_own_prop_string   -> old_get_own_prop s o p (* TODO: ES6 version *)
   | Coq_builtin_get_own_prop_proxy    -> proxy_object_internal_get_own_property s o p
 
 (** Function to dispatch calls to O.[[DefineOwnProperty]](P, desc) *)
@@ -270,8 +274,8 @@ and object_internal_define_own_property s o p desc =
   let%some internal_method = run_object_method object_define_own_prop_ s o in
   match internal_method with
   | Coq_builtin_define_own_prop_default  -> ordinary_object_internal_define_own_property s o p desc
-  | Coq_builtin_define_own_prop_array    -> Coq_result_not_yet_implemented (* TODO *)
-  | Coq_builtin_define_own_prop_args_obj -> Coq_result_not_yet_implemented (* TODO *)
+  | Coq_builtin_define_own_prop_array    -> object_define_own_prop s some_context o (string_of_value p) desc false (* TODO: ES6 version *)
+  | Coq_builtin_define_own_prop_args_obj -> object_define_own_prop s some_context o (string_of_value p) desc false (* TODO: ES6 version *)
   | Coq_builtin_define_own_prop_proxy    -> ordinary_object_internal_define_own_property s o p desc
 
 (** Function to dispatch calls to O.[[HasProperty]](P) *)
@@ -304,16 +308,8 @@ and object_internal_delete s o p =
   let%some internal_method = run_object_method object_delete_ s o in
   match internal_method with
   | Coq_builtin_delete_default  -> ordinary_object_internal_delete s o p
-  | Coq_builtin_delete_args_obj -> Coq_result_not_yet_implemented
+  | Coq_builtin_delete_args_obj -> object_delete s some_context o (string_of_value p) false (* TODO: Replace with ES6 version *)
   | Coq_builtin_delete_proxy    -> proxy_object_internal_delete s o p
-
-(** @deprecated TODO: ES5 *)
-and object_delete_default s c l x str =
-  let%bool s, b = ordinary_object_internal_delete s l (Coq_value_string x) in
-  if str && (not b) then
-    run_error_no_c s Coq_native_error_type
-  else
-    res_ter s (res_val (Coq_value_bool b))
 
 (** Function to dispatch calls to O.[[OwnPropertyKeys]]() *)
 and object_internal_own_property_keys s o =
@@ -2104,8 +2100,7 @@ and proxy_create s target handler =
     @essec 19.1.2
     @esid  sec-properties-of-the-object-constructor *)
 
-(** TODO: Hook into ES5 run_prealloc once [set_integrity_level] fully implemented.
-    @esid sec-object.freeze
+(** @esid sec-object.freeze
     @essec 19.1.2.6 *)
 and builtin_object_freeze s c f this newTarget o =
   if not (type_of o === Coq_type_object) then res_ter s (res_val o)
@@ -2126,15 +2121,13 @@ and builtin_object_is_extensible s c f this newTarget o =
   if not (type_of o === Coq_type_object) then res_ter s (res_val (Coq_value_bool false))
   else is_extensible s o
 
-(** TODO: Hook into ES5 run_prealloc once [test_integrity_level] fully implemented.
-    @esid sec-object.isfrozen
+(** @esid sec-object.isfrozen
     @essec 19.1.2.14 *)
 and builtin_object_is_frozen s c f this newTarget o =
   if not (type_of o === Coq_type_object) then res_ter s (res_val (Coq_value_bool true))
   else test_integrity_level s o "frozen"
 
-(** TODO: Hook into ES5 run_prealloc once [test_integrity_level] fully implemented.
-    @esid sec-object.issealed
+(** @esid sec-object.issealed
     @essec 19.1.2.15 *)
 and builtin_object_is_sealed s c f this newTarget o =
   if not (type_of o === Coq_type_object) then res_ter s (res_val (Coq_value_bool true))
@@ -2149,8 +2142,7 @@ and builtin_object_prevent_extensions s c f this newTarget o =
   if not status then run_error_no_c s Coq_native_error_type
   else res_ter s (res_val o)
 
-(** TODO: Hook into ES5 run_prealloc once [set_integrity_level] fully implemented.
-    @esid sec-object.seal
+(** @esid sec-object.seal
     @essec 19.1.2.19 *)
 and builtin_object_seal s c f this newTarget o =
   if not (type_of o === Coq_type_object) then res_ter s (res_val o)
@@ -2159,8 +2151,7 @@ and builtin_object_seal s c f this newTarget o =
   if not status then run_error_no_c s Coq_native_error_type
   else res_ter s (res_val o)
 
-(** TODO: Hook into prealloc object code.
-    @esid sec-object.setprototypeof
+(** @esid sec-object.setprototypeof
     @essec 19.1.2.20 *)
 and builtin_object_set_prototype_of s c f this newTarget o proto =
   let%value s, o = require_object_coercible s o in
@@ -2224,8 +2215,8 @@ and builtin_proxy_revocation_function s c f this newTarget =
 
 (******** UNCHECKED ES5 IMPLEMENTATION CONTINUES BELOW ***********)
 
-(** @deprecated Compatibility wrapper for ES5 code to ES6
-                implementation use [has_property] instead *)
+(** @deprecated Compatibility wrapper for ES5 code to ES6 implementation use [has_property] instead. TODO: Remove call
+    sites. *)
 and object_has_prop s c l x =
   object_internal_has_property s l (Coq_value_string x)
 
@@ -2397,10 +2388,8 @@ and run_object_define_own_prop_array_loop s c l newLen oldLen newLenDesc newWrit
       false
   else res_ter s (res_val (Coq_value_bool true))
 
-(** val object_define_own_prop :
-    state -> execution_ctx -> object_loc -> prop_name ->
-    descriptor -> strictness_flag -> result **)
-
+(** ES5 [[DefineOwnProperty]]
+    @deprecated Use ES6 object_internal_define_own_property instead. TODO: ES6 version. *)
 and object_define_own_prop s c l x desc throwcont =
   let reject s0 throwcont0 =
     out_error_or_cst
@@ -2408,8 +2397,6 @@ and object_define_own_prop s c l x desc throwcont =
   let def s p d _ = ordinary_define_own_property s l (Coq_value_string p) d in
   let%some b = (run_object_method object_define_own_prop_ s l) in
   match b with
-  | Coq_builtin_define_own_prop_default ->
-      object_internal_define_own_property s l (Coq_value_string x) desc (* ES6 hack *)
   | Coq_builtin_define_own_prop_array ->
     let%spec (s0, d) = (run_object_get_own_prop s c l ("length")) in
     begin
@@ -2499,7 +2486,12 @@ and object_define_own_prop s c l x desc throwcont =
             let%void s2 = (object_put s1 c lmap x v throwcont) in follow0 s2
           | None -> follow0 s1
     else reject s1 throwcont
-  | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
+  | _ ->
+    let%bool (s, b) = object_internal_define_own_property s l (Coq_value_string x) desc (* ES6 hack *)
+    in if throwcont && not b then
+      run_error_no_c s Coq_native_error_type
+    else
+      res_ter s (res_val (Coq_value_bool b))
 
 (** val prim_new_object : state -> prim -> result **)
 
@@ -2570,20 +2562,17 @@ and lexical_env_get_identifier_ref s c x x0 str =
         then res_spec s1 (ref_create_env_loc l x0 str)
         else lexical_env_get_identifier_ref s1 c x_2 x0 str
 
-(** val object_delete :
-    state -> execution_ctx -> object_loc -> prop_name ->
-    strictness_flag -> result **)
-
+(** @deprecated: ES5 implementation for arguments object. Others redirect to ES2016 implementation.
+    TODO: Switch out to ES2016 version. *)
 and object_delete s c l x str =
   let%some b = (run_object_method object_delete_ s l) in
       match b with
-      | Coq_builtin_delete_default -> object_delete_default s c l x str
       | Coq_builtin_delete_args_obj ->
         begin
           let%some mo = (run_object_method object_parameter_map_ s l) in
           let%some m = (mo) in
           let%spec (s1, d) = (run_object_get_own_prop s c m x) in
-          let%bool (s2, b0) = (object_delete_default s1 c l x str) in
+          let%bool (s2, b0) = (object_delete_default s1 l x str) in
           if b0 then (match d with
             | Coq_full_descriptor_undef ->
               res_ter s2 (res_val (Coq_value_bool b0))
@@ -2592,7 +2581,21 @@ and object_delete s c l x str =
               res_ter s3 (res_val (Coq_value_bool b0)))
           else res_ter s2 (res_val (Coq_value_bool b0))
         end
-      | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
+      | _ ->
+        let%bool s, b = object_internal_delete s l (Coq_value_string x) in
+        if str && (not b) then
+          run_error_no_c s Coq_native_error_type
+        else
+          res_ter s (res_val (Coq_value_bool b))
+
+(** @deprecated TODO: Replace ES5 callsites with ES2016 version. *)
+and object_delete_default s l x str =
+  let%bool s, b = ordinary_object_internal_delete s l (Coq_value_string x) in
+  if str && (not b) then
+    run_error_no_c s Coq_native_error_type
+  else
+    res_ter s (res_val (Coq_value_bool b))
+
 
 (** val env_record_delete_binding :
     state -> execution_ctx -> env_loc -> prop_name -> result **)
@@ -3395,19 +3398,15 @@ and entering_func_code s c lf vthis args =
       | Coq_value_string s0 -> let%value (s2, v) = (to_object s vthis) in follow s2 v
       | Coq_value_object lthis -> follow s vthis)
 
-(** val run_object_get_own_prop :
-    state -> execution_ctx -> object_loc -> prop_name ->
-    full_descriptor specres **)
-
+(** ES5 version of [[GetOwnProperty]], redirects to ES6 as appropriate.
+    @deprecated TODO: Rewrite into ES6 *)
 and run_object_get_own_prop s c l x =
   let%some b = (run_object_method object_get_own_prop_ s l) in
-  let def = (fun s_2 ->
-    let%some p = (run_object_method object_properties_ s_2 l) in
-    res_spec s_2 (ifx_some_or_default (convert_option_attributes (HeapStr.read_option p x))
-      Coq_full_descriptor_undef (fun x -> x))
+  let def = (fun s ->
+    let%spec (s, prop) = ordinary_get_own_property s l (Coq_value_string x) in
+    res_spec s (full_descriptor_of_undef_descriptor prop)
   ) in
   match b with
-  | Coq_builtin_get_own_prop_default -> def s
   | Coq_builtin_get_own_prop_args_obj ->
     let%spec (s1, d) = (def s) in
     begin
@@ -3451,7 +3450,9 @@ and run_object_get_own_prop s c l x =
                     attributes_data_configurable = false } in
           res_spec s5 (Coq_full_descriptor_some (Coq_attributes_data_of a))
     | Coq_full_descriptor_some a -> res_spec s0 d)
-  | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
+  | _ ->
+    let%spec (s, prop) = object_internal_get_own_property s l (Coq_value_string x) in
+    res_spec s (full_descriptor_of_undef_descriptor prop)
 
 (** val run_function_has_instance :
     state -> object_loc -> value -> result **)
@@ -4567,123 +4568,6 @@ and push s c l args ilen =
              let%not_throw  (s1, x) = (object_put s0 c l slen v throw_true) in
                  push s1 c l vs (ilen +. 1.)
 
-(** val run_object_is_sealed :
-    state -> execution_ctx -> object_loc -> prop_name list ->
-    result **)
-
-and run_object_is_sealed s c l _foo_ = match _foo_ with
-  | [] ->
-    let%some ext = (run_object_method object_extensible_ s l) in
-        res_ter s (res_val (Coq_value_bool (not ext)))
-  | x :: xs_2 ->
-    let%spec (s0, d) = (run_object_get_own_prop s c l x) in
-        match d with
-        | Coq_full_descriptor_undef ->
-          (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-            s0
-            ("[run_object_is_sealed]:  Undefined descriptor found in a place where it shouldn\'t.")
-        | Coq_full_descriptor_some a ->
-          if attributes_configurable a
-          then res_ter s0 (res_val (Coq_value_bool false))
-          else run_object_is_sealed s0 c l xs_2
-
-(** val run_object_seal :
-    state -> execution_ctx -> object_loc -> prop_name list ->
-    result **)
-
-and run_object_seal s c l _foo_ = match _foo_ with
-  | [] ->
-    let%some s0= (run_object_heap_set_extensible false s l) in
-        res_ter s0 (res_val (Coq_value_object l))
-  | x :: xs_2 ->
-    let%spec (s0, d) = (run_object_get_own_prop s c l x) in
-        match d with
-        | Coq_full_descriptor_undef ->
-          (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-            s0
-            ("[run_object_seal]:  Undefined descriptor found in a place where it shouldn\'t.")
-        | Coq_full_descriptor_some a ->
-          let a_2 =
-            if attributes_configurable a
-            then let desc = { descriptor_value = None; descriptor_writable =
-                                                         None; descriptor_get = None; descriptor_set = None;
-                              descriptor_enumerable = None; descriptor_configurable = (Some
-                                                                                         false) }
-              in
-              attributes_update a desc
-            else a
-          in
-          let%bool
-             (s1, x0) = (object_define_own_prop s0 c l x (descriptor_of_attributes a_2)
-               true) in run_object_seal s1 c l xs_2
-
-(** val run_object_freeze :
-    state -> execution_ctx -> object_loc -> prop_name list ->
-    result **)
-
-and run_object_freeze s c l _foo_ = match _foo_ with
-  | [] ->
-    let%some s0= (run_object_heap_set_extensible false s l) in
-        res_ter s0 (res_val (Coq_value_object l))
-  | x :: xs_2 ->
-    let%spec (s0, d) = (run_object_get_own_prop s c l x) in
-        match d with
-        | Coq_full_descriptor_undef ->
-          (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-            s0
-            ("[run_object_freeze]:  Undefined descriptor found in a place where it shouldn\'t.")
-        | Coq_full_descriptor_some a ->
-          let a_2 =
-            if (attributes_is_data_dec a) && (attributes_writable a)
-            then let desc = { descriptor_value = None; descriptor_writable =
-                                                         (Some false); descriptor_get = None; descriptor_set = None;
-                              descriptor_enumerable = None; descriptor_configurable = None }
-              in
-              attributes_update a desc
-            else a
-          in
-          let a_3 =
-            if attributes_configurable a_2
-            then let desc = { descriptor_value = None; descriptor_writable =
-                                                         None; descriptor_get = None; descriptor_set = None;
-                              descriptor_enumerable = None; descriptor_configurable = (Some
-                                                                                         false) }
-              in
-              attributes_update a_2 desc
-            else a_2
-          in
-          let%bool
-             (s1, x0) = (object_define_own_prop s0 c l x (descriptor_of_attributes a_3)
-               true) in run_object_freeze s1 c l xs_2
-
-(** val run_object_is_frozen :
-    state -> execution_ctx -> object_loc -> prop_name list ->
-    result **)
-
-and run_object_is_frozen s c l _foo_ = match _foo_ with
-  | [] ->
-    let%some ext = (run_object_method object_extensible_ s l) in
-        res_ter s (res_val (Coq_value_bool (not ext)))
-  | x :: xs_2 ->
-    let%spec (s0, d) = (run_object_get_own_prop s c l x) in
-        let  check_configurable = (fun a ->
-            if attributes_configurable a
-            then res_ter s0 (res_val (Coq_value_bool false))
-            else run_object_is_frozen s0 c l xs_2) in
-            match d with
-            | Coq_full_descriptor_undef ->
-              (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-                s0
-                ("[run_object_is_frozen]:  Undefined descriptor found in a place where it shouldn\'t.")
-            | Coq_full_descriptor_some a ->
-              (match a with
-               | Coq_attributes_data_of ad ->
-                 if attributes_writable (Coq_attributes_data_of ad)
-                 then res_ter s0 (res_val (Coq_value_bool false))
-                 else check_configurable (Coq_attributes_data_of ad)
-               | Coq_attributes_accessor_of aa ->
-                 check_configurable (Coq_attributes_accessor_of aa))
-
 (** val run_get_args_for_apply :
     state -> execution_ctx -> object_loc -> float -> float ->
     value list specres **)
@@ -4761,6 +4645,10 @@ and run_call_prealloc s c b l vthis args =
   | Coq_prealloc_object_get_proto_of ->
     let  v = (get_arg 0 args) in
     builtin_object_get_prototype_of s c () vthis () v
+  | Coq_prealloc_object_set_proto_of ->
+    let o = get_arg 0 args in
+    let proto = get_arg 1 args in
+    builtin_object_set_prototype_of s c () vthis () o proto
   | Coq_prealloc_object_get_own_prop_descriptor ->
     let  v = (get_arg 0 args) in begin
       match v with
@@ -4783,38 +4671,20 @@ and run_call_prealloc s c b l vthis args =
       | _ -> run_error s c Coq_native_error_type
     end
   | Coq_prealloc_object_seal ->
-    let v = (get_arg 0 args) in begin
-      match v with
-      | Coq_value_object l ->
-        let%some _x_ = (object_properties_keys_as_list_option s l) in
-        run_object_seal s c l _x_
-      | _ -> run_error s c Coq_native_error_type
-    end
+    let v = get_arg 0 args in
+    builtin_object_seal s c () vthis () v
   | Coq_prealloc_object_freeze ->
-    let  v = (get_arg 0 args) in begin
-      match v with
-      | Coq_value_object l ->
-        let%some _x_ = (object_properties_keys_as_list_option s l) in
-        run_object_freeze s c l _x_
-      | _ -> run_error s c Coq_native_error_type
-    end
+    let v = get_arg 0 args in
+    builtin_object_freeze s c () vthis () v
   | Coq_prealloc_object_prevent_extensions ->
-    let  v = (get_arg 0 args) in
+    let v = get_arg 0 args in
     builtin_object_prevent_extensions s c () vthis () v
   | Coq_prealloc_object_is_sealed ->
-    let  v = (get_arg 0 args) in begin
-      match v with
-      | Coq_value_object l ->
-        let%some _x_ = (object_properties_keys_as_list_option s l) in  run_object_is_sealed s c l _x_
-      | _ -> run_error s c Coq_native_error_type
-    end
+    let v = get_arg 0 args in
+    builtin_object_is_sealed s c () vthis () v
   | Coq_prealloc_object_is_frozen ->
-    let  v = (get_arg 0 args) in begin
-      match v with
-      | Coq_value_object l ->
-        let%some _x_ = (object_properties_keys_as_list_option s l) in  run_object_is_frozen s c l _x_
-      | _ -> run_error s c Coq_native_error_type
-    end
+    let v = get_arg 0 args in
+    builtin_object_is_frozen s c () vthis () v
   | Coq_prealloc_object_is_extensible ->
     let  v = (get_arg 0 args) in
     builtin_object_is_extensible s c () vthis () v

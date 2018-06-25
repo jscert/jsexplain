@@ -298,84 +298,31 @@ let global_encode_uri_component_function_object =
 (** val object_prealloc_object : coq_object **)
 
 let object_prealloc_object =
-  let p =
-    write_constant Heap.empty
-      ("prototype")
-      (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_proto))
-  in
-  let p0 =
-    write_native p
-      ("getPrototypeOf")
-      (Coq_value_object (Coq_object_loc_prealloc
-      Coq_prealloc_object_get_proto_of))
-  in
-  let p1 =
-    write_native p0
-      ("getOwnPropertyDescriptor")
-      (Coq_value_object (Coq_object_loc_prealloc
-      Coq_prealloc_object_get_own_prop_descriptor))
-  in
-  let p2 =
-    write_native p1
-      ("getOwnPropertyNames")
-      (Coq_value_object (Coq_object_loc_prealloc
-      Coq_prealloc_object_get_own_prop_name))
-  in
-  let p3 =
-    write_native p2 ("create")
-      (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_create))
-  in
-  let p4 =
-    write_native p3
-      ("defineProperty")
-      (Coq_value_object (Coq_object_loc_prealloc
-      Coq_prealloc_object_define_prop))
-  in
-  let p5 =
-    write_native p4
-      ("defineProperties")
-      (Coq_value_object (Coq_object_loc_prealloc
-      Coq_prealloc_object_define_props))
-  in
-  let p6 =
-    write_native p5 ("seal") (Coq_value_object
-      (Coq_object_loc_prealloc Coq_prealloc_object_seal))
-  in
-  let p7 =
-    write_native p6 ("freeze")
-      (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_freeze))
-  in
-  let p8 =
-    write_native p7
-      ("preventExtensions")
-      (Coq_value_object (Coq_object_loc_prealloc
-      Coq_prealloc_object_prevent_extensions))
-  in
-  let p9 =
-    write_native p8
-      ("isSealed")
-      (Coq_value_object (Coq_object_loc_prealloc
-      Coq_prealloc_object_is_sealed))
-  in
-  let p10 =
-    write_native p9
-      ("isFrozen")
-      (Coq_value_object (Coq_object_loc_prealloc
-      Coq_prealloc_object_is_frozen))
-  in
-  let p11 =
-    write_native p10
-      ("isExtensible")
-      (Coq_value_object (Coq_object_loc_prealloc
-      Coq_prealloc_object_is_extensible))
-  in
-  object_create_prealloc_constructor Coq_prealloc_object (Coq_value_number 1.0) p11
+  let p = write_constant Heap.empty ("prototype") (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_proto)) in
+  let p = write_native p ("getPrototypeOf") (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_get_proto_of)) in
+  let p = write_native p ("setPrototypeOf") (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_set_proto_of)) in
+  let p = write_native p ("getOwnPropertyDescriptor") (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_get_own_prop_descriptor)) in
+  let p = write_native p ("getOwnPropertyNames") (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_get_own_prop_name)) in
+  let p = write_native p ("create") (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_create)) in
+  let p = write_native p ("defineProperty") (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_define_prop)) in
+  let p = write_native p ("defineProperties") (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_define_props)) in
+  let p = write_native p ("seal") (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_seal)) in
+  let p = write_native p ("freeze") (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_freeze)) in
+  let p = write_native p ("preventExtensions") (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_prevent_extensions)) in
+  let p = write_native p ("isSealed") (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_is_sealed)) in
+  let p = write_native p ("isFrozen") (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_is_frozen)) in
+  let p = write_native p ("isExtensible") (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_is_extensible)) in
+  object_create_prealloc_constructor Coq_prealloc_object (Coq_value_number 1.0) p
 
 (** val object_get_proto_of_function_object : coq_object **)
 
 let object_get_proto_of_function_object =
   object_create_prealloc_call Coq_prealloc_object_get_proto_of
     (Coq_value_number 1.0) Heap.empty
+
+let object_set_proto_of_function_object =
+  object_create_prealloc_call Coq_prealloc_object_set_proto_of
+    (Coq_value_number 2.0) Heap.empty
 
 (** val object_get_own_prop_descriptor_function_object : coq_object **)
 
@@ -990,10 +937,8 @@ let object_heap_initial_function_objects_1 h =
 
 let object_heap_initial_function_objects_2 h =
   let h0 = object_heap_initial_function_objects_1 h in
-  let h1 =
-    HeapObj.write h0 (Coq_object_loc_prealloc Coq_prealloc_object_get_proto_of)
-      object_get_proto_of_function_object
-  in
+  let h1 = HeapObj.write h0 (Coq_object_loc_prealloc Coq_prealloc_object_get_proto_of) object_get_proto_of_function_object in
+  let h1 = HeapObj.write h1 (Coq_object_loc_prealloc Coq_prealloc_object_set_proto_of) object_set_proto_of_function_object in
   let h2 =
     HeapObj.write h1 (Coq_object_loc_prealloc
       Coq_prealloc_object_get_own_prop_descriptor)

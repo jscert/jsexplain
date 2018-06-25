@@ -165,6 +165,7 @@ type prealloc =
 | Coq_prealloc_object_get_proto_of
 | Coq_prealloc_object_get_own_prop_descriptor
 | Coq_prealloc_object_get_own_prop_name
+| Coq_prealloc_object_set_proto_of
 | Coq_prealloc_object_create
 | Coq_prealloc_object_define_prop
 | Coq_prealloc_object_define_props

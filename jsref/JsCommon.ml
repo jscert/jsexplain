@@ -141,6 +141,17 @@ let attributes_data_of_descriptor desc =
 let attributes_accessor_of_descriptor desc =
   attributes_accessor_update attributes_accessor_default desc
 
+(** Converts a complete descriptor into attributes. Nonstandard operation for backwards compat only. Not to be used with
+    generic descriptors.
+    @deprecated For backwards compatibility only. *)
+let attributes_of_descriptor desc =
+  if (is_some desc.descriptor_get) || (is_some desc.descriptor_set) then
+    Coq_attributes_accessor_of (attributes_accessor_of_descriptor desc)
+  else if is_some desc.descriptor_value then
+    Coq_attributes_data_of (attributes_data_of_descriptor desc)
+  else
+    failwith "attributes_of_descriptor type cast used with generic descriptor"
+
 (** val descriptor_of_attributes : attributes -> descriptor **)
 
 let descriptor_of_attributes _foo_ = match _foo_ with
@@ -158,6 +169,16 @@ let descriptor_of_attributes _foo_ = match _foo_ with
     descriptor_set = (Some aa.attributes_accessor_set);
     descriptor_enumerable = (Some aa.attributes_accessor_enumerable);
     descriptor_configurable = (Some aa.attributes_accessor_configurable) }
+
+let full_descriptor_of_undef_descriptor desc =
+  match desc with
+  | Descriptor_undef -> Coq_full_descriptor_undef
+  | Descriptor desc -> Coq_full_descriptor_some (attributes_of_descriptor desc)
+
+let undef_descriptor_of_full_descriptor desc =
+  match desc with
+  | Coq_full_descriptor_undef -> Descriptor_undef
+  | Coq_full_descriptor_some att -> Descriptor (descriptor_of_attributes att)
 
 (** val attributes_configurable : attributes -> bool **)
 

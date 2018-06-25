@@ -90,6 +90,7 @@ let int_of_prealloc p =
   | Coq_prealloc_proxy -> 70
   | Coq_prealloc_proxy_revocable -> 71
   | Coq_builtin_proxy_revocation -> 72
+  | Coq_prealloc_object_set_proto_of -> 73
   | Coq_prealloc_mathop o -> 100 + int_of_mathop o
   | Coq_prealloc_native_error e -> 200 + int_of_native_error e
   | Coq_prealloc_native_error_proto e -> 300 + int_of_native_error e
@@ -119,6 +120,8 @@ let string_of_prealloc prealloc = match prealloc with
   | Coq_prealloc_object -> "object"
   | Coq_prealloc_object_get_proto_of ->
     "object_get_proto_of"
+  | Coq_prealloc_object_set_proto_of ->
+    "object_set_proto_of"
   | Coq_prealloc_object_get_own_prop_descriptor ->
     "object_get_own_prop_descriptor"
   | Coq_prealloc_object_get_own_prop_name ->
