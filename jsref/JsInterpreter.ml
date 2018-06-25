@@ -286,7 +286,7 @@ and object_internal_get s o p receiver =
   let%some internal_method = (run_object_method object_get_ s o) in
   match internal_method with
   | Coq_builtin_get_default  -> ordinary_object_internal_get s o p receiver
-  | Coq_builtin_get_args_obj -> Coq_result_not_yet_implemented
+  | Coq_builtin_get_args_obj -> object_get_builtin_args s internal_method receiver o p (* TODO: ES6-ify *)
   | Coq_builtin_get_proxy    -> proxy_object_internal_get s o p receiver
 
 (** Function to dispatch calls to O.[[Set]](P, V, Receiver) *)
@@ -2242,14 +2242,12 @@ and out_error_or_void s c str ne =
 and out_error_or_cst s c str ne v =
   if str then run_error s c ne else res_out s (res_val v)
 
-(** val object_get_builtin :
-    state -> execution_ctx -> builtin_get -> value -> object_loc
-    -> prop_name -> result
-
-    @deprecated ES5 version of function. New versions need to be written and
-                dispatched to in {!object_internal_get}.
-**)
-and object_get_builtin s c b vthis l x =
+(**
+    @deprecated TODO: ES6 version of function. dispatched to in {!object_internal_get}.
+*)
+and object_get_builtin_args s b vthis l x =
+  let x = string_of_value x in
+  let c = some_context in
   let def s0 l0 =
     let%spec (s1, d) = (run_object_get_prop s0 c l0 x) in
     match d with
@@ -2274,7 +2272,6 @@ and object_get_builtin s c b vthis l x =
     then run_error s_2 c Coq_native_error_type
     else res_ter s_2 (res_val v) in
   match b with
-  | Coq_builtin_get_default -> def s l
   | Coq_builtin_get_args_obj -> (
     let%some lmapo = (run_object_method object_parameter_map_ s l) in
     let%some lmap = (lmapo) in
@@ -2282,16 +2279,16 @@ and object_get_builtin s c b vthis l x =
     match d with
     | Coq_full_descriptor_undef -> function0 s0
     | Coq_full_descriptor_some a -> run_object_get s0 c lmap x)
-  | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
+  | _ -> Coq_result_impossible (* Should have been caught by [object_internal_get] *)
 
 (** val run_object_get :
     state -> execution_ctx -> object_loc -> prop_name -> result
 
     @deprecated This is the ES5 version, replaced by {!object_internal_get}
+    TODO: Replace calls to this and delete.
     **)
 and run_object_get s c l x =
-  let%some b = (run_object_method object_get_ s l) in
-  object_get_builtin s c b (Coq_value_object l) l x
+  object_internal_get s l (Coq_value_string x) (Coq_value_object l)
 
 (** val run_object_get_prop :
     state -> execution_ctx -> object_loc -> prop_name ->
@@ -2548,13 +2545,6 @@ and to_object s _foo_ = match _foo_ with
 and run_object_prim_value s l =
   let%some ov = (run_object_method object_prim_value_ s l) in
       let%some v = (ov) in  res_ter s (res_val v)
-
-(** val prim_value_get :
-    state -> execution_ctx -> value -> prop_name -> result **)
-
-and prim_value_get s c v x =
-  let%object (s_2, l) = (to_object s v) in
-      object_get_builtin s_2 c Coq_builtin_get_default v l x
 
 (** val env_record_has_binding :
     state -> execution_ctx -> env_loc -> prop_name -> result **)
