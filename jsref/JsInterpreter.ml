@@ -323,22 +323,16 @@ and object_internal_call s o thisArgument argumentsList =
   let%some internal_method = run_object_method object_call_ s o in
   let%some internal_method = internal_method in
   match internal_method with
-  (* TODO: ES5 *)
-  | Coq_call_default    -> run_call s some_context o thisArgument argumentsList
-  | Coq_call_after_bind -> run_call s some_context o thisArgument argumentsList
-  | Coq_call_prealloc _ -> run_call s some_context o thisArgument argumentsList
-  | Coq_call_proxy      -> proxy_object_internal_call s o thisArgument argumentsList
+  | Coq_call_proxy -> proxy_object_internal_call s o thisArgument argumentsList
+  | _              -> run_call s some_context o thisArgument argumentsList (* TODO: ES5 *)
 
 (** Function to dispatch calls to O.[[Construct]](argumentsList, newTarget) *)
 and object_internal_construct s o argumentsList newTarget =
   let%some internal_method = run_object_method object_construct_ s o in
   let%some internal_method = internal_method in
   match internal_method with
-  (* TODO: ES5 *)
-  | Coq_construct_default    -> run_construct s some_context internal_method o argumentsList
-  | Coq_construct_after_bind -> run_construct s some_context internal_method o argumentsList
-  | Coq_construct_prealloc _ -> run_construct s some_context internal_method o argumentsList
-  | Coq_construct_proxy      -> proxy_object_internal_construct s o argumentsList newTarget
+  | Coq_construct_proxy -> proxy_object_internal_construct s o argumentsList newTarget
+  | _                   -> run_construct s some_context internal_method o argumentsList (* TODO: ES5 *)
 
 
 (** {3 The Reference Specification Type}
@@ -894,13 +888,12 @@ and has_property s o p =
 (** @essec 7.3.12
     @esid sec-call *)
 and call s f v argumentList =
-  if_some_or_apply_default argumentList [] (fun argumentList ->
-    let callable = is_callable s f in
-    if not callable then run_error_no_c s Coq_native_error_type
-    else
-    let l = loc_of_value f in
-    object_internal_call s l v argumentList
-  )
+  let argumentList = unsome_default [] argumentList in
+  let callable = is_callable s f in
+  if not callable then run_error_no_c s Coq_native_error_type
+  else
+  let l = loc_of_value f in
+  object_internal_call s l v argumentList
 
 (** @essec 7.3.13
     @esid sec-construct *)
@@ -2967,7 +2960,7 @@ and run_construct s c co l args =
       | None -> run_error s c Coq_native_error_type
     end
   | Coq_construct_prealloc b -> run_construct_prealloc s c b args
-  | _ -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
+  | _ -> construct s (Coq_value_object l) (Some args) None
 
 (** val run_call_default :
     state -> execution_ctx -> object_loc -> result **)
@@ -5031,7 +5024,7 @@ and run_call s c l vthis args =
     let%some target = otrg in
     let arguments_ = (LibList.append boundArgs args) in run_call s c target boundThis arguments_
   | Coq_call_prealloc b -> run_call_prealloc s c b l vthis args
-  | Coq_call_proxy -> Coq_result_not_yet_implemented (* FIXME: Proxy *)
+  | _ -> object_internal_call s l vthis args
 
 (** val run_javascript_from_state : state -> prog -> result **)
 

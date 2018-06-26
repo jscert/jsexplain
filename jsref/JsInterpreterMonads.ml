@@ -95,11 +95,6 @@ let if_some op k = if_some2 op k (fun x -> x)
 let if_some_or_default o d k =
   option_case d k o
 
-let if_some_or_apply_default o d k =
-  match o with
-  | Some x -> k x
-  | None   -> k d
-
 (** val if_result_some :
     'a1 resultof -> ('a1 -> 'a2 resultof) -> 'a2 resultof **)
 
