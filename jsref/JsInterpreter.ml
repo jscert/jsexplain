@@ -981,7 +981,6 @@ and create_list_from_array_like s obj elementTypes =
       Continue (s, index, list)) in
   res_spec s list
 
-
 (** {1 Executable Code and Execution Contexts}
     @essec 8
     @esid sec-executable-code-and-execution-contexts *)
@@ -2162,6 +2161,25 @@ and builtin_object_set_prototype_of s c f this newTarget o proto =
   if not status then run_error_no_c s Coq_native_error_type
   else res_ter s (res_val o)
 
+(** {3 Properties of the Object Prototype Object}
+    @esid sec-properties-of-the-object-prototype-object
+    @essec 19.1.3 *)
+
+(** @esid sec-object.prototype.isprototypeof
+    @essec 19.1.3.4 *)
+and builtin_object_prototype_is_prototype_of s c f this newTarget v =
+  if not (type_of v === Coq_type_object) then res_out s (res_val (Coq_value_bool false))
+  else
+  let v = loc_of_value v in
+  let%value (s, o) = to_object s this in
+  let%ret _ = repeat (fun _ -> true) s (fun s ->
+    let%value_ret (s, v) = object_internal_get_prototype_of s v in
+    if v === Coq_value_null then Return (res_out s (res_val (Coq_value_bool false)))
+    else if same_value o v then Return (res_out s (res_val (Coq_value_bool true)))
+    else Continue s
+  ) in
+  Coq_result_impossible (* The repeat function must terminate with a return. *)
+
 (** {1 Reflection}
     @essec 26
     @esid sec-reflection *)
@@ -2300,23 +2318,6 @@ and run_object_get_prop s c l x =
           s1
           ("Found a non-object or null value as a prototype in [run_object_get_prop].")
     else res_spec s1 d
-
-(** val object_proto_is_prototype_of :
-    state -> object_loc -> object_loc -> result **)
-
-and object_proto_is_prototype_of s l0 l =
-  let%some b = (run_object_method object_proto_ s l) in
-  match b with
-  | Coq_value_null ->
-    res_out s (res_val (Coq_value_bool false))
-  | Coq_value_object l_2 ->
-    if object_loc_compare l_2 l0
-    then res_out s (res_val (Coq_value_bool true))
-    else object_proto_is_prototype_of s l0 l_2
-  | _ ->
-    (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
-      s
-      ("[run_object_method] returned a non-object in [object_proto_is_prototype_of_body].")
 
 (** val object_default_value :
     state -> execution_ctx -> object_loc -> preftype option ->
@@ -4723,14 +4724,8 @@ and run_call_prealloc s c b l vthis args =
                       res_ter s3 (res_val (Coq_value_bool true))
     end
   | Coq_prealloc_object_proto_is_prototype_of ->
-    let  v = (get_arg 0 args) in begin
-      match v with
-      | Coq_value_object l ->
-        let%object (s1, lo) = (to_object s vthis) in
-        object_proto_is_prototype_of s1 lo l
-      | _ ->
-        res_out s (res_val (Coq_value_bool false))
-    end
+    let v = get_arg 0 args in
+    builtin_object_prototype_is_prototype_of s c () vthis () v
   | Coq_prealloc_object_proto_prop_is_enumerable ->
     let  v = (get_arg 0 args) in
     let%string (s1, x) = (to_string s v) in

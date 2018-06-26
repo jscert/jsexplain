@@ -436,6 +436,20 @@ and iterate' l acc f = match l with
 | []      -> acc
 | x :: l' -> let_ret_ret acc (fun v -> iterate' l' (f x v) f)
 
+(** A continuation-passing while loop with early function-level return.
+
+    [repeat condition acc f] will: {ul
+    {- Initially set the accumulator to be [Continue acc].}
+    {- Repeatedly: {ul
+      {- If the accumulator is [Return x], then the loop terminates with value [Return x].}
+      {- Otherwise, the accumulator will be [Continue v]. {ul
+        {- If, [condition v] is [true], then repeat the loop with the value of the accumulator being [f v].}
+        {- Otherwise, the loop terminates with the value [Continue v].}
+    }}}}}
+
+    When combined with a [let%ret] monadic binder, a repeat loop evaluating to a [Return x] value will return [x] as the
+    function's result, whereas a [Continue v] value will bind [v] to the binder's pattern for use in the continuation.
+*)
 let rec repeat condition acc f = repeat' condition (Continue acc) f
 and repeat' condition acc f =
   let_ret_ret acc (fun v ->
