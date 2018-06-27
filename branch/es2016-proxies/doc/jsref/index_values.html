@@ -174,6 +174,11 @@ Updates a given data attribute with values from the given descriptor
 <td></td></tr>
 <tr><td><a href="JsCommonAux.html#VALattributes_is_data_dec">attributes_is_data_dec</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsCommon.html#VALattributes_of_descriptor">attributes_of_descriptor</a> [<a href="JsCommon.html">JsCommon</a>]</td>
+<td><div class="info">
+<span class="deprecated">Converts a complete descriptor into attributes.
+</span></div>
+</td></tr>
 <tr><td><a href="JsCommon.html#VALattributes_update">attributes_update</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td><div class="info">
 Updates a given attribute with values from the given descriptor.
@@ -210,7 +215,6 @@ Updates a given attribute with values from the given descriptor.
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALbuiltin_object_freeze">builtin_object_freeze</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
-TODO: Hook into ES5 run_prealloc once <code class="code">set_integrity_level</code> fully implemented.
 </div>
 </td></tr>
 <tr><td><a href="JsInterpreter.html#VALbuiltin_object_get_prototype_of">builtin_object_get_prototype_of</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
@@ -223,26 +227,26 @@ TODO: Hook into ES5 run_prealloc once <code class="code">set_integrity_level</co
 </td></tr>
 <tr><td><a href="JsInterpreter.html#VALbuiltin_object_is_frozen">builtin_object_is_frozen</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
-TODO: Hook into ES5 run_prealloc once <code class="code">test_integrity_level</code> fully implemented.
 </div>
 </td></tr>
 <tr><td><a href="JsInterpreter.html#VALbuiltin_object_is_sealed">builtin_object_is_sealed</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
-TODO: Hook into ES5 run_prealloc once <code class="code">test_integrity_level</code> fully implemented.
 </div>
 </td></tr>
 <tr><td><a href="JsInterpreter.html#VALbuiltin_object_prevent_extensions">builtin_object_prevent_extensions</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
 </td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_object_prototype_is_prototype_of">builtin_object_prototype_is_prototype_of</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALbuiltin_object_seal">builtin_object_seal</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
-TODO: Hook into ES5 run_prealloc once <code class="code">set_integrity_level</code> fully implemented.
 </div>
 </td></tr>
 <tr><td><a href="JsInterpreter.html#VALbuiltin_object_set_prototype_of">builtin_object_set_prototype_of</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
-TODO: Hook into prealloc object code.
 </div>
 </td></tr>
 <tr><td><a href="JsInterpreter.html#VALbuiltin_proxy_constructor">builtin_proxy_constructor</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
@@ -531,6 +535,8 @@ Implements spec text: "true, if every field in d is absent"
 <td></td></tr>
 <tr><td><a href="JsCommonAux.html#VALfull_descriptor_compare">full_descriptor_compare</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsCommon.html#VALfull_descriptor_of_undef_descriptor">full_descriptor_of_undef_descriptor</a> [<a href="JsCommon.html">JsCommon</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsSyntaxAux.html#VALfuncbody_is_strict">funcbody_is_strict</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsSyntaxAux.html#VALfuncbody_prog">funcbody_prog</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
@@ -664,8 +670,6 @@ GetValue(V)
 <tr><td><a href="JsInterpreterMonads.html#VALif_some">if_some</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_some2">if_some2</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
-<td></td></tr>
-<tr><td><a href="JsInterpreterMonads.html#VALif_some_or_apply_default">if_some_or_apply_default</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALif_some_or_default">if_some_or_default</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
@@ -985,7 +989,10 @@ Fetches Some object from location l in the heap, None if it is not allocated
 <tr><td><a href="JsSyntax.html#VALobject_default_value_">object_default_value_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALobject_define_own_prop">object_define_own_prop</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
+<td><div class="info">
+<span class="deprecated">ES5 <code class="code">[DefineOwnProperty]</code>
+</span></div>
+</td></tr>
 <tr><td><a href="JsSyntax.html#VALobject_define_own_prop_">object_define_own_prop_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInit.html#VALobject_define_prop_function_object">object_define_prop_function_object</a> [<a href="JsInit.html">JsInit</a>]</td>
@@ -993,7 +1000,9 @@ Fetches Some object from location l in the heap, None if it is not allocated
 <tr><td><a href="JsInit.html#VALobject_define_props_function_object">object_define_props_function_object</a> [<a href="JsInit.html">JsInit</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALobject_delete">object_delete</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
+<td><div class="info">
+<span class="deprecated"></span></div>
+</td></tr>
 <tr><td><a href="JsSyntax.html#VALobject_delete_">object_delete_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALobject_delete_default">object_delete_default</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
@@ -1020,12 +1029,9 @@ Fetches Some object from location l in the heap, None if it is not allocated
 <td></td></tr>
 <tr><td><a href="JsSyntax.html#VALobject_get_">object_get_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALobject_get_builtin">object_get_builtin</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<tr><td><a href="JsInterpreter.html#VALobject_get_builtin_args">object_get_builtin_args</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
-<span class="deprecated">val object_get_builtin :
-    state -&gt; execution_ctx -&gt; builtin_get -&gt; value -&gt; object_loc
-    -&gt; prop_name -&gt; result
-</span></div>
+<span class="deprecated"></span></div>
 </td></tr>
 <tr><td><a href="JsSyntax.html#VALobject_get_own_prop_">object_get_own_prop_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
@@ -1227,8 +1233,6 @@ Updates an object's property given the location, property name and function mapp
 <td></td></tr>
 <tr><td><a href="JsInit.html#VALobject_proto_has_own_prop_function_object">object_proto_has_own_prop_function_object</a> [<a href="JsInit.html">JsInit</a>]</td>
 <td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALobject_proto_is_prototype_of">object_proto_is_prototype_of</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
 <tr><td><a href="JsInit.html#VALobject_proto_is_prototype_of_function_object">object_proto_is_prototype_of_function_object</a> [<a href="JsInit.html">JsInit</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInit.html#VALobject_proto_prop_is_enumerable_function_object">object_proto_prop_is_enumerable_function_object</a> [<a href="JsInit.html">JsInit</a>]</td>
@@ -1271,6 +1275,8 @@ Update an object's property given the location, property name and new attributes
 </div>
 </td></tr>
 <tr><td><a href="JsSyntaxAux.html#VALobject_set_proto">object_set_proto</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInit.html#VALobject_set_proto_of_function_object">object_set_proto_of_function_object</a> [<a href="JsInit.html">JsInit</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsSyntax.html#VALobject_set_prototype_of_">object_set_prototype_of_</a> [<a href="JsSyntax.html">JsSyntax</a>]</td>
 <td></td></tr>
@@ -1420,8 +1426,6 @@ Update an object's property given the location, property name and new attributes
 <tr><td><a href="JsCommonAux.html#VALprepost_unary_op_dec">prepost_unary_op_dec</a> [<a href="JsCommonAux.html">JsCommonAux</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALprim_new_object">prim_new_object</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALprim_value_get">prim_value_get</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="Prheap.html#VALprloc">prloc</a> [<a href="Prheap.html">Prheap</a>]</td>
 <td></td></tr>
@@ -1591,7 +1595,10 @@ PutValue(V,W)
 <tr><td><a href="StdMap.html#VALremove_min_binding">remove_min_binding</a> [<a href="StdMap.html">StdMap</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALrepeat">repeat</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
-<td></td></tr>
+<td><div class="info">
+A continuation-passing while loop with early function-level return.
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALrepeat'">repeat'</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALrequire_object_coercible">require_object_coercible</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
@@ -1729,8 +1736,6 @@ TODO: ES6ify
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_object_define_own_prop_array_loop">run_object_define_own_prop_array_loop</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALrun_object_freeze">run_object_freeze</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_object_get">run_object_get</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 <span class="deprecated">val run_object_get :
@@ -1738,7 +1743,10 @@ TODO: ES6ify
 </span></div>
 </td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_object_get_own_prop">run_object_get_own_prop</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
+<td><div class="info">
+<span class="deprecated">ES5 version of <code class="code">[GetOwnProperty]</code>, redirects to ES6 as appropriate.
+</span></div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_object_get_prop">run_object_get_prop</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_object_has_instance">run_object_has_instance</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
@@ -1752,10 +1760,6 @@ Updates the properties Heap of a given object using f
 <td></td></tr>
 <tr><td><a href="Debug.html#VALrun_object_heap_set_extensible">run_object_heap_set_extensible</a> [<a href="Debug.html">Debug</a>]</td>
 <td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALrun_object_is_frozen">run_object_is_frozen</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALrun_object_is_sealed">run_object_is_sealed</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_object_method">run_object_method</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 Fetches a given object slot value (using proj) from the object l in state s
@@ -1765,8 +1769,6 @@ Fetches a given object slot value (using proj) from the object l in state s
 <tr><td><a href="Debug.html#VALrun_object_method">run_object_method</a> [<a href="Debug.html">Debug</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_object_prim_value">run_object_prim_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
-<td></td></tr>
-<tr><td><a href="JsInterpreter.html#VALrun_object_seal">run_object_seal</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_object_set_internal">run_object_set_internal</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
@@ -1998,6 +2000,8 @@ TODO: ES6-ify
 <td></td></tr>
 <tr><td align="left"><br>U</td></tr>
 <tr><td><a href="JsNumber.html#VALuint32_right_shift">uint32_right_shift</a> [<a href="JsNumber.html">JsNumber</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsCommon.html#VALundef_descriptor_of_full_descriptor">undef_descriptor_of_full_descriptor</a> [<a href="JsCommon.html">JsCommon</a>]</td>
 <td></td></tr>
 <tr><td><a href="LibOption.html#VALunsome_default">unsome_default</a> [<a href="LibOption.html">LibOption</a>]</td>
 <td></td></tr>

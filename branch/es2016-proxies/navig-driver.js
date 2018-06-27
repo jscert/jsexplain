@@ -122,7 +122,7 @@ function initSourceDocs() {
 // Registers a new source doc
 function newSourceDoc(name, text, readOnly) {
   if (!source_docs.hasOwnProperty(name)) {
-    source_docs[name] = CodeMirror.Doc(text, 'js');
+    source_docs[name] = CodeMirror.Doc(text, 'text/javascript');
     var tab = $('<span>').addClass('file_item')
                 .text(name)
                 .click(e => selectSourceDoc(e.target.textContent))
@@ -608,17 +608,29 @@ function cursor() {
 function get_file_extension(filename) {
   var re = /(?:\.([^.]+))?$/;
   var s = re.exec(filename)[1];
-  // if (s == "pseudo") { return "js"; }
   return s;
 }
+
+function get_file_mime(filename) {
+  switch(get_file_extension(filename)) {
+    case "js":
+    case "pseudo":
+      return "text/javascript";
+    case "ml":
+      return "text/x-ocaml";
+    default:
+      return "text/plain";
+  }
+}
+
 
 // load files in CodeMirror view
 var docs = {};
 for (var i = 0; i < tracer_files.length; i++) {
   var file = tracer_files[i].file;
-  var ext = get_file_extension(file);
+  var mime = get_file_mime(file);
   var txt = tracer_files[i].contents;
-  docs[file] = CodeMirror.Doc(txt, ext);
+  docs[file] = CodeMirror.Doc(txt, mime);
 }
 
 function viewFile(file) {

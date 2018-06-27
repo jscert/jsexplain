@@ -118,10 +118,18 @@ Create a data property from a descriptor, using default attribute values if
 Create an accessor property from a descriptor, using default attribute
     values if the required attribute is absent.<br>
 </div>
+
+<pre><span id="VALattributes_of_descriptor"><span class="keyword">val</span> attributes_of_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>For backwards compatibility only.<br>
+Converts a complete descriptor into attributes. Nonstandard operation for backwards compat only. Not to be used with
+    generic descriptors.<br>
+</div>
 <br>
 val descriptor_of_attributes : attributes -&gt; descriptor *<br>
 
-<pre><span id="VALdescriptor_of_attributes"><span class="keyword">val</span> descriptor_of_attributes</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a></code></pre><br>
+<pre><span id="VALdescriptor_of_attributes"><span class="keyword">val</span> descriptor_of_attributes</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a></code></pre>
+<pre><span id="VALfull_descriptor_of_undef_descriptor"><span class="keyword">val</span> full_descriptor_of_undef_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> <a href="JsSyntax.html#TYPEfull_descriptor">JsSyntax.full_descriptor</a></code></pre>
+<pre><span id="VALundef_descriptor_of_full_descriptor"><span class="keyword">val</span> undef_descriptor_of_full_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEfull_descriptor">JsSyntax.full_descriptor</a> -> <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a></code></pre><br>
 val attributes_configurable : attributes -&gt; bool *<br>
 
 <pre><span id="VALattributes_configurable"><span class="keyword">val</span> attributes_configurable</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> bool</code></pre><br>
