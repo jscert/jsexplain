@@ -190,7 +190,7 @@ function typecheckAST(ast) {
 }
 
 describe("EsprimaToAST", function() {
-  it("Extracts function body strings", function() {
+  it("Extracts function body strings?", function() {
     var source =
 `function f() {
   // body line 1
@@ -210,7 +210,7 @@ a()};`;
   , { source: `""; 0; "use strict";`          , strict: false }
   , { source: `"use\\u0020strict";`           , strict: false }
   ].forEach(function (test) {
-    it("Correctly parses that `" + test.source + "` is " + (test.strict ? " " : "not ") + "strict mode code.", function() {
+    it("Correctly parses that `" + test.source + "` is " + (test.strict ? " " : "not ") + "strict mode code?", function() {
       var est = esprima.parse(test.source, {loc: true, range: true});
       var ast = esprimaToAST.esprimaToAST(est, test.source);
       assert.equal(test.strict, ast.strictness);
@@ -259,7 +259,7 @@ a()};`;
 });
 
 test262tests.push(args => {
-  it('parse', function() {
+  it('parses?', function() {
     var negative = isParserNegativeTest(args.negative);
     try {
       esprima.parse(args.source, {loc: true, range: true});
@@ -272,10 +272,10 @@ test262tests.push(args => {
 });
 
 test262tests.push(args => {
-  it('convert ast', function() {
+  it('converts ast?', function() {
     try {
       var prog = esprima.parse(args.source, {loc: true, range: true});
-    } catch(e) { return; }
+    } catch(e) { this.skip(); }
 
     try {
       var ast = esprimaToAST.esprimaToAST(prog, args.source);

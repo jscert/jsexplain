@@ -1,6 +1,7 @@
 "use strict";
 
 const fs = require('fs');
+const assert = require('assert').strict;
 // tripwire module is no longer maintained
 //const tripwire = require('tripwire');
 
@@ -32,6 +33,7 @@ before(function(done) {
   fs.readFile(__dirname + '/data/test_prelude.js', (err, data) => {
     if (err) throw err;
     prelude = jsref.JsInterpreter.run_javascript(parse(data));
+    assert.doesNotThrow(() => testResultForException(prelude, false), "Prelude execution threw!");
     done();
   });
 });
@@ -44,7 +46,8 @@ Test262Error.prototype = Object.create(Error.prototype);
 Test262Error.prototype.constructor = Test262Error;
 
 function testPreludeError(result) {
-  var state = result.value.out.state;
+  // FIXME: Reintrouduce this error case to prelude
+  var state = result.value.state;
 
   var error = jsref.JsInterpreterUtils.get_global_value(state, "__$ERROR__");
 
@@ -85,8 +88,8 @@ function getExceptionFromValue(state, value) {
 };
 
 function testResultForException(result, negative) {
-  var state = result.value.out.state;
-  var completion = result.value.out.res;
+  var state = result.value.state;
+  var completion = result.value.res;
   var value = completion.res_value.value;
 
   switch (completion.res_type.tag) {
@@ -134,10 +137,10 @@ function testResultForException(result, negative) {
 };
 
 test262tests.push(args => {
-  it("interprets correctly", function() {
+  it("interprets correctly?", function() {
     try {
       var ast = parse(args.source);
-    } catch(e) { return; }
+    } catch(e) { this.skip(); }
 
     this.timeout(timeout);
     //tripwire.resetTripwire(timeout);

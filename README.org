@@ -15,7 +15,13 @@ make test_init
 make test
 #+END_SRC
 
-~make test~ tests jsjsref only at present.
+~make test~ tests jsjsref only at present, this executes `npx mocha`.
+
+To select subsets of tests to run you can use the ~-g~ flag with the
+pattern to grep for in the test name. Each test262 test case's path is
+a part of the test name. For example, to select only the interpreter
+run test cases for the if statement, you could use:
+~npx mocha -g 'test/language/statements/if.*interprets'~
 
 Latest version of jsjsref & debugger is automatically published at:
 https://jscert.github.io/jsexplain/branch/master/driver.html
