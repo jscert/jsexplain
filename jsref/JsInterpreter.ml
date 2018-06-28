@@ -5028,17 +5028,17 @@ and run_call s c l vthis args =
 
 (** val run_javascript_from_state : state -> prog -> result **)
 
-and run_javascript_from_state s p =
-  let c = execution_ctx_initial (prog_intro_strictness p) in
-  let%void s_2 = execution_ctx_binding_inst s c Coq_codetype_global None p [] in
-  run_prog s_2 c p
+and run_javascript_from_state s _term_ =
+  let c = execution_ctx_initial (prog_intro_strictness _term_) in
+  let%void s_2 = execution_ctx_binding_inst s c Coq_codetype_global None _term_ [] in
+  run_prog s_2 c _term_
 
 (** val run_javascript_from_result : result -> prog -> result **)
 
-and run_javascript_from_result w p =
-  if_success w (fun s _ -> run_javascript_from_state s p)
+and run_javascript_from_result w _term_ =
+  if_success w (fun s _ -> run_javascript_from_state s _term_)
 
 (** val run_javascript : prog -> result **)
 
-and run_javascript p =
-  run_javascript_from_state state_initial p
+and run_javascript _term_ =
+  run_javascript_from_state state_initial _term_
