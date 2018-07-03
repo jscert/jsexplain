@@ -1,0 +1,1090 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="Start" href="index.html">
+<link rel="previous" href="JsInterpreterMonads.html">
+<link rel="next" href="JsInterpreterUtils.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="BinNums" rel="Chapter" href="BinNums.html">
+<link title="Datatypes" rel="Chapter" href="Datatypes.html">
+<link title="Fappli_IEEE_bits" rel="Chapter" href="Fappli_IEEE_bits.html">
+<link title="Fappli_IEEE" rel="Chapter" href="Fappli_IEEE.html">
+<link title="LibList" rel="Chapter" href="LibList.html">
+<link title="LibOption" rel="Chapter" href="LibOption.html">
+<link title="LibProd" rel="Chapter" href="LibProd.html">
+<link title="StdMap" rel="Chapter" href="StdMap.html">
+<link title="Heap" rel="Chapter" href="Heap.html">
+<link title="HeapInt" rel="Chapter" href="HeapInt.html">
+<link title="HeapStr" rel="Chapter" href="HeapStr.html">
+<link title="HeapList" rel="Chapter" href="HeapList.html">
+<link title="Shared" rel="Chapter" href="Shared.html">
+<link title="Compare" rel="Chapter" href="Compare.html">
+<link title="JsNumber" rel="Chapter" href="JsNumber.html">
+<link title="JsSyntax" rel="Chapter" href="JsSyntax.html">
+<link title="JsSyntaxAux" rel="Chapter" href="JsSyntaxAux.html">
+<link title="HeapObj" rel="Chapter" href="HeapObj.html">
+<link title="Translate_syntax" rel="Chapter" href="Translate_syntax.html">
+<link title="JsCommon" rel="Chapter" href="JsCommon.html">
+<link title="JsCommonAux" rel="Chapter" href="JsCommonAux.html">
+<link title="JsInit" rel="Chapter" href="JsInit.html">
+<link title="Prheap" rel="Chapter" href="Prheap.html">
+<link title="Debug" rel="Chapter" href="Debug.html">
+<link title="JsInterpreterMonads" rel="Chapter" href="JsInterpreterMonads.html">
+<link title="JsInterpreter" rel="Chapter" href="JsInterpreter.html">
+<link title="JsInterpreterUtils" rel="Chapter" href="JsInterpreterUtils.html">
+<link title="ModuleExport" rel="Chapter" href="ModuleExport.html">
+<link title="Run_js" rel="Chapter" href="Run_js.html"><link title="Abstract Operations " rel="Section" href="#1_AbstractOperations">
+<link title="Executable Code and Execution Contexts" rel="Section" href="#1_ExecutableCodeandExecutionContexts">
+<link title="Ordinary and Exotic Objects Behaviours " rel="Section" href="#1_OrdinaryandExoticObjectsBehaviours">
+<link title="Fundamental Objects" rel="Section" href="#1_FundamentalObjects">
+<link title="Reflection" rel="Section" href="#1_Reflection">
+<link title="Type Conversion " rel="Subsection" href="#2_TypeConversion">
+<link title="Testing and Comparison Operations " rel="Subsection" href="#2_TestingandComparisonOperations">
+<link title="Operations on Objects " rel="Subsection" href="#2_OperationsonObjects">
+<link title="Lexical Environments" rel="Subsection" href="#2_LexicalEnvironments">
+<link title="Execution Contexts" rel="Subsection" href="#2_ExecutionContexts">
+<link title="Ordinary Object Internal Methods and Internal Slots " rel="Subsection" href="#2_OrdinaryObjectInternalMethodsandInternalSlots">
+<link title="ECMAScript Function Objects" rel="Subsection" href="#2_ECMAScriptFunctionObjects">
+<link title="Built-in Function Objects" rel="Subsection" href="#2_BuiltinFunctionObjects">
+<link title="Array Exotic Objects" rel="Subsection" href="#2_ArrayExoticObjects">
+<link title="Proxy Object Internal Methods and Internal Slots" rel="Subsection" href="#2_ProxyObjectInternalMethodsandInternalSlots">
+<link title="Object Objects" rel="Subsection" href="#2_ObjectObjects">
+<link title="Proxy Objects" rel="Subsection" href="#2_ProxyObjects">
+<title>JsInterpreter</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="JsInterpreterMonads.html" title="JsInterpreterMonads">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="JsInterpreterUtils.html" title="JsInterpreterUtils">Next</a>
+</div>
+<h1>Module <a href="type_JsInterpreter.html">JsInterpreter</a></h1>
+
+<pre><span class="keyword">module</span> JsInterpreter: <code class="code">sig</code> <a href="JsInterpreter.html">..</a> <code class="code">end</code></pre><div class="info module top">
+ECMAScript Reference Interpreter Implementation<br>
+</div>
+<hr width="100%">
+<br>
+ECMAScript Reference Interpreter Implementation<br>
+<br>
+val equality_test_for_same_type : coq_type -&gt; value -&gt; value -&gt; bool *<br>
+
+<pre><span id="VALequality_test_for_same_type"><span class="keyword">val</span> equality_test_for_same_type</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_type">JsSyntax.coq_type</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><br>
+val strict_equality_test : value -&gt; value -&gt; bool *<br>
+
+<pre><span id="VALstrict_equality_test"><span class="keyword">val</span> strict_equality_test</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><br>
+val inequality_test_number : number -&gt; number -&gt; prim *<br>
+
+<pre><span id="VALinequality_test_number"><span class="keyword">val</span> inequality_test_number</span> : <code class="type"><a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><br>
+val inequality_test_string : string -&gt; string -&gt; bool *<br>
+
+<pre><span id="VALinequality_test_string"><span class="keyword">val</span> inequality_test_string</span> : <code class="type">string -> string -> bool</code></pre><br>
+val typeof_prim : prim -&gt; string *<br>
+
+<pre><span id="VALtypeof_prim"><span class="keyword">val</span> typeof_prim</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> string</code></pre><br>
+val string_of_propname : propname -&gt; prop_name *<br>
+
+<pre><span id="VALstring_of_propname"><span class="keyword">val</span> string_of_propname</span> : <code class="type"><a href="JsSyntax.html#TYPEpropname">JsSyntax.propname</a> -> string</code></pre>
+<pre><span id="VALrun_object_method"><span class="keyword">val</span> run_object_method</span> : <code class="type">(<a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> 'a) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a option</code></pre><div class="info ">
+Fetches a given object slot value (using proj) from the object l in state s
+    FIXME: The name is very confusing.<br>
+</div>
+<br>
+val run_object_heap_set :
+    (coq_object -&gt; a' -&gt; coq_object) -&gt; state -&gt; object_loc -&gt; a' -&gt; state option *<br>
+<br>
+Updates an object's internal field with the given update function <code class="code">prj</code>.
+    (Update functions are defined in JsSyntaxAux)<br>
+
+<pre><span id="VALrun_object_set_internal"><span class="keyword">val</span> run_object_set_internal</span> : <code class="type">(<a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> 'a -> <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a>) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> option</code></pre><br>
+val run_object_heap_set_extensible :
+    bool -&gt; state -&gt; object_loc -&gt; state option *<br>
+
+<pre><span id="VALrun_object_heap_set_extensible"><span class="keyword">val</span> run_object_heap_set_extensible</span> : <code class="type">bool -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> option</code></pre>
+<pre><span id="VALbuild_error"><span class="keyword">val</span> build_error</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALrun_error"><span class="keyword">val</span> run_error</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEnative_error">JsSyntax.native_error</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALrun_error_no_c"><span class="keyword">val</span> run_error_no_c</span> : <code class="type">'a.<br>         <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>         <a href="JsSyntax.html#TYPEnative_error">JsSyntax.native_error</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALsome_context"><span class="keyword">val</span> some_context</span> : <code class="type"><a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a></code></pre><br>
+New ES6 Spec functions here, writting in the specification in CamelCase()
+    will all be prefixed with spec_<br>
+<br>
+<h4 id="4_ObjectInternalMethodsandInternalSlots">Object Internal Methods and Internal Slots </h4><br>
+
+<pre><span id="VALobject_has_internal_slot"><span class="keyword">val</span> object_has_internal_slot</span> : <code class="type">'a.<br>         <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>         <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> (<a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> 'a option) -> bool</code></pre><div class="info ">
+Function to implement the specification text "O has a <code class="code">[X]</code> internal slot"<br>
+</div>
+<div class="param_info"><code class="code">l</code> : The location of O</div>
+<div class="param_info"><code class="code">prj</code> : The object projection function corresponding to <code class="code">[X]</code></div>
+
+<pre><span id="VALobject_has_internal_method"><span class="keyword">val</span> object_has_internal_method</span> : <code class="type">'a.<br>         <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>         <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> (<a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> 'a option) -> bool</code></pre><div class="info ">
+Function to implement the specification text of "O has a <code class="code">[X]</code> internal method"<br>
+</div>
+<br>
+<h5 id="5_ObjectInternalMethodDispatchFunctions">Object Internal Method Dispatch Functions </h5>
+    Functions in this section are used to dispatch Internal Methods to the
+    correct implementation based upon the value of the internal slot
+<p>
+
+    All these functions accept a parameter o, which is the <i>location</i> of the object.<br>
+
+<pre><span id="VALobject_internal_get_prototype_of"><span class="keyword">val</span> object_internal_get_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+Function to dispatch calls to O.<code class="code">[GetPrototypeOf]</code>()<br>
+</div>
+
+<pre><span id="VALobject_internal_set_prototype_of"><span class="keyword">val</span> object_internal_set_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+Function to dispatch calls to O.<code class="code">[GetPrototypeOf]</code>(V)<br>
+</div>
+
+<pre><span id="VALobject_internal_is_extensible"><span class="keyword">val</span> object_internal_is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+Function to dispatch calls to O.<code class="code">[IsExtensible]</code>()<br>
+</div>
+
+<pre><span id="VALobject_internal_prevent_extensions"><span class="keyword">val</span> object_internal_prevent_extensions</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+Function to dispatch calls to O.<code class="code">[PreventExtensions]</code>()<br>
+</div>
+
+<pre><span id="VALobject_internal_get_own_property"><span class="keyword">val</span> object_internal_get_own_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+Function to dispatch calls to O.<code class="code">[GetOwnProperty]</code>(P)<br>
+</div>
+
+<pre><span id="VALobject_internal_define_own_property"><span class="keyword">val</span> object_internal_define_own_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+Function to dispatch calls to O.<code class="code">[DefineOwnProperty]</code>(P, desc)<br>
+</div>
+
+<pre><span id="VALobject_internal_has_property"><span class="keyword">val</span> object_internal_has_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+Function to dispatch calls to O.<code class="code">[HasProperty]</code>(P)<br>
+</div>
+
+<pre><span id="VALobject_internal_get"><span class="keyword">val</span> object_internal_get</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+Function to dispatch calls to O.<code class="code">[Get]</code>(P, receiver)<br>
+</div>
+
+<pre><span id="VALobject_internal_set"><span class="keyword">val</span> object_internal_set</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+Function to dispatch calls to O.<code class="code">[Set]</code>(P, V, Receiver)<br>
+</div>
+
+<pre><span id="VALobject_put"><span class="keyword">val</span> object_put</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>TODO: Replace in favour of potentially the same <code class="code">object_internal_set</code> ES6 method<br>
+</div>
+
+<pre><span id="VALobject_internal_delete"><span class="keyword">val</span> object_internal_delete</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+Function to dispatch calls to O.<code class="code">[Delete]</code>(P)<br>
+</div>
+
+<pre><span id="VALobject_internal_own_property_keys"><span class="keyword">val</span> object_internal_own_property_keys</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+Function to dispatch calls to O.<code class="code">[OwnPropertyKeys]</code>()<br>
+</div>
+
+<pre><span id="VALobject_internal_call"><span class="keyword">val</span> object_internal_call</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+Function to dispatch calls to O.<code class="code">[Call]</code>(thisArgument, argumentsList)<br>
+</div>
+
+<pre><span id="VALobject_internal_construct"><span class="keyword">val</span> object_internal_construct</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+Function to dispatch calls to O.<code class="code">[Construct]</code>(argumentsList, newTarget)<br>
+</div>
+<br>
+<h3 id="3_TheReferenceSpecificationType">The Reference Specification Type</h3><br>
+
+<pre><span id="VALget_base"><span class="keyword">val</span> get_base</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> <a href="JsSyntax.html#TYPEref_base_type">JsSyntax.ref_base_type</a></code></pre>
+<pre><span id="VALget_referenced_name"><span class="keyword">val</span> get_referenced_name</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre>
+<pre><span id="VALis_strict_reference"><span class="keyword">val</span> is_strict_reference</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
+<pre><span id="VALhas_primitive_base"><span class="keyword">val</span> has_primitive_base</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
+<pre><span id="VALis_property_reference"><span class="keyword">val</span> is_property_reference</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
+<pre><span id="VALis_unresolvable_reference"><span class="keyword">val</span> is_unresolvable_reference</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
+<pre><span id="VALis_super_reference"><span class="keyword">val</span> is_super_reference</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> bool</code></pre>
+<pre><span id="VALget_value"><span class="keyword">val</span> get_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+GetValue(V)
+<p>
+
+    Note: Although the type of <code class="code">v</code> is a resultof, its state is disregarded
+    and must be explicitly passed to prevent issues with the value being
+    computed prior to other state mutations.<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-getvalue">6.2.4.1</a></div>
+
+<pre><span id="VALput_value"><span class="keyword">val</span> put_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       'c <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+PutValue(V,W)
+<p>
+
+    Note: Although the types of <code class="code">v</code> and <code class="code">w</code> are resultof, their states are
+    disregarded and must be explicitly passed, as it is not clear in which
+    order they were calculated.<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-putvalue">6.2.4.2</a></div>
+
+<pre><span id="VALget_this_value"><span class="keyword">val</span> get_this_value</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-getthisvalue">6.2.4.3</a></div>
+<br>
+<h3 id="3_ThePropertyDescriptorSpecificationType">The Property Descriptor Specification Type</h3><br>
+
+<pre><span id="VALis_accessor_descriptor"><span class="keyword">val</span> is_accessor_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> bool</code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-isaccessordescriptor">6.2.5.1</a></div>
+
+<pre><span id="VALis_data_descriptor"><span class="keyword">val</span> is_data_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> bool</code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-isdatadescriptor">6.2.5.2</a></div>
+
+<pre><span id="VALis_generic_descriptor"><span class="keyword">val</span> is_generic_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> bool</code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-isgenericdescriptor">6.2.5.3</a></div>
+
+<pre><span id="VALfrom_property_descriptor"><span class="keyword">val</span> from_property_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-frompropertydescriptor">6.2.5.4</a></div>
+
+<pre><span id="VALto_property_descriptor"><span class="keyword">val</span> to_property_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-topropertydescriptor">6.2.5.5</a></div>
+
+<pre><span id="VALcomplete_property_descriptor"><span class="keyword">val</span> complete_property_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a></code></pre><div class="info ">
+Completes a property descriptor by setting default fields.
+<p>
+
+  WARNING: ⚠️ This implementation treats Property Descriptors as value types
+  instead of as reference types as the specification intends. This method
+  is used in the spec as "Call CompletePropertyDescriptor(Desc)" expecting
+  that Desc will be mutated. ⚠️<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-completepropertydescriptor">6.2.5.6</a></div>
+<br>
+<h1 id="1_AbstractOperations">Abstract Operations </h1><br>
+<br>
+<h2 id="2_TypeConversion">Type Conversion </h2><br>
+
+<pre><span id="VALto_primitive"><span class="keyword">val</span> to_primitive</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsCommon.html#TYPEpreftype">JsCommon.preftype</a> option -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-toprimitive">7.1.1</a></div>
+
+<pre><span id="VALto_boolean"><span class="keyword">val</span> to_boolean</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-toboolean">7.1.2</a></div>
+
+<pre><span id="VALto_number"><span class="keyword">val</span> to_number</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-tonumber">link</a></div>
+
+<pre><span id="VALto_number_string"><span class="keyword">val</span> to_number_string</span> : <code class="type">string -> <a href="JsNumber.html#TYPEnumber">JsNumber.number</a></code></pre><div class="info ">
+TODO: ES6-ify<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-tonumber-applied-to-the-string-type">7.1.3.1</a></div>
+
+<pre><span id="VALto_integer"><span class="keyword">val</span> to_integer</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-tointeger">7.1.4</a></div>
+
+<pre><span id="VALto_string"><span class="keyword">val</span> to_string</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-tostring">7.1.12</a></div>
+
+<pre><span id="VALto_string_number"><span class="keyword">val</span> to_string_number</span> : <code class="type"><a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> string</code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-tostring-applied-to-the-number-type">7.1.12.1</a></div>
+
+<pre><span id="VALto_length"><span class="keyword">val</span> to_length</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-tolength">7.1.15</a></div>
+<br>
+<h2 id="2_TestingandComparisonOperations">Testing and Comparison Operations </h2><br>
+
+<pre><span id="VALrequire_object_coercible"><span class="keyword">val</span> require_object_coercible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-requireobjectcoercible">7.2.1</a></div>
+
+<pre><span id="VALis_callable"><span class="keyword">val</span> is_callable</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-iscallable">7.2.3</a></div>
+
+<pre><span id="VALis_constructor"><span class="keyword">val</span> is_constructor</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-isconstructor">7.2.4</a></div>
+
+<pre><span id="VALis_extensible"><span class="keyword">val</span> is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-isextensible-o">7.2.5</a></div>
+
+<pre><span id="VALis_property_key"><span class="keyword">val</span> is_property_key</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ispropertykey">7.2.7</a></div>
+
+<pre><span id="VALsame_value"><span class="keyword">val</span> same_value</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-samevalue">7.2.9</a></div>
+
+<pre><span id="VALsame_value_non_number"><span class="keyword">val</span> same_value_non_number</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-samevaluenonnumber">7.2.11</a></div>
+<br>
+<h2 id="2_OperationsonObjects">Operations on Objects </h2><br>
+
+<pre><span id="VALget"><span class="keyword">val</span> get</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-get-o-p">7.3.1</a></div>
+
+<pre><span id="VALget_v"><span class="keyword">val</span> get_v</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-getv">7.3.2</a></div>
+
+<pre><span id="VALset"><span class="keyword">val</span> set</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-set-o-p-v-throw">7.3.3</a></div>
+
+<pre><span id="VALcreate_data_property"><span class="keyword">val</span> create_data_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-createdataproperty">7.3.4</a></div>
+
+<pre><span id="VALdefine_property_or_throw"><span class="keyword">val</span> define_property_or_throw</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-definepropertyorthrow">7.3.7</a></div>
+
+<pre><span id="VALget_method"><span class="keyword">val</span> get_method</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-getmethod">7.3.9</a></div>
+
+<pre><span id="VALhas_property"><span class="keyword">val</span> has_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-hasproperty">7.3.10</a></div>
+
+<pre><span id="VALcall"><span class="keyword">val</span> call</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list option -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-call">7.3.12</a></div>
+
+<pre><span id="VALconstruct"><span class="keyword">val</span> construct</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list option -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> option -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-construct">7.3.13</a></div>
+
+<pre><span id="VALset_integrity_level"><span class="keyword">val</span> set_integrity_level</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> string -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-setintegritylevel">7.3.14</a></div>
+
+<pre><span id="VALtest_integrity_level"><span class="keyword">val</span> test_integrity_level</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> string -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-testintegritylevel">7.3.15</a></div>
+
+<pre><span id="VALcreate_array_from_list"><span class="keyword">val</span> create_array_from_list</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-createarrayfromlist">7.3.16</a></div>
+
+<pre><span id="VALcreate_list_from_array_like"><span class="keyword">val</span> create_list_from_array_like</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEcoq_type">JsSyntax.coq_type</a> list option -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-createlistfromarraylike">7.3.17</a></div>
+<br>
+<h1 id="1_ExecutableCodeandExecutionContexts">Executable Code and Execution Contexts</h1><br>
+<br>
+<h2 id="2_LexicalEnvironments">Lexical Environments</h2><br>
+<br>
+<h3 id="3_EnvironmentRecords">Environment Records</h3><br>
+<br>
+<h4 id="4_AbstractMethods">Abstract Methods</h4>
+    Dynamic dispatch functions for environment record abstract methods.<br>
+
+<pre><span id="VALset_mutable_binding"><span class="keyword">val</span> set_mutable_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALget_binding_value"><span class="keyword">val</span> get_binding_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+<h4 id="4_DeclarativeEnvironmentRecords">Declarative Environment Records</h4><br>
+
+<pre><span id="VALbinding_is_uninitialized"><span class="keyword">val</span> binding_is_uninitialized</span> : <code class="type"><a href="JsSyntax.html#TYPEmutability">JsSyntax.mutability</a> * <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre>
+<pre><span id="VALbinding_is_mutable"><span class="keyword">val</span> binding_is_mutable</span> : <code class="type"><a href="JsSyntax.html#TYPEmutability">JsSyntax.mutability</a> * <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre>
+<pre><span id="VALdecl_env_record_create_mutable_binding"><span class="keyword">val</span> decl_env_record_create_mutable_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEdecl_env_record">JsSyntax.decl_env_record</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-declarative-environment-records-createmutablebinding-n-d">8.1.1.1.2</a></div>
+
+<pre><span id="VALdecl_env_record_initialize_binding"><span class="keyword">val</span> decl_env_record_initialize_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEdecl_env_record">JsSyntax.decl_env_record</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-declarative-environment-records-initializebinding-n-v">8.1.1.1.4</a></div>
+
+<pre><span id="VALdecl_env_record_set_mutable_binding"><span class="keyword">val</span> decl_env_record_set_mutable_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEdecl_env_record">JsSyntax.decl_env_record</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-declarative-environment-records-setmutablebinding-n-v-s">8.1.1.1.5</a></div>
+
+<pre><span id="VALdecl_env_record_get_binding_value"><span class="keyword">val</span> decl_env_record_get_binding_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEdecl_env_record">JsSyntax.decl_env_record</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec sec-declarative-environment-records-getbindingvalue-n-s">8.1.1.1.6</a></div>
+<br>
+<h4 id="4_ObjectEnvironmentRecords">Object Environment Records</h4><br>
+
+<pre><span id="VALobject_env_record_set_mutable_binding"><span class="keyword">val</span> object_env_record_set_mutable_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEprovide_this_flag">JsSyntax.provide_this_flag</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+</div>
+
+<pre><span id="VALobject_env_record_get_binding_value"><span class="keyword">val</span> object_env_record_get_binding_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEprovide_this_flag">JsSyntax.provide_this_flag</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object-environment-records-getbindingvalue-n-s">8.1.1.1.2.6</a></div>
+<br>
+<h2 id="2_ExecutionContexts">Execution Contexts</h2><br>
+
+<pre><span id="VALget_global_object"><span class="keyword">val</span> get_global_object</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-getglobalobject">8.3.6</a></div>
+<br>
+<h1 id="1_OrdinaryandExoticObjectsBehaviours">Ordinary and Exotic Objects Behaviours </h1><br>
+<br>
+<h2 id="2_OrdinaryObjectInternalMethodsandInternalSlots">Ordinary Object Internal Methods and Internal Slots </h2><br>
+
+<pre><span id="VALordinary_object_internal_get_prototype_of"><span class="keyword">val</span> ordinary_object_internal_get_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<code class="code">[GetPrototypeOf]</code>()<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-getprototypeof">9.1.1</a></div>
+
+<pre><span id="VALordinary_get_prototype_of"><span class="keyword">val</span> ordinary_get_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinarygetprototypeof">9.1.1.1</a></div>
+
+<pre><span id="VALordinary_object_internal_set_prototype_of"><span class="keyword">val</span> ordinary_object_internal_set_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<code class="code">[SetPrototypeOf]</code>(V)<br>
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-setprototypeof-v">9.1.2</a></div>
+
+<pre><span id="VALordinary_set_prototype_of"><span class="keyword">val</span> ordinary_set_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinarysetprototypeof">9.1.2.1</a></div>
+
+<pre><span id="VALordinary_object_internal_is_extensible"><span class="keyword">val</span> ordinary_object_internal_is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-isextensible">9.1.3</a></div>
+
+<pre><span id="VALordinary_is_extensible"><span class="keyword">val</span> ordinary_is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinaryisextensible">9.1.3.1</a></div>
+
+<pre><span id="VALordinary_object_internal_prevent_extensions"><span class="keyword">val</span> ordinary_object_internal_prevent_extensions</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-preventextensions">9.1.4</a></div>
+
+<pre><span id="VALordinary_prevent_extensions"><span class="keyword">val</span> ordinary_prevent_extensions</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinarypreventextensions">9.1.4.1</a></div>
+
+<pre><span id="VALordinary_object_internal_get_own_property"><span class="keyword">val</span> ordinary_object_internal_get_own_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-getownproperty-p">9.1.5</a></div>
+
+<pre><span id="VALordinary_get_own_property"><span class="keyword">val</span> ordinary_get_own_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinarygetownproperty">9.1.5.1</a></div>
+
+<pre><span id="VALordinary_object_internal_define_own_property"><span class="keyword">val</span> ordinary_object_internal_define_own_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-defineownproperty-p-desc">9.1.6</a></div>
+
+<pre><span id="VALordinary_define_own_property"><span class="keyword">val</span> ordinary_define_own_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinarydefineownproperty">9.1.6.1</a></div>
+
+<pre><span id="VALis_compatible_property_descriptor"><span class="keyword">val</span> is_compatible_property_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       bool -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -><br>       <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-iscompatiblepropertydescriptor">9.1.6.2</a></div>
+
+<pre><span id="VALvalidate_and_apply_property_descriptor"><span class="keyword">val</span> validate_and_apply_property_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       bool -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -><br>       <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-validateandapplypropertydescriptor">9.1.6.3</a></div>
+
+<pre><span id="VALordinary_object_internal_has_property"><span class="keyword">val</span> ordinary_object_internal_has_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-hasproperty-p">link</a></div>
+
+<pre><span id="VALordinary_has_property"><span class="keyword">val</span> ordinary_has_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinaryhasproperty">9.1.7.1</a></div>
+
+<pre><span id="VALordinary_object_internal_get"><span class="keyword">val</span> ordinary_object_internal_get</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-get-p-receiver">9.1.8</a></div>
+
+<pre><span id="VALordinary_get"><span class="keyword">val</span> ordinary_get</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinaryget">9.1.8.1</a></div>
+
+<pre><span id="VALordinary_object_internal_set"><span class="keyword">val</span> ordinary_object_internal_set</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-set-p-v-receiver">9.1.9</a></div>
+
+<pre><span id="VALordinary_set"><span class="keyword">val</span> ordinary_set</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinaryset">9.1.9.1</a></div>
+
+<pre><span id="VALordinary_object_internal_delete"><span class="keyword">val</span> ordinary_object_internal_delete</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinary-object-internal-methods-and-internal-slots-delete-p">9.1.10</a></div>
+
+<pre><span id="VALordinary_delete"><span class="keyword">val</span> ordinary_delete</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinarydelete">9.1.10.1</a></div>
+
+<pre><span id="VALordinary_object_internal_own_property_keys"><span class="keyword">val</span> ordinary_object_internal_own_property_keys</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALordinary_own_property_keys"><span class="keyword">val</span> ordinary_own_property_keys</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-ordinaryownpropertykeys">9.1.11.1</a></div>
+
+<pre><span id="VALobject_create"><span class="keyword">val</span> object_create</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       'a list option -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-objectcreate">9.1.12</a></div>
+<br>
+<h2 id="2_ECMAScriptFunctionObjects">ECMAScript Function Objects</h2><br>
+
+<pre><span id="VALadd_restricted_function_properties"><span class="keyword">val</span> add_restricted_function_properties</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-addrestrictedfunctionproperties">9.2.7</a></div>
+
+<pre><span id="VALbuiltin_throw_type_error"><span class="keyword">val</span> builtin_throw_type_error</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -> unit -> unit -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-%throwtypeerror%">9.2.7.1</a></div>
+<br>
+<h2 id="2_BuiltinFunctionObjects">Built-in Function Objects</h2><br>
+
+<pre><span id="VALcreate_builtin_function"><span class="keyword">val</span> create_builtin_function</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -><br>       'a list -><br>       'b option -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> option -> 'c <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-createbuiltinfunction">9.3.3</a></div>
+<br>
+<h2 id="2_ArrayExoticObjects">Array Exotic Objects</h2><br>
+
+<pre><span id="VALarray_create"><span class="keyword">val</span> array_create</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       'a option -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-arraycreate">9.4.2.2</a></div>
+<br>
+<h2 id="2_ProxyObjectInternalMethodsandInternalSlots">Proxy Object Internal Methods and Internal Slots</h2><br>
+<br>
+<h3 id="3_Specificationtexthelperfunctions">Specification text helper functions</h3><br>
+
+<pre><span id="VALis_proxy_exotic_object"><span class="keyword">val</span> is_proxy_exotic_object</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> bool</code></pre><div class="info ">
+Implements the specification text "If <code class="code">l</code> is a Proxy exotic object"<br>
+</div>
+
+<pre><span id="VALproxy_object_internal_get_prototype_of"><span class="keyword">val</span> proxy_object_internal_get_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-object-internal-methods-and-internal-slots-getprototypeof">9.5.1</a></div>
+
+<pre><span id="VALproxy_object_internal_set_prototype_of"><span class="keyword">val</span> proxy_object_internal_set_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-object-internal-methods-and-internal-slots-setprototypeof-v">9.5.2</a></div>
+
+<pre><span id="VALproxy_object_internal_is_extensible"><span class="keyword">val</span> proxy_object_internal_is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-object-internal-methods-and-internal-slots-isextensible">9.5.3</a></div>
+
+<pre><span id="VALproxy_object_internal_prevent_extensions"><span class="keyword">val</span> proxy_object_internal_prevent_extensions</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-object-internal-methods-and-internal-slots-preventextensions">9.5.4</a></div>
+
+<pre><span id="VALproxy_object_internal_get_own_property"><span class="keyword">val</span> proxy_object_internal_get_own_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-object-internal-methods-and-internal-slots-getownproperty-p">9.5.5</a></div>
+
+<pre><span id="VALproxy_object_internal_define_own_property"><span class="keyword">val</span> proxy_object_internal_define_own_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-object-internal-methods-and-internal-slots-defineownproperty-p-desc">9.5.6</a></div>
+
+<pre><span id="VALproxy_object_internal_has_property"><span class="keyword">val</span> proxy_object_internal_has_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-object-internal-methods-and-internal-slots-hasproperty-p">9.5.7</a></div>
+
+<pre><span id="VALproxy_object_internal_get"><span class="keyword">val</span> proxy_object_internal_get</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-object-internal-methods-and-internal-slots-get-p-receiver">9.5.8</a></div>
+
+<pre><span id="VALproxy_object_internal_set"><span class="keyword">val</span> proxy_object_internal_set</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-object-internal-methods-and-internal-slots-set-p-v-receiver">9.5.9</a></div>
+
+<pre><span id="VALproxy_object_internal_delete"><span class="keyword">val</span> proxy_object_internal_delete</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-object-internal-methods-and-internal-slots-delete-p">9.5.10</a></div>
+
+<pre><span id="VALproxy_object_internal_own_property_keys"><span class="keyword">val</span> proxy_object_internal_own_property_keys</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-object-internal-methods-and-internal-slots-ownpropertykeys">9.5.11</a></div>
+
+<pre><span id="VALproxy_object_internal_call"><span class="keyword">val</span> proxy_object_internal_call</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-object-internal-methods-and-internal-slots-call-thisargument-argumentslist">9.5.12</a></div>
+
+<pre><span id="VALproxy_object_internal_construct"><span class="keyword">val</span> proxy_object_internal_construct</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-object-internal-methods-and-internal-slots-construct-argumentslist-newtarget">9.5.13</a></div>
+
+<pre><span id="VALproxy_create"><span class="keyword">val</span> proxy_create</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxycreate">9.5.14</a></div>
+<br>
+<h1 id="1_FundamentalObjects">Fundamental Objects</h1><br>
+<br>
+<h2 id="2_ObjectObjects">Object Objects</h2><br>
+<br>
+<h3 id="3_PropertiesoftheObjectContructor">Properties of the Object Contructor</h3><br>
+
+<pre><span id="VALbuiltin_object_freeze"><span class="keyword">val</span> builtin_object_freeze</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       unit -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.freeze">19.1.2.6</a></div>
+
+<pre><span id="VALbuiltin_object_get_prototype_of"><span class="keyword">val</span> builtin_object_get_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       unit -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.getprototypeof">19.1.2.11</a></div>
+
+<pre><span id="VALbuiltin_object_is_extensible"><span class="keyword">val</span> builtin_object_is_extensible</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       unit -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.isextensible">19.1.2.13</a></div>
+
+<pre><span id="VALbuiltin_object_is_frozen"><span class="keyword">val</span> builtin_object_is_frozen</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       unit -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.isfrozen">19.1.2.14</a></div>
+
+<pre><span id="VALbuiltin_object_is_sealed"><span class="keyword">val</span> builtin_object_is_sealed</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       unit -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.issealed">19.1.2.15</a></div>
+
+<pre><span id="VALbuiltin_object_prevent_extensions"><span class="keyword">val</span> builtin_object_prevent_extensions</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       unit -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.preventextensions">19.1.2.17</a></div>
+
+<pre><span id="VALbuiltin_object_seal"><span class="keyword">val</span> builtin_object_seal</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       unit -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.seal">19.1.2.19</a></div>
+
+<pre><span id="VALbuiltin_object_set_prototype_of"><span class="keyword">val</span> builtin_object_set_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.setprototypeof">19.1.2.20</a></div>
+<br>
+<h3 id="3_PropertiesoftheObjectPrototypeObject">Properties of the Object Prototype Object</h3><br>
+
+<pre><span id="VALbuiltin_object_prototype_is_prototype_of"><span class="keyword">val</span> builtin_object_prototype_is_prototype_of</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       unit -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.prototype.isprototypeof">19.1.3.4</a></div>
+<br>
+<h1 id="1_Reflection">Reflection</h1><br>
+<br>
+<h2 id="2_ProxyObjects">Proxy Objects</h2><br>
+<br>
+<h3 id="3_TheProxyConstructor">The Proxy Constructor</h3>
+<p>
+
+    The <code class="code">%Proxy%</code> intrinsic object, initial value of the <code class="code">Proxy</code> property of the global object.<br>
+
+<pre><span id="VALbuiltin_proxy_constructor"><span class="keyword">val</span> builtin_proxy_constructor</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-target-handler">26.2.1.1</a></div>
+<br>
+<h3 id="3_PropertiesoftheProxyConstructor">Properties of the Proxy Constructor</h3><br>
+<br>
+<code class="code">%Proxy%.[[Prototype]] = %FunctionPrototype%</code><br>
+
+<pre><span id="VALbuiltin_proxy_revocable"><span class="keyword">val</span> builtin_proxy_revocable</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       unit -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy.revocable">26.2.2.1</a></div>
+
+<pre><span id="VALbuiltin_proxy_revocation_function"><span class="keyword">val</span> builtin_proxy_revocation_function</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       unit -> unit -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-proxy-revocation-functions">26.2.2.1.1</a></div>
+
+<pre><span id="VALobject_has_prop"><span class="keyword">val</span> object_has_prop</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>Compatibility wrapper for ES5 code to ES6 implementation use <code class="code">has_property</code> instead. TODO: Remove call
+    sites.<br>
+</div>
+<br>
+val out_error_or_void :
+    state -&gt; strictness_flag -&gt; native_error -&gt; result *<br>
+
+<pre><span id="VALout_error_or_void"><span class="keyword">val</span> out_error_or_void</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -><br>       <a href="JsSyntax.html#TYPEnative_error">JsSyntax.native_error</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val out_error_or_cst :
+    state -&gt; strictness_flag -&gt; native_error -&gt; value -&gt; result *<br>
+
+<pre><span id="VALout_error_or_cst"><span class="keyword">val</span> out_error_or_cst</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -><br>       <a href="JsSyntax.html#TYPEnative_error">JsSyntax.native_error</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALobject_get_builtin_args"><span class="keyword">val</span> object_get_builtin_args</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEbuiltin_get">JsSyntax.builtin_get</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>TODO: ES6 version of function. dispatched to in <a href="JsInterpreter.html#VALobject_internal_get"><code class="code">JsInterpreter.object_internal_get</code></a>.<br>
+</div>
+
+<pre><span id="VALrun_object_get"><span class="keyword">val</span> run_object_get</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>This is the ES5 version, replaced by <a href="JsInterpreter.html#VALobject_internal_get"><code class="code">JsInterpreter.object_internal_get</code></a>
+    TODO: Replace calls to this and delete.
+    *<br>
+val run_object_get :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; prop_name -&gt; result<br>
+</div>
+<br>
+val run_object_get_prop :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; prop_name -&gt;
+    full_descriptor specres *<br>
+
+<pre><span id="VALrun_object_get_prop"><span class="keyword">val</span> run_object_get_prop</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPEfull_descriptor">JsSyntax.full_descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val object_default_value :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; preftype option -&gt;
+    result *<br>
+
+<pre><span id="VALobject_default_value"><span class="keyword">val</span> object_default_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsCommon.html#TYPEpreftype">JsCommon.preftype</a> option -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val to_int32 :
+    state -&gt; execution_ctx -&gt; value -&gt; float specres *<br>
+
+<pre><span id="VALto_int32"><span class="keyword">val</span> to_int32</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val to_uint32 :
+    state -&gt; execution_ctx -&gt; value -&gt; float specres *<br>
+
+<pre><span id="VALto_uint32"><span class="keyword">val</span> to_uint32</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_object_define_own_prop_array_loop :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; float -&gt; float -&gt;
+    descriptor -&gt; bool -&gt; bool -&gt; (state -&gt; prop_name -&gt; descriptor -&gt;
+    strictness_flag -&gt; __ specres) -&gt; result *<br>
+
+<pre><span id="VALrun_object_define_own_prop_array_loop"><span class="keyword">val</span> run_object_define_own_prop_array_loop</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -><br>       bool -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -><br>       (<a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>        string -><br>        <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -><br>        bool -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a>) -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALobject_define_own_prop"><span class="keyword">val</span> object_define_own_prop</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>Use ES6 object_internal_define_own_property instead. TODO: ES6 version.<br>
+ES5 <code class="code">[DefineOwnProperty]</code><br>
+</div>
+<br>
+val prim_new_object : state -&gt; prim -&gt; result *<br>
+
+<pre><span id="VALprim_new_object"><span class="keyword">val</span> prim_new_object</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val to_object : state -&gt; value -&gt; result *<br>
+
+<pre><span id="VALto_object"><span class="keyword">val</span> to_object</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_object_prim_value : state -&gt; object_loc -&gt; result *<br>
+
+<pre><span id="VALrun_object_prim_value"><span class="keyword">val</span> run_object_prim_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val env_record_has_binding :
+    state -&gt; execution_ctx -&gt; env_loc -&gt; prop_name -&gt; result *<br>
+
+<pre><span id="VALenv_record_has_binding"><span class="keyword">val</span> env_record_has_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val lexical_env_get_identifier_ref :
+    state -&gt; execution_ctx -&gt; lexical_env -&gt; prop_name -&gt;
+    strictness_flag -&gt; ref specres *<br>
+
+<pre><span id="VALlexical_env_get_identifier_ref"><span class="keyword">val</span> lexical_env_get_identifier_ref</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPElexical_env">JsSyntax.lexical_env</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -><br>       <a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALobject_delete"><span class="keyword">val</span> object_delete</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       bool -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>: ES5 implementation for arguments object. Others redirect to ES2016 implementation.
+    TODO: Switch out to ES2016 version.<br>
+</div>
+
+<pre><span id="VALobject_delete_default"><span class="keyword">val</span> object_delete_default</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       bool -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>TODO: Replace ES5 callsites with ES2016 version.<br>
+</div>
+<br>
+val env_record_delete_binding :
+    state -&gt; execution_ctx -&gt; env_loc -&gt; prop_name -&gt; result *<br>
+
+<pre><span id="VALenv_record_delete_binding"><span class="keyword">val</span> env_record_delete_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val env_record_implicit_this_value : state -&gt; env_loc -&gt; value option *<br>
+
+<pre><span id="VALenv_record_implicit_this_value"><span class="keyword">val</span> env_record_implicit_this_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> option</code></pre><br>
+val identifier_resolution :
+    state -&gt; execution_ctx -&gt; prop_name -&gt; ref specres *<br>
+
+<pre><span id="VALidentifier_resolution"><span class="keyword">val</span> identifier_resolution</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALenv_record_get_binding_value"><span class="keyword">val</span> env_record_get_binding_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       'a -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       string -> bool -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>ES5<br>
+</div>
+
+<pre><span id="VALref_get_value"><span class="keyword">val</span> ref_get_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>ES5<br>
+</div>
+
+<pre><span id="VALrun_expr_get_value"><span class="keyword">val</span> run_expr_get_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>ES5<br>
+</div>
+<br>
+val env_record_set_mutable_binding :
+    state -&gt; execution_ctx -&gt; env_loc -&gt; prop_name -&gt; value -&gt;
+    strictness_flag -&gt; result_void *<br>
+
+<pre><span id="VALenv_record_set_mutable_binding"><span class="keyword">val</span> env_record_set_mutable_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALref_put_value"><span class="keyword">val</span> ref_put_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>ES5<br>
+</div>
+<br>
+val env_record_create_mutable_binding :
+    state -&gt; execution_ctx -&gt; env_loc -&gt; prop_name -&gt; bool
+    option -&gt; result_void *<br>
+
+<pre><span id="VALenv_record_create_mutable_binding"><span class="keyword">val</span> env_record_create_mutable_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       bool option -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val env_record_create_set_mutable_binding :
+    state -&gt; execution_ctx -&gt; env_loc -&gt; prop_name -&gt; bool
+    option -&gt; value -&gt; strictness_flag -&gt; result_void *<br>
+
+<pre><span id="VALenv_record_create_set_mutable_binding"><span class="keyword">val</span> env_record_create_set_mutable_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       bool option -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val env_record_create_immutable_binding :
+    state -&gt; env_loc -&gt; prop_name -&gt; result_void *<br>
+
+<pre><span id="VALenv_record_create_immutable_binding"><span class="keyword">val</span> env_record_create_immutable_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       string -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val env_record_initialize_immutable_binding :
+    state -&gt; env_loc -&gt; prop_name -&gt; value -&gt; result_void *<br>
+
+<pre><span id="VALenv_record_initialize_immutable_binding"><span class="keyword">val</span> env_record_initialize_immutable_binding</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       string -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val call_object_new : state -&gt; value -&gt; result *<br>
+
+<pre><span id="VALcall_object_new"><span class="keyword">val</span> call_object_new</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val array_args_map_loop :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; value list -&gt; float
+    -&gt; result_void *<br>
+
+<pre><span id="VALarray_args_map_loop"><span class="keyword">val</span> array_args_map_loop</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_construct_prealloc :
+    state -&gt; execution_ctx -&gt; prealloc -&gt; value list -&gt; result *<br>
+
+<pre><span id="VALrun_construct_prealloc"><span class="keyword">val</span> run_construct_prealloc</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_construct_default :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; value list -&gt; __
+    specres *<br>
+
+<pre><span id="VALrun_construct_default"><span class="keyword">val</span> run_construct_default</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_construct :
+    state -&gt; execution_ctx -&gt; construct -&gt; object_loc -&gt; value
+    list -&gt; result *<br>
+
+<pre><span id="VALrun_construct"><span class="keyword">val</span> run_construct</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEconstruct">JsSyntax.construct</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_call_default :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; result *<br>
+
+<pre><span id="VALrun_call_default"><span class="keyword">val</span> run_call_default</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val creating_function_object_proto :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; result *<br>
+
+<pre><span id="VALcreating_function_object_proto"><span class="keyword">val</span> creating_function_object_proto</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val creating_function_object :
+    state -&gt; execution_ctx -&gt; string list -&gt; funcbody -&gt;
+    lexical_env -&gt; strictness_flag -&gt; result *<br>
+
+<pre><span id="VALcreating_function_object"><span class="keyword">val</span> creating_function_object</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       string list -><br>       <a href="JsSyntax.html#TYPEfuncbody">JsSyntax.funcbody</a> -><br>       <a href="JsSyntax.html#TYPElexical_env">JsSyntax.lexical_env</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val binding_inst_formal_params :
+    state -&gt; execution_ctx -&gt; env_loc -&gt; value list -&gt; string
+    list -&gt; strictness_flag -&gt; result_void *<br>
+
+<pre><span id="VALbinding_inst_formal_params"><span class="keyword">val</span> binding_inst_formal_params</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> list -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val binding_inst_function_decls :
+    state -&gt; execution_ctx -&gt; env_loc -&gt; funcdecl list -&gt;
+    strictness_flag -&gt; bool -&gt; result_void *<br>
+
+<pre><span id="VALbinding_inst_function_decls"><span class="keyword">val</span> binding_inst_function_decls</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEfuncdecl">JsSyntax.funcdecl</a> list -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -><br>       bool -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val make_arg_getter :
+    state -&gt; execution_ctx -&gt; prop_name -&gt; lexical_env -&gt; result *<br>
+
+<pre><span id="VALmake_arg_getter"><span class="keyword">val</span> make_arg_getter</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPElexical_env">JsSyntax.lexical_env</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val make_arg_setter :
+    state -&gt; execution_ctx -&gt; prop_name -&gt; lexical_env -&gt; result *<br>
+
+<pre><span id="VALmake_arg_setter"><span class="keyword">val</span> make_arg_setter</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPElexical_env">JsSyntax.lexical_env</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val arguments_object_map_loop :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; string list -&gt;
+    int -&gt; value list -&gt; lexical_env -&gt; strictness_flag -&gt; object_loc -&gt;
+    string list -&gt; result_void *<br>
+
+<pre><span id="VALarguments_object_map_loop"><span class="keyword">val</span> arguments_object_map_loop</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> list -><br>       int -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -><br>       <a href="JsSyntax.html#TYPElexical_env">JsSyntax.lexical_env</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val arguments_object_map :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; string list -&gt;
+    value list -&gt; lexical_env -&gt; strictness_flag -&gt; result_void *<br>
+
+<pre><span id="VALarguments_object_map"><span class="keyword">val</span> arguments_object_map</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> list -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -><br>       <a href="JsSyntax.html#TYPElexical_env">JsSyntax.lexical_env</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val create_arguments_object :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; string list -&gt;
+    value list -&gt; lexical_env -&gt; strictness_flag -&gt; result *<br>
+
+<pre><span id="VALcreate_arguments_object"><span class="keyword">val</span> create_arguments_object</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> list -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -><br>       <a href="JsSyntax.html#TYPElexical_env">JsSyntax.lexical_env</a> -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val binding_inst_arg_obj :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; prog -&gt; string
+    list -&gt; value list -&gt; env_loc -&gt; result_void *<br>
+
+<pre><span id="VALbinding_inst_arg_obj"><span class="keyword">val</span> binding_inst_arg_obj</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprog">JsSyntax.prog</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> list -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val binding_inst_var_decls :
+    state -&gt; execution_ctx -&gt; env_loc -&gt; string list -&gt; bool
+    -&gt; strictness_flag -&gt; result_void *<br>
+
+<pre><span id="VALbinding_inst_var_decls"><span class="keyword">val</span> binding_inst_var_decls</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> list -><br>       bool -><br>       <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val execution_ctx_binding_inst :
+    state -&gt; execution_ctx -&gt; codetype -&gt; object_loc option -&gt;
+    prog -&gt; value list -&gt; result_void *<br>
+
+<pre><span id="VALexecution_ctx_binding_inst"><span class="keyword">val</span> execution_ctx_binding_inst</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEcodetype">JsSyntax.codetype</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> option -><br>       <a href="JsSyntax.html#TYPEprog">JsSyntax.prog</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val entering_func_code :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; value -&gt; value list
+    -&gt; result *<br>
+
+<pre><span id="VALentering_func_code"><span class="keyword">val</span> entering_func_code</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALrun_object_get_own_prop"><span class="keyword">val</span> run_object_get_own_prop</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPEfull_descriptor">JsSyntax.full_descriptor</a> <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>TODO: Rewrite into ES6<br>
+ES5 version of <code class="code">[GetOwnProperty]</code>, redirects to ES6 as appropriate.<br>
+</div>
+<br>
+val run_function_has_instance :
+    state -&gt; object_loc -&gt; value -&gt; result *<br>
+
+<pre><span id="VALrun_function_has_instance"><span class="keyword">val</span> run_function_has_instance</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_object_has_instance :
+    state -&gt; execution_ctx -&gt; builtin_has_instance -&gt; object_loc
+    -&gt; value -&gt; result *<br>
+
+<pre><span id="VALrun_object_has_instance"><span class="keyword">val</span> run_object_has_instance</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEbuiltin_has_instance">JsSyntax.builtin_has_instance</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val from_prop_descriptor :
+    state -&gt; execution_ctx -&gt; full_descriptor -&gt; result *<br>
+
+<pre><span id="VALfrom_prop_descriptor"><span class="keyword">val</span> from_prop_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEfull_descriptor">JsSyntax.full_descriptor</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_equal :
+    state -&gt; execution_ctx -&gt; value -&gt; value -&gt; result *<br>
+
+<pre><span id="VALrun_equal"><span class="keyword">val</span> run_equal</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val convert_twice :
+    ('a2 resultof -&gt; (state -&gt; 'a1 -&gt; ('a1 * 'a1) specres) -&gt; ('a1 * 'a1)
+    specres) -&gt; (state -&gt; value -&gt; 'a2 resultof) -&gt; state -&gt; value -&gt; value
+    -&gt; ('a1 * 'a1) specres *<br>
+
+<pre><span id="VALconvert_twice"><span class="keyword">val</span> convert_twice</span> : <code class="type">'a1 'a2.<br>         ('a2 <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>          (<a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> 'a1 -> ('a1 * 'a1) <a href="JsInterpreterMonads.html#TYPEspecres">JsInterpreterMonads.specres</a>) -><br>          ('a1 * 'a1) <a href="JsInterpreterMonads.html#TYPEspecres">JsInterpreterMonads.specres</a>) -><br>         (<a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a2 <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a>) -><br>         <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>         <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> ('a1 * 'a1) <a href="JsInterpreterMonads.html#TYPEspecres">JsInterpreterMonads.specres</a></code></pre><br>
+val convert_twice_primitive :
+    state -&gt; execution_ctx -&gt; value -&gt; value -&gt; (prim * prim)
+    specres *<br>
+
+<pre><span id="VALconvert_twice_primitive"><span class="keyword">val</span> convert_twice_primitive</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       (<a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> * <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a>) <a href="JsInterpreterMonads.html#TYPEspecres">JsInterpreterMonads.specres</a></code></pre><br>
+val convert_twice_number :
+    state -&gt; execution_ctx -&gt; value -&gt; value -&gt;
+    (number * number) specres *<br>
+
+<pre><span id="VALconvert_twice_number"><span class="keyword">val</span> convert_twice_number</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       (<a href="JsNumber.html#TYPEnumber">JsNumber.number</a> * <a href="JsNumber.html#TYPEnumber">JsNumber.number</a>) <a href="JsInterpreterMonads.html#TYPEspecres">JsInterpreterMonads.specres</a></code></pre><br>
+val convert_twice_string :
+    state -&gt; execution_ctx -&gt; value -&gt; value -&gt;
+    (string * string) specres *<br>
+
+<pre><span id="VALconvert_twice_string"><span class="keyword">val</span> convert_twice_string</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> (string * string) <a href="JsInterpreterMonads.html#TYPEspecres">JsInterpreterMonads.specres</a></code></pre><br>
+val issome : 'a1 option -&gt; bool *<br>
+
+<pre><span id="VALissome"><span class="keyword">val</span> issome</span> : <code class="type">'a1. 'a1 option -> bool</code></pre>
+<pre><span id="VALrun_binary_op_add"><span class="keyword">val</span> run_binary_op_add</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALrun_binary_op_arith"><span class="keyword">val</span> run_binary_op_arith</span> : <code class="type">(<a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsNumber.html#TYPEnumber">JsNumber.number</a>) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALrun_binary_op_shift"><span class="keyword">val</span> run_binary_op_shift</span> : <code class="type">bool -><br>       (<a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsNumber.html#TYPEnumber">JsNumber.number</a>) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALrun_binary_op_bitwise"><span class="keyword">val</span> run_binary_op_bitwise</span> : <code class="type">(<a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsNumber.html#TYPEnumber">JsNumber.number</a>) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALrun_binary_op_compare"><span class="keyword">val</span> run_binary_op_compare</span> : <code class="type">bool -><br>       bool -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+TODO: ES6ify<br>
+</div>
+
+<pre><span id="VALrun_binary_op_instanceof"><span class="keyword">val</span> run_binary_op_instanceof</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALrun_binary_op_in"><span class="keyword">val</span> run_binary_op_in</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_binary_op :
+    state -&gt; execution_ctx -&gt; binary_op -&gt; value -&gt; value -&gt;
+    result *<br>
+
+<pre><span id="VALrun_binary_op"><span class="keyword">val</span> run_binary_op</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEbinary_op">JsSyntax.binary_op</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_prepost_op : unary_op -&gt; ((number -&gt; number) * bool) option *<br>
+
+<pre><span id="VALrun_prepost_op"><span class="keyword">val</span> run_prepost_op</span> : <code class="type"><a href="JsSyntax.html#TYPEunary_op">JsSyntax.unary_op</a> -> ((<a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsNumber.html#TYPEnumber">JsNumber.number</a>) * bool) option</code></pre><br>
+val run_typeof_value : state -&gt; value -&gt; string *<br>
+
+<pre><span id="VALrun_typeof_value"><span class="keyword">val</span> run_typeof_value</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> string</code></pre><br>
+val run_unary_op :
+    state -&gt; execution_ctx -&gt; unary_op -&gt; expr -&gt; result *<br>
+
+<pre><span id="VALrun_unary_op"><span class="keyword">val</span> run_unary_op</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEunary_op">JsSyntax.unary_op</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val create_new_function_in :
+    state -&gt; execution_ctx -&gt; string list -&gt; funcbody -&gt;
+    result *<br>
+
+<pre><span id="VALcreate_new_function_in"><span class="keyword">val</span> create_new_function_in</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       string list -><br>       <a href="JsSyntax.html#TYPEfuncbody">JsSyntax.funcbody</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val init_object :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; propdefs -&gt; result *<br>
+
+<pre><span id="VALinit_object"><span class="keyword">val</span> init_object</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       (<a href="JsSyntax.html#TYPEpropname">JsSyntax.propname</a> * <a href="JsSyntax.html#TYPEpropbody">JsSyntax.propbody</a>) list -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_array_element_list :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; expr option list -&gt;
+    float -&gt; result *<br>
+
+<pre><span id="VALrun_array_element_list"><span class="keyword">val</span> run_array_element_list</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> option list -><br>       float -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val init_array :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; expr option list -&gt;
+    result *<br>
+
+<pre><span id="VALinit_array"><span class="keyword">val</span> init_array</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> option list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_var_decl_item :
+    state -&gt; execution_ctx -&gt; prop_name -&gt; expr option -&gt; result *<br>
+
+<pre><span id="VALrun_var_decl_item"><span class="keyword">val</span> run_var_decl_item</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> option -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_var_decl :
+    state -&gt; execution_ctx -&gt; (prop_name * expr option) list -&gt;
+    result *<br>
+
+<pre><span id="VALrun_var_decl"><span class="keyword">val</span> run_var_decl</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       (<a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> * <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> option) list -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_list_expr :
+    state -&gt; execution_ctx -&gt; value list -&gt; expr list -&gt; value
+    list specres *<br>
+
+<pre><span id="VALrun_list_expr"><span class="keyword">val</span> run_list_expr</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> list -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_block :
+    state -&gt; execution_ctx -&gt; stat list -&gt; result *<br>
+
+<pre><span id="VALrun_block"><span class="keyword">val</span> run_block</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALrun_binary_op_and"><span class="keyword">val</span> run_binary_op_and</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre>
+<pre><span id="VALrun_binary_op_or"><span class="keyword">val</span> run_binary_op_or</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_expr_binary_op :
+    state -&gt; execution_ctx -&gt; binary_op -&gt; expr -&gt; expr -&gt;
+    result *<br>
+
+<pre><span id="VALrun_expr_binary_op"><span class="keyword">val</span> run_expr_binary_op</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEbinary_op">JsSyntax.binary_op</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_expr_access :
+    state -&gt; execution_ctx -&gt; expr -&gt; expr -&gt; result *<br>
+
+<pre><span id="VALrun_expr_access"><span class="keyword">val</span> run_expr_access</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_expr_assign :
+    state -&gt; execution_ctx -&gt; binary_op option -&gt; expr -&gt; expr
+    -&gt; result *<br>
+
+<pre><span id="VALrun_expr_assign"><span class="keyword">val</span> run_expr_assign</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEbinary_op">JsSyntax.binary_op</a> option -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_expr_function :
+    state -&gt; execution_ctx -&gt; prop_name option -&gt; string list
+    -&gt; funcbody -&gt; result *<br>
+
+<pre><span id="VALrun_expr_function"><span class="keyword">val</span> run_expr_function</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       string option -><br>       string list -><br>       <a href="JsSyntax.html#TYPEfuncbody">JsSyntax.funcbody</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val entering_eval_code :
+    state -&gt; execution_ctx -&gt; bool -&gt; funcbody -&gt; (state -&gt;
+    execution_ctx -&gt; result) -&gt; result *<br>
+
+<pre><span id="VALentering_eval_code"><span class="keyword">val</span> entering_eval_code</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       bool -><br>       <a href="JsSyntax.html#TYPEfuncbody">JsSyntax.funcbody</a> -><br>       (<a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>        <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a>) -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_eval :
+    state -&gt; execution_ctx -&gt; bool -&gt; value list -&gt; result *<br>
+
+<pre><span id="VALrun_eval"><span class="keyword">val</span> run_eval</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       bool -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_expr_call :
+    state -&gt; execution_ctx -&gt; expr -&gt; expr list -&gt; result *<br>
+
+<pre><span id="VALrun_expr_call"><span class="keyword">val</span> run_expr_call</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_expr_conditionnal :
+    state -&gt; execution_ctx -&gt; expr -&gt; expr -&gt; expr -&gt; result *<br>
+
+<pre><span id="VALrun_expr_conditionnal"><span class="keyword">val</span> run_expr_conditionnal</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_expr_new :
+    state -&gt; execution_ctx -&gt; expr -&gt; expr list -&gt; result *<br>
+
+<pre><span id="VALrun_expr_new"><span class="keyword">val</span> run_expr_new</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_label :
+    state -&gt; execution_ctx -&gt; label -&gt; stat -&gt; result *<br>
+
+<pre><span id="VALrun_stat_label"><span class="keyword">val</span> run_stat_label</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPElabel">JsSyntax.label</a> -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_with :
+    state -&gt; execution_ctx -&gt; expr -&gt; stat -&gt; result *<br>
+
+<pre><span id="VALrun_stat_with"><span class="keyword">val</span> run_stat_with</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_if :
+    state -&gt; execution_ctx -&gt; expr -&gt; stat -&gt; stat option -&gt;
+    result *<br>
+
+<pre><span id="VALrun_stat_if"><span class="keyword">val</span> run_stat_if</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> option -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_while :
+    state -&gt; execution_ctx -&gt; resvalue -&gt; label_set -&gt; expr -&gt;
+    stat -&gt; result *<br>
+
+<pre><span id="VALrun_stat_while"><span class="keyword">val</span> run_stat_while</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -><br>       <a href="JsSyntax.html#TYPElabel_set">JsSyntax.label_set</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_switch_end :
+    state -&gt; execution_ctx -&gt; resvalue -&gt; switchclause list -&gt;
+    result *<br>
+
+<pre><span id="VALrun_stat_switch_end"><span class="keyword">val</span> run_stat_switch_end</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -><br>       <a href="JsSyntax.html#TYPEswitchclause">JsSyntax.switchclause</a> list -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_switch_no_default :
+    state -&gt; execution_ctx -&gt; value -&gt; resvalue -&gt; switchclause
+    list -&gt; result *<br>
+
+<pre><span id="VALrun_stat_switch_no_default"><span class="keyword">val</span> run_stat_switch_no_default</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -><br>       <a href="JsSyntax.html#TYPEswitchclause">JsSyntax.switchclause</a> list -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_switch_with_default_default :
+    state -&gt; execution_ctx -&gt; stat list -&gt; switchclause list -&gt;
+    result *<br>
+
+<pre><span id="VALrun_stat_switch_with_default_default"><span class="keyword">val</span> run_stat_switch_with_default_default</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> list -><br>       <a href="JsSyntax.html#TYPEswitchclause">JsSyntax.switchclause</a> list -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_switch_with_default_B :
+    state -&gt; execution_ctx -&gt; value -&gt; resvalue -&gt; stat list -&gt;
+    switchclause list -&gt; result *<br>
+
+<pre><span id="VALrun_stat_switch_with_default_B"><span class="keyword">val</span> run_stat_switch_with_default_B</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> list -><br>       <a href="JsSyntax.html#TYPEswitchclause">JsSyntax.switchclause</a> list -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_switch_with_default_A :
+    state -&gt; execution_ctx -&gt; bool -&gt; value -&gt; resvalue -&gt;
+    switchclause list -&gt; stat list -&gt; switchclause list -&gt; result *<br>
+
+<pre><span id="VALrun_stat_switch_with_default_A"><span class="keyword">val</span> run_stat_switch_with_default_A</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       bool -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -><br>       <a href="JsSyntax.html#TYPEswitchclause">JsSyntax.switchclause</a> list -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> list -><br>       <a href="JsSyntax.html#TYPEswitchclause">JsSyntax.switchclause</a> list -><br>       'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_switch :
+    state -&gt; execution_ctx -&gt; label_set -&gt; expr -&gt; switchbody -&gt;
+    result *<br>
+
+<pre><span id="VALrun_stat_switch"><span class="keyword">val</span> run_stat_switch</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPElabel_set">JsSyntax.label_set</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -><br>       <a href="JsSyntax.html#TYPEswitchbody">JsSyntax.switchbody</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_do_while :
+    state -&gt; execution_ctx -&gt; resvalue -&gt; label_set -&gt; expr -&gt;
+    stat -&gt; result *<br>
+
+<pre><span id="VALrun_stat_do_while"><span class="keyword">val</span> run_stat_do_while</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -><br>       <a href="JsSyntax.html#TYPElabel_set">JsSyntax.label_set</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_try :
+    state -&gt; execution_ctx -&gt; stat -&gt; (prop_name * stat) option
+    -&gt; stat option -&gt; result *<br>
+
+<pre><span id="VALrun_stat_try"><span class="keyword">val</span> run_stat_try</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> -><br>       (<a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> * <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a>) option -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> option -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_throw :
+    state -&gt; execution_ctx -&gt; expr -&gt; result *<br>
+
+<pre><span id="VALrun_stat_throw"><span class="keyword">val</span> run_stat_throw</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_return :
+    state -&gt; execution_ctx -&gt; expr option -&gt; result *<br>
+
+<pre><span id="VALrun_stat_return"><span class="keyword">val</span> run_stat_return</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> option -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_for_loop :
+    state -&gt; execution_ctx -&gt; label_set -&gt; resvalue -&gt; expr
+    option -&gt; expr option -&gt; stat -&gt; result *<br>
+
+<pre><span id="VALrun_stat_for_loop"><span class="keyword">val</span> run_stat_for_loop</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPElabel_set">JsSyntax.label_set</a> -><br>       <a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> option -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> option -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_for :
+    state -&gt; execution_ctx -&gt; label_set -&gt; expr option -&gt; expr
+    option -&gt; expr option -&gt; stat -&gt; result *<br>
+
+<pre><span id="VALrun_stat_for"><span class="keyword">val</span> run_stat_for</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPElabel_set">JsSyntax.label_set</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> option -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> option -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> option -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat_for_var :
+    state -&gt; execution_ctx -&gt; label_set -&gt; (string * expr
+    option) list -&gt; expr option -&gt; expr option -&gt; stat -&gt; result *<br>
+
+<pre><span id="VALrun_stat_for_var"><span class="keyword">val</span> run_stat_for_var</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPElabel_set">JsSyntax.label_set</a> -><br>       (string * <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> option) list -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> option -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> option -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_expr : state -&gt; execution_ctx -&gt; expr -&gt; result *<br>
+
+<pre><span id="VALrun_expr"><span class="keyword">val</span> run_expr</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_stat : state -&gt; execution_ctx -&gt; stat -&gt; result *<br>
+
+<pre><span id="VALrun_stat"><span class="keyword">val</span> run_stat</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_elements :
+    state -&gt; execution_ctx -&gt; elements -&gt; result *<br>
+
+<pre><span id="VALrun_elements"><span class="keyword">val</span> run_elements</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEelement">JsSyntax.element</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_prog : state -&gt; execution_ctx -&gt; prog -&gt; result *<br>
+
+<pre><span id="VALrun_prog"><span class="keyword">val</span> run_prog</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEprog">JsSyntax.prog</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val push :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; value list -&gt; float
+    -&gt; result *<br>
+
+<pre><span id="VALpush"><span class="keyword">val</span> push</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_get_args_for_apply :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; float -&gt; float -&gt;
+    value list specres *<br>
+
+<pre><span id="VALrun_get_args_for_apply"><span class="keyword">val</span> run_get_args_for_apply</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val valueToStringForJoin :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; float -&gt; string
+    specres *<br>
+
+<pre><span id="VALvalueToStringForJoin"><span class="keyword">val</span> valueToStringForJoin</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> string <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_array_join_elements :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; float -&gt; float -&gt;
+    string -&gt; string -&gt; result *<br>
+
+<pre><span id="VALrun_array_join_elements"><span class="keyword">val</span> run_array_join_elements</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -><br>       string -> string -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+Definitions of prealloc (built-in) functions<br>
+<br>
+val run_call_prealloc :
+    state -&gt; execution_ctx -&gt; prealloc -&gt; value -&gt; value list -&gt;
+    result *<br>
+
+<pre><span id="VALrun_call_prealloc"><span class="keyword">val</span> run_call_prealloc</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_call :
+    state -&gt; execution_ctx -&gt; object_loc -&gt; value -&gt; value list
+    -&gt; result *<br>
+
+<pre><span id="VALrun_call"><span class="keyword">val</span> run_call</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_javascript_from_state : state -&gt; prog -&gt; result *<br>
+
+<pre><span id="VALrun_javascript_from_state"><span class="keyword">val</span> run_javascript_from_state</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEprog">JsSyntax.prog</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_javascript_from_result : result -&gt; prog -&gt; result *<br>
+
+<pre><span id="VALrun_javascript_from_result"><span class="keyword">val</span> run_javascript_from_result</span> : <code class="type">'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a> -><br>       <a href="JsSyntax.html#TYPEprog">JsSyntax.prog</a> -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><br>
+val run_javascript : prog -&gt; result *<br>
+
+<pre><span id="VALrun_javascript"><span class="keyword">val</span> run_javascript</span> : <code class="type"><a href="JsSyntax.html#TYPEprog">JsSyntax.prog</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre></body></html>
