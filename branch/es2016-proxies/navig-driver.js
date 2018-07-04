@@ -53,9 +53,6 @@ var handlers = [];
 
 // --------------- Variables ----------------
 
-// file currently displayed
-var curfile = '';
-
 // object of type loc describing the text currenctly selected
 var source_loc_selected = undefined;
 
@@ -69,13 +66,9 @@ var tracer_pos = 0;
 var source = null;
 var interpreter = null;
 
-var source_docs = {};
-var initialSourceName = "";
-
-// Initial source code
+// --------------- Source Code UI ----------------------
 
 var source_files = [
-  // '',
   'var x = 1;\nx++;\nx',
   'var x = { a : { c : 1 } };\nx.a.b = 2;\nx.a.x = x;\nx',
   'var t = [];\nfor (var i = 0; i < 3; i++) {\n  t[i] = function() { return i; } \n};\nt[0](); ',
@@ -89,7 +82,7 @@ var source_files = [
   'var x = 2;\nx',
   '"use strict";\nvar x = 1;\ nx++;\nx',
   '{} + {}',
-  'x = [1]',  
+  'x = [1]',
   'throw 3',
   'var x = { a : 1, b : 2 }; ',
   'var x = { a : 1 };\n x.b = 2;\nx',
@@ -105,6 +98,7 @@ var source_files = [
   '2 === 2',
 ];
 
+// Populate the source files dropdown
 source_files.reduce((select, file_content) => {
   var option = document.createElement('option');
   option.textContent = file_content;
@@ -113,72 +107,76 @@ source_files.reduce((select, file_content) => {
   return select;
 }, $('#select_source_code'));
 
-function initSourceDocs() {
-  source_docs = {};
-  Translate_syntax.eval_counter = 0;
-  $('#source_tabs').empty();
-}
+// Preload the test262 harness files from the network/filesystem
+const test262_harness_docs = new Map();
+const test262_promises = ['assert.js', 'sta.js'].map(f => {
+  test262_harness_docs.set(f, null); // Populate the map for insertion order
+  return fetch("test/data/test262/harness/"+f, {mode: 'same-origin'})
+           .then(r => r.text())
+           .then(t => test262_harness_docs.set(f, newSourceDoc(f, t, false)))
+});
+test262_promises.push(new Promise((resolve, reject) => window.addEventListener("load", resolve)));
+Promise.all(test262_promises).then(() => setExample(0));
 
 // Registers a new source doc
 function newSourceDoc(name, text, readOnly) {
-  if (!source_docs.hasOwnProperty(name)) {
-    source_docs[name] = CodeMirror.Doc(text, 'text/javascript');
-    var tab = $('<span>').addClass('file_item')
-                .text(name)
-                .click(e => selectSourceDoc(e.target.textContent))
-                .appendTo('#source_tabs');
-    if (name === '_eval_') { tab.hide(); }
-    source_docs[name].doc_name = name;
-    source_docs[name].tab = tab;
-    source_docs[name].readOnly = Boolean(readOnly);
-  }
-  return source_docs[name];
-}
-
-function selectSourceDocFromLoc(loc) {
-  var name = loc.file;
-  if (name === '_eval_') {
-    source_docs['_eval_'].tab.show();
-    source_docs['_eval_'].setValue(loc.sourceText);
-  }
-  var old_doc = selectSourceDoc(loc.file);
-  if (old_doc.doc_name === "_eval_" && name !== "_eval_") {
-    source_docs['_eval_'].tab.hide();
-  }
-}
-
-// Switches current source doc
-function selectSourceDoc(name) {
-  var old_doc = source.swapDoc(source_docs[name]);
-  if (old_doc.tab) old_doc.tab.removeClass('file_item_current');
-  source_docs[name].tab.addClass('file_item_current');
-  source.setOption('readOnly', source_docs[name].readOnly);
-  return old_doc;
+  let doc = CodeMirror.Doc(text, 'text/javascript');
+  doc.setName(name);
+  doc.cantEdit = !!readOnly;
+  return doc;
 }
 
 // Sets the initial source doc
 function setInitialSourceCode(name, text) {
-  initSourceDocs();
-  var doc = newSourceDoc(name, text);
-  initialSourceName = name;
-
-  $("#source_code").val(text);
-
-  selectSourceDoc(name);
+  const newDocs = getTest262Docs();
+  newDocs.push(newSourceDoc(name, text));
+  source.setDocs(newDocs);
+  source.swapDocByName(name);
 }
 
 $('#select_source_code').change(e => {
-  setInitialSourceCode("example" + (e.target.selectedOptions[0].index - 1) + ".js", e.target.value);
+  let selected = e.target.selectedOptions[0];
+  if (selected.disabled) {
+    return;
+  }
+  $('#select_file')[0].value = null;
+  setInitialSourceCode("example" + (selected.index - 1) + ".js", e.target.value);
   buttonRunHandler();
 });
+
 $('#select_file').change(e => {
+  if (e.target.files.length == 0) {
+    return;
+  }
+  $('#select_source_code')[0].selectedIndex = 0;
   var f = e.target.files[0];
   var fr = new FileReader();
-  fr.onload = function (e) {
+  fr.onload = (e) => {
     setInitialSourceCode(f.name, e.target.result);
     buttonRunHandler();
   };
   fr.readAsText(f);
+});
+
+function getTest262Docs() {
+  const ret = [];
+  if($('#use_test262_harness')[0].checked) {
+    for (const doc of test262_harness_docs.values()) {
+      const copy = doc.copy();
+      copy.setName(doc.getName());
+      ret.push(copy);
+    }
+  }
+  return ret;
+}
+
+$('#use_test262_harness').change(e => {
+  if(e.target.checked) {
+    source.setDocs([...getTest262Docs(), ...source]);
+  } else {
+    source.removeDocs(test262_harness_docs.keys());
+  }
+  buttonRunHandler();
 });
 
 function setExample(idx) {
@@ -338,7 +336,7 @@ function evalPred(item, pred) {
       if (locByExt === undefined) {
          return -1;
       }
-      var ext = get_file_extension(curfile);
+      var ext = get_file_extension(interpreter.getDoc().getName()); // TODO: Make work for any I_line
       var loc = locByExt[ext];
       if (loc === undefined) {
          return -1;
@@ -436,7 +434,7 @@ $("#navigation_step").change(function(e) {
 });
 
 function buttonRunHandler() {
-  initSourceDocs();
+  source.markAllClean();
   var message = readSourceParseAndRun();
   $("#action_output").html(message);
   var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 1000);
@@ -623,39 +621,9 @@ function get_file_mime(filename) {
   }
 }
 
-
-// load files in CodeMirror view
-var docs = {};
-for (var i = 0; i < tracer_files.length; i++) {
-  var file = tracer_files[i].file;
-  var mime = get_file_mime(file);
-  var txt = tracer_files[i].contents;
-  docs[file] = CodeMirror.Doc(txt, mime);
-}
-
 function viewFile(file) {
- if (curfile !== file) {
-   curfile = file;
-   if (docs[curfile] == undefined) {
-     console.log("Cannot view file " + curfile);
-     return;
-   }
-   interpreter.swapDoc(docs[curfile]);
-   interpreter.focus();
-   updateFileList();
-   updateSelection();
- }
+  interpreter.swapDocByName(file);
 }
-
-function updateFileList() {
- var s = '';
- for (var i = 0; i < tracer_files.length; i++) {
-   var file = tracer_files[i].file;
-   s += "<span class=\"file_item" + ((curfile == file) ? '_current' : '') + "\" onclick=\"viewFile('" + file + "')\">" + file + "</span> ";
- }
- $('#file_list').html(s);
-}
-
 
 
 // --------------- Tools for Views ----------------
@@ -1169,28 +1137,61 @@ function itemToHtml(item) {
 
 // --------------- Selection view ----------------
 
-function updateSelectionInCodeMirror(codeMirrorObj, loc) {
+// Converts a loc from Esprima to CodeMirror and sets the highlight on the given doc
+// codeMirrorObj may be either a CodeMirror instance, or a Doc instance
+// opts are the same as can be passed to CodeMirror's doc.markText.
+function updateSelectionInCodeMirror(codeMirrorObj, loc, opts) {
   if (loc === undefined) {
-     return; 
+     return;
   }
+
+  // Clear old marks
+  codeMirrorObj.getAllMarks().forEach(m => m.clear());
+
   // Substracting 1 because Esprima counts from 1, and Codemirror from 0
-  var anchor = {line: loc.start.line-1 , ch: loc.start.column };
-  var head = {line: loc.end.line-1, ch: loc.end.column };
-  codeMirrorObj.setSelection(anchor, head);
+  var from = {line: loc.start.line-1 , ch: loc.start.column };
+  var to = {line: loc.end.line-1, ch: loc.end.column };
+
+  codeMirrorObj.markText(from, to, opts);
+  scrollToLoc(codeMirrorObj, {from: from, to: to});
 }
 
-function updateSelectionInCodeMirrorAccordingToExt(codeMirrorObj, locByExt) {
+function updateInterpreterSelection(locByExt, selectionOpts) {
   if (locByExt === undefined) {
-   return; 
+   return;
   }
-  var ext = get_file_extension(curfile);
-  var loc = locByExt[ext];
-  if (loc === undefined) {
-    console.log("Error: missing loc for " + curfile + " in:");
-    console.log(locByExt);
-    return;
+
+  for (let doc of interpreter) {
+    let curfile = doc.getName();
+    let ext = get_file_extension(curfile);
+    let loc = locByExt[ext];
+    if (loc === undefined) {
+      console.log("Error: missing loc for " + curfile + " in:");
+      console.log(locByExt);
+      return;
+    }
+    updateSelectionInCodeMirror(doc, loc, selectionOpts);
   }
-  updateSelectionInCodeMirror(codeMirrorObj, loc);
+}
+
+// Scroll to the first mark in the given CodeMirror or Doc object.
+// No-op if given object not active, or if no marks in the doc.
+function scrollToFirstMark(doc) {
+  let ms = doc.getAllMarks();
+  if (ms.length < 1) return;
+  let loc = ms[0].find();
+  scrollToLoc(doc, loc);
+}
+
+// Scroll to the given location in the given CodeMirror or Doc object.
+// No-op if the given doc is not currently active.
+function scrollToLoc(doc, loc) {
+  if (doc instanceof CodeMirror.Doc) {
+    doc = doc.getEditor();
+  }
+  if (doc) {
+    doc.scrollIntoView(loc, 100);
+  }
 }
 
 function clearFeedback() {
@@ -1200,65 +1201,53 @@ function clearFeedback() {
 }
 
 function updateSelection() {
+  const selectionOpts = {className: "debug-selection"};
   clearFeedback();
   var item = tracer_items[tracer_pos];
-  source.setSelection({line: 0, ch:0}, {line: 0, ch:0}); // TODO: introduce a fct reset
 
- if (item !== undefined) {
-   // console.log(item);
-   // $("#disp_infos").html(itemToHtml(item));
-   if (item.source_loc === undefined) {
-     console.log("Error: missing line in log event");
+  if (item !== undefined) {
+    // $("#disp_infos").html(itemToHtml(item));
+    if (item.source_loc === undefined) {
+      console.log("Error: missing line in log event");
+    } else {
+      // source panel
+      source_loc_selected = item.source_loc;
 
-   } else {
+      source.swapDocByName(source_loc_selected.file);
+      updateSelectionInCodeMirror(source, source_loc_selected, selectionOpts);
 
-     // source panel
-     source_loc_selected = item.source_loc;
+      // source heap/env panel
+      if (item.state === undefined || item.execution_ctx === undefined) {
+        $("#disp_env").html("<undefined state or context>");
+      } else {
+        show_execution_ctx(item.state, item.execution_ctx, "disp_env");
+      }
 
-     selectSourceDocFromLoc(source_loc_selected);
-     updateSelectionInCodeMirror(source, source_loc_selected);
-     // console.log(source_loc_selected);
+      // interpreter ctx panel
+      show_interp_ctx(item.state, item.ctx, "disp_ctx");
 
-     // source heap/env panel
-     if (item.state === undefined || item.execution_ctx === undefined) {
-       $("#disp_env").html("<undefined state or context>");
-     } else {
-       show_execution_ctx(item.state, item.execution_ctx, "disp_env");
-     }
+      // interpreter code panel
+      // TEMPORARILY DISABLED BECAUSE ONLY SINGLE FILE TO TRACE
+      // viewFile(item.loc.file);
 
-     // interpreter ctx panel
-     show_interp_ctx(item.state, item.ctx, "disp_ctx");
+      updateInterpreterSelection(item.locByExt, selectionOpts);
+    }
 
-     // interpreter code panel
-     // TEMPORARILY DISABLED BECAUSE ONLY SINGLE FILE TO TRACE
-     // viewFile(item.loc.file);
-
-     var color = '#F3F781';
-        // possible to use different colors depending on event type
-        // var color = (item.type === 'enter') ? '#F3F781' : '#CCCCCC';
-     $('.CodeMirror-selected').css({ background: color });
-     $('.CodeMirror-focused .CodeMirror-selected').css({ background: color });
-     updateSelectionInCodeMirrorAccordingToExt(interpreter, item.locByExt);
-   }
-
-   // navig panel
-   $("#navigation_step").val(tracer_pos);
-   $("#event_type").html(item.type);
- }
- updateFileList();
- interpreter.focus();
+    // navig panel
+    $("#navigation_step").val(tracer_pos);
+    $("#event_type").html(item.type);
+  }
+  interpreter.focus();
 }
 
 // --------------- CodeMirror ----------------
 
-source = CodeMirror.fromTextArea(document.getElementById('source_code'), {
+source = new CodeMirror(document.getElementById('source_code'), {
  mode: 'text/javascript',
  lineNumbers: true,
  lineWrapping: true
 });
 source.setSize(500, 150);
-
-setInitialSourceCode("source.js", "source code here");
 
 interpreter = CodeMirror.fromTextArea(document.getElementById('interpreter_code'), {
  mode: 'text/javascript',
@@ -1281,6 +1270,17 @@ interpreter = CodeMirror.fromTextArea(document.getElementById('interpreter_code'
 });
 interpreter.setSize(800,250);
 
+interpreter.setDocs(tracer_files.map(file => {
+  let name = file.file;
+  let mime = get_file_mime(name);
+  let txt = file.contents;
+  let doc = CodeMirror.Doc(txt, mime);
+  doc.setName(name);
+  return doc;
+}));
+interpreter.swapDocByName("JsInterpreter.pseudo");
+interpreter.on("swapDoc", scrollToFirstMark);
+
 
 /* ==> try in new version of codemirror*/
 try {
@@ -1289,9 +1289,6 @@ try {
      interpreter.setSize($(this).width(), $(this).height());
    }
  });
-} catch(e) { }
-// TODO: factorize code below with the above
-try {
  $(source.getWrapperElement()).resizable({
    resize: function() {
      source.setSize($(this).width(), $(this).height());
@@ -1305,10 +1302,6 @@ try {
    }
  });
 } catch(e) { }
-
-
-
-
 
 interpreter.on('dblclick', function() {
  var line = interpreter.getCursor().line;
@@ -1335,7 +1328,7 @@ interpreter.focus();
 // the corresponding location from the piece of AST that corresponds.
 // These locations are used for source highlighting.
 function assignExtraInfosInTrace() {
- var last_loc = program.loc;
+ var last_loc;
  var last_state = undefined;
  var last_execution_ctx = undefined;
    // { start: { line: 1, column: 0}, end: { line: 1, column: 1 } };
@@ -1375,32 +1368,36 @@ function assignExtraInfosInTrace() {
 
 
 
-function runDebug() {
-  reset_datalog();
-  JsInterpreter.run_javascript(program);
+function runInterpreter(asts) {
+  let result;
+  for (let ast of asts) {
+    if (!result) {
+      result = JsInterpreter.run_javascript(ast);
+    } else {
+      result = JsInterpreter.run_javascript_from_result(result, ast);
+    }
+  }
+  return result;
 }
 
-function run() {
- reset_datalog();
- var success = true;
- try {
-    JsInterpreter.run_javascript(program);
- } catch (e) {
-   success = false;
-   // alert("Error during the run");
-   console.log(e);
-   console.log("execute runDebug() to get the trace.");
-   // throw e;
-   // LATER: return "Error during the run.";
- }
+function run(asts) {
+  reset_datalog();
+  var success = true;
+  try {
+    runInterpreter(asts);
+  } catch (e) {
+    success = false;
+    console.log(e);
+    console.info("Execute runInterpreter() to debug in-browser.");
+  }
 
- tracer_items = datalog;
- tracer_length = tracer_items.length;
- assignExtraInfosInTrace();
- $("#navigation_total").html(tracer_length - 1);
- // stepTo(tracer_length-1);
- stepTo(0);
- return (success) ? "Run successful!" : "Error during the run!";
+  tracer_items = datalog;
+  tracer_length = tracer_items.length;
+  assignExtraInfosInTrace(asts[0].loc);
+  $("#navigation_total").html(tracer_length - 1);
+  // stepTo(tracer_length-1);
+  stepTo(0);
+  return (success) ? "Run successful!" : "Error during the run!";
 }
 
 function parseSource(source, name, readOnly) {
@@ -1410,30 +1407,19 @@ function parseSource(source, name, readOnly) {
 }
 
 function readSourceParseAndRun() {
-   var message = "";
-   var code = source.getValue();
-   //console.log(code);
-   // TODO handle parsing error
-   // TODO handle out of scope errors
-   try {
-     program = parseSource(code, initialSourceName);
-   } catch (e) {
-     return "Parse error";
-   }
+  Translate_syntax.eval_counter = 0;
+  try {
+    let asts = [];
+    for (let doc of source) {
+      asts.push(parseSource(doc.getValue(), doc.getName()));
+    }
+    return run(asts);
+  } catch (e) {
+    console.log(e);
+    return "Parse error";
+  }
 
-   return run();
 }
-
-
-// --------------- Initialization, continuted ----------------
-
-
-// interpreter file displayed initially
-// -- viewFile(tracer_files[0].file);
-viewFile("JsInterpreter.pseudo");
-
-//$timeout(function() {codeMirror.refresh();});
-
 
 
 // -------------- Testing ----------------
@@ -1450,28 +1436,6 @@ function testLineof(filename, token) {
   console.log(lineof(filename, token));
 }
 
-// for easy debugging, launch at startup:
-//
-//  ---readSourceParseAndRun();
-
-// stepTo(2466);
-
-// button_reach_handler();
-// $("#reach_condition").val("S_raw('x')");
-// button_test_handler();
-
-//  $("#reach_condition").val("I_line()");
-//  button_test_handler();
-
-//$("#reach_condition").val("S('x') == 2");
-
-//stepTo(5873);
-// setExample(20);
-setExample(0);
-// setExample(11);
-$("#reach_condition").val("S_line() == 3 && S('i') == 1");
-
-
 function showCurrent() {
   console.log(tracer_items[tracer_pos]);
 };
@@ -1486,4 +1450,3 @@ function findToken(token) {
   return -1;
 };
 
-//S_line() == 4 && S("j") == 2

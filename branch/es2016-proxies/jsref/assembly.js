@@ -42104,12 +42104,12 @@ var run_call = function (s, c, l, vthis, args) {
   return (_return_4554); 
 };
 
-var run_javascript_from_state = function (s, p) {
-  var ctx_1740 = ctx_push(ctx_empty, [{key: "s", val: s}, {key: "p", val: p}]);
+var run_javascript_from_state = function (s, _term_) {
+  var ctx_1740 = ctx_push(ctx_empty, [{key: "s", val: s}, {key: "_term_", val: _term_}]);
   log_event("JsInterpreter.js", 10406, ctx_1740, "enter");
   var c = (function () {
     log_event("JsInterpreter.js", 10395, ctx_1740, "call");
-    var _return_4555 = execution_ctx_initial(prog_intro_strictness(p));
+    var _return_4555 = execution_ctx_initial(prog_intro_strictness(_term_));
     log_event("JsInterpreter.js", 10394, ctx_push(ctx_1740, [{key: "#RETURN_VALUE#", val: _return_4555}]), "return");
     return (_return_4555); 
   }())
@@ -42120,7 +42120,7 @@ var run_javascript_from_state = function (s, p) {
                          log_event("JsInterpreter.js", 10397, ctx_1740, "call");
                          var _return_4556 = execution_ctx_binding_inst(s, c,
                                               Coq_codetype_global(), 
-                                              None(), p, mk_nil());
+                                              None(), _term_, mk_nil());
                          log_event("JsInterpreter.js", 10396, ctx_push(ctx_1740, [{key: "#RETURN_VALUE#", val: _return_4556}]), "return");
                          return (_return_4556); }()), function(s_2) {
                          
@@ -42128,7 +42128,7 @@ var run_javascript_from_state = function (s, p) {
                          log_event("JsInterpreter.js", 10403, ctx_1741, "let");
                          var _return_4558 = (function () {
                            log_event("JsInterpreter.js", 10399, ctx_1741, "call");
-                           var _return_4557 = run_prog(s_2, c, p);
+                           var _return_4557 = run_prog(s_2, c, _term_);
                            log_event("JsInterpreter.js", 10398, ctx_push(ctx_1741, [{key: "#RETURN_VALUE#", val: _return_4557}]), "return");
                            return (_return_4557); 
                          }())
@@ -42141,8 +42141,8 @@ var run_javascript_from_state = function (s, p) {
   
 };
 
-var run_javascript_from_result = function (w, p) {
-  var ctx_1743 = ctx_push(ctx_empty, [{key: "w", val: w}, {key: "p", val: p}]);
+var run_javascript_from_result = function (w, _term_) {
+  var ctx_1743 = ctx_push(ctx_empty, [{key: "w", val: w}, {key: "_term_", val: _term_}]);
   log_event("JsInterpreter.js", 10414, ctx_1743, "enter");
   var _return_4564 = (function () {
     log_event("JsInterpreter.js", 10412, ctx_1743, "call");
@@ -42152,7 +42152,7 @@ var run_javascript_from_result = function (w, p) {
                            var _return_4562 = (function () {
                              log_event("JsInterpreter.js", 10408, ctx_1744, "call");
                              var _return_4561 = run_javascript_from_state(s,
-                                                  p);
+                                                  _term_);
                              log_event("JsInterpreter.js", 10407, ctx_push(ctx_1744, [{key: "#RETURN_VALUE#", val: _return_4561}]), "return");
                              return (_return_4561); 
                            }())
@@ -42167,12 +42167,12 @@ var run_javascript_from_result = function (w, p) {
   return (_return_4564); 
 };
 
-var run_javascript = function (p) {
-  var ctx_1745 = ctx_push(ctx_empty, [{key: "p", val: p}]);
+var run_javascript = function (_term_) {
+  var ctx_1745 = ctx_push(ctx_empty, [{key: "_term_", val: _term_}]);
   log_event("JsInterpreter.js", 10418, ctx_1745, "enter");
   var _return_4566 = (function () {
     log_event("JsInterpreter.js", 10416, ctx_1745, "call");
-    var _return_4565 = run_javascript_from_state(state_initial, p);
+    var _return_4565 = run_javascript_from_state(state_initial, _term_);
     log_event("JsInterpreter.js", 10415, ctx_push(ctx_1745, [{key: "#RETURN_VALUE#", val: _return_4565}]), "return");
     return (_return_4565); 
   }())
