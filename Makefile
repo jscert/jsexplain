@@ -23,8 +23,7 @@ mljsref: generator # (requires the ppx)
 	$(MAKE) -C jsref mljsref
 
 # Test Stages
-test_init:
-	git submodule update --init test/data/test262
+test_init: test/data/test262
 	npm install
 
 test: test_generator test_jsjsref
@@ -34,6 +33,12 @@ test_generator:
 
 test_jsjsref: jsjsref
 	node_modules/.bin/mocha
+
+test/data/test262:
+	git submodule update --init test/data/test262
+
+test/data/test262/%:
+	git submodule update --init test/data/test262
 
 # Documentation
 doc: doc/jsref
@@ -49,8 +54,9 @@ doc/jsref: generator esdocgen
 # Publication Stages
 PUB_FILES=driver.html libraries jquery-ui-1.11.4.custom jquery_scroll \
 	  jsref/displayed_sources.js tools.js node_modules/esprima/esprima.js \
-	  esprima-to-ast.js jsref/lineof.js navig-driver.js \
-	  jsref/assembly.js doc/documentation.html doc/screenshots doc/jsref
+	  esprima-to-ast.js jsref/lineof.js navig-driver.js codemirror-tabs.js \
+	  jsref/assembly.js doc/documentation.html doc/screenshots doc/jsref \
+	  test/data/test262/harness
 
 dist: jsjsref $(PUB_FILES)
 	mkdir -p $@
