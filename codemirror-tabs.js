@@ -19,28 +19,6 @@
     cm.add(new CodeMirror.Doc());
   };
 
-  // doc may be a Doc or a name of a doc
-  let removeDoc = function (doc, dontSwap) {
-    if (typeof doc === "string") {
-      doc = this.state.docs.get(doc);
-    }
-    if (doc === undefined) {
-      return;
-    }
-    doc.tab.remove();
-    doc.tab.removeEventListener("click", doc.tabEh);
-    doc.tabEh = null;
-    doc.tab = null;
-    this.state.docs.delete(doc.getName());
-
-    const editor = doc.getEditor();
-    if (!dontSwap && editor) {
-      swapValidDoc(editor);
-    }
-
-    return doc;
-  };
-
   let setActiveTab = doc => doc.tab.className = "file_item_current";
 
   let unsetActiveTab = doc => {
@@ -111,7 +89,32 @@
     return new Set(this.state.docs.keys());
   });
 
-  CodeMirror.defineExtension("removeDoc", removeDoc);
+  // doc may be a Doc or a name of a doc
+  CodeMirror.defineExtension("removeDoc", function (doc, dontSwap) {
+    if (typeof doc === "string") {
+      doc = this.state.docs.get(doc);
+    }
+    if (doc === undefined) {
+      return;
+    }
+    doc.tab.remove();
+    doc.tab.removeEventListener("click", doc.tabEh);
+    doc.tabEh = null;
+    doc.tab = null;
+
+    // Test that the doc being removed hasn't already been replaced in the map
+    const name = doc.getName();
+    if (this.state.docs.get(name) === doc) {
+      this.state.docs.delete(name);
+    }
+
+    const editor = doc.getEditor();
+    if (!dontSwap && editor) {
+      swapValidDoc(editor);
+    }
+
+    return doc;
+  });
 
   CodeMirror.defineExtension("removeDocs", function(docs) {
     const removedDocs = [];
