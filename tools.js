@@ -1,28 +1,28 @@
 
 // ----------- Lineof ----------------
 
-// see "generator/lineof.ml" and "lineof.js" 
+// see "generator/lineof.ml" and "lineof.js"
 function lineof(filename, token) {
-   var f = lineof_data[filename];
-   if (f == undefined) {
-     console.log("could not find lineof for " + filename);
-     return;
-   }
-   var d = f[token];
-   if (d == undefined) {
-     console.log("could not find token " + token + " for " + filename);
-     return;
-   }
-   return { file: filename,
-            start: {line: d[0], column: d[1]}, 
-            end: {line: d[2], column: d[3]} };
+  var f = lineof_data[filename];
+  if (f == undefined) {
+    console.log("could not find lineof for " + filename);
+    return;
+  }
+  var d = f[token];
+  if (d == undefined) {
+    console.log("could not find token " + token + " for " + filename);
+    return;
+  }
+  return { file: filename,
+    start: {line: d[0], column: d[1]},
+    end: {line: d[2], column: d[3]} };
 };
 
 
 // ----------- Auxiliary --------------
 
 String.prototype.replaceAt=function(index, character) {
-    return this.substr(0, index) + character + this.substr(index+character.length);
+  return this.substr(0, index) + character + this.substr(index+character.length);
 }
 
 // ----------- Datalog ----------------
@@ -52,16 +52,16 @@ function log_event(filename, token, ctx, type) {
   var pseudoloc = lineof(pseudofilename, token);
 
   var event = { token: token, locByExt: { "ml": mlloc, "js": jsloc, "pseudo": pseudoloc },
-                ctx : ctx, type : type, state: {}, env: {}};
+    ctx : ctx, type : type, state: {}, env: {}};
   datalog.push(event);
 
   // for debug
-  if (event.type == "return" && 
-     // event.ctx.bindings[0].key == "#RETURN_VALUE#"   must be true
-     event.ctx.bindings[0].val === undefined) {
+  if (event.type == "return" &&
+    // event.ctx.bindings[0].key == "#RETURN_VALUE#"   must be true
+    event.ctx.bindings[0].val === undefined) {
     console.log("Return event carrying undefined");
     console.log(event);
-   }
+  }
 }
 
 
@@ -99,4 +99,3 @@ function ctx_to_array(ctx) {
 
   return a;
 }
-
