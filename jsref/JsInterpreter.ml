@@ -579,8 +579,8 @@ and to_property_descriptor s _foo_ =
         else res_spec s (descriptor_with_set desc (Some setter))
       else res_spec s desc
     in
-    if ((not (desc.descriptor_get === None)) || (not (desc.descriptor_set === None)))
-      && ((not (desc.descriptor_value === None)) || (not (desc.descriptor_writable === None)))
+    if (is_some desc.descriptor_get || is_some desc.descriptor_set)
+      && (is_some desc.descriptor_value || is_some desc.descriptor_writable)
     then run_error_no_c s Coq_native_error_type
     else res_spec s desc
   | _ -> throw_result (run_error_no_c s Coq_native_error_type)
@@ -1469,7 +1469,7 @@ and ordinary_set s o p v receiver =
         Return (object_internal_set s parent p v receiver)
       else Continue (Descriptor {
         descriptor_value = Some Coq_value_undef;
-        descriptor_writable = Some false;
+        descriptor_writable = Some true;
         descriptor_get = None;
         descriptor_set = None;
         descriptor_enumerable = Some true;
@@ -4028,9 +4028,8 @@ and run_expr_function s c fo args bd =
       let%object (s2, l0) = (creating_function_object s1 c args bd lex_2 (funcbody_is_strict bd)) in
       let%void s3 = (env_record_initialize_immutable_binding s2 l fn (Coq_value_object l0)) in
       res_out s3 (res_val (Coq_value_object l0))
-    in destr_list lex_2
-      (fun x -> Debug.impossible_with_heap_because __LOC__ s "Empty lexical environnment allocated in [run_expr_function]."; Coq_result_impossible)
-      (fun l x -> follow l) ()
+    in destr_list lex_2 (Coq_result_impossible (*"Empty lexical environnment allocated in [run_expr_function]."*))
+      (fun l -> follow l)
   | None ->
     let lex = c.execution_ctx_lexical_env in
     creating_function_object s c args bd lex (funcbody_is_strict bd)

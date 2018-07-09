@@ -1407,16 +1407,16 @@ function parseSource(source, name, readOnly) {
 
 function readSourceParseAndRun() {
   Translate_syntax.eval_counter = 0;
+  let asts = [];
   try {
-    let asts = [];
     for (let doc of source) {
       asts.push(parseSource(doc.getValue(), doc.getName()));
     }
-    return run(asts);
   } catch (e) {
     console.log(e);
     return "Parse error";
   }
+  return run(asts);
 }
 
 
