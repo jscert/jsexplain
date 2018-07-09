@@ -80,6 +80,7 @@ function ctx_push(ctx, bindings) {
       console.log("ctx_push with undefined value");
       console.log(ctx);
       console.log(bindings);
+      debugger;
     }
   }
 
