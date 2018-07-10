@@ -1738,7 +1738,7 @@ and proxy_object_internal_get_own_property s o p =
   let%some target = target in
   let%value s, trap = get_method s handler (Coq_value_string "getOwnPropertyDescriptor") in
   if trap === Coq_value_undef then
-    object_internal_get_own_property s o p
+    object_internal_get_own_property s (loc_of_value target) p
   else
   let%value s, trapResultObj = call s trap handler (Some [target; p]) in
   if not ((type_of trapResultObj === Coq_type_object) || (trapResultObj === Coq_value_undef)) then
