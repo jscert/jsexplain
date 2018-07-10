@@ -63,7 +63,7 @@ let length l =
 (** val take_drop_last : 'a1 list -> 'a1 list * 'a1 **)
 
 let rec take_drop_last l = match l with
-  | [] -> raise Not_found
+  | [] -> failwith "Not_found"
   | x :: l' ->
     (match l' with
      | [] -> ([], x)

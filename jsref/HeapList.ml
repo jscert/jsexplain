@@ -17,7 +17,7 @@ let empty =
 (** val read : 'a1 comparison -> ('a1 * 'a2) list -> 'a1 -> 'a2 **)
 
 let rec read h l k = match l with
-| [] -> raise Not_found
+| [] -> failwith "Not_found"
 | p :: l' -> let (x, v) = p in if int_eq (h x k) 0 then v else read h l' k 
 
 (** val write : 'a1 comparison -> ('a1, 'a2) heap -> 'a1 -> 'a2 -> ('a1 * 'a2) list **)

@@ -67,7 +67,7 @@ let rec add compare x data s =
 
 let rec find compare x s =
   match s with
-    Empty -> raise Not_found
+    Empty -> failwith "Not_found"
   | Node(l, v, d, r, _) ->
       let c = compare x v in
       if int_eq c 0 then d
@@ -94,7 +94,7 @@ let rec mem compare x s =
 
 let rec min_binding s = 
   match s with
-    Empty -> raise Not_found
+    Empty -> failwith "Not_found"
   | Node(l, x, d, r, _) ->
     match l with 
       Empty -> (x, d)

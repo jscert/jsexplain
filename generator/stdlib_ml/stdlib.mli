@@ -28,7 +28,7 @@ implementation of this library as the functions None, Some, mk_nil, mk_cons.
 *)
 
 (**{6 Exceptions }*)
-(** Behaves as [throw "Not_found"] in JS. *)
+(** Behaves as [throw x] in JS. *)
 val raise : exn -> 'a
 val failwith : string -> 'a
 
