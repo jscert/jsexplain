@@ -276,7 +276,7 @@ and object_internal_define_own_property s o p desc =
   | Coq_builtin_define_own_prop_default  -> ordinary_object_internal_define_own_property s o p desc
   | Coq_builtin_define_own_prop_array    -> object_define_own_prop s some_context o (string_of_value p) desc false (* TODO: ES6 version *)
   | Coq_builtin_define_own_prop_args_obj -> object_define_own_prop s some_context o (string_of_value p) desc false (* TODO: ES6 version *)
-  | Coq_builtin_define_own_prop_proxy    -> ordinary_object_internal_define_own_property s o p desc
+  | Coq_builtin_define_own_prop_proxy    -> proxy_object_internal_define_own_property s o p desc
 
 (** Function to dispatch calls to O.[[HasProperty]](P) *)
 and object_internal_has_property s o p =
