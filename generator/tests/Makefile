@@ -37,10 +37,10 @@ test_js: $(TESTS_JS)
 %.as.js: $(patsubst %.cmo,%.js,$(LINK_LIBS)) Compare.js %.js
 	../assembly.byte -o $@ $^
 
-lib/%.cmi: lib/%.mli
+lib/mocha.cmi: lib/mocha.mli
 	ocamlfind ocamlc -package alcotest -c $< -o $@
 
-lib/%.cmo: lib/%.ml lib/%.cmi
+lib/mocha.cmo: lib/mocha.ml lib/mocha.cmi
 	ocamlfind ocamlc -package alcotest -c -I lib $< -o $@
 
 %.cmo: %.ml
