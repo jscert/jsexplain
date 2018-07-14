@@ -1387,7 +1387,6 @@ function run(asts) {
   } catch (e) {
     success = false;
     console.log(e);
-    console.info("Execute runInterpreter() to debug in-browser.");
   }
 
   tracer_items = datalog;
