@@ -1284,10 +1284,10 @@ and is_compatible_property_descriptor s extensible desc current =
 (** @essec 9.1.6.3
     @esid sec-validateandapplypropertydescriptor *)
 and validate_and_apply_property_descriptor s o p extensible desc current =
-  (* FIXME: o, p type mismatch, specified as object, property key but undefined passed *)
+  (* NOTE: o, p type mismatch, specified as object, property key but undefined is passed by
+     is_compatible_property_descriptor *)
   (* A -> B === !A || B *)
   let%assert _ = (value_compare o Coq_value_undef) || (is_property_key p) in
-  let p = string_of_value p in (* TODO: Will break with Symbols *)
   match current with
   (* Three types of descriptors: full, attributes: accessor and data...
      Spec assumes one with variable field definitions, move to this? (equiv. our full)
@@ -1299,6 +1299,7 @@ and validate_and_apply_property_descriptor s o p extensible desc current =
       let%some s =
         match o with
         | Coq_value_object l ->
+          let p = string_of_value p in
           if (is_generic_descriptor (Descriptor desc)) || (is_data_descriptor (Descriptor desc))
           then object_set_property s l p (Coq_attributes_data_of (attributes_data_of_descriptor desc))
           else object_set_property s l p (Coq_attributes_accessor_of (attributes_accessor_of_descriptor desc))
@@ -1348,12 +1349,12 @@ and validate_and_apply_property_descriptor s o p extensible desc current =
       else if is_data_descriptor (Descriptor current)
         then
           let s = unsome_default s (match o with
-          | Coq_value_object l -> object_map_property s l p attributes_accessor_of_attributes_data
+          | Coq_value_object l -> object_map_property s l (string_of_value p) attributes_accessor_of_attributes_data
           | _ -> Some s)
           in Continue s
         else
           let s = unsome_default s (match o with
-          | Coq_value_object l -> object_map_property s l p attributes_data_of_attributes_accessor
+          | Coq_value_object l -> object_map_property s l (string_of_value p) attributes_data_of_attributes_accessor
           | _ -> Some s)
           in Continue s
 
@@ -1400,7 +1401,7 @@ and validate_and_apply_property_descriptor s o p extensible desc current =
     (* Step 10 *)
     in let%some s = match o with
     | Coq_value_object l ->
-       object_map_property s l p (fun a -> attributes_update a desc)
+       object_map_property s l (string_of_value p) (fun a -> attributes_update a desc)
     | _ -> Some s
 
     (* Step 11 *)
