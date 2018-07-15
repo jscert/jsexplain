@@ -3455,7 +3455,7 @@ and run_object_get_own_prop s c l x =
 and run_function_has_instance s c lv _foo_ =
   (match _foo_ with
   | Coq_value_object lo ->
-    let%some vproto = (run_object_method object_proto_ s lv) in
+    let%value s, vproto = object_internal_get_prototype_of s lv in
       (match vproto with
         | Coq_value_null -> res_ter s (res_val (Coq_value_bool false))
         | Coq_value_object proto ->
