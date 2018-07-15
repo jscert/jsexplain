@@ -31103,14 +31103,15 @@ var run_function_has_instance = function (s, c, lv, _foo_) {
       var lo = _foo_.value;var ctx_1131 = ctx_push(ctx_1130, [{key: "lo", val: lo}]);
     log_event("JsInterpreter.js", 6971, ctx_1131, "case");
     
-      var _return_3124 = if_some((function () {
+      var _return_3124 = if_value((function () {
                              log_event("JsInterpreter.js", 6949, ctx_1131, "call");
-                             var _return_3114 = run_object_method(
-                                                  object_proto_, s, lv);
+                             var _return_3114 = object_internal_get_prototype_of(
+                                                  s, lv);
                              log_event("JsInterpreter.js", 6948, ctx_push(ctx_1131, [{key: "#RETURN_VALUE#", val: _return_3114}]), "return");
-                             return (_return_3114); }()), function(vproto) {
+                             return (_return_3114); }()), function(s,
+                           vproto) {
                              
-                             var ctx_1132 = ctx_push(ctx_1131, [{key: "vproto", val: vproto}]);
+                             var ctx_1132 = ctx_push(ctx_1131, [{key: "s", val: s}, {key: "vproto", val: vproto}]);
                              log_event("JsInterpreter.js", 6969, ctx_1132, "let");
                              log_event("JsInterpreter.js", 6966, ctx_1132, "switch");
                              switch (vproto.tag) {
