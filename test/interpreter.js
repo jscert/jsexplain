@@ -26,7 +26,7 @@ var run = function(program) {
   return jsref.JsInterpreter.run_javascript(program);
 };
 
-Error.stackTraceLimit = 30;
+Error.stackTraceLimit = 0;
 
 var prelude;
 before(function(done) {
