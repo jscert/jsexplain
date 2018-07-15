@@ -3,37 +3,27 @@
 // Registers test cases to be run against Test262
 // To add a testcase to be tested against test262:
 //   var test262tests = require('./helper-test262.js')'
-//   test262tests.push(function testConstructorFunction(source, negativity) {});
+//   test262tests.push(function testConstructorFunction(getFile) {});
 //
 // Tests are run in the order added to the array. If inter-module test ordering is required,
 // ensure the later test module depends on the earlier one.
 //
-// Arguments to testConstructorFunction:
-// - source: The raw test source code
-// - negative: The @negative test header content
-// -
+// The testConstructorFunction should call its first argument to get the test case.
+// The test case is an object as returned from the test262-parser library, it will contain
+// the fields file, contents, attrs, and async at minimum.
 
-var fs = require('mz/fs');
-var walk = require('klaw');
-var filter = require('through2-filter');
+const fs = require('mz/fs');
+const walk = require('klaw');
+const filter = require('through2-filter');
 fs.readlinkSync = require('readlink').sync; // a non-broken readlink...
+const test262parser = require('test262-parser');
 
-var testConstructors = [];
-
-function testNegativity(str) {
-  var result = /@negative[ \t]*(\S*)?[ \t]*$/m.exec(str);
-  if(result) {
-    result = result[1] || true;
-  } else {
-    result = false;
-  }
-  return result;
-}
+const testConstructors = [];
 
 setImmediate(() => {
-  var testDataDir = __dirname + '/../data';
-  var test262path = fs.readlinkSync(testDataDir + '/test262/test');
-  var tests = [];
+  const testDataDir = __dirname + '/../data';
+  const test262path = fs.readlinkSync(testDataDir + '/test262/test');
+  const tests = [];
 
   walk(test262path)
   .pipe(filter.obj(file => file.stats.isFile() && file.path.endsWith(".js")))
@@ -41,32 +31,19 @@ setImmediate(() => {
   .on('end', function() {
     describe("test262", function() {
       if (tests.length === 0) { throw new Error("Unable to find any test262 tests (uninitialised git submodule?)") }
-      tests.forEach(item => {
-        describe(item, function() {
-          // Preseed test arguments with safe defaults
-          var args = {
-            path: "not initialised",
-            source: "if // invalid syntax",
-            negative: false
-          };
-
-          var source;
-          var negative = '';
+      tests.forEach(path => {
+        describe(path, function() {
+          // Variable to be lazy-loaded, captured by closure below.
+          let test = null;
 
           // Lazy-load the source file prior to tests
           before(function(doneFile) {
-            fs.readFile(item).then(
-              data => {
-                args.path = item;
-                args.source = data.toString();
-                args.negative = testNegativity(args.source);
-              }
-            ).then(doneFile);
+            fs.readFile(path)
+              .then(data => { test = test262parser.parseFile({ file: path, contents: data.toString() }); })
+              .then(doneFile);
           });
 
-          // args only gets populated prior to the execution of this item
-          // (it is empty at the point of construction of the test)
-          testConstructors.forEach(constructor => constructor(args));
+          testConstructors.forEach(constructor => constructor(() => test));
         });
       });
     });

@@ -13,11 +13,10 @@ var test262tests = require('./helpers/test262.js');
  * Returns: a string if type of failure specified, true, or false
  */
 function isParserNegativeTest(negative) {
-  if (typeof negative === 'boolean') {
-    return negative;
+  if (typeof negative === 'undefined') {
+    return false;
   }
-  // Second case testing for an Early (Syntax) Error
-  return /(?:SyntaxError|\?!NotEarlyError)/.test(negative);
+  return (negative.phase === 'parse' || negative.phase === 'early') ? negative.type : false;
 }
 
 function typecheckAST(ast) {
@@ -258,27 +257,29 @@ a()};`;
   });
 });
 
-test262tests.push(args => {
+test262tests.push(getTest => {
   it('parses?', function() {
-    var negative = isParserNegativeTest(args.negative);
+    const test = getTest(); // This line cannot be lifted out of the 'it' callback
+
+    var negative = isParserNegativeTest(test.attrs.negative);
     try {
-      esprima.parse(args.source, {loc: true, range: true});
+      esprima.parse(test.contents, {loc: true, range: true});
     } catch(e) {
       if (!negative) {
         throw e;
       }
     }
   });
-});
 
-test262tests.push(args => {
   it('converts ast?', function() {
+    const test = getTest();
+
     try {
-      var prog = esprima.parse(args.source, {loc: true, range: true});
+      var prog = esprima.parse(test.contents, {loc: true, range: true});
     } catch(e) { this.skip(); }
 
     try {
-      var ast = esprimaToAST.esprimaToAST(prog, args.source);
+      var ast = esprimaToAST.esprimaToAST(prog, test.contents);
       typecheckAST(ast);
     } catch (e) {
       if (e instanceof esprimaToAST.UnsupportedSyntaxError) {

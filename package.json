@@ -8,7 +8,8 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "esprima": "^1.2.5"
+    "esprima": "^1.2.5",
+    "test262-parser": "^2.0.7"
   },
   "devDependencies": {
     "klaw": "^2.1.1",

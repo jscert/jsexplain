@@ -33,7 +33,7 @@ before(function(done) {
   fs.readFile(__dirname + '/data/test_prelude.js', (err, data) => {
     if (err) throw err;
     prelude = jsref.JsInterpreter.run_javascript(parse(data));
-    assert.doesNotThrow(() => testResultForException(prelude, false), "Prelude execution threw!");
+    assert.doesNotThrow(() => testResultForException(prelude, undefined), "Prelude execution threw!");
     done();
   });
 });
@@ -109,14 +109,13 @@ function testResultForException(result, negative) {
         }
         throw new Error(msg);
 
-      } else if (typeof negative === "string") {
+      } else if (negative.phase === "runtime") {
         // We were expecting a specific exception
-        let pat = new RegExp(negative);
-        if (!pat.test(exc.name)) {
-          throw new Error("Test should have thrown a "+negative+" error, but we got a "+exc.name+" instead!");
+        if (negative.type !== exc.name) {
+          throw new Error(`Test should have thrown a ${negative.type} error, but we got a ${exc.name} instead!`);
         }
       } else {
-        // We expected it :)
+        throw new Error(`Test should have thrown at ${negative.phase} but actually at runtime.`);
       }
 
       break;
@@ -136,10 +135,12 @@ function testResultForException(result, negative) {
   }
 };
 
-test262tests.push(args => {
+test262tests.push(getTest => {
   it("interprets correctly?", function() {
+    const test = getTest();
+
     try {
-      var ast = parse(args.source);
+      var ast = parse(test.contents);
     } catch(e) { this.skip(); }
 
     this.timeout(timeout);
@@ -150,7 +151,7 @@ test262tests.push(args => {
     //tripwire.clearTripwire();
 
     testPreludeError(result);
-    testResultForException(result, args.negative);
+    testResultForException(result, test.attrs.negative);
   });
 });
 
