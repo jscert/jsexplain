@@ -23,6 +23,10 @@ matrix:
       node_js: "10"
       env: TEST=true
 
+cache:
+  directories:
+  - $HOME/.opam
+
 
 install:
   - wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-ocaml.sh
