@@ -20,6 +20,21 @@ const test262parser = require('test262-parser');
 
 const testConstructors = [];
 
+// Shorten failure output
+const Base = require('mocha').reporters.Base;
+const oldReporterList = Base.list;
+Base.list = failures => {
+  const num = process.env.ERROR_NUM ? Number(process.env.ERROR_NUM) : 1;
+  if (failures.length > num) {
+    oldReporterList(failures.slice(0, num));
+    console.log(Base.color('fail', 'Error printout limited to %d failures. Set ERROR_NUM in environment to show more.'), num);
+  } else {
+    oldReporterList(failures);
+  }
+};
+
+// Run the given callback at the end of this I/O Loop, so that testConstructors may be registered before constructing
+// test cases.
 setImmediate(() => {
   const testDataDir = __dirname + '/../data';
   const test262path = fs.readlinkSync(testDataDir + '/test262/test');

@@ -26,8 +26,6 @@ var run = function(program) {
   return jsref.JsInterpreter.run_javascript(program);
 };
 
-Error.stackTraceLimit = 0;
-
 var prelude;
 before(function(done) {
   fs.readFile(__dirname + '/data/test_prelude.js', (err, data) => {
