@@ -25,12 +25,10 @@ const testConstructors = [];
 const Base = require('mocha').reporters.Base;
 const oldReporterList = Base.list;
 Base.list = failures => {
-  const num = process.env.ERROR_NUM ? Number(process.env.ERROR_NUM) : 1;
-  if (failures.length > num) {
-    oldReporterList(failures.slice(0, num));
-    console.log(Base.color('fail', 'Error printout limited to %d failures. Set ERROR_NUM in environment to show more.'), num);
-  } else {
+  if (!process.env.CI || process.env.CI === 'false') {
     oldReporterList(failures);
+  } else {
+    console.log(Base.color('fail', 'Failure stack traces are suppressed in the CI environment.'));
   }
 };
 
@@ -58,6 +56,7 @@ setImmediate(() => {
               .then(data => {
                 test = test262parser.parseFile({ file: path, contents: data.toString() });
 
+                // Skip the test if it uses features that we don't support.
                 const usedFeatures = new Set(test.attrs.features);
                 for (const feature of supportedFeatures) {
                   usedFeatures.delete(feature);
