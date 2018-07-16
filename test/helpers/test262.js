@@ -17,6 +17,7 @@ const walk = require('klaw');
 const filter = require('through2-filter');
 fs.readlinkSync = require('readlink').sync; // a non-broken readlink...
 const test262parser = require('test262-parser');
+const supportedFeatures = require('./supported-features.js');
 
 const testConstructors = [];
 
@@ -54,8 +55,20 @@ setImmediate(() => {
           // Lazy-load the source file prior to tests
           before(function(doneFile) {
             fs.readFile(path)
-              .then(data => { test = test262parser.parseFile({ file: path, contents: data.toString() }); })
-              .then(doneFile);
+              .then(data => {
+                test = test262parser.parseFile({ file: path, contents: data.toString() });
+
+                const usedFeatures = new Set(test.attrs.features);
+                for (const feature of supportedFeatures) {
+                  usedFeatures.delete(feature);
+                }
+                if (usedFeatures.size > 0) {
+                  console.log(Base.color('pending', 'Test skipped due to missing features: %s'), Array.from(usedFeatures).join(', '));
+                  this.skip();
+                }
+              })
+              .then(doneFile)
+              .catch(doneFile);
           });
 
           testConstructors.forEach(constructor => constructor(() => test));
