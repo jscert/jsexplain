@@ -5002,6 +5002,7 @@ and run_call_prealloc s c b l vthis args =
   | Coq_prealloc_proxy -> builtin_proxy_constructor s c () () Coq_value_undef (get_arg 0 args) (get_arg 1 args)
   | Coq_prealloc_proxy_revocable -> builtin_proxy_revocable s c () () () (get_arg 0 args) (get_arg 1 args)
   | Coq_builtin_proxy_revocation -> builtin_proxy_revocation_function s c l () ()
+  | Coq_prealloc_global_eval -> run_eval s c false args
   | _ ->
     (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_not_yet_implemented)
       (strappend ("Call prealloc_") (strappend (string_of_prealloc b) (" not yet implemented")))
