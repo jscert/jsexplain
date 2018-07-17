@@ -78,6 +78,7 @@ function testResultForException(result, negative) {
   if (result.tag !== "Coq_result_some") {
     throw new Error(`Execution resulted in ${result.tag}.`);
   }
+
   var state = result.value.state;
   var completion = result.value.res;
   var value = completion.res_value.value;
@@ -148,6 +149,11 @@ test262.addTest(getTest => {
 
     //tripwire.clearTripwire();
 
+    // FIXME: Temporary use only.
+    if (result.tag !== "Coq_result_some") {
+      console.log(`Execution resulted in ${result.tag}.`);
+      this.skip();
+    }
     testResultForException(result, test.attrs.negative);
   });
 });
