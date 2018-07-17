@@ -6,7 +6,7 @@ const util = require('util');
 var esprima = require('esprima');
 var esprimaToAST = require('../esprima-to-ast.js');
 
-var test262tests = require('./helpers/test262.js');
+var test262 = require('./helpers/test262.js');
 
 /* Tests whether a given test is negative.
  * Param: negative (boolean or string): Return value of helper-test262.testNegativity
@@ -257,7 +257,7 @@ a()};`;
   });
 });
 
-test262tests.push(getTest => {
+test262.addTest(getTest => {
   it('parses?', function() {
     const test = getTest(); // This line cannot be lifted out of the 'it' callback
 

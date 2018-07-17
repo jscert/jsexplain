@@ -13,6 +13,7 @@
 // the fields file, contents, attrs, and async at minimum.
 
 const fs = require('mz/fs');
+const path = require('path');
 const walk = require('klaw');
 const filter = require('through2-filter');
 fs.readlinkSync = require('readlink').sync; // a non-broken readlink...
@@ -32,14 +33,15 @@ Base.list = failures => {
   }
 };
 
+const testDataDir = path.join(__dirname, '..', 'data');
+const test262path = fs.readlinkSync(path.join(testDataDir, 'test262'));
+
 // Run the given callback at the end of this I/O Loop, so that testConstructors may be registered before constructing
 // test cases.
 setImmediate(() => {
-  const testDataDir = __dirname + '/../data';
-  const test262path = fs.readlinkSync(testDataDir + '/test262/test');
   const tests = [];
 
-  walk(test262path)
+  walk(path.join(test262path, 'test'))
   .pipe(filter.obj(file => file.stats.isFile() && file.path.endsWith(".js")))
   .on('data', (item) => { tests.push(item.path); })
   .on('end', function() {
@@ -79,4 +81,17 @@ setImmediate(() => {
   });
 });
 
-module.exports = testConstructors;
+const harnessCache = new Map();
+function fetchHarness(name) {
+  if (harnessCache.has(name)) {
+    return harnessCache.get(name);
+  }
+  const content = fs.readFileSync(path.join(test262path, 'harness', name));
+  harnessCache.set(name, content);
+  return content;
+}
+
+module.exports = {
+  addTest: test => testConstructors.push(test),
+  fetchHarness: fetchHarness
+}

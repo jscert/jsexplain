@@ -109,7 +109,7 @@ source_files.reduce((select, file_content) => {
 
 // Preload the test262 harness files from the network/filesystem
 const test262_harness_docs = new Map();
-const test262_promises = ['assert.js', 'sta.js'].map(f => {
+const test262_promises = ['assert.js', 'sta.js', 'propertyHelper.js'].map(f => {
   test262_harness_docs.set(f, null); // Populate the map for insertion order
   return fetch("test/data/test262/harness/"+f, {mode: 'same-origin'})
     .then(r => r.text())

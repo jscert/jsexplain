@@ -16,7 +16,7 @@ const jsref = require('../jsref/assembly.js');
 const timeout = 5000;
 
 require('./parser.js');
-var test262tests = require('./helpers/test262.js');
+var test262 = require('./helpers/test262.js');
 
 var parse = function(source) {
   return esprimaToAST(esprima.parse(source, {loc: true, range: true}), source);
@@ -133,18 +133,26 @@ function testResultForException(result, negative) {
   }
 };
 
-test262tests.push(getTest => {
+test262.addTest(getTest => {
   it("interprets correctly?", function() {
     const test = getTest();
+    let initHeap = prelude;
 
     try {
       var ast = parse(test.contents);
     } catch(e) { this.skip(); }
 
+    for (const include of test.attrs.includes) {
+      const content = test262.fetchHarness(include);
+      const contentAst = parse(content);
+      initHeap = jsref.JsInterpreter.run_javascript_from_result(initHeap, contentAst);
+      assert.doesNotThrow(() => testResultForException(initHeap, undefined), `initHeap execution threw on ${include}.`);
+    }
+
     this.timeout(timeout);
     //tripwire.resetTripwire(timeout);
 
-    var result = jsref.JsInterpreter.run_javascript_from_result(prelude, ast);
+    var result = jsref.JsInterpreter.run_javascript_from_result(initHeap, ast);
 
     //tripwire.clearTripwire();
 
