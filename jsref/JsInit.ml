@@ -37,6 +37,18 @@ let attrib_constant v =
     attributes_data_enumerable = false; attributes_data_configurable =
     false }
 
+(** @essec sec-ecmascript-standard-built-in-objects
+    @esid 17-11
+
+Unless otherwise specified, the length property of a built-in function object has the attributes { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: true }.
+*)
+let length_property_attributes v = {
+  attributes_data_value = v;
+  attributes_data_writable = false;
+  attributes_data_enumerable = false;
+  attributes_data_configurable = true;
+}
+
 (** val object_create_builtin :
     value -> class_name -> object_properties_type -> coq_object **)
 
@@ -50,7 +62,7 @@ let object_create_prealloc_call_or_construct length p =
   let sclass = "Function" in
   let p' =
     HeapStr.write p ("length")
-      (Coq_attributes_data_of (attrib_constant length))
+      (Coq_attributes_data_of (length_property_attributes length))
   in
   object_create_builtin (Coq_value_object (Coq_object_loc_prealloc
     Coq_prealloc_function_proto)) sclass p'
