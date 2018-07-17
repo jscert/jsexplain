@@ -35,7 +35,6 @@ let prprealloc = function
   | Coq_prealloc_object_is_frozen -> "Coq_prealloc_object_is_frozen"
   | Coq_prealloc_object_is_extensible -> "Coq_prealloc_object_is_extensible"
   | Coq_prealloc_object_keys -> "Coq_prealloc_object_keys"
-  | Coq_prealloc_object_keys_call -> "Coq_prealloc_object_keys_call"
   | Coq_prealloc_object_proto -> "Coq_prealloc_object_proto"
   | Coq_prealloc_object_proto_to_string -> "Coq_prealloc_object_proto_to_string"
   | Coq_prealloc_object_proto_value_of -> "Coq_prealloc_object_proto_value_of"

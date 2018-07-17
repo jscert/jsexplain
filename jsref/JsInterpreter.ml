@@ -974,6 +974,11 @@ and create_list_from_array_like s obj elementTypes =
       Continue (s, index, list)) in
   res_spec s list
 
+(** @essec 7.3.21
+    @esid sec-enumerableownproperties *)
+and enumerable_own_properties s o kind =
+  Coq_result_not_yet_implemented
+
 (** {1 Executable Code and Execution Contexts}
     @essec 8
     @esid sec-executable-code-and-execution-contexts *)
@@ -2125,6 +2130,13 @@ and builtin_object_is_frozen s c f this newTarget o =
 and builtin_object_is_sealed s c f this newTarget o =
   if not (type_of o === Coq_type_object) then res_ter s (res_val (Coq_value_bool true))
   else test_integrity_level s o "sealed"
+
+(** @esid sec-object.keys
+    @essec 19.1.2.16 *)
+and builtin_object_keys s c f this newTarget o =
+  let%object (s, obj) = to_object s o in
+  let%spec (s, nameList) = enumerable_own_properties s obj "key" in
+  create_array_from_list s nameList
 
 (** @esid sec-object.preventextensions
     @essec 19.1.2.17 *)
@@ -4682,6 +4694,9 @@ and run_call_prealloc s c b l vthis args =
   | Coq_prealloc_object_is_extensible ->
     let  v = (get_arg 0 args) in
     builtin_object_is_extensible s c () vthis () v
+  | Coq_prealloc_object_keys ->
+    let v = get_arg 0 args in
+    builtin_object_keys s c () vthis () v
   | Coq_prealloc_object_proto_to_string ->
     (match vthis with
      | Coq_value_undef ->

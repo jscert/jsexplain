@@ -42,7 +42,6 @@ let int_of_prealloc p =
   | Coq_prealloc_object_is_frozen -> 22
   | Coq_prealloc_object_is_extensible -> 23
   | Coq_prealloc_object_keys -> 24
-  | Coq_prealloc_object_keys_call -> 25
   | Coq_prealloc_object_proto -> 26
   | Coq_prealloc_object_proto_to_string -> 27
   | Coq_prealloc_object_proto_value_of -> 28
@@ -146,8 +145,6 @@ let string_of_prealloc prealloc = match prealloc with
     "object_is_extensible"
   | Coq_prealloc_object_keys ->
     "object_keys"
-  | Coq_prealloc_object_keys_call ->
-    "object_keys_call"
   | Coq_prealloc_object_proto ->
     "object_proto_"
   | Coq_prealloc_object_proto_to_string ->

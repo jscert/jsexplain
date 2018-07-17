@@ -211,6 +211,7 @@ let object_prealloc_object =
   let p = write_native p "isSealed" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_is_sealed)) in
   let p = write_native p "isFrozen" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_is_frozen)) in
   let p = write_native p "isExtensible" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_is_extensible)) in
+  let p = write_native p "keys" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_keys)) in
   object_create_prealloc_constructor Coq_prealloc_object "Object" 1.0 p
 
 (** val object_get_proto_of_function_object : coq_object **)
@@ -275,6 +276,9 @@ let object_is_frozen_function_object =
 
 let object_is_extensible_function_object =
   object_create_prealloc_call Coq_prealloc_object_is_extensible "isExtensible" 1.0 Heap.empty
+
+let object_keys_function_object =
+  object_create_prealloc_call Coq_prealloc_object_keys "keys" 1.0 Heap.empty
 
 (** val object_prealloc_object_proto : coq_object **)
 
@@ -571,20 +575,21 @@ let object_heap_initial_function_objects_1 h =
     (object_loc, coq_object) Heap.heap -> (object_loc, coq_object) Heap.heap **)
 
 let object_heap_initial_function_objects_2 h =
-  let h0 = object_heap_initial_function_objects_1 h in
-  let h1 = HeapObj.write h0 (Coq_object_loc_prealloc Coq_prealloc_object_get_proto_of) object_get_proto_of_function_object in
-  let h1 = HeapObj.write h1 (Coq_object_loc_prealloc Coq_prealloc_object_set_proto_of) object_set_proto_of_function_object in
-  let h2 = HeapObj.write h1 (Coq_object_loc_prealloc Coq_prealloc_object_get_own_prop_descriptor) object_get_own_prop_descriptor_function_object in
-  let h3 = HeapObj.write h2 (Coq_object_loc_prealloc Coq_prealloc_object_get_own_prop_name) object_get_own_prop_name_function_object in
-  let h4 = HeapObj.write h3 (Coq_object_loc_prealloc Coq_prealloc_object_create) object_create_function_object in
-  let h5 = HeapObj.write h4 (Coq_object_loc_prealloc Coq_prealloc_object_define_prop) object_define_prop_function_object in
-  let h6 = HeapObj.write h5 (Coq_object_loc_prealloc Coq_prealloc_object_define_props) object_define_props_function_object in
-  let h7 = HeapObj.write h6 (Coq_object_loc_prealloc Coq_prealloc_object_seal) object_seal_function_object in
-  let h8 = HeapObj.write h7 (Coq_object_loc_prealloc Coq_prealloc_object_freeze) object_freeze_function_object in
-  let h9 = HeapObj.write h8 (Coq_object_loc_prealloc Coq_prealloc_object_prevent_extensions) object_prevent_extensions_function_object in
-  let h10 = HeapObj.write h9 (Coq_object_loc_prealloc Coq_prealloc_object_is_sealed) object_is_sealed_function_object in
-  let h11 = HeapObj.write h10 (Coq_object_loc_prealloc Coq_prealloc_object_is_frozen) object_is_frozen_function_object in
-  HeapObj.write h11 (Coq_object_loc_prealloc Coq_prealloc_object_is_extensible) object_is_extensible_function_object
+  let h = object_heap_initial_function_objects_1 h in
+  let h = HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_object_get_proto_of) object_get_proto_of_function_object in
+  let h = HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_object_set_proto_of) object_set_proto_of_function_object in
+  let h = HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_object_get_own_prop_descriptor) object_get_own_prop_descriptor_function_object in
+  let h = HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_object_get_own_prop_name) object_get_own_prop_name_function_object in
+  let h = HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_object_create) object_create_function_object in
+  let h = HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_object_define_prop) object_define_prop_function_object in
+  let h = HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_object_define_props) object_define_props_function_object in
+  let h = HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_object_seal) object_seal_function_object in
+  let h = HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_object_freeze) object_freeze_function_object in
+  let h = HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_object_prevent_extensions) object_prevent_extensions_function_object in
+  let h = HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_object_is_sealed) object_is_sealed_function_object in
+  let h = HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_object_is_frozen) object_is_frozen_function_object in
+  let h = HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_object_keys) object_keys_function_object in
+  HeapObj.write h (Coq_object_loc_prealloc Coq_prealloc_object_is_extensible) object_is_extensible_function_object
 
 (** val object_heap_initial_function_objects_3 :
     (object_loc, coq_object) Heap.heap -> (object_loc, coq_object) Heap.heap **)
