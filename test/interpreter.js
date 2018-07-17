@@ -43,17 +43,6 @@ function Test262Error(message) {
 Test262Error.prototype = Object.create(Error.prototype);
 Test262Error.prototype.constructor = Test262Error;
 
-function testPreludeError(result) {
-  // FIXME: Reintrouduce this error case to prelude
-  var state = result.value.state;
-
-  var error = jsref.JsInterpreterUtils.get_global_value(state, "__$ERROR__");
-
-  if (error.tag === 'Some') {
-    throw new Test262Error(error.value.value.value);
-  }
-};
-
 function jsvalue_of_prim(v) {
   switch (v.tag) {
   case "Coq_prim_undef":
@@ -86,6 +75,9 @@ function getExceptionFromValue(state, value) {
 };
 
 function testResultForException(result, negative) {
+  if (result.tag !== "Coq_result_some") {
+    throw new Error(`Execution resulted in ${result.tag}.`);
+  }
   var state = result.value.state;
   var completion = result.value.res;
   var value = completion.res_value.value;
@@ -156,7 +148,6 @@ test262.addTest(getTest => {
 
     //tripwire.clearTripwire();
 
-    testPreludeError(result);
     testResultForException(result, test.attrs.negative);
   });
 });
