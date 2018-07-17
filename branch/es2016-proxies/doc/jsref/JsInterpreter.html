@@ -338,6 +338,9 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#
 
 <pre><span id="VALcreate_list_from_array_like"><span class="keyword">val</span> create_list_from_array_like</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEcoq_type">JsSyntax.coq_type</a> list option -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-createlistfromarraylike">7.3.17</a></div>
+
+<pre><span id="VALenumerable_own_properties"><span class="keyword">val</span> enumerable_own_properties</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       string -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> list <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-enumerableownproperties">7.3.21</a></div>
 <br>
 <h1 id="1_ExecutableCodeandExecutionContexts">Executable Code and Execution Contexts</h1><br>
 <br>
@@ -546,6 +549,9 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#
 
 <pre><span id="VALbuiltin_object_is_sealed"><span class="keyword">val</span> builtin_object_is_sealed</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       unit -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.issealed">19.1.2.15</a></div>
+
+<pre><span id="VALbuiltin_object_keys"><span class="keyword">val</span> builtin_object_keys</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       unit -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.keys">19.1.2.16</a></div>
 
 <pre><span id="VALbuiltin_object_prevent_extensions"><span class="keyword">val</span> builtin_object_prevent_extensions</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -><br>       unit -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       unit -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-object.preventextensions">19.1.2.17</a></div>
