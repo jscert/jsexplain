@@ -35,7 +35,7 @@ let attrib_constant v =
     @esid 17-11
 
     Unless otherwise specified, the length property of a built-in function object has the attributes
-    { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: true }.
+    {v \{ \[\[Writable\]\]: false, \[\[Enumerable\]\]: false, \[\[Configurable\]\]: true \} v}.
 *)
 let length_property_attributes length = {
   attributes_data_value = Coq_value_number length;
@@ -48,7 +48,7 @@ let length_property_attributes length = {
     @esid 17-13
 
     Unless otherwise specified, the name property of a built-in function object, if it exists, has the attributes
-    { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: true }.
+    {v \{ \[\[Writable\]\]: false, \[\[Enumerable\]\]: false, \[\[Configurable\]\]: true \} v}.
 *)
 let name_property_attributes name = {
   attributes_data_value = Coq_value_string name;
