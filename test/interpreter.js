@@ -43,32 +43,32 @@ function Test262Error(message) {
 Test262Error.prototype = Object.create(Error.prototype);
 Test262Error.prototype.constructor = Test262Error;
 
-function jsvalue_of_prim(v) {
+function unpack_value(v) {
   switch (v.tag) {
-  case "Coq_prim_undef":
-    return undefined;
-  case "Coq_prim_null":
-    return null;
-  case "Coq_prim_bool":
-    return (v.value) ? true : false;
-  case "Coq_prim_number":
-    return v.value;
-  case "Coq_prim_string":
-    return v.value;
-  default:
-    throw "unrecognized tag in jsvalue_of_prim";
+    case "Coq_value_undef":
+      return undefined;
+    case "Coq_value_null":
+      return null;
+    case "Coq_value_bool":
+      return (v.value) ? true : false;
+    case "Coq_value_number":
+      return v.value;
+    case "Coq_value_string":
+      return v.value;
+    default:
+      throw "unrecognized tag in unpack_value";
   }
 }
 
 function getExceptionFromValue(state, value) {
   let vname, vmessage;
   let name = jsref.JsInterpreterUtils.get_object_value(state, value, "name");
-  if (name.tag === 'Some' && name.value.tag === 'Coq_value_prim') {
-    vname = jsvalue_of_prim(name.value.value);
+  if (name.tag === 'Some') {
+    vname = unpack_value(name.value);
   }
   let message = jsref.JsInterpreterUtils.get_object_value(state, value, "message");
-  if (message.tag === 'Some' && message.value.tag === 'Coq_value_prim') {
-    vmessage = jsvalue_of_prim(message.value.value);
+  if (message.tag === 'Some') {
+    vmessage = unpack_value(message.value);
   }
 
   return { name: vname, message: vmessage };
@@ -93,9 +93,9 @@ function testResultForException(result, negative) {
         // But we were not expecting one :(
 
         if (value.tag === "Coq_value_prim") {
-          msg += "\nThrown primitive value: " + jsvalue_of_prim(value.value);
+          msg += "\nThrown primitive value: " + unpack_value(value.value);
         } else if (value.tag === "Coq_value_object") {
-          msg += "\nException type: " + exc.name
+          msg += "\nException type: " + exc.name;
           msg += "\nException message: " + exc.message;
         }
         throw new Error(msg);
