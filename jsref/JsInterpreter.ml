@@ -1768,7 +1768,7 @@ and proxy_object_internal_get_own_property s o p =
   let%bool s, valid = is_compatible_property_descriptor s extensibleTarget resultDesc targetDesc in
   if not valid then
     run_error_no_c s Coq_native_error_type
-  else if unsome_error (descriptor_configurable resultDesc) === true &&
+  else if unsome_error (descriptor_configurable resultDesc) === false &&
     (targetDesc === Descriptor_undef || unsome_error (descriptor_configurable (descriptor_get_defined targetDesc)) === true) then
       run_error_no_c s Coq_native_error_type
   else
