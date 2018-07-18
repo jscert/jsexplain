@@ -307,3 +307,17 @@ let object_retrieve_property s l x =
 
 let object_property_exists s l x =
   is_some (object_retrieve_property s l x)
+
+(** Fetches a given object slot value (using proj) from the object l in state s
+    FIXME: The name is very confusing. *)
+let run_object_method proj s l =
+  LibOption.map proj (object_binds_option s l)
+
+(** val run_object_heap_set :
+    (coq_object -> a' -> coq_object) -> state -> object_loc -> a' -> state option **)
+(** Updates an object's internal field with the given update function [prj].
+    (Update functions are defined in JsSyntaxAux) *)
+
+let run_object_set_internal prj s l v =
+  LibOption.map (fun o -> object_write s l (prj o v)) (object_binds_option s l)
+

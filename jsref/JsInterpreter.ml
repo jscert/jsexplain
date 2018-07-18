@@ -120,36 +120,13 @@ let typeof_prim _foo_ = match _foo_ with
 
 (** val string_of_propname : propname -> prop_name **)
 
-let string_of_propname _foo_ = match _foo_ with
+let string_of_propname _term_ = match _term_ with
 | Coq_propname_identifier s -> s
 | Coq_propname_string s -> s
 | Coq_propname_number n -> JsNumber.to_string n
 
 (*---------------------------------*)
 
-
-(** Fetches a given object slot value (using proj) from the object l in state s
-    FIXME: The name is very confusing. *)
-let run_object_method proj s l =
-  LibOption.map proj (object_binds_option s l)
-
-(*---DEBUG
-  let run_object_method proj s l =
-   let opt = object_binds_option s l in
-     begin match opt with
-       | None -> Debug.run_object_method l
-       | _ -> ()
-     end;
-     LibOption.map proj opt
-*)
-
-(** val run_object_heap_set :
-    (coq_object -> a' -> coq_object) -> state -> object_loc -> a' -> state option **)
-(** Updates an object's internal field with the given update function [prj].
-    (Update functions are defined in JsSyntaxAux) *)
-
-let run_object_set_internal prj s l v =
-  LibOption.map (fun o -> object_write s l (prj o v)) (object_binds_option s l)
 
 (** val run_object_heap_set_extensible :
     bool -> state -> object_loc -> state option **)
@@ -2663,8 +2640,8 @@ and ref_get_value s c _foo_ =
   res_spec s v
 
 (** @deprecated ES5 *)
-and run_expr_get_value s c e =
-  let result = run_expr s c e in
+and run_expr_get_value s c _term_ =
+  let result = run_expr s c _term_ in
   let%ter s, _ = result in
   let%value s, v = get_value s result in
   res_spec s v
@@ -3817,8 +3794,8 @@ and run_unary_op s c op e =
     state -> execution_ctx -> string list -> funcbody ->
     result **)
 
-and create_new_function_in s c args bd =
-  creating_function_object s c args bd c.execution_ctx_lexical_env
+and create_new_function_in s c args _term_ =
+  creating_function_object s c args _term_ c.execution_ctx_lexical_env
     c.execution_ctx_strict
 
 (** val init_object :
@@ -3827,12 +3804,12 @@ and create_new_function_in s c args bd =
 and init_object s c l _foo_ = match _foo_ with
   | [] -> res_out s (res_val (Coq_value_object l))
   | p :: pds_2 ->
-    let (pn, pb) = p in
+    let (pn, _term_) = p in
     let  x = (string_of_propname pn) in
         let  follows = (fun s1 desc ->
             let%success
               (s2, rv) = (object_define_own_prop s1 c l x desc false) in  init_object s2 c l pds_2) in
-            match pb with
+            match _term_ with
             | Coq_propbody_val e0 ->
               let%spec (s1, v0) = (run_expr_get_value s c e0) in
                   let desc = { descriptor_value = (Some v0); descriptor_writable =
