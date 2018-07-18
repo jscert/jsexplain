@@ -29,6 +29,8 @@ let is_some o = match o with
 | Some x -> true
 | None   -> false
 
+let is_none o = not (is_some o)
+
 (** Compares two Some values, failing if either are None *)
 let some_compare h o1 o2 =
 match o1 with

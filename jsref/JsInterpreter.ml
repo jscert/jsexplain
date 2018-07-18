@@ -605,19 +605,15 @@ and complete_property_descriptor desc =
   in let desc =
     if is_generic_descriptor (Descriptor desc) || is_data_descriptor (Descriptor desc)
     then
-      let desc = descriptor_with_value desc like.descriptor_value in
-      descriptor_with_writable desc like.descriptor_writable
+      let desc = if is_none desc.descriptor_value then descriptor_with_value desc like.descriptor_value else desc in
+      let desc = if is_none desc.descriptor_writable then descriptor_with_writable desc like.descriptor_writable else desc in
+      desc
     else
-      let desc = descriptor_with_get desc like.descriptor_get in
-      descriptor_with_set desc like.descriptor_set
-  in let desc =
-    if option_compare bool_eq desc.descriptor_enumerable None
-    then descriptor_with_enumerable desc like.descriptor_enumerable
-    else desc
-  in let desc =
-    if option_compare bool_eq desc.descriptor_configurable None
-    then descriptor_with_configurable desc like.descriptor_configurable
-    else desc
+      let desc = if is_none desc.descriptor_get then descriptor_with_get desc like.descriptor_get else desc in
+      let desc = if is_none desc.descriptor_set then descriptor_with_set desc like.descriptor_set else desc in
+      desc
+  in let desc = if is_none desc.descriptor_enumerable then descriptor_with_enumerable desc like.descriptor_enumerable else desc
+  in let desc = if is_none desc.descriptor_configurable then descriptor_with_configurable desc like.descriptor_configurable else desc
   in desc
 
 (** {1 Abstract Operations }
