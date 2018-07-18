@@ -213,7 +213,7 @@ function esprimaToAST(prog, sourceText, filename) {
       propbody.tag = "Coq_propbody_get";
       propbody.body = trFuncExprAsFuncbody(property.value);
     } else if (property.kind === "set") {
-      propbody.tag = "Coq_propbody_get";
+      propbody.tag = "Coq_propbody_set";
       propbody.body = trFuncExprAsFuncbody(property.value);
       propbody.names = toList(property.value.params.map(trPattern));
     } else {

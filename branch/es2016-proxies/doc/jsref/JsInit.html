@@ -67,12 +67,6 @@ Val prop_attributes_for_global_object : value -&gt; attributes_data *<br>
 val attrib_constant : value -&gt; attributes_data *<br>
 
 <pre><span id="VALattrib_constant"><span class="keyword">val</span> attrib_constant</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre>
-<pre><span id="VALlength_property_attributes"><span class="keyword">val</span> length_property_attributes</span> : <code class="type"><a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="#17-11
-
-    Unless otherwise specified, the length property of a built-in function object has the attributes
-    { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: true }.">sec-ecmascript-standard-built-in-objects</a></div>
-
 <pre><span id="VALname_property_attributes"><span class="keyword">val</span> name_property_attributes</span> : <code class="type">string -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="#17-13
 

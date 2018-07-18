@@ -160,7 +160,13 @@ val object_new : value -&gt; class_name -&gt; coq_object *<br>
 
 <pre><span id="VALobject_new"><span class="keyword">val</span> object_new</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEclass_name">JsSyntax.class_name</a> -> <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a></code></pre>
 <pre><span id="VALproxy_object_new"><span class="keyword">val</span> proxy_object_new</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> * <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a></code></pre>
-<pre><span id="VALbuiltin_function_new"><span class="keyword">val</span> builtin_function_new</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> * <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><br>
+<pre><span id="VALlength_property_attributes"><span class="keyword">val</span> length_property_attributes</span> : <code class="type"><a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="#17-11
+
+    Unless otherwise specified, the length property of a built-in function object has the attributes
+    { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: true }.">sec-ecmascript-standard-built-in-objects</a></div>
+
+<pre><span id="VALbuiltin_function_new"><span class="keyword">val</span> builtin_function_new</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> bool -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> * <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><br>
 val attributes_writable : attributes -&gt; bool *<br>
 
 <pre><span id="VALattributes_writable"><span class="keyword">val</span> attributes_writable</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> bool</code></pre><br>

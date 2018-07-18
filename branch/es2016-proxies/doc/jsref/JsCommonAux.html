@@ -171,4 +171,16 @@ Updates an object's property given the location, property name and function mapp
 </div>
 
 <pre><span id="VALobject_retrieve_property"><span class="keyword">val</span> object_retrieve_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> string -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> option</code></pre>
-<pre><span id="VALobject_property_exists"><span class="keyword">val</span> object_property_exists</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> string -> bool</code></pre></body></html>
+<pre><span id="VALobject_property_exists"><span class="keyword">val</span> object_property_exists</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> string -> bool</code></pre>
+<pre><span id="VALrun_object_method"><span class="keyword">val</span> run_object_method</span> : <code class="type">(<a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> 'a) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a option</code></pre><div class="info ">
+Fetches a given object slot value (using proj) from the object l in state s
+    FIXME: The name is very confusing.<br>
+</div>
+<br>
+val run_object_heap_set :
+    (coq_object -&gt; a' -&gt; coq_object) -&gt; state -&gt; object_loc -&gt; a' -&gt; state option *<br>
+<br>
+Updates an object's internal field with the given update function <code class="code">prj</code>.
+    (Update functions are defined in JsSyntaxAux)<br>
+
+<pre><span id="VALrun_object_set_internal"><span class="keyword">val</span> run_object_set_internal</span> : <code class="type">(<a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> 'a -> <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a>) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> option</code></pre></body></html>

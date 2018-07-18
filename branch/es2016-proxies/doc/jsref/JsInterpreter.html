@@ -90,19 +90,7 @@ val typeof_prim : prim -&gt; string *<br>
 <pre><span id="VALtypeof_prim"><span class="keyword">val</span> typeof_prim</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> string</code></pre><br>
 val string_of_propname : propname -&gt; prop_name *<br>
 
-<pre><span id="VALstring_of_propname"><span class="keyword">val</span> string_of_propname</span> : <code class="type"><a href="JsSyntax.html#TYPEpropname">JsSyntax.propname</a> -> string</code></pre>
-<pre><span id="VALrun_object_method"><span class="keyword">val</span> run_object_method</span> : <code class="type">(<a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> 'a) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a option</code></pre><div class="info ">
-Fetches a given object slot value (using proj) from the object l in state s
-    FIXME: The name is very confusing.<br>
-</div>
-<br>
-val run_object_heap_set :
-    (coq_object -&gt; a' -&gt; coq_object) -&gt; state -&gt; object_loc -&gt; a' -&gt; state option *<br>
-<br>
-Updates an object's internal field with the given update function <code class="code">prj</code>.
-    (Update functions are defined in JsSyntaxAux)<br>
-
-<pre><span id="VALrun_object_set_internal"><span class="keyword">val</span> run_object_set_internal</span> : <code class="type">(<a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> 'a -> <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a>) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> option</code></pre><br>
+<pre><span id="VALstring_of_propname"><span class="keyword">val</span> string_of_propname</span> : <code class="type"><a href="JsSyntax.html#TYPEpropname">JsSyntax.propname</a> -> string</code></pre><br>
 val run_object_heap_set_extensible :
     bool -&gt; state -&gt; object_loc -&gt; state option *<br>
 
@@ -471,8 +459,13 @@ ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#
 <br>
 <h2 id="2_BuiltinFunctionObjects">Built-in Function Objects</h2><br>
 
-<pre><span id="VALcreate_builtin_function"><span class="keyword">val</span> create_builtin_function</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -><br>       'a list -><br>       'b option -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> option -> 'c <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
-ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-createbuiltinfunction">9.3.3</a></div>
+<pre><span id="VALcreate_builtin_function"><span class="keyword">val</span> create_builtin_function</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -><br>       'a list -><br>       'b option -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> option -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> bool -> 'c <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">JsInterpreterMonads.resultof</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="https://tc39.github.io/ecma262/2017/#sec-createbuiltinfunction
+
+    Note: This function has an additional 'length' property that is implicit in the specification. Ditto for whether the
+    function is a constructor.
+    TODO: Suggest specification amendments to make the setting of this explicit in CreateBuiltinFunction. Possibly fold
+    this into the 'steps' psuedo-value?">9.3.3</a></div>
 <br>
 <h2 id="2_ArrayExoticObjects">Array Exotic Objects</h2><br>
 
