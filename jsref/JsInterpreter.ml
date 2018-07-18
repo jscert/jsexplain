@@ -825,8 +825,8 @@ and get s o p =
     @esid sec-getv *)
 and get_v s v p =
   let%assert _ = is_property_key p in
-  let%object (s1, l) = to_object s v in
-  object_internal_get s1 l p v
+  let%object s, l = to_object s v in
+  object_internal_get s l p v
 
 (** @essec 7.3.3
     @esid sec-set-o-p-v-throw *)
@@ -867,15 +867,15 @@ and define_property_or_throw s o p desc =
     @esid sec-getmethod *)
 and get_method s v p =
   let%assert _ = is_property_key p in
-  let%value (s1, func) = get_v s v p in
+  let%value s, func = get_v s v p in
   match type_of func with
-  | Coq_type_undef -> res_out s1 (res_val Coq_value_undef)
-  | Coq_type_null  -> res_out s1 (res_val Coq_value_undef)
+  | Coq_type_undef -> res_out s (res_val Coq_value_undef)
+  | Coq_type_null  -> res_out s (res_val Coq_value_undef)
   | _ ->
-    let callable = is_callable s1 func in
+    let callable = is_callable s func in
     if not callable
-    then run_error_no_c s1 Coq_native_error_type
-    else res_out s1 (res_val func)
+    then run_error_no_c s Coq_native_error_type
+    else res_out s (res_val func)
 
 (** @essec 7.3.10
     @esid sec-hasproperty *)
@@ -1172,7 +1172,7 @@ and get_global_object s ctx =
     @essec 9.1.1
     @esid sec-ordinary-object-internal-methods-and-internal-slots-getprototypeof *)
 and ordinary_object_internal_get_prototype_of s o =
-  let%value (s1, v) = ordinary_get_prototype_of s o in
+  let%value s, v = ordinary_get_prototype_of s o in
   res_out s (res_val v)
 
 (** @essec 9.1.1.1
@@ -1185,7 +1185,7 @@ and ordinary_get_prototype_of s o =
     @essec 9.1.2
     @esid sec-ordinary-object-internal-methods-and-internal-slots-setprototypeof-v *)
 and ordinary_object_internal_set_prototype_of s o v =
-  let%value (s1, v) = ordinary_set_prototype_of s o v in
+  let%value s, v = ordinary_set_prototype_of s o v in
   res_out s (res_val v)
 
 (** @essec 9.1.2.1
@@ -1215,15 +1215,15 @@ and ordinary_set_prototype_of s o v =
         | _ -> failwith "ordinary_set_prototype_of, p is not object or null")
       else
         (* Set the value of the [[Prototype]] internal slot of O to V *)
-        let%some s' = run_object_set_internal object_set_proto s o v in
-        res_spec s' (res_val (Coq_value_bool true))
+        let%some s = run_object_set_internal object_set_proto s o v in
+        res_spec s (res_val (Coq_value_bool true))
     end
     in repeat v false
 
 (** @essec 9.1.3
     @esid sec-ordinary-object-internal-methods-and-internal-slots-isextensible *)
 and ordinary_object_internal_is_extensible s o =
-  let%value (s1, v) = ordinary_is_extensible s o in
+  let%value s, v = ordinary_is_extensible s o in
   res_out s (res_val v)
 
 (** @essec 9.1.3.1
@@ -1235,13 +1235,13 @@ and ordinary_is_extensible s o =
 (** @essec 9.1.4
     @esid sec-ordinary-object-internal-methods-and-internal-slots-preventextensions *)
 and ordinary_object_internal_prevent_extensions s o =
-  let%value (s1, v) = ordinary_prevent_extensions s o in
+  let%value s, v = ordinary_prevent_extensions s o in
   res_out s (res_val v)
 
 (** @essec 9.1.4.1
     @esid sec-ordinarypreventextensions *)
 and ordinary_prevent_extensions s o =
-  let%some s' = run_object_set_internal object_set_extensible s o false in
+  let%some s = run_object_set_internal object_set_extensible s o false in
   res_ter s (res_val (Coq_value_bool true))
 
 (** @essec 9.1.5
