@@ -244,8 +244,22 @@ let proxy_object_new s =
   let loc, s = object_alloc s proxy_object_create_record in
   s, loc
 
-let builtin_function_new s prototype bi =
-  let loc, s = object_alloc s (create_builtin_function_record prototype bi) in
+(** @essec sec-ecmascript-standard-built-in-objects
+    @esid 17-11
+
+    Unless otherwise specified, the length property of a built-in function object has the attributes
+    {v \{ \[\[Writable\]\]: false, \[\[Enumerable\]\]: false, \[\[Configurable\]\]: true \} v}.
+*)
+let length_property_attributes length = {
+  attributes_data_value = Coq_value_number length;
+  attributes_data_writable = false;
+  attributes_data_enumerable = false;
+  attributes_data_configurable = true;
+}
+
+let builtin_function_new s prototype bi length isconstructor =
+  let props = HeapStr.write Heap.empty "length" (Coq_attributes_data_of (length_property_attributes length)) in
+  let loc, s = object_alloc s (create_builtin_function_record prototype bi props isconstructor) in
   s, Coq_value_object loc
 
 (** val attributes_writable : attributes -> bool **)

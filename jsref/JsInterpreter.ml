@@ -1587,8 +1587,14 @@ and builtin_throw_type_error s c thisArgument argumentsList newTarget =
     @esid sec-built-in-function-objects *)
 
 (** @essec 9.3.3
-    @esid sec-createbuiltinfunction *)
-and create_builtin_function s steps internalSlotsList realm prototype =
+    @esid sec-createbuiltinfunction
+
+    Note: This function has an additional 'length' property that is implicit in the specification. Ditto for whether the
+    function is a constructor.
+    TODO: Suggest specification amendments to make the setting of this explicit in CreateBuiltinFunction. Possibly fold
+    this into the 'steps' psuedo-value?
+*)
+and create_builtin_function s steps internalSlotsList realm prototype length isconstructor =
   (* 1. Assert: steps is either a set of algorithm steps or other definition of a function's behaviour provided in this specification. *)
   (* 2. If realm is not present, set realm to te current Realm Record. *)
   (* 3. Assert: realm is a Realm Record. *)
@@ -1603,7 +1609,7 @@ and create_builtin_function s steps internalSlotsList realm prototype =
   (* 8. Set func.[[Extensible]] to true. *)
   (* 9. Set func.[[ScriptOrModule]] to null. *)
   (* 10. Return func. *)
-  let s, func = builtin_function_new s prototype steps in
+  let s, func = builtin_function_new s prototype steps length isconstructor in
   res_ter s (res_val func)
 
 (** {2 Array Exotic Objects}
@@ -2212,7 +2218,7 @@ and builtin_proxy_constructor s c f this newTarget target handler =
 and builtin_proxy_revocable s c f this newTarget target handler =
   let%value s, p = proxy_create s target handler in
   let steps = Coq_builtin_proxy_revocation in
-  let%object s, revoker = create_builtin_function s steps (* [ [[RevocableProxy]] ] *) [] None None in
+  let%object s, revoker = create_builtin_function s steps (* [ [[RevocableProxy]] ] *) [] None None 0. false in
   let%some s = run_object_set_internal object_set_revocable_proxy s revoker p in
   let%value s, result = object_create s (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object_proto)) None in
   let%bool s, _ = create_data_property s result (Coq_value_string "proxy") p in
