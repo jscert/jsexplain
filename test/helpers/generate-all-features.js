@@ -1,6 +1,7 @@
 /* Generate a list of all features present in test262 file headers. */
 const t262stream = require('test262-stream');
 
+const existingFeatures = require('./supported-features.js')
 const features = new Set();
 
 const stream = new t262stream('test/data/test262', {
@@ -15,9 +16,13 @@ stream.on('data', test => {
 });
 
 stream.on('end', () => {
-  console.log('module.exports = new Set([');
+  console.log(
+`/* List of supported test262 features.
+ * This list can be regenerated using the generate-all-features.js script. */
+module.exports = new Set([`
+  );
   for (const entry of Array.from(features).sort()) {
-    console.log(`  //'${entry}',`);
+    console.log(`  ${existingFeatures.has(entry) ? '' : '//'}'${entry}',`);
   }
   console.log(']);');
 });
