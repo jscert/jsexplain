@@ -150,11 +150,14 @@ test262.addTest(getTest => {
     //tripwire.clearTripwire();
 
     // FIXME: Temporary use only.
-    if (result.tag !== "Coq_result_some") {
+    if (result.tag === "Coq_result_some") {
+      testResultForException(result, test.attrs.negative);
+    } else if (result.tag === "Coq_result_not_yet_implemented") {
       console.log(`Execution resulted in ${result.tag}.`);
       this.skip();
+    } else {
+      throw Error(`Execution resulted in ${result.tag}.`);
     }
-    testResultForException(result, test.attrs.negative);
   });
 });
 
