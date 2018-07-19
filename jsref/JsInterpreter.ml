@@ -1642,7 +1642,7 @@ and proxy_object_internal_set_prototype_of s o v =
   let%assert _ = (type_of handler) === Coq_type_object in
   let%some target = run_object_method object_proxy_target_ s o in
   let%some target = target in
-  let%value s, trap = get_method s handler (Coq_value_string "") in
+  let%value s, trap = get_method s handler (Coq_value_string "setPrototypeOf") in
   if trap === Coq_value_undef then
     object_internal_set_prototype_of s (loc_of_value target) v
   else
