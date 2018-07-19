@@ -1,4 +1,5 @@
 open Mocha
+open Shadow_include
 
 type shadow =
 | Shadow of int [@f num]
@@ -59,5 +60,16 @@ describe "shadow.ml" (fun _ ->
     let x = x + x in
     let x = x + x + x in
     assert_int x 60 "x should be able to be redeclared based upon the previous value of x"
+  );
+
+  it "recursively shadows" (fun _ ->
+    let myrec x = 0 in
+    let rec myrec y = if y then 1 else myrec true in
+    assert_int (myrec false) 1 "recursive function should shadow"
+  )[@ocaml.warning "-26"];
+
+  it "shadows across modules" (fun _ ->
+    let external_def c = 0 in
+    assert_int (external_def ()) 0 "external_def should have been shadowed"
   )
 )

@@ -864,7 +864,7 @@ and js_of_expression (sm : shadow_map) ctx dest e =
       let sexp = js_of_constant c in
       apply_dest' ctx dest sexp
 
-  | Texp_let (_, vb_l, e) ->
+  | Texp_let (recur, vb_l, e) ->
     (* [vb_l] is a list of value bindings, corresponding to each term of a [let vb_0 and vb_1 and vb_2] *)
     (* TODO: Handle mixed tuple/record/standard vbs let expressions *)
     reject_inline dest;
@@ -907,7 +907,7 @@ and js_of_expression (sm : shadow_map) ctx dest e =
         (* vb subexpressions are in the context of overall expression: use constant sm for this,
            but fold over a changing new_sm for the created bindings *)
         let folder vb (sids, jsexprs, new_sm) =
-          let (sid, jsexpr, new_sm) = js_of_let_pattern sm new_sm ctx vb in
+          let (sid, jsexpr, new_sm) = js_of_let_pattern sm new_sm ctx vb recur in
           (sid::sids, jsexpr::jsexprs, new_sm)
         in
         let (ids, sdecls, new_sm) = List.fold_right folder vb_l ([], [], sm) in
@@ -1259,7 +1259,7 @@ and js_of_expression (sm : shadow_map) ctx dest e =
   | _                                 -> out_of_scope loc "Unknown js_of_expression Texp value"
 
 (* returns the name bound and the code that assigns a value to this name *)
-and js_of_let_pattern sm new_sm ctx vb =
+and js_of_let_pattern sm new_sm ctx vb recur =
   let { vb_pat = pat; vb_expr = expr } = vb in
   let id =
     match pat.pat_desc with
@@ -1278,6 +1278,7 @@ and js_of_let_pattern sm new_sm ctx vb =
     in
   let new_sm = update_shadow_map new_sm pat.pat_env id in
   let sid = ppf_ident id new_sm in
+  let sm = if recur = Recursive then update_shadow_map sm pat.pat_env id else sm in
   let js_expr = js_of_expression sm ctx (Dest_assign (sid, false (*FIXME*))) expr in
   (sid, js_expr, new_sm)
 
