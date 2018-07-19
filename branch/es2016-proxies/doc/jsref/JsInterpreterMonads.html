@@ -283,7 +283,10 @@ Executes the continuation with state s of a <code class="code">Continue s</code>
 <pre><span id="VALifx_success_or_return"><span class="keyword">val</span> ifx_success_or_return</span> : <code class="type">'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a> -><br>       (<a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a>) -><br>       (<a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>        <a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a>) -><br>       'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></pre>
 <pre><span id="VALifx_empty_label"><span class="keyword">val</span> ifx_empty_label</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> -><br>       (unit -> 'a <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a>) -> 'a <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></pre>
 <pre><span id="VALifx_any_or_throw"><span class="keyword">val</span> ifx_any_or_throw</span> : <code class="type">'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a> -><br>       (<a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> -> 'b <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a>) -><br>       (<a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> 'b <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a>) -><br>       'b <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></pre>
-<pre><span id="VALiterate"><span class="keyword">val</span> iterate</span> : <code class="type">'a list -><br>       'b -><br>       ('a -> 'b -> ('c, 'b) <a href="JsInterpreterMonads.html#TYPEif_ret_type">if_ret_type</a>) -><br>       ('c, 'b) <a href="JsInterpreterMonads.html#TYPEif_ret_type">if_ret_type</a></code></pre>
+<pre><span id="VALiterate"><span class="keyword">val</span> iterate</span> : <code class="type">'a list -><br>       'b -><br>       ('a -> 'b -> ('c, 'b) <a href="JsInterpreterMonads.html#TYPEif_ret_type">if_ret_type</a>) -><br>       ('c, 'b) <a href="JsInterpreterMonads.html#TYPEif_ret_type">if_ret_type</a></code></pre><div class="info ">
+Iterate over the elements of an array, with the option of breaking the iteration early.<br>
+</div>
+
 <pre><span id="VALiterate'"><span class="keyword">val</span> iterate'</span> : <code class="type">'a list -><br>       ('b, 'c) <a href="JsInterpreterMonads.html#TYPEif_ret_type">if_ret_type</a> -><br>       ('a -> 'c -> ('b, 'c) <a href="JsInterpreterMonads.html#TYPEif_ret_type">if_ret_type</a>) -><br>       ('b, 'c) <a href="JsInterpreterMonads.html#TYPEif_ret_type">if_ret_type</a></code></pre>
 <pre><span id="VALrepeat"><span class="keyword">val</span> repeat</span> : <code class="type">('a -> bool) -><br>       'a -><br>       ('a -> ('b, 'a) <a href="JsInterpreterMonads.html#TYPEif_ret_type">if_ret_type</a>) -><br>       ('b, 'a) <a href="JsInterpreterMonads.html#TYPEif_ret_type">if_ret_type</a></code></pre><div class="info ">
 A continuation-passing while loop with early function-level return.
@@ -305,7 +308,24 @@ A continuation-passing while loop with early function-level return.
 <p>
 
     When combined with a <code class="code">let%ret</code> monadic binder, a repeat loop evaluating to a <code class="code">Return x</code> value will return <code class="code">x</code> as the
-    function's result, whereas a <code class="code">Continue v</code> value will bind <code class="code">v</code> to the binder's pattern for use in the continuation.<br>
+    function's result, whereas a <code class="code">Continue v</code> value will bind <code class="code">v</code> to the binder's pattern for use in the continuation.
+<p>
+
+    For example, the loop in CreateListFromArrayLike is coded as follows:
+    <code class="code">
+let list = [] in
+let index = 0. in
+let%ret (s, index, list) = repeat (fun (_, index, _) -&gt; index &lt; len) (s, index, list) (fun (s, index, list) -&gt;
+  let%VALUE_ret s, indexName = to_string s (Coq_value_number index) in
+  let%value_ret s, next = get s obj indexName in
+  if not (mem_decide (fun x y -&gt; x === y) (type_of next) elementTypes) then
+    Return (run_error_no_c s Coq_native_error_type)
+  else
+  let list = append list [next] in
+  let index = index +. 1. in
+  Continue (s, index, list)) in
+res_spec s list
+    </code><br>
 </div>
 
 <pre><span id="VALrepeat'"><span class="keyword">val</span> repeat'</span> : <code class="type">('a -> bool) -><br>       ('b, 'a) <a href="JsInterpreterMonads.html#TYPEif_ret_type">if_ret_type</a> -><br>       ('a -> ('b, 'a) <a href="JsInterpreterMonads.html#TYPEif_ret_type">if_ret_type</a>) -><br>       ('b, 'a) <a href="JsInterpreterMonads.html#TYPEif_ret_type">if_ret_type</a></code></pre></body></html>
