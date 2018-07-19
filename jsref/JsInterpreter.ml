@@ -935,8 +935,9 @@ and create_list_from_array_like s obj elementTypes =
   let%number s, len = to_length s tempVar in
   let list = [] in
   let index = 0. in
-  let%ret (s, index, list) = repeat (fun acc -> let _, index, _ = acc in index < len) (s, index, list) (fun acc ->
-      let s, index, list = acc in
+  (* TODO: Allow fun expressions to deconstruct tuples, to avoid this verbosity! *)
+  let%ret (s, index, list) = repeat (fun acc -> let (s, index, list) = acc in index < len) (s, index, list) (fun acc ->
+      let (s, index, list) = acc in
       let%VALUE_ret s, indexName = to_string s (Coq_value_number index) in
       let%value_ret s, next = get s obj indexName in
       if not (mem_decide (fun x y -> x === y) (type_of next) elementTypes) then
@@ -1171,27 +1172,21 @@ and ordinary_set_prototype_of s o v =
   if sv then res_out s (res_val (Coq_value_bool true))
   else if not extensible then res_out s (res_val (Coq_value_bool false))
   else
-    let rec repeat p done_ = begin
-      if not done_ then
-        (match p with
-        | Coq_value_null -> repeat p true
-        | Coq_value_object p_l ->
-          if same_value p (Coq_value_object o)
-          then res_out s (res_val (Coq_value_bool false))
-          else
-            let%some gpo = run_object_method object_get_prototype_of_ s p_l in
-            (match gpo with
-            | Coq_builtin_get_prototype_of_default -> (
-              let%some prototype = run_object_method object_prototype_ s p_l in
-              repeat prototype false)
-            | _ -> repeat p true)
-        | _ -> failwith "ordinary_set_prototype_of, p is not object or null")
+    let p = v in
+    let done' = false in
+    let%ret (s, _, _) = repeat (fun acc -> let (_, done', _) = acc in done') (s, done', p) (fun acc ->
+      let (s, done', p) = acc in
+      if p === Coq_value_null then Continue (s, true, p)
+      else if same_value p (Coq_value_object o) then Return (res_out s (res_val (Coq_value_bool false)))
       else
-        (* Set the value of the [[Prototype]] internal slot of O to V *)
-        let%some s = run_object_set_internal object_set_proto s o v in
-        res_spec s (res_val (Coq_value_bool true))
-    end
-    in repeat v false
+        let%some_ret gpo = run_object_method object_get_prototype_of_ s (loc_of_value p) in
+        if not (gpo === Coq_builtin_get_prototype_of_default) then Continue (s, true, p)
+        else
+          let%some_ret p = run_object_method object_prototype_ s (loc_of_value p) in
+          Continue (s, done', p)
+    ) in
+    let%some s = run_object_set_internal object_set_proto s o v in
+    res_out s (res_val (Coq_value_bool true))
 
 (** @essec 9.1.3
     @esid sec-ordinary-object-internal-methods-and-internal-slots-isextensible *)

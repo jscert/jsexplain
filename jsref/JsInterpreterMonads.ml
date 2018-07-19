@@ -426,6 +426,7 @@ let ifx_success_or_return a b c = if_success_or_return a b c
 let ifx_empty_label a b c = if_empty_label a b c
 let ifx_any_or_throw a b c = if_any_or_throw a b c
 
+(** Iterate over the elements of an array, with the option of breaking the iteration early. *)
 let rec iterate l acc f = iterate' l (Continue acc) f
 and iterate' l acc f = match l with
 | []      -> acc
@@ -444,6 +445,22 @@ and iterate' l acc f = match l with
 
     When combined with a [let%ret] monadic binder, a repeat loop evaluating to a [Return x] value will return [x] as the
     function's result, whereas a [Continue v] value will bind [v] to the binder's pattern for use in the continuation.
+
+    For example, the loop in CreateListFromArrayLike is coded as follows:
+    [
+let list = [] in
+let index = 0. in
+let%ret (s, index, list) = repeat (fun (_, index, _) -> index < len) (s, index, list) (fun (s, index, list) ->
+  let%VALUE_ret s, indexName = to_string s (Coq_value_number index) in
+  let%value_ret s, next = get s obj indexName in
+  if not (mem_decide (fun x y -> x === y) (type_of next) elementTypes) then
+    Return (run_error_no_c s Coq_native_error_type)
+  else
+  let list = append list [next] in
+  let index = index +. 1. in
+  Continue (s, index, list)) in
+res_spec s list
+    ]
 *)
 let rec repeat condition acc f = repeat' condition (Continue acc) f
 and repeat' condition acc f =
