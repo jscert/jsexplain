@@ -738,21 +738,22 @@ let combine_list_output args =
 
 (* returns a pair (x,e), where [x] in the name in [pat]
    and where [e] is the access to "stupleobj[index]" *)
-let tuple_component_bind stupleobj (result, index, sm) pat =
+let tuple_component_bind stupleobj pat (result, index, sm) =
    let loc = pat.pat_loc in
    match pat.pat_desc with
    | Tpat_var (id, _) ->
        let sm = update_shadow_map sm pat.pat_env id in
        let sid = ppf_ident id sm in
-       ((sid, Printf.sprintf "%s[%d]" stupleobj index)::result, index+1, sm)
-   | Tpat_any -> (result, index+1, sm)
+       ((sid, Printf.sprintf "%s[%d]" stupleobj index)::result, index-1, sm)
+   | Tpat_any -> (result, index-1, sm)
    | _ -> out_of_scope loc "Nested pattern matching"
 
 (* returns a list of pairs of the form (x,e), corresponding
    to the bindings to be performed for decomposing [stupleobj]
     as the tuple of patterns [pl]. *)
 let tuple_binders stupleobj sm pl =
-  let (result, _, sm) = List.fold_left (tuple_component_bind stupleobj) ([], 0, sm) pl in
+  let nb_args = List.length pl in
+  let (result, _, sm) = List.fold_right (tuple_component_bind stupleobj) pl ([], nb_args - 1, sm) in
   (result, sm)
 
 (****************************************************************)
