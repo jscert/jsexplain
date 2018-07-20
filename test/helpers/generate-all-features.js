@@ -1,28 +1,28 @@
-/* Generate a list of all features present in test262 file headers. */
-const t262stream = require('test262-stream');
+/* Convert test262's declared set of features into a source file for import */
+const fs = require('fs');
 
-const existingFeatures = require('./supported-features.js')
+const existingFeatures = require('./supported-features.js');
 const features = new Set();
 
-const stream = new t262stream('test/data/test262', {
-  omitRuntime: true,
-});
-stream.on('data', test => {
-  if (test.attrs.features) {
-    for (const feature of test.attrs.features) {
-      features.add(feature);
+const generateSource = (features, existingFeatures) => {
+  return [
+    '/* List of supported test262 features.',
+    ' * This list can be regenerated using the generate-all-features.js script. */',
+    'module.exports = new Set([',
+    ...Array.from(features).sort().map(entry => `  ${existingFeatures.has(entry) ? '' : '//'}'${entry}',`),
+    ']);',
+    ''
+  ].join('\n');
+}
+
+fs.readFile('test/data/test262/features.txt', 'utf8', (err, data) => {
+  if (err) throw err;
+  for (const line of data.split('\n')) {
+    const trim = line.trim();
+    if (trim && !trim.startsWith('#')) {
+      features.add(trim);
     }
   }
-});
 
-stream.on('end', () => {
-  console.log(
-`/* List of supported test262 features.
- * This list can be regenerated using the generate-all-features.js script. */
-module.exports = new Set([`
-  );
-  for (const entry of Array.from(features).sort()) {
-    console.log(`  ${existingFeatures.has(entry) ? '' : '//'}'${entry}',`);
-  }
-  console.log(']);');
+  fs.writeFile('test/helpers/supported-features.js', generateSource(features, existingFeatures), err => {throw err});
 });
