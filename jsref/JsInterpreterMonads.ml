@@ -48,7 +48,8 @@ let res_void s =
     Use something else when the specification {i could} assert this, but presently doesn't.
 *)
 let spec_assertion_failure _ =
-  Debug.impossible_because __LOC__ "spec assertion failed"
+  Debug.impossible_because __LOC__ "spec assertion failed";
+  Coq_result_impossible
 
 (** val get_arg : int -> value list -> value **)
 
@@ -348,6 +349,13 @@ let if_spec w k = if_spec2 w k (fun x -> x)
 let check_assert b k =
   if b then k () else spec_assertion_failure ()
 
+(** Pure version of spec_assert *)
+let spec_assert b =
+  if b then () else failwith "spec assertion failure"
+
+let spec_assert_fail _ =
+  failwith "spec assertion failure"
+
 type ('t, 'a) if_ret_type =
 | Return of 't resultof [@f result]
 | Continue of 'a [@f cont]
@@ -370,52 +378,58 @@ let let_ret2 w k kret =
   | Continue s -> k s
   | Return  r -> kret r
 
-let let_ret w k = let_ret2 w k (fun x -> x)
-let let_ret_ret w k = let_ret2 w k (fun x -> Return x)
+let return x = Return x
+let return_saf x = Return (spec_assertion_failure x)
 
-let if_some_ret w k = if_some2 w k (fun x -> Return x)
+let let_ret w k = let_ret2 w k (fun x -> x)
+let let_ret_ret w k = let_ret2 w k return
+
+let if_some_ret w k = if_some2 w k return
 
 let if_success_ret w k =
-  if_success2 w k (fun x -> Return x)
+  if_success2 w k return
 
 let if_value_ret w k =
-  if_value2 w k (fun x -> Return x)
+  if_value2 w k return
 
 let assert_value_ret w k =
-  if_value2 w k spec_assertion_failure
+  if_value2 w k return_saf
 
 let if_object_ret w k =
-  if_object2 w k (fun x -> Return x)
+  if_object2 w k return
 
 let if_number_ret w k =
-  if_number2 w k (fun x -> Return x)
+  if_number2 w k return
 
 let if_bool_ret w k =
-  if_bool2 w k (fun x -> Return x)
+  if_bool2 w k return
 
 let assert_object w k =
   if_object2 w k spec_assertion_failure
 
 let assert_object_ret w k =
-  if_object2 w k spec_assertion_failure
+  if_object2 w k return_saf
 
 let assert_bool w k =
   if_bool2 w k spec_assertion_failure
 
 let assert_bool_ret w k =
-  if_bool2 w k spec_assertion_failure
+  if_bool2 w k return_saf
 
 let assert_string w k =
   if_string2 w k spec_assertion_failure
 
 let assert_string_ret w k =
-  if_string2 w k spec_assertion_failure
+  if_string2 w k return_saf
 
 let check_assert_ret b k =
-  if b then k () else spec_assertion_failure ()
+  if b then k () else return_saf ()
 
 let if_spec_ret w k =
-  if_spec2 w k (fun x -> Return x)
+  if_spec2 w k return
+
+let assert_value w k =
+  if_value2 w k spec_assertion_failure
 
 let ifx_prim w k = if_prim w k
 let ifx_number w k = if_number w k

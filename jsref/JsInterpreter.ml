@@ -413,7 +413,7 @@ and put_value s c v w =
 (** @esid sec-getthisvalue
     @essec 6.2.4.3 *)
 and get_this_value v =
-  let%assert _ = (is_property_reference v) in
+  let _ = spec_assert (is_property_reference v) in
   if is_super_reference v then
     ref_this_value v
   else
@@ -757,30 +757,30 @@ and same_value x y =
 (** @essec 7.2.11
     @esid sec-samevaluenonnumber *)
 and same_value_non_number x y =
-  let%assert _ = not (type_compare (type_of x) Coq_type_number) in
-  let%assert _ = type_compare (type_of x) (type_of y) in
+  let _ = spec_assert (not (type_compare (type_of x) Coq_type_number)) in
+  let _ = spec_assert (type_compare (type_of x) (type_of y)) in
   match x with
   | Coq_value_undef      -> true
   | Coq_value_null       -> true
   | Coq_value_string s_x ->
     (match y with
     | Coq_value_string s_y -> string_eq s_x s_y
-    | _ -> spec_assertion_failure ())
+    | _ -> spec_assert_fail ())
   | Coq_value_bool b_x   ->
     (match y with
      | Coq_value_bool b_y -> bool_eq b_x b_y
-     | _ -> spec_assertion_failure ())
+     | _ -> spec_assert_fail ())
   (* TODO: Symbol
   | Coq_value_symbol s_x ->
      (match y with
      | Coq_value_symbol s_y -> symbol_compare s_x s_y
-     | _ -> spec_assertion_failure ())
+     | _ -> spec_spec_assertion_failure ())
   *)
   | Coq_value_object l_x ->
     (match y with
     | Coq_value_object l_y -> object_loc_compare l_x l_y
-    | _ -> spec_assertion_failure ())
-  | _ -> spec_assertion_failure ()
+    | _ -> spec_assert_fail ())
+  | _ -> spec_assert_fail ()
 
 (** {2 Operations on Objects }
     @essec 7.3

@@ -1264,7 +1264,7 @@ and js_of_let_pattern sm new_sm ctx vb recur =
   let id =
     match pat.pat_desc with
     | Tpat_var (id, _) -> id
-    | Tpat_any -> out_of_scope pat.pat_loc "_ in let"
+    | Tpat_any -> Ident.create (id_fresh "_pat_any_")
     | Tpat_alias _ -> out_of_scope pat.pat_loc "alias in let"
     | Tpat_constant _ -> out_of_scope pat.pat_loc "constant in let"
     | Tpat_tuple _ -> out_of_scope pat.pat_loc "tuple in let"
