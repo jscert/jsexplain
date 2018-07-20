@@ -81,6 +81,9 @@ let object_create_prealloc_constructor fprealloc name length p =
 let write_native p name v =
   HeapStr.write p name (Coq_attributes_data_of (prop_attributes_for_global_object v))
 
+let write_native_prealloc p name prealloc =
+  write_native p name (Coq_value_object (Coq_object_loc_prealloc prealloc))
+
 (** val write_constant :
     object_properties_type -> prop_name -> value -> (prop_name, attributes)
     Heap.heap **)
@@ -96,40 +99,58 @@ let object_prealloc_global_proto = Coq_value_null
 
 let object_prealloc_global_class = "GlobalClass"
 
+(** Create a prealloc object using [object_create_prealloc_call] and place the resulting object into [heap]. *)
+let heap_prealloc_object heap prealloc vproto sclass props =
+  let obj = object_create_builtin (Coq_value_object (Coq_object_loc_prealloc vproto)) sclass props in
+  HeapObj.write heap (Coq_object_loc_prealloc prealloc) obj
+
+(** Create a prealloc function and allocate into [heap]. *)
+let heap_prealloc_object_call heap name prealloc length =
+  let obj = object_create_prealloc_call prealloc name length Heap.empty in
+  HeapObj.write heap (Coq_object_loc_prealloc prealloc) obj
+
+(** Create a prealloc function, allocate into [heap] and assign to [props] using [name] *)
+let heap_assign_prealloc_object_call heap props name prealloc length =
+  let heap = heap_prealloc_object_call heap name prealloc length in
+  let props = write_native props name (Coq_value_object (Coq_object_loc_prealloc prealloc)) in
+  (heap, props)
+
 (** val object_prealloc_global_properties :
     (prop_name, attributes) Heap.heap **)
 
 let object_prealloc_global_properties =
-  let p = write_constant Heap.empty "NaN" (Coq_value_number JsNumber.nan) in
-  let p0 = write_constant p "Infinity" (Coq_value_number JsNumber.infinity) in
-  let p1 = write_constant p0 "undefined" Coq_value_undef in
-  let p2 = write_native p1 "eval" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_global_eval)) in
-  let p3 = write_native p2 "parseInt" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_global_parse_int)) in
-  let p4 = write_native p3 "parseFloat" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_global_parse_float)) in
-  let p5 = write_native p4 "isNaN" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_global_is_nan)) in
-  let p6 = write_native p5 "isFinite" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_global_is_finite)) in
-  let p7 = write_native p6 "decodeURI" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_global_decode_uri)) in
-  let p8 = write_native p7 "decodeURIComponent" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_global_decode_uri_component)) in
-  let p9 = write_native p8 "encodeURI" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_global_encode_uri)) in
-  let p10 = write_native p9 "encodeURIComponent" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_global_encode_uri_component)) in
-  let p11 = write_native p10 "Object" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_object)) in
-  let p12 = write_native p11 "Function" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_function)) in
-  let p13 = write_native p12 "Array" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_array)) in
-  let p14 = write_native p13 "String" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_string)) in
-  let p15 = write_native p14 "Boolean" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_bool)) in
-  let p16 = write_native p15 "Number" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_number)) in
-  let p17 = write_native p16 "Math" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_math)) in
-  let p18 = write_native p17 "Date" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_date)) in
-  let p19 = write_native p18 "RegExp" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_regexp)) in
-  let p20 = write_native p19 "Error" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_error)) in
-  let p21 = write_native p20 "EvalError" (Coq_value_object (Coq_object_loc_prealloc (Coq_prealloc_native_error Coq_native_error_eval))) in
-  let p22 = write_native p21 "RangeError" (Coq_value_object (Coq_object_loc_prealloc (Coq_prealloc_native_error Coq_native_error_range))) in
-  let p23 = write_native p22 "ReferenceError" (Coq_value_object (Coq_object_loc_prealloc (Coq_prealloc_native_error Coq_native_error_ref))) in
-  let p24 = write_native p23 "SyntaxError" (Coq_value_object (Coq_object_loc_prealloc (Coq_prealloc_native_error Coq_native_error_syntax))) in
-  let p25 = write_native p24 "TypeError" (Coq_value_object (Coq_object_loc_prealloc (Coq_prealloc_native_error Coq_native_error_type))) in
-  let p26 = write_native p25 "URIError" (Coq_value_object (Coq_object_loc_prealloc (Coq_prealloc_native_error Coq_native_error_uri))) in
-  let p27 = write_native p26 "JSON" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_json)) in
-  write_native p27 "Proxy" (Coq_value_object (Coq_object_loc_prealloc Coq_prealloc_proxy))
+  let p = Heap.empty in
+  let p = write_constant p "NaN" (Coq_value_number JsNumber.nan) in
+  let p = write_constant p "Infinity" (Coq_value_number JsNumber.infinity) in
+  let p = write_constant p "undefined" Coq_value_undef in
+  let p = write_native_prealloc p "eval"  Coq_prealloc_global_eval in
+  let p = write_native_prealloc p "parseInt"  Coq_prealloc_global_parse_int in
+  let p = write_native_prealloc p "parseFloat"  Coq_prealloc_global_parse_float in
+  let p = write_native_prealloc p "isNaN"  Coq_prealloc_global_is_nan in
+  let p = write_native_prealloc p "isFinite"  Coq_prealloc_global_is_finite in
+  let p = write_native_prealloc p "decodeURI"  Coq_prealloc_global_decode_uri in
+  let p = write_native_prealloc p "decodeURIComponent"  Coq_prealloc_global_decode_uri_component in
+  let p = write_native_prealloc p "encodeURI"  Coq_prealloc_global_encode_uri in
+  let p = write_native_prealloc p "encodeURIComponent"  Coq_prealloc_global_encode_uri_component in
+  let p = write_native_prealloc p "Object"  Coq_prealloc_object in
+  let p = write_native_prealloc p "Function"  Coq_prealloc_function in
+  let p = write_native_prealloc p "Array"  Coq_prealloc_array in
+  let p = write_native_prealloc p "String"  Coq_prealloc_string in
+  let p = write_native_prealloc p "Boolean"  Coq_prealloc_bool in
+  let p = write_native_prealloc p "Number"  Coq_prealloc_number in
+  let p = write_native_prealloc p "Math"  Coq_prealloc_math in
+  let p = write_native_prealloc p "Date"  Coq_prealloc_date in
+  let p = write_native_prealloc p "RegExp"  Coq_prealloc_regexp in
+  let p = write_native_prealloc p "Error"  Coq_prealloc_error in
+  let p = write_native_prealloc p "EvalError"  (Coq_prealloc_native_error Coq_native_error_eval) in
+  let p = write_native_prealloc p "RangeError"  (Coq_prealloc_native_error Coq_native_error_range) in
+  let p = write_native_prealloc p "ReferenceError"  (Coq_prealloc_native_error Coq_native_error_ref) in
+  let p = write_native_prealloc p "SyntaxError"  (Coq_prealloc_native_error Coq_native_error_syntax) in
+  let p = write_native_prealloc p "TypeError"  (Coq_prealloc_native_error Coq_native_error_type) in
+  let p = write_native_prealloc p "URIError"  (Coq_prealloc_native_error Coq_native_error_uri) in
+  let p = write_native_prealloc p "JSON"  Coq_prealloc_json in
+  let p = write_native_prealloc p "Reflect" Coq_prealloc_reflect in
+  write_native_prealloc p "Proxy" Coq_prealloc_proxy
 
 (** val object_prealloc_global : coq_object **)
 
@@ -534,6 +555,25 @@ let throw_type_error_object =
   let o = object_with_formal_params o (Some []) in
   object_set_extensible o false
 
+(** @essec 26.1
+    @esid sec-reflect-object *)
+let heap_prealloc_reflect h =
+  let p = Heap.empty in
+  let h, p = heap_assign_prealloc_object_call h p "apply" Coq_prealloc_reflect_apply 3. in
+  let h, p = heap_assign_prealloc_object_call h p "construct" Coq_prealloc_reflect_construct 2. in
+  let h, p = heap_assign_prealloc_object_call h p "defineProperty" Coq_prealloc_reflect_define_property 3. in
+  let h, p = heap_assign_prealloc_object_call h p "deleteProperty" Coq_prealloc_reflect_delete_property 2. in
+  let h, p = heap_assign_prealloc_object_call h p "get" Coq_prealloc_reflect_get 2. in
+  let h, p = heap_assign_prealloc_object_call h p "getOwnPropertyDescriptor" Coq_prealloc_reflect_get_own_property_descriptor 2. in
+  let h, p = heap_assign_prealloc_object_call h p "getPrototypeOf" Coq_prealloc_reflect_get_prototype_of 1. in
+  let h, p = heap_assign_prealloc_object_call h p "has" Coq_prealloc_reflect_has 2. in
+  let h, p = heap_assign_prealloc_object_call h p "isExtensible" Coq_prealloc_reflect_is_extensible 1. in
+  let h, p = heap_assign_prealloc_object_call h p "ownKeys" Coq_prealloc_reflect_own_keys 1. in
+  let h, p = heap_assign_prealloc_object_call h p "preventExtensions" Coq_prealloc_reflect_prevent_extensions 1. in
+  let h, p = heap_assign_prealloc_object_call h p "set" Coq_prealloc_reflect_set 3. in
+  let h, p = heap_assign_prealloc_object_call h p "setPrototypeOf" Coq_prealloc_reflect_set_prototype_of 2. in
+  heap_prealloc_object h Coq_prealloc_reflect Coq_prealloc_object_proto "Object" p
+
 (** @essec 26.2.1
     @esid sec-proxy-constructor *)
 let object_prealloc_proxy =
@@ -665,7 +705,8 @@ let object_heap_initial =
       (object_prealloc_native_error Coq_native_error_uri) in
   let h29 = HeapObj.write h28 (Coq_object_loc_prealloc Coq_prealloc_json) object_prealloc_json in
   let h30 = HeapObj.write h29 (Coq_object_loc_prealloc Coq_prealloc_proxy) object_prealloc_proxy in
-  object_heap_initial_function_objects h30
+  let h31 = heap_prealloc_reflect h30 in
+  object_heap_initial_function_objects h31
 
 (** val env_record_heap_initial : (env_loc, env_record) Heap.heap **)
 

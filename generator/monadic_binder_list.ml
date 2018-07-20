@@ -4,6 +4,7 @@ let monad_mapping = [
     ("object", "if_object");
     ("OBJECT", "assert_object");
     ("value", "if_value");
+    ("VALUE", "assert_value");
     ("prim", "if_prim");
     ("number", "if_number");
     ("some", "if_some");

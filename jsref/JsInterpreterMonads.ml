@@ -56,6 +56,9 @@ let spec_assertion_failure _ =
 let get_arg x l =
   nth_def Coq_value_undef x l
 
+let get_arg_opt x l =
+  nth_def_map None (fun x -> Some x) x l
+
 (** val get_arg_first_and_rest : value list -> value * value list **)
 
 let get_arg_first_and_rest lv =

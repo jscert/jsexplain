@@ -90,6 +90,20 @@ let int_of_prealloc p =
   | Coq_prealloc_proxy_revocable -> 71
   | Coq_builtin_proxy_revocation -> 72
   | Coq_prealloc_object_set_proto_of -> 73
+  | Coq_prealloc_reflect                             -> 74
+  | Coq_prealloc_reflect_apply                       -> 75
+  | Coq_prealloc_reflect_construct                   -> 76
+  | Coq_prealloc_reflect_define_property             -> 77
+  | Coq_prealloc_reflect_delete_property             -> 78
+  | Coq_prealloc_reflect_get                         -> 79
+  | Coq_prealloc_reflect_get_own_property_descriptor -> 80
+  | Coq_prealloc_reflect_get_prototype_of            -> 81
+  | Coq_prealloc_reflect_has                         -> 82
+  | Coq_prealloc_reflect_is_extensible               -> 83
+  | Coq_prealloc_reflect_own_keys                    -> 84
+  | Coq_prealloc_reflect_prevent_extensions          -> 85
+  | Coq_prealloc_reflect_set                         -> 86
+  | Coq_prealloc_reflect_set_prototype_of            -> 87
   | Coq_prealloc_mathop o -> 100 + int_of_mathop o
   | Coq_prealloc_native_error e -> 200 + int_of_native_error e
   | Coq_prealloc_native_error_proto e -> 300 + int_of_native_error e
@@ -232,6 +246,20 @@ let string_of_prealloc prealloc = match prealloc with
   | Coq_prealloc_proxy -> "proxy"
   | Coq_prealloc_proxy_revocable -> "proxy_revocable"
   | Coq_builtin_proxy_revocation -> "proxy_revocation"
+  | Coq_prealloc_reflect                             -> "Coq_prealloc_reflect"
+  | Coq_prealloc_reflect_apply                       -> "Coq_prealloc_reflect_apply"
+  | Coq_prealloc_reflect_construct                   -> "Coq_prealloc_reflect_construct"
+  | Coq_prealloc_reflect_define_property             -> "Coq_prealloc_reflect_define_property"
+  | Coq_prealloc_reflect_delete_property             -> "Coq_prealloc_reflect_delete_property"
+  | Coq_prealloc_reflect_get                         -> "Coq_prealloc_reflect_get"
+  | Coq_prealloc_reflect_get_own_property_descriptor -> "Coq_prealloc_reflect_get_own_property_descriptor"
+  | Coq_prealloc_reflect_get_prototype_of            -> "Coq_prealloc_reflect_get_prototype_of"
+  | Coq_prealloc_reflect_has                         -> "Coq_prealloc_reflect_has"
+  | Coq_prealloc_reflect_is_extensible               -> "Coq_prealloc_reflect_is_extensible"
+  | Coq_prealloc_reflect_own_keys                    -> "Coq_prealloc_reflect_own_keys"
+  | Coq_prealloc_reflect_prevent_extensions          -> "Coq_prealloc_reflect_prevent_extensions"
+  | Coq_prealloc_reflect_set                         -> "Coq_prealloc_reflect_set"
+  | Coq_prealloc_reflect_set_prototype_of            -> "Coq_prealloc_reflect_set_prototype_of"
 
 let prealloc_cmp p1 p2 =
   int_compare (int_of_prealloc p1) (int_of_prealloc p2)

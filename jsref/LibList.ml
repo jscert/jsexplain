@@ -75,6 +75,10 @@ let rec nth_def d n l = match l with
   | [] -> d
   | x :: l' -> if int_eq n 0 then x else nth_def d (n-1) l'
 
+let rec nth_def_map d f n l = match l with
+  | [] -> d
+  | x :: l' -> if int_eq n 0 then f x else nth_def_map d f (n-1) l'
+
 (** val mem_decide :  ('a1 -> 'a1 -> bool)  -> 'a1 -> 'a1 list -> bool **)
 
 let rec mem_decide h x l = match l with

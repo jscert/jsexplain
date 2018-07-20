@@ -223,6 +223,20 @@ type prealloc =
 | Coq_prealloc_proxy                                          (** Proxy *)
 | Coq_prealloc_proxy_revocable
 | Coq_builtin_proxy_revocation
+| Coq_prealloc_reflect                                        (** Reflect *)
+| Coq_prealloc_reflect_apply
+| Coq_prealloc_reflect_construct
+| Coq_prealloc_reflect_define_property
+| Coq_prealloc_reflect_delete_property
+| Coq_prealloc_reflect_get
+| Coq_prealloc_reflect_get_own_property_descriptor
+| Coq_prealloc_reflect_get_prototype_of
+| Coq_prealloc_reflect_has
+| Coq_prealloc_reflect_is_extensible
+| Coq_prealloc_reflect_own_keys
+| Coq_prealloc_reflect_prevent_extensions
+| Coq_prealloc_reflect_set
+| Coq_prealloc_reflect_set_prototype_of
 | Coq_prealloc_mathop of mathop [@f mathop]
 | Coq_prealloc_native_error of native_error [@f error]
 | Coq_prealloc_native_error_proto of native_error [@f error]

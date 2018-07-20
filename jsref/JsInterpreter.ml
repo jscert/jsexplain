@@ -686,6 +686,14 @@ and to_string s argument =
     @esid sec-tostring-applied-to-the-number-type *)
 and to_string_number = JsNumber.to_string
 
+(** @essec 7.1.14
+    @esid sec-topropertykey *)
+and to_property_key s argument =
+  let%value s, key = to_primitive s argument (Some Coq_preftype_string) in
+  (* TODO: Symbol check *)
+  let%VALUE s, str = to_string s key in
+  res_out s (res_val str)
+
 (** @essec 7.1.15
     @esid sec-tolength *)
 and to_length s argument =
@@ -1508,7 +1516,7 @@ and ordinary_object_internal_own_property_keys s o =
     @esid sec-ordinaryownpropertykeys *)
 and ordinary_own_property_keys s o =
   let%some keys = object_properties_keys_as_list_option s o in
-  (* TODO: Precise key ordering is to be implemented here! *)
+  (* FIXME: Precise key ordering is to be implemented here! *)
   let keys = LibList.map (fun key -> Coq_value_string key) keys in
   res_spec s keys
 
@@ -2163,6 +2171,109 @@ and builtin_object_prototype_is_prototype_of s c f this newTarget v =
 (** {1 Reflection}
     @essec 26
     @esid sec-reflection *)
+(** {2 The Reflect Object}
+    @essec 26.1
+    @esid sec-reflect-object *)
+(** @essec 26.1.1
+    @esid sec-reflect.apply *)
+and builtin_reflect_apply s c f this newTarget target thisArgument argumentsList =
+  if not (is_callable s target) then run_error s c Coq_native_error_type else
+  let%spec s, args = create_list_from_array_like s argumentsList None in
+  (* TODO: prepare_for_tail_call goes here *)
+  call s target thisArgument (Some args)
+
+(** @essec 26.1.2
+    @esid sec-reflect.construct
+
+    Note: [_newTarget] is specified by 9.3.2 *)
+and builtin_reflect_construct s c f this _newTarget target argumentsList newTarget =
+  if not (is_constructor s target) then run_error s c Coq_native_error_type else
+  let%ret newTarget =
+    if is_none newTarget then Continue target
+    else let newTarget = unsome_error newTarget in
+    if not (is_constructor s newTarget) then Return (run_error s c Coq_native_error_type)
+    else Continue newTarget in
+  let%spec s, args = create_list_from_array_like s argumentsList None in
+  construct s target (Some args) (Some newTarget)
+
+(** @essec 26.1.3
+    @esid sec-reflect.defineproperty *)
+and builtin_reflect_define_property s c f this newTarget target propertyKey attributes =
+  if not (type_of target === Coq_type_object) then run_error s c Coq_native_error_type else
+  let%value s, key = to_property_key s propertyKey in
+  let%spec s, desc = to_property_descriptor s attributes in
+  object_internal_define_own_property s (loc_of_value target) key desc
+
+(** @essec 26.1.4
+    @esid sec-reflect.deleteproperty *)
+and builtin_reflect_delete_property s c f this newTarget target propertyKey =
+  if not (type_of target === Coq_type_object) then run_error s c Coq_native_error_type else
+  let%value s, key = to_property_key s propertyKey in
+  object_internal_delete s (loc_of_value target) key
+
+(** @essec 26.1.5
+    @esid sec-reflect.get *)
+and builtin_reflect_get s c f this newTarget target propertyKey receiver =
+  if not (type_of target === Coq_type_object) then run_error s c Coq_native_error_type else
+  let%value s, key = to_property_key s propertyKey in
+  let receiver = unsome_default target receiver in
+  object_internal_get s (loc_of_value target) key receiver
+
+(** @essec 26.1.6
+    @esid sec-reflect.getownpropertydescriptor *)
+and builtin_reflect_get_own_property_descriptor s c f this newTarget target propertyKey =
+  if not (type_of target === Coq_type_object) then run_error s c Coq_native_error_type else
+  let%value s, key = to_property_key s propertyKey in
+  let%spec s, desc = object_internal_get_own_property s (loc_of_value target) key in
+  from_property_descriptor s desc
+
+(** @essec 26.1.7
+    @esid sec-reflect.getprototypeof *)
+and builtin_reflect_get_prototype_of s c f this newTarget target =
+  if not (type_of target === Coq_type_object) then run_error s c Coq_native_error_type else
+  object_internal_get_prototype_of s (loc_of_value target)
+
+(** @essec 26.1.8
+    @esid sec-reflect.has *)
+and builtin_reflect_has s c f this newTarget target propertyKey =
+  if not (type_of target === Coq_type_object) then run_error s c Coq_native_error_type else
+  let%value s, key = to_property_key s propertyKey in
+  object_internal_has_property s (loc_of_value target) key
+
+(** @essec 26.1.9
+    @esid sec-reflect.isextensible *)
+and builtin_reflect_is_extensible s c f this newTarget target =
+  if not (type_of target === Coq_type_object) then run_error s c Coq_native_error_type else
+  object_internal_is_extensible s (loc_of_value target)
+
+(** @essec 26.1.10
+    @esid sec-reflect.ownkeys *)
+and builtin_reflect_own_keys s c f this newTarget target =
+  if not (type_of target === Coq_type_object) then run_error s c Coq_native_error_type else
+  let%spec s, keys = object_internal_own_property_keys s (loc_of_value target) in
+  create_array_from_list s keys
+
+(** @essec 26.1.11
+    @esid sec-reflect.preventextensions *)
+and builtin_reflect_prevent_extensions s c f this newTarget target =
+  if not (type_of target === Coq_type_object) then run_error s c Coq_native_error_type else
+  object_internal_prevent_extensions s (loc_of_value target)
+
+(** @essec 26.1.12
+    @esid sec-reflect.set *)
+and builtin_reflect_set s c f this newTarget target propertyKey v receiver =
+  if not (type_of target === Coq_type_object) then run_error s c Coq_native_error_type else
+  let%value s, key = to_property_key s propertyKey in
+  let receiver = unsome_default target receiver in
+  object_internal_set s (loc_of_value target) key v receiver
+
+(** @essec 26.1.13
+    @esid sec-reflect.setprototypeof *)
+and builtin_reflect_set_prototype_of s c f this newTarget target proto =
+  if not (type_of target === Coq_type_object) then run_error s c Coq_native_error_type else
+  if (not (type_of proto === Coq_type_object)) && (not (proto === Coq_value_null)) then run_error s c Coq_native_error_type else
+  object_internal_set_prototype_of s (loc_of_value target) proto
+
 (** {2 Proxy Objects}
     @essec 26.2
     @esid sec-proxy-objects *)
@@ -4992,6 +5103,19 @@ and run_call_prealloc s c b l vthis args =
   | Coq_prealloc_proxy_revocable -> builtin_proxy_revocable s c () () () (get_arg 0 args) (get_arg 1 args)
   | Coq_builtin_proxy_revocation -> builtin_proxy_revocation_function s c l () ()
   | Coq_prealloc_global_eval -> run_eval s c false args
+  | Coq_prealloc_reflect_apply -> builtin_reflect_apply s c () () () (get_arg 0 args) (get_arg 1 args) (get_arg 2 args)
+  | Coq_prealloc_reflect_construct -> builtin_reflect_construct s c () () () (get_arg 0 args) (get_arg 1 args) (get_arg_opt 2 args)
+  | Coq_prealloc_reflect_define_property -> builtin_reflect_define_property s c () () () (get_arg 0 args) (get_arg 1 args) (get_arg 2 args)
+  | Coq_prealloc_reflect_delete_property -> builtin_reflect_delete_property s c () () () (get_arg 0 args) (get_arg 1 args)
+  | Coq_prealloc_reflect_get -> builtin_reflect_get s c () () () (get_arg 0 args) (get_arg 1 args) (get_arg_opt 2 args)
+  | Coq_prealloc_reflect_get_own_property_descriptor -> builtin_reflect_get_own_property_descriptor s c () () () (get_arg 0 args) (get_arg 1 args)
+  | Coq_prealloc_reflect_get_prototype_of -> builtin_reflect_get_prototype_of s c () () () (get_arg 0 args)
+  | Coq_prealloc_reflect_has -> builtin_reflect_has s c () () () (get_arg 0 args) (get_arg 1 args)
+  | Coq_prealloc_reflect_is_extensible -> builtin_reflect_is_extensible s c () () () (get_arg 0 args)
+  | Coq_prealloc_reflect_own_keys -> builtin_reflect_own_keys s c () () () (get_arg 0 args)
+  | Coq_prealloc_reflect_prevent_extensions -> builtin_reflect_prevent_extensions s c () () () (get_arg 0 args)
+  | Coq_prealloc_reflect_set -> builtin_reflect_set s c () () () (get_arg 0 args) (get_arg 1 args) (get_arg 2 args) (get_arg_opt 3 args)
+  | Coq_prealloc_reflect_set_prototype_of -> builtin_reflect_set_prototype_of s c () () () (get_arg 0 args) (get_arg 1 args)
   | _ ->
     (fun s -> Debug.not_yet_implemented_because __LOC__ s; Coq_result_not_yet_implemented)
       (strappend ("Call prealloc_") (strappend (string_of_prealloc b) (" not yet implemented")))
