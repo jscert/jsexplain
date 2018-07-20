@@ -93,7 +93,8 @@ val write_native :
     object_properties_type -&gt; prop_name -&gt; value -&gt; (prop_name, attributes)
     Heap.heap *<br>
 
-<pre><span id="VALwrite_native"><span class="keyword">val</span> write_native</span> : <code class="type">(string, <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a>) <a href="StdMap.html#TYPEt">StdMap.t</a> -><br>       string -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> (string, <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a>) <a href="StdMap.html#TYPEt">StdMap.t</a></code></pre><br>
+<pre><span id="VALwrite_native"><span class="keyword">val</span> write_native</span> : <code class="type">(string, <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a>) <a href="StdMap.html#TYPEt">StdMap.t</a> -><br>       string -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> (string, <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a>) <a href="StdMap.html#TYPEt">StdMap.t</a></code></pre>
+<pre><span id="VALwrite_native_prealloc"><span class="keyword">val</span> write_native_prealloc</span> : <code class="type">(string, <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a>) <a href="StdMap.html#TYPEt">StdMap.t</a> -><br>       string -> <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -> (string, <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a>) <a href="StdMap.html#TYPEt">StdMap.t</a></code></pre><br>
 val write_constant :
     object_properties_type -&gt; prop_name -&gt; value -&gt; (prop_name, attributes)
     Heap.heap *<br>
@@ -104,7 +105,19 @@ val object_prealloc_global_proto : value *<br>
 <pre><span id="VALobject_prealloc_global_proto"><span class="keyword">val</span> object_prealloc_global_proto</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><br>
 val object_prealloc_global_class : string *<br>
 
-<pre><span id="VALobject_prealloc_global_class"><span class="keyword">val</span> object_prealloc_global_class</span> : <code class="type">string</code></pre><br>
+<pre><span id="VALobject_prealloc_global_class"><span class="keyword">val</span> object_prealloc_global_class</span> : <code class="type">string</code></pre>
+<pre><span id="VALheap_prealloc_object"><span class="keyword">val</span> heap_prealloc_object</span> : <code class="type">(<a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a>, <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a>) <a href="StdMap.html#TYPEt">StdMap.t</a> -><br>       <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -><br>       <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -><br>       <a href="JsSyntax.html#TYPEclass_name">JsSyntax.class_name</a> -><br>       <a href="JsSyntax.html#TYPEobject_properties_type">JsSyntax.object_properties_type</a> -><br>       (<a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a>, <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a>) <a href="StdMap.html#TYPEt">StdMap.t</a></code></pre><div class="info ">
+Create a prealloc object using <code class="code">object_create_prealloc_call</code> and place the resulting object into <code class="code">heap</code>.<br>
+</div>
+
+<pre><span id="VALheap_prealloc_object_call"><span class="keyword">val</span> heap_prealloc_object_call</span> : <code class="type">(<a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a>, <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a>) <a href="StdMap.html#TYPEt">StdMap.t</a> -><br>       string -><br>       <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> (<a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a>, <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a>) <a href="StdMap.html#TYPEt">StdMap.t</a></code></pre><div class="info ">
+Create a prealloc function and allocate into <code class="code">heap</code>.<br>
+</div>
+
+<pre><span id="VALheap_assign_prealloc_object_call"><span class="keyword">val</span> heap_assign_prealloc_object_call</span> : <code class="type">(<a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a>, <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a>) <a href="StdMap.html#TYPEt">StdMap.t</a> -><br>       (string, <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a>) <a href="StdMap.html#TYPEt">StdMap.t</a> -><br>       string -><br>       <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -><br>       (<a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a>, <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a>) <a href="StdMap.html#TYPEt">StdMap.t</a> *<br>       (string, <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a>) <a href="StdMap.html#TYPEt">StdMap.t</a></code></pre><div class="info ">
+Create a prealloc function, allocate into <code class="code">heap</code> and assign to <code class="code">props</code> using <code class="code">name</code><br>
+</div>
+<br>
 val object_prealloc_global_properties :
     (prop_name, attributes) Heap.heap *<br>
 
@@ -300,6 +313,9 @@ val object_prealloc_json : coq_object *<br>
 <pre><span id="VALobject_prealloc_json"><span class="keyword">val</span> object_prealloc_json</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a></code></pre>
 <pre><span id="VALthrow_type_error_object"><span class="keyword">val</span> throw_type_error_object</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="#sec-%throwtypeerror%">9.2.7.1</a></div>
+
+<pre><span id="VALheap_prealloc_reflect"><span class="keyword">val</span> heap_prealloc_reflect</span> : <code class="type">(<a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a>, <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a>) <a href="StdMap.html#TYPEt">StdMap.t</a> -><br>       (<a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a>, <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a>) <a href="StdMap.html#TYPEt">StdMap.t</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="#sec-reflect-object">26.1</a></div>
 
 <pre><span id="VALobject_prealloc_proxy"><span class="keyword">val</span> object_prealloc_proxy</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a></code></pre><div class="info ">
 ECMAScript Specification section: <a href="#sec-proxy-constructor">26.2.1</a></div>

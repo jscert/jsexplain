@@ -90,6 +90,8 @@
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALassert_success">assert_success</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALassert_value">assert_value</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALassert_value_ret">assert_value_ret</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInit.html#VALattrib_constant">attrib_constant</a> [<a href="JsInit.html">JsInit</a>]</td>
@@ -262,6 +264,58 @@ Updates a given attribute with values from the given descriptor.
 </div>
 </td></tr>
 <tr><td><a href="JsInterpreter.html#VALbuiltin_proxy_revocation_function">builtin_proxy_revocation_function</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_reflect_apply">builtin_reflect_apply</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_reflect_construct">builtin_reflect_construct</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_reflect_define_property">builtin_reflect_define_property</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_reflect_delete_property">builtin_reflect_delete_property</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_reflect_get">builtin_reflect_get</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_reflect_get_own_property_descriptor">builtin_reflect_get_own_property_descriptor</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_reflect_get_prototype_of">builtin_reflect_get_prototype_of</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_reflect_has">builtin_reflect_has</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_reflect_is_extensible">builtin_reflect_is_extensible</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_reflect_own_keys">builtin_reflect_own_keys</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_reflect_prevent_extensions">builtin_reflect_prevent_extensions</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_reflect_set">builtin_reflect_set</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreter.html#VALbuiltin_reflect_set_prototype_of">builtin_reflect_set_prototype_of</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
 </td></tr>
@@ -574,6 +628,8 @@ Implements spec text: "true, if every field in d is absent"
 <td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALget_arg_first_and_rest">get_arg_first_and_rest</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALget_arg_opt">get_arg_opt</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALget_base">get_base</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALget_binding_value">get_binding_value</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
@@ -634,6 +690,25 @@ GetValue(V)
 </td></tr>
 <tr><td><a href="LibList.html#VALhd">hd</a> [<a href="LibList.html">LibList</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInit.html#VALheap_assign_prealloc_object_call">heap_assign_prealloc_object_call</a> [<a href="JsInit.html">JsInit</a>]</td>
+<td><div class="info">
+Create a prealloc function, allocate into <code class="code">heap</code> and assign to <code class="code">props</code> using <code class="code">name</code>
+</div>
+</td></tr>
+<tr><td><a href="JsInit.html#VALheap_prealloc_object">heap_prealloc_object</a> [<a href="JsInit.html">JsInit</a>]</td>
+<td><div class="info">
+Create a prealloc object using <code class="code">object_create_prealloc_call</code> and place the resulting object into <code class="code">heap</code>.
+</div>
+</td></tr>
+<tr><td><a href="JsInit.html#VALheap_prealloc_object_call">heap_prealloc_object_call</a> [<a href="JsInit.html">JsInit</a>]</td>
+<td><div class="info">
+Create a prealloc function and allocate into <code class="code">heap</code>.
+</div>
+</td></tr>
+<tr><td><a href="JsInit.html#VALheap_prealloc_reflect">heap_prealloc_reflect</a> [<a href="JsInit.html">JsInit</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="StdMap.html#VALheight">height</a> [<a href="StdMap.html">StdMap</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>I</td></tr>
@@ -962,6 +1037,8 @@ Executes the continuation with state s of a <code class="code">Continue s</code>
 <tr><td><a href="Debug.html#VALnot_yet_implemented_because">not_yet_implemented_because</a> [<a href="Debug.html">Debug</a>]</td>
 <td></td></tr>
 <tr><td><a href="LibList.html#VALnth_def">nth_def</a> [<a href="LibList.html">LibList</a>]</td>
+<td></td></tr>
+<tr><td><a href="LibList.html#VALnth_def_map">nth_def_map</a> [<a href="LibList.html">LibList</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsSyntaxAux.html#VALnumber_of_value">number_of_value</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
 <td></td></tr>
@@ -1670,6 +1747,10 @@ A continuation-passing while loop with early function-level return.
 <td></td></tr>
 <tr><td><a href="JsSyntaxAux.html#VALresvalue_compare">resvalue_compare</a> [<a href="JsSyntaxAux.html">JsSyntaxAux</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALreturn">return</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALreturn_saf">return_saf</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="LibList.html#VALrev">rev</a> [<a href="LibList.html">LibList</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInterpreter.html#VALrun_array_element_list">run_array_element_list</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
@@ -1879,6 +1960,13 @@ Compares two Some values, failing if either are None
 </td></tr>
 <tr><td><a href="JsInterpreter.html#VALsome_context">some_context</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td></td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALspec_assert">spec_assert</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td><div class="info">
+Pure version of spec_assert
+</div>
+</td></tr>
+<tr><td><a href="JsInterpreterMonads.html#VALspec_assert_fail">spec_assert_fail</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
+<td></td></tr>
 <tr><td><a href="JsInterpreterMonads.html#VALspec_assertion_failure">spec_assertion_failure</a> [<a href="JsInterpreterMonads.html">JsInterpreterMonads</a>]</td>
 <td><div class="info">
 Call when a spec assertion fails
@@ -2001,6 +2089,10 @@ TODO: ES6-ify
 <td><div class="info">
 </div>
 </td></tr>
+<tr><td><a href="JsInterpreter.html#VALto_property_key">to_property_key</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
+<td><div class="info">
+</div>
+</td></tr>
 <tr><td><a href="JsInterpreter.html#VALto_string">to_string</a> [<a href="JsInterpreter.html">JsInterpreter</a>]</td>
 <td><div class="info">
 </div>
@@ -2057,6 +2149,8 @@ TODO: ES6-ify
 <tr><td><a href="JsInit.html#VALwrite_constant">write_constant</a> [<a href="JsInit.html">JsInit</a>]</td>
 <td></td></tr>
 <tr><td><a href="JsInit.html#VALwrite_native">write_native</a> [<a href="JsInit.html">JsInit</a>]</td>
+<td></td></tr>
+<tr><td><a href="JsInit.html#VALwrite_native_prealloc">write_native_prealloc</a> [<a href="JsInit.html">JsInit</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>Z</td></tr>
 <tr><td><a href="JsNumber.html#VALzero">zero</a> [<a href="JsNumber.html">JsNumber</a>]</td>
