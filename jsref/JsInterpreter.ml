@@ -1476,7 +1476,7 @@ and ordinary_set s o p v receiver =
     let%some setter = ownDesc.descriptor_set in
     if setter === Coq_value_undef then res_ter s (res_val (Coq_value_bool false))
     else
-      let%spec s, _ = call s setter receiver (Some [v]) in
+      let%success s, _ = call s setter receiver (Some [v]) in
       res_ter s (res_val (Coq_value_bool true))
 
 (** @essec 9.1.10
