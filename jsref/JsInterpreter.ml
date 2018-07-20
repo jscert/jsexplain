@@ -1174,7 +1174,7 @@ and ordinary_set_prototype_of s o v =
   else
     let p = v in
     let done' = false in
-    let%ret (s, _, _) = repeat (fun acc -> let (_, done', _) = acc in done') (s, done', p) (fun acc ->
+    let%ret (s, _, _) = repeat (fun acc -> let (_, done', _) = acc in not done') (s, done', p) (fun acc ->
       let (s, done', p) = acc in
       if p === Coq_value_null then Continue (s, true, p)
       else if same_value p (Coq_value_object o) then Return (res_out s (res_val (Coq_value_bool false)))
