@@ -938,7 +938,7 @@ and create_list_from_array_like s obj elementTypes =
       [Coq_type_undef; Coq_type_null; Coq_type_bool; Coq_type_string;
        (* TODO: Symbols Coq_type_symbol; *) Coq_type_number; Coq_type_object]
       elementTypes in
-  let%assert _ = (type_of obj) === Coq_type_object in
+  if not (type_of obj === Coq_type_object) then run_error_no_c s Coq_native_error_type else
   let%value s, tempVar = get s obj (Coq_value_string "length") in
   let%number s, len = to_length s tempVar in
   let list = [] in
