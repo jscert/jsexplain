@@ -309,7 +309,9 @@ and object_internal_construct s o argumentsList newTarget =
   let%some internal_method = internal_method in
   match internal_method with
   | Coq_construct_proxy -> proxy_object_internal_construct s o argumentsList newTarget
-  | _                   -> run_construct s some_context internal_method o argumentsList (* TODO: ES5 *)
+  | _                   -> (* TODO: update to ES6 *)
+    if not (newTarget === Coq_value_object o) then Coq_result_not_yet_implemented else
+    run_construct s some_context internal_method o argumentsList
 
 
 (** {3 The Reference Specification Type}
