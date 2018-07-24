@@ -1196,6 +1196,7 @@ var _compare_JsSyntax_coq_type = _compare_basic_types;
 var _compare_JsSyntax_mathop = _compare_basic_types;
 var _compare_JsSyntax_mutability = _compare_basic_types;
 var _compare_JsSyntax_native_error = _compare_basic_types;
+var _compare_JsSyntax_builtin_get_prototype_of = _compare_basic_types;
 
 var _compare_JsSyntax_object_loc = function (l1, l2) {
   switch (l1.tag) {
