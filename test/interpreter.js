@@ -127,7 +127,7 @@ function testResultForException(result, negative) {
 };
 
 test262.addTest(getTest => {
-  it("interprets correctly?", function() {
+  it("interprets correctly?", async function() {
     const test = getTest();
     let initHeap = prelude;
 
@@ -136,10 +136,11 @@ test262.addTest(getTest => {
     } catch(e) { this.skip(); }
 
     for (const include of test.attrs.includes) {
-      const content = test262.fetchHarness(include);
+      const content = await test262.fetchHarness(include);
       const contentAst = parse(content);
       initHeap = jsref.JsInterpreter.run_javascript_from_result(initHeap, contentAst);
-      assert.doesNotThrow(() => testResultForException(initHeap, undefined), `initHeap execution threw on ${include}.`);
+      assert.doesNotThrow(() => testResultForException(initHeap, undefined),
+        `initHeap execution threw on ${include}.`);
     }
 
     this.timeout(timeout);

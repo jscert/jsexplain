@@ -33,8 +33,10 @@ Base.list = failures => {
   }
 };
 
-const testDataDir = path.join(__dirname, '..', 'data');
-const test262path = fs.readlinkSync(path.join(testDataDir, 'test262'));
+const testDataPath = path.join(__dirname, '..', 'data');
+const test262path = fs.readlinkSync(path.join(testDataPath, 'test262'));
+const localHarnessPath = path.join(testDataPath, 'harness');
+const test262HarnessPath = path.join(test262path, 'harness');
 
 // Run the given callback at the end of this I/O Loop, so that testConstructors may be registered before constructing
 // test cases.
@@ -82,11 +84,16 @@ setImmediate(() => {
 });
 
 const harnessCache = new Map();
-function fetchHarness(name) {
+async function fetchHarness(name) {
   if (harnessCache.has(name)) {
     return harnessCache.get(name);
   }
-  const content = fs.readFileSync(path.join(test262path, 'harness', name));
+  let content;
+  try {
+    content = await fs.readFile(path.join(localHarnessPath, name));
+  } catch (e) {
+    content = await fs.readFile(path.join(test262HarnessPath, name));
+  }
   harnessCache.set(name, content);
   return content;
 }
