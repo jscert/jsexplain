@@ -2,14 +2,14 @@
 var Mocha = {};
 ({ ok   : Mocha.assert_ok
  , fail : Mocha.assert_fail
- , equal: Mocha.assert_bool
- , equal: Mocha.assert_int
- , equal: Mocha.assert_float
- , equal: Mocha.assert_char
- , equal: Mocha.assert_string
- , deepEqual : Mocha.assert_struct_eq
+ , strictEqual: Mocha.assert_bool
+ , strictEqual: Mocha.assert_int
+ , strictEqual: Mocha.assert_float
+ , strictEqual: Mocha.assert_char
+ , strictEqual: Mocha.assert_string
+ , deepStrictEqual : Mocha.assert_struct_eq
  , throws: Mocha.throws
-} = require('assert').strict);
+} = require('assert'));
 var old_it = it;
 it = function(string, callback) {
   old_it(string, function(done) {
