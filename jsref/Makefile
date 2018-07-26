@@ -63,10 +63,7 @@ REPLACE_STDLIB := -nopervasives -nostdlib $(STDLIB_FLAG)
 
 # ASSEMBLY_JS_FILES must respect dependencies order
 ASSEMBLY_JS_FILES := \
-	BinNums.unlog.js \
 	Datatypes.unlog.js \
-	Fappli_IEEE_bits.unlog.js \
-	Fappli_IEEE.unlog.js \
 	LibList.unlog.js \
 	LibOption.unlog.js \
 	LibProd.unlog.js \
