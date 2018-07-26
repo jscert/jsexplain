@@ -187,15 +187,6 @@ var substring = function(n, m, s) {
   return s.slice(n, n+m);
 };
 
-/* --------------------- BinNums.unlog.js --------------------- */
-
-var BinNums = (function() {
-
-
-
-return {};
-})();
-
 /* --------------------- Datatypes.unlog.js --------------------- */
 
 var Datatypes = (function() {
@@ -224,24 +215,6 @@ return {
   Eq: Eq, 
   Lt: Lt, 
   Gt: Gt};
-})();
-
-/* --------------------- Fappli_IEEE_bits.unlog.js --------------------- */
-
-var Fappli_IEEE_bits = (function() {
-
-
-
-return {};
-})();
-
-/* --------------------- Fappli_IEEE.unlog.js --------------------- */
-
-var Fappli_IEEE = (function() {
-
-
-
-return {};
 })();
 
 /* --------------------- LibList.unlog.js --------------------- */
