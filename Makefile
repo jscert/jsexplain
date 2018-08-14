@@ -28,16 +28,16 @@ test_init: test/data/test262
 
 test: test_generator test_jsjsref
 
-test_generator:
+test_generator: FORCE
 	$(MAKE) -C generator test
 
 test_jsjsref: jsjsref
 	node_modules/.bin/mocha
 
-test/data/test262:
+test/data/test262: FORCE
 	git submodule update --init test/data/test262
 
-test/data/test262/%:
+test/data/test262/%: FORCE
 	git submodule update --init test/data/test262
 
 # Documentation
