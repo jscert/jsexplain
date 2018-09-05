@@ -33,6 +33,9 @@ ASSEMBLY     := $(ASSEMBLY_BIN)
 DISPLAYGEN_BIN := $(GENERATOR_DIR)/displayed_sources.byte
 DISPLAYGEN     := $(OCAMLPAR) $(DISPLAYGEN_BIN)
 
+OCAMLDOT_DIR := ../tools/ocamldot
+OCAMLDOT := $(OCAMLDOT_DIR)/ocamldot
+
 # Warn if buildtools are missing
 $(MLTOJS_BIN) $(LINEOF_BIN) $(PPX_BIN) $(ASSEMBLY_BIN) $(DISPLAYGEN_BIN):
 	$(error Missing generator tools, build from project root, or set paths.)
@@ -104,7 +107,14 @@ ALL_DISPLAYED := $(DISPLAYED:.ml=.unlog.js) $(DISPLAYED:.ml=.pseudo.js) $(DISPLA
 
 ALL_LINEOF := $(DISPLAYED:.ml=.token.js) $(DISPLAYED:.ml=.mlloc.js) $(DISPLAYED:.ml=.ptoken.js)
 
+###############################################################
 
+ocamldot :
+	$(MAKE) -C $(OCAMLDOT_DIR)
+
+archi : all ocamldot
+	$(OCAMLDEP) *.ml > .depend
+	cat .depend | $(OCAMLDOT) | dot -Tpdf > archi_jsref.pdf
 
 ###############################################################
 # Rules
@@ -191,7 +201,7 @@ ASSEMBLY_ML_FILES := \
 	Run_js.cmo
 
 ASSEMBLY_ML := \
-  	$(STDLIB_DIR)/stdlib.cmo \
+	$(STDLIB_DIR)/stdlib.cmo \
 	$(ASSEMBLY_ML_FILES)
 
 mljsref: main.byte
@@ -258,6 +268,8 @@ clean: clean_jsjsref clean_mljsref
 	sh -c "rm -f *.cmi"
 	sh -c "rm -f .depends"
 	sh -c "rm -Rf $(DOC_DIR)"
+	sh -c "rm -f *.depend archi_jsref.pdf"
+	$(MAKE) -C $(OCAMLDOT_DIR) clean
 
 # Phony global targets
 .PHONY: all clean
