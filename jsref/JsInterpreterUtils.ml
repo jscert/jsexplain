@@ -12,7 +12,9 @@ let get_object_value state vobj name =
   get_value_ref state {
     JsSyntax.ref_base = JsSyntax.Coq_ref_base_type_value vobj;
     JsSyntax.ref_name = name;
-    JsSyntax.ref_strict = false }
+    JsSyntax.ref_strict = false;
+    JsSyntax.ref_this_value = None
+  }
 
 let get_global_value state name =
     let r =

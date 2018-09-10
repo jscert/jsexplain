@@ -25,3 +25,21 @@ let map f o = match o with
 | Some x -> Some (f x)
 | None -> None
 
+let is_some o = match o with
+| Some x -> true
+| None   -> false
+
+let is_none o = not (is_some o)
+
+(** Compares two Some values, failing if either are None *)
+let some_compare h o1 o2 =
+match o1 with
+| Some v1 ->
+  (match o2 with
+   | Some v2 -> h v1 v2
+   | None -> failwith "some_compare with None")
+| None -> failwith "some_compare with None"
+
+let unsome_error o = match o with
+| Some x -> x
+| None -> failwith "unsome_error with None"

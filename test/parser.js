@@ -1,22 +1,22 @@
 "use strict";
 
-var assert = require('chai').assert;
+const assert = require('assert').strict;
+const util = require('util');
 
 var esprima = require('esprima');
 var esprimaToAST = require('../esprima-to-ast.js');
 
-var test262tests = require('./helpers/test262.js');
+var test262 = require('./helpers/test262.js');
 
 /* Tests whether a given test is negative.
  * Param: negative (boolean or string): Return value of helper-test262.testNegativity
  * Returns: a string if type of failure specified, true, or false
  */
 function isParserNegativeTest(negative) {
-  if (typeof negative === 'boolean') {
-    return negative;
+  if (typeof negative === 'undefined') {
+    return false;
   }
-  // Second case testing for an Early (Syntax) Error
-  return /(?:SyntaxError|\?!NotEarlyError)/.test(negative);
+  return (negative.phase === 'parse' || negative.phase === 'early') ? negative.type : false;
 }
 
 function typecheckAST(ast) {
@@ -143,7 +143,7 @@ function typecheckAST(ast) {
     if (i >= 0) {
       var polyTypeName = type.substring(i+1);
       var polyTypeConstr = getType(polyTypeName);
-      assert.isFunction(polyTypeConstr);
+      assert(typeof polyTypeConstr === 'function');
       var instance = polyTypeConstr(type.substring(0, i));
       instance._typeName = polyTypeName;
       return instance;
@@ -164,12 +164,12 @@ function typecheckAST(ast) {
     var t = getType(type);
     if (isBaseType(t)) {
       assert(t === typeof value, errorMsg(value, "was expected to have type of "+t));
-    } else if (t instanceof Array) {
-      assert.instanceOf(value, Array);
+    } else if (Array.isArray(t)) {
+      assert(Array.isArray(value));
       t.forEach((type, index) => typecheck(type, value[index]));
     } else {
       assert(value.type === t._typeName, errorMsg(value, "was expected to have type of " + t._typeName));
-      assert.notStrictEqual(value.tag, "_typeName");
+      assert.notEqual(value.tag, "_typeName");
       assert(t.hasOwnProperty(value.tag), value.tag + " is a not a valid constructor of " + t._typeName);
 
       // Test each field defined in the type constructor
@@ -189,7 +189,7 @@ function typecheckAST(ast) {
 }
 
 describe("EsprimaToAST", function() {
-  it("Extracts function body strings", function() {
+  it("Extracts function body strings?", function() {
     var source =
 `function f() {
   // body line 1
@@ -199,7 +199,7 @@ a()};`;
     var ast = esprimaToAST.esprimaToAST(prog, source);
 
     var sourceBody = /{([^]*)}/.exec(source)[1];
-    assert.strictEqual(sourceBody, ast.elements.head.body.source);
+    assert.equal(sourceBody, ast.elements.head.body.source);
 
   });
 
@@ -209,10 +209,10 @@ a()};`;
   , { source: `""; 0; "use strict";`          , strict: false }
   , { source: `"use\\u0020strict";`           , strict: false }
   ].forEach(function (test) {
-    it("Correctly parses that `" + test.source + "` is " + (test.strict ? " " : "not ") + "strict mode code.", function() {
+    it("Correctly parses that `" + test.source + "` is " + (test.strict ? " " : "not ") + "strict mode code?", function() {
       var est = esprima.parse(test.source, {loc: true, range: true});
       var ast = esprimaToAST.esprimaToAST(est, test.source);
-      assert.strictEqual(test.strict, ast.strictness);
+      assert.equal(test.strict, ast.strictness);
     });
   });
 
@@ -248,7 +248,7 @@ a()};`;
       var index = 0;
       while (listElem.tag === "::") {
         if (isFunction(listElem.head)) {
-          assert.strictEqual(test.strict[index], getFunctionStrictness(listElem.head));
+          assert.equal(test.strict[index], getFunctionStrictness(listElem.head));
           index++;
         }
         listElem = listElem.tail;
@@ -257,27 +257,29 @@ a()};`;
   });
 });
 
-test262tests.push(args => {
-  it('parse', function() {
-    var negative = isParserNegativeTest(args.negative);
+test262.addTest(getTest => {
+  it('parses?', function() {
+    const test = getTest(); // This line cannot be lifted out of the 'it' callback
+
+    var negative = isParserNegativeTest(test.attrs.negative);
     try {
-      esprima.parse(args.source, {loc: true, range: true});
+      esprima.parse(test.contents, {loc: true, range: true});
     } catch(e) {
       if (!negative) {
         throw e;
       }
     }
   });
-});
 
-test262tests.push(args => {
-  it('convert ast', function() {
-    try {
-      var prog = esprima.parse(args.source, {loc: true, range: true});
-    } catch(e) { return; }
+  it('converts ast?', function() {
+    const test = getTest();
 
     try {
-      var ast = esprimaToAST.esprimaToAST(prog, args.source);
+      var prog = esprima.parse(test.contents, {loc: true, range: true});
+    } catch(e) { this.skip(); }
+
+    try {
+      var ast = esprimaToAST.esprimaToAST(prog, test.contents);
       typecheckAST(ast);
     } catch (e) {
       if (e instanceof esprimaToAST.UnsupportedSyntaxError) {

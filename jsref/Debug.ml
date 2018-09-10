@@ -4,13 +4,20 @@
 (* Inserted by extraction *)
 
 let not_yet_implemented_because loc s =
-  print_endline (loc ^ ": Not implemented because: " ^ Prheap.string_of_char_list s)
+  print_endline (loc ^ ": Not implemented because: " ^ Prheap.string_of_char_list s);
+  assert false
 
 let impossible_because loc s =
-  print_endline (loc ^ ": Stuck because: " ^ Prheap.string_of_char_list s)
+  print_endline (loc ^ ": Stuck because: " ^ Prheap.string_of_char_list s);
+  assert false
 
 let impossible_with_heap_because loc s message =
-  print_endline (loc ^ ": Stuck!\nState:  " ^ Prheap.prstate true s ^ "\nMessage:\t" ^ Prheap.string_of_char_list message)
+  print_endline (loc ^ ": Stuck!\nState:  " ^ Prheap.prstate true s ^ "\nMessage:\t" ^ Prheap.string_of_char_list message);
+  assert false
+
+let impossible_resvalue loc rv message =
+  print_endline (loc ^ ": Stuck!\nrv:  " ^ Prheap.prresvalue rv ^ "\nMessage:\t" ^ Prheap.string_of_char_list message);
+  assert false
 
 (* Inserted into JsInterpreter by patching in Makefile functions named after the appropriate insertion *)
 

@@ -35,7 +35,6 @@ let prprealloc = function
   | Coq_prealloc_object_is_frozen -> "Coq_prealloc_object_is_frozen"
   | Coq_prealloc_object_is_extensible -> "Coq_prealloc_object_is_extensible"
   | Coq_prealloc_object_keys -> "Coq_prealloc_object_keys"
-  | Coq_prealloc_object_keys_call -> "Coq_prealloc_object_keys_call"
   | Coq_prealloc_object_proto -> "Coq_prealloc_object_proto"
   | Coq_prealloc_object_proto_to_string -> "Coq_prealloc_object_proto_to_string"
   | Coq_prealloc_object_proto_value_of -> "Coq_prealloc_object_proto_value_of"
@@ -93,15 +92,18 @@ let prprealloc = function
   | Coq_prealloc_error_proto -> "Coq_prealloc_error_proto"
   | Coq_prealloc_error_proto_to_string -> "Coq_prealloc_error_proto_to_string"
   | Coq_prealloc_json -> "Coq_prealloc_json"
-
+  | Coq_prealloc_proxy -> "Coq_prealloc_proxy"
+  | Coq_prealloc_proxy_revocable -> "Coq_prealloc_proxy_revocable"
 
 let prcall = function
   | Coq_call_default -> "Coq_call_default"
+  | Coq_call_proxy -> "Coq_call_proxy"
   | Coq_call_after_bind -> "Coq_call_after_bind"
   | Coq_call_prealloc pa -> "Coq_call_prealloc " ^ prprealloc pa
 
 let prconstruct = function
   | Coq_construct_default -> "Coq_construct_default"
+  | Coq_construct_proxy -> "Coq_construct_proxy"
   | Coq_construct_after_bind -> "Coq_construct_after_bind"
   | Coq_construct_prealloc pa -> "Coq_construct_prealloc " ^ prprealloc pa
 
@@ -111,10 +113,11 @@ let prhas_instance = function
 
 let prget = function
   | Coq_builtin_get_default -> "Coq_builtin_get_default"
-  | Coq_builtin_get_function -> "Coq_builtin_get_function"
+  | Coq_builtin_get_proxy -> "Coq_builtin_get_proxy"
   | Coq_builtin_get_args_obj -> "Coq_builtin_get_args_obj"
 
 let prdelete = function
+  | Coq_builtin_delete_proxy -> "Coq_builtin_delete_proxy"
   | Coq_builtin_delete_default -> "Coq_builtin_delete_default"
   | Coq_builtin_delete_args_obj -> "Coq_builtin_delete_args_obj"
 
@@ -167,15 +170,12 @@ let prliteral = function
 	| Coq_literal_number f -> string_of_float f
 	| Coq_literal_string cl -> string_of_char_list cl
 
-let prprim = function
-  | Coq_prim_undef -> "undefined"
-  | Coq_prim_null -> "null"
-  | Coq_prim_bool b -> string_of_bool b
-  | Coq_prim_number f -> string_of_float f
-  | Coq_prim_string cl -> "\"" ^ string_of_char_list cl ^ "\""
-
 let prvalue = function
-  | Coq_value_prim p -> prprim p
+  | Coq_value_undef -> "undefined"
+  | Coq_value_null -> "null"
+  | Coq_value_bool b -> string_of_bool b
+  | Coq_value_number f -> string_of_float f
+  | Coq_value_string cl -> "\"" ^ string_of_char_list cl ^ "\""
   | Coq_value_object ol -> prloc ol
 
 let prattributes = function

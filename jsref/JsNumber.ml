@@ -14,6 +14,10 @@ let pi  = 4. *. atan 1.;;
 let e   = exp 1.;;
 let ln2 = log 2.
 
+let min = min
+let max = max
+let pow = ( ** )
+
 (* Note that we're using `float_of_string' there, which does not have the same
    behavior than JavaScript.  For instance it will read "022" as 22 instead of
    18, which should be the JavaScript result for it. *)

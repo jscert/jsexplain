@@ -6,10 +6,12 @@
 
 <script src="libraries/jquery-2.1.1.min.js"></script>
 
-<link rel=stylesheet href="libraries/codemirror/lib/codemirror.css">
-<script src="libraries/codemirror/lib/codemirror.js"></script>
-<script src="libraries/codemirror/lib/javascript.js"></script>
-
+<link rel=stylesheet href="libraries/codemirror/codemirror.css">
+<script src="libraries/codemirror/codemirror.js"></script>
+<script src="libraries/codemirror/panel.js"></script>
+<script src="codemirror-tabs.js"></script>
+<script src="libraries/codemirror/javascript.js"></script>
+<script src="libraries/codemirror/mllike.js"></script>
 
 <!-- styles needed by jScrollPane - include in your own sites -->
 <link type="text/css" href="jquery_scroll/jquery.jscrollpane.css" rel="stylesheet" media="all" />
@@ -27,79 +29,72 @@
 
 <style>
 .source_div {
-   border-top: 1px solid black; 
-   border-bottom: 1px solid black;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
 }
 
 .heap_link {
-   color: black;
-}
-
-#file_list {
-   height: 1em;
-   padding-top: 3px;
-   padding-bottom: 5px;
-   border-bottom: 1px solid black;
-}
-
-#source_tabs {
-   padding: 3px;
+  color: black;
 }
 
 .file_item, .file_item_current {
-   font-size: smaller;
-   margin-right: 3px;
-   padding: 3px;
-   text-decoration: underline;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-size: smaller;
+  margin-right: 3px;
+  padding: 3px;
+  text-decoration: underline;
 }
 
 .file_item, .file_item_current:hover {
-   cursor: pointer; 
-   cursor: hand;
+  cursor: pointer;
+  cursor: hand;
 }
 
 .file_item {
-   background-color: #FAFAFA;
+  background-color: #FAFAFA;
 }
 
 .file_item_current {
-   background-color: #FFCCCC;
+  background-color: #FFCCCC;
 }
 
 #main_table td {
-   vertical-align: top;
-   border: 1px solid black;
+  vertical-align: top;
+  border: 1px solid black;
 }
 
 #action_output {
-   font-weight: bold;
-   color: red;
+  font-weight: bold;
+  color: red;
 }
 
 #disp_env {
-   margin-top: 0.5em;
+  margin-top: 0.5em;
 }
 
 #select_source_code {
-   width: 40em;
+  width: 40em;
 }
 
 #disp_env_pane {
-   height: 100%;
+  height: 100%;
 }
 
-.CodeMirror-selected { background: #F3F781; }
-.CodeMirror-focused .CodeMirror-selected { background: #F3F781; }
-
+.debug-selection {
+  background: #F3F781;
+}
 
 .scroll-pane
 {
-	width: 100%;
-	height: 300px;
-	overflow: auto;
+  width: 100%;
+  height: 300px;
+  overflow: auto;
 }
 .hint {
-   display: none;
+  display: none;
 }
 </style>
 
@@ -114,10 +109,10 @@
      Load example: 
      <select id='select_source_code'><option disabled selected>Example Programs</option></select>
      Load file: <input type='file' accept='.js' id='select_file' />
+     <label><input type='checkbox' id='use_test262_harness' /> Use test262 harness (not Chrome from file://)</label>
    <table id='main_table'><tr>
    <td>
-      <div id='source_tabs'></div>
-      <textarea id='source_code' class='source' rows='6' cols='60'>source code here</textarea>
+      <div id='source_code' class='source'></div>
    </td>
    <td width='600'>
       <div id='disp_env_pane' class="scroll-pane">
@@ -165,7 +160,6 @@ Using: S('x'), S_raw('x'), S_line(), I('x'), I_line().
 
 <table id='main_table'><tr>
 <td>
-   <div id='file_list'></div>
    <textarea id='interpreter_code' class='source' rows='15' cols='60'></textarea>
 </td>
 <!--<td width='600'>
@@ -208,33 +202,4 @@ $(function() {
 
 </body>
 </html>
-
-
-<!--
-/*
-   $timeout(function() {codeMirror.refresh();});
-
-   this.codeMirrorInstance.setValue(content);
-   var that = this;
-   setTimeout(function() {
-       that.codeMirrorInstance.refresh();
-   },1);
-
-   http://codemirror.net/demo/buffers.html
-*/
----->
-
-
-
-
-
-
-<!---
-
-var t = []; for (var i = 0; i < 3; i++) { t[i] = function() { return i; } };
-() { return i; }
-t[0]();
-3
-
--->
 

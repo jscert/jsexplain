@@ -4,7 +4,7 @@ version: "1.0~dev"
 maintainer: "Thomas Wood <thomas.wood09@imperial.ac.uk>"
 authors: [
   "Arthur Charguéraud <arthur@chargueraud.org>"
-  "Alan Schmitt <alan.schmitt@inria.fr"
+  "Alan Schmitt <alan.schmitt@inria.fr>"
   "Thomas Wood <thomas.wood09@imperial.ac.uk>"
 ]
 homepage: "http://jscert.org/"
@@ -16,7 +16,11 @@ available: [ocaml-version >= "4.04.0" & ocaml-version < "4.05"]
 build: [
   [make]
 ]
+build-test: [
+  [make test]
+]
 depends: [
   "ocamlfind" {build}
+  "alcotest" {test}
   "JS_Parser" { >= "0.1" & < "0.2" }
 ]

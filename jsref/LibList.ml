@@ -16,6 +16,8 @@ let list_eq_nil_decidable l = match l with
 | [] -> true
 | a :: l0 -> false
 
+let is_empty = list_eq_nil_decidable
+
 (** val fold_right : ('a1 -> 'a2 -> 'a2) -> 'a2 -> 'a1 list -> 'a2 **)
 
 let rec fold_right f acc l = match l with
@@ -61,7 +63,7 @@ let length l =
 (** val take_drop_last : 'a1 list -> 'a1 list * 'a1 **)
 
 let rec take_drop_last l = match l with
-  | [] -> raise Not_found
+  | [] -> failwith "Not_found"
   | x :: l' ->
     (match l' with
      | [] -> ([], x)
@@ -72,6 +74,10 @@ let rec take_drop_last l = match l with
 let rec nth_def d n l = match l with
   | [] -> d
   | x :: l' -> if int_eq n 0 then x else nth_def d (n-1) l'
+
+let rec nth_def_map d f n l = match l with
+  | [] -> d
+  | x :: l' -> if int_eq n 0 then f x else nth_def_map d f (n-1) l'
 
 (** val mem_decide :  ('a1 -> 'a1 -> bool)  -> 'a1 -> 'a1 list -> bool **)
 

@@ -33,8 +33,10 @@ ASSEMBLY     := $(ASSEMBLY_BIN)
 DISPLAYGEN_BIN := $(GENERATOR_DIR)/displayed_sources.byte
 DISPLAYGEN     := $(OCAMLPAR) $(DISPLAYGEN_BIN)
 
+ESDOCGEN := ../tools/esdocgen/esdocgen.cmo
+
 # Warn if buildtools are missing
-$(MLTOJS_BIN) $(LINEOF_BIN) $(PPX_BIN) $(ASSEMBLY_BIN) $(DISPLAYGEN_BIN):
+$(MLTOJS_BIN) $(LINEOF_BIN) $(PPX_BIN) $(ASSEMBLY_BIN) $(DISPLAYGEN_BIN) $(ESDOCGEN):
 	$(error Missing generator tools, build from project root, or set paths.)
 
 ###############################################################
@@ -61,10 +63,7 @@ REPLACE_STDLIB := -nopervasives -nostdlib $(STDLIB_FLAG)
 
 # ASSEMBLY_JS_FILES must respect dependencies order
 ASSEMBLY_JS_FILES := \
-	BinNums.unlog.js \
 	Datatypes.unlog.js \
-	Fappli_IEEE_bits.unlog.js \
-	Fappli_IEEE.unlog.js \
 	LibList.unlog.js \
 	LibOption.unlog.js \
 	LibProd.unlog.js \
@@ -82,7 +81,6 @@ ASSEMBLY_JS_FILES := \
 	Translate_syntax.js \
 	JsCommon.unlog.js \
 	JsCommonAux.unlog.js \
-	JsPreliminary.unlog.js \
 	JsInit.unlog.js \
 	Prheap.js \
 	Debug.js \
@@ -112,7 +110,7 @@ ALL_LINEOF := $(DISPLAYED:.ml=.token.js) $(DISPLAYED:.ml=.mlloc.js) $(DISPLAYED:
 ##### Rule for cmi
 # Ordering of these rules is important, mli rule must be first.
 %.cmi: %.mli
-	ocamlc $(REPLACE_STDLIB) $<
+	ocamlc $(REPLACE_STDLIB) $(OCAMLCFLAGS) $<
 
 %.cmi: %.ml $(MLTOJS_BIN)
 	$(MLTOJS) -mode cmi -I $(STDLIB_DIR) $<
@@ -185,6 +183,8 @@ clean_jsjsref:
 ###############################################################
 # ML-JSRef
 
+OCAMLCFLAGS=
+
 # Strip all extensions of $(ASSEMBLY_JS) and replace with .cmo
 ASSEMBLY_ML_FILES := \
 	$(addsuffix .cmo,$(basename $(basename $(ASSEMBLY_JS_FILES)))) \
@@ -196,22 +196,25 @@ ASSEMBLY_ML := \
 
 mljsref: main.byte
 
+mljsref_debug: OCAMLCFLAGS+=-g
+mljsref_debug: mljsref
+
 main.byte: $(ASSEMBLY_ML)
-	ocamlfind ocamlc -linkpkg -package JS_Parser -o $@ $^
+	ocamlfind ocamlc -linkpkg -package JS_Parser -o $@ $(OCAMLCFLAGS) $^
 
 Run_js.cmo: Run_js.ml Run_js.mli Run_js.cmi
-	ocamlfind ocamlc -c -package JS_Parser $<
+	ocamlfind ocamlc -c -package JS_Parser $(OCAMLCFLAGS) $<
 
 Translate_syntax.cmo: Translate_syntax.ml Translate_syntax.mli Translate_syntax.cmi
-	ocamlfind ocamlc -c -package JS_Parser $<
+	ocamlfind ocamlc -c -package JS_Parser $(OCAMLCFLAGS) $<
 
 # Ordering of the .cmo rules is important. mli dependency forces "standard" compilation
 %.cmo: %.ml %.mli %.cmi $(PPX_BIN)
-	ocamlc -c $(PPX_FLAG) $<
+	ocamlc -c $(PPX_FLAG) $(OCAMLCFLAGS) $<
 
 # Standalone .ml files
 %.cmo: %.ml %.cmi $(PPX_BIN)
-	ocamlc -c $(REPLACE_STDLIB) $(PPX_FLAG) $<
+	ocamlc -c $(REPLACE_STDLIB) $(PPX_FLAG) $(OCAMLCFLAGS) $<
 
 clean_mljsref:
 	sh -c "rm -f $(ML_FRONTEND_SRC)/*.mli"
@@ -230,7 +233,7 @@ DOC_DIR = doc_build
 DUMP_FILE = $(DOC_DIR)/odoc.dump
 DUMP = -dump $(DUMP_FILE) -load $(DUMP_FILE)
 
-ODOC_FLAGS = -html -d $(DOC_DIR) $(DUMP) $(PPX_FLAG)
+ODOC_FLAGS = -html -d $(DOC_DIR) $(DUMP) $(PPX_FLAG) -g $(ESDOCGEN)
 
 doc: $(addprefix doc_build/,$(addsuffix .html,$(basename $(ASSEMBLY_ML_FILES))))
 	sh -c "rm -f $(DUMP_FILE)"
@@ -242,10 +245,10 @@ $(DOC_DIR):
 $(DUMP_FILE): $(DOC_DIR)
 	ocamldoc -html -d $(DOC_DIR) -dump $(DUMP_FILE)
 
-$(DOC_DIR)/%.html $(DOC_DIR)/type_%.html: %.ml %.mli %.cmi $(PPX_BIN) $(DUMP_FILE)
+$(DOC_DIR)/%.html $(DOC_DIR)/type_%.html: %.ml %.mli %.cmi $(PPX_BIN) $(ESDOCGEN) $(DUMP_FILE)
 	ocamlfind ocamldoc $(ODOC_FLAGS) -package JS_Parser $(*F).ml $(*F).mli
 
-$(DOC_DIR)/%.html $(DOC_DIR)/type_%.html: %.ml %.cmi $(PPX_BIN) $(DUMP_FILE)
+$(DOC_DIR)/%.html $(DOC_DIR)/type_%.html: %.ml %.cmi $(PPX_BIN) $(ESDOCGEN) $(DUMP_FILE)
 	ocamldoc $(ODOC_FLAGS) $(STDLIB_FLAG) $<
 
 .PHONY: doc

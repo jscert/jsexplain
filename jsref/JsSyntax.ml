@@ -1,6 +1,7 @@
 (*open JsNumber*)
 open Heap
 open Shared
+open LibOption
 
 type unary_op =
 | Coq_unary_op_delete
@@ -148,6 +149,7 @@ type native_error =
 | Coq_native_error_type
 | Coq_native_error_uri
 
+(** Intrinsic Objects *)
 type prealloc =
 | Coq_prealloc_global
 | Coq_prealloc_global_eval
@@ -163,6 +165,7 @@ type prealloc =
 | Coq_prealloc_object_get_proto_of
 | Coq_prealloc_object_get_own_prop_descriptor
 | Coq_prealloc_object_get_own_prop_name
+| Coq_prealloc_object_set_proto_of
 | Coq_prealloc_object_create
 | Coq_prealloc_object_define_prop
 | Coq_prealloc_object_define_props
@@ -173,8 +176,7 @@ type prealloc =
 | Coq_prealloc_object_is_frozen
 | Coq_prealloc_object_is_extensible
 | Coq_prealloc_object_keys
-| Coq_prealloc_object_keys_call
-| Coq_prealloc_object_proto
+| Coq_prealloc_object_proto                                   (** ObjectPrototype *)
 | Coq_prealloc_object_proto_to_string
 | Coq_prealloc_object_proto_value_of
 | Coq_prealloc_object_proto_has_own_prop
@@ -218,19 +220,42 @@ type prealloc =
 | Coq_prealloc_error_proto_to_string
 | Coq_prealloc_throw_type_error
 | Coq_prealloc_json
+| Coq_prealloc_proxy                                          (** Proxy *)
+| Coq_prealloc_proxy_revocable
+| Coq_builtin_proxy_revocation
+| Coq_prealloc_reflect                                        (** Reflect *)
+| Coq_prealloc_reflect_apply
+| Coq_prealloc_reflect_construct
+| Coq_prealloc_reflect_define_property
+| Coq_prealloc_reflect_delete_property
+| Coq_prealloc_reflect_get
+| Coq_prealloc_reflect_get_own_property_descriptor
+| Coq_prealloc_reflect_get_prototype_of
+| Coq_prealloc_reflect_has
+| Coq_prealloc_reflect_is_extensible
+| Coq_prealloc_reflect_own_keys
+| Coq_prealloc_reflect_prevent_extensions
+| Coq_prealloc_reflect_set
+| Coq_prealloc_reflect_set_prototype_of
 | Coq_prealloc_mathop of mathop [@f mathop]
 | Coq_prealloc_native_error of native_error [@f error]
 | Coq_prealloc_native_error_proto of native_error [@f error]
 
+
+
+
+(** Identities of implementations for Object Internal Methods *)
 type call =
 | Coq_call_default
 | Coq_call_after_bind
 | Coq_call_prealloc of prealloc [@f prealloc]
+| Coq_call_proxy
 
 type construct =
 | Coq_construct_default
 | Coq_construct_after_bind
 | Coq_construct_prealloc of prealloc [@f prealloc]
+| Coq_construct_proxy
 
 type builtin_has_instance =
 | Coq_builtin_has_instance_function
@@ -238,30 +263,29 @@ type builtin_has_instance =
 
 type builtin_get =
 | Coq_builtin_get_default
-| Coq_builtin_get_function
 | Coq_builtin_get_args_obj
+| Coq_builtin_get_proxy
 
 type builtin_get_own_prop =
 | Coq_builtin_get_own_prop_default
 | Coq_builtin_get_own_prop_args_obj
 | Coq_builtin_get_own_prop_string
+| Coq_builtin_get_own_prop_proxy
 
+(* FIXME: REMOVED IN ES7 *)
 type builtin_get_prop =
 | Coq_builtin_get_prop_default
 
-type builtin_put =
-| Coq_builtin_put_default
-
-type builtin_can_put =
-| Coq_builtin_can_put_default
-
 type builtin_has_prop =
 | Coq_builtin_has_prop_default
+| Coq_builtin_has_prop_proxy
 
 type builtin_delete =
 | Coq_builtin_delete_default
 | Coq_builtin_delete_args_obj
+| Coq_builtin_delete_proxy
 
+(* FIXME: REMOVED IN ES7 *)
 type builtin_default_value =
 | Coq_builtin_default_value_default
 
@@ -269,20 +293,46 @@ type builtin_define_own_prop =
 | Coq_builtin_define_own_prop_default
 | Coq_builtin_define_own_prop_array
 | Coq_builtin_define_own_prop_args_obj
+| Coq_builtin_define_own_prop_proxy
+
+type builtin_get_prototype_of =
+| Coq_builtin_get_prototype_of_default
+| Coq_builtin_get_prototype_of_proxy
+
+type builtin_set_prototype_of =
+| Coq_builtin_set_prototype_of_default
+| Coq_builtin_set_prototype_of_proxy
+
+type builtin_is_extensible =
+| Coq_builtin_is_extensible_default
+| Coq_builtin_is_extensible_proxy
+
+type builtin_prevent_extensions =
+| Coq_builtin_prevent_extensions_default
+| Coq_builtin_prevent_extensions_proxy
+
+type builtin_set =
+| Coq_builtin_set_default
+| Coq_builtin_set_proxy
+
+type builtin_own_property_keys =
+| Coq_builtin_own_property_keys_default
+| Coq_builtin_own_property_keys_proxy
+
+
+
+
 
 type object_loc =
 | Coq_object_loc_normal of int [@f address]
 | Coq_object_loc_prealloc of prealloc [@f prealloc]
 
-type prim =
-| Coq_prim_undef
-| Coq_prim_null
-| Coq_prim_bool of bool [@f value]
-| Coq_prim_number of JsNumber.number [@f value]
-| Coq_prim_string of string [@f value]
-
 type value =
-| Coq_value_prim of prim [@f value]
+| Coq_value_undef
+| Coq_value_null
+| Coq_value_bool of bool [@f value]
+| Coq_value_number of JsNumber.number [@f value]
+| Coq_value_string of string [@f value]
 | Coq_value_object of object_loc [@f value]
 
 type coq_type =
@@ -370,9 +420,17 @@ let descriptor_enumerable x = x.descriptor_enumerable
 
 let descriptor_configurable x = x.descriptor_configurable
 
+(** Representing the option type [undefined | descriptor]
+  used when undefined returned from [[GetOwnProperty]] *)
+type undef_descriptor =
+| Descriptor_undef
+| Descriptor of descriptor [@f descriptor]
+
+(** @deprecated Raw attributes should not be returned by GetOwnProperty *)
 type full_descriptor =
 | Coq_full_descriptor_undef
 | Coq_full_descriptor_some of attributes [@f value]
+
 
 type mutability =
 | Coq_mutability_uninitialized_immutable
@@ -417,14 +475,22 @@ let execution_ctx_this_binding x = x.execution_ctx_this_binding
 
 let execution_ctx_strict x = x.execution_ctx_strict
 
+
+(** {3 Reference Specification Type (Definitions)}
+    @essec 6.2.4
+    @esid sec-reference-specification-type *)
 type prop_name = string
 
 type ref_base_type =
 | Coq_ref_base_type_value of value [@f value]
 | Coq_ref_base_type_env_loc of env_loc [@f value]
 
-type ref = { ref_base : ref_base_type; ref_name : prop_name;
-             ref_strict : bool }
+type ref = { ref_base : ref_base_type;
+             ref_name : prop_name;
+             ref_strict : bool;
+             (** A ref with a thisValue shall never have a base type of env_loc *)
+             ref_this_value : value option
+           }
 
 (** val ref_base : ref -> ref_base_type **)
 
@@ -438,23 +504,36 @@ let ref_name x = x.ref_name
 
 let ref_strict x = x.ref_strict
 
+let ref_this_value x =
+  unsome_error x.ref_this_value
+
 type class_name = string
 
 type object_properties_type = (prop_name, attributes) Heap.heap
 
-type coq_object = { object_proto_ : value; object_class_ : class_name;
+
+(** Object type definition
+    @esid: sec-object-type *)
+(* FIXME: ES7 defines internal slots as being able to take the undefined value *)
+(* FIXME: prototype, extensible are now optional slots. class, default_value, others to be removed. *)
+type coq_object = { object_proto_ : value;
+                    object_class_ : class_name;
                     object_extensible_ : bool;
                     object_prim_value_ : value option;
                     object_properties_ : object_properties_type;
-                    object_get_ : builtin_get;
+                    object_get_prototype_of_ : builtin_get_prototype_of;
+                    object_set_prototype_of_ : builtin_set_prototype_of;
+                    object_is_extensible_ : builtin_is_extensible;
+                    object_prevent_extensions_ : builtin_prevent_extensions;
                     object_get_own_prop_ : builtin_get_own_prop;
-                    object_get_prop_ : builtin_get_prop;
-                    object_put_ : builtin_put;
-                    object_can_put_ : builtin_can_put;
                     object_has_prop_ : builtin_has_prop;
+                    object_get_ : builtin_get;
+                    object_set_ : builtin_set;
+                    object_get_prop_ : builtin_get_prop;
                     object_delete_ : builtin_delete;
                     object_default_value_ : builtin_default_value;
                     object_define_own_prop_ : builtin_define_own_prop;
+                    object_own_property_keys_ : builtin_own_property_keys;
                     object_construct_ : construct option;
                     object_call_ : call option;
                     object_has_instance_ : builtin_has_instance option;
@@ -464,103 +543,44 @@ type coq_object = { object_proto_ : value; object_class_ : class_name;
                     object_target_function_ : object_loc option;
                     object_bound_this_ : value option;
                     object_bound_args_ : value list option;
-                    object_parameter_map_ : object_loc option }
+                    object_parameter_map_ : object_loc option;
+                    object_revocable_proxy_ : value option;
+                    object_proxy_target_ : value option;
+                    object_proxy_handler_ : value option }
 
-(** val object_proto_ : coq_object -> value **)
-
+(* Object projection functions *)
 let object_proto_ x = x.object_proto_
-
-(** val object_class_ : coq_object -> class_name **)
-
+let object_prototype_ x = x.object_proto_
 let object_class_ x = x.object_class_
-
-(** val object_extensible_ : coq_object -> bool **)
-
 let object_extensible_ x = x.object_extensible_
-
-(** val object_prim_value_ : coq_object -> value option **)
-
 let object_prim_value_ x = x.object_prim_value_
-
-(** val object_properties_ : coq_object -> object_properties_type **)
-
 let object_properties_ x = x.object_properties_
-
-(** val object_get_ : coq_object -> builtin_get **)
-
+let object_get_prototype_of_ x = x.object_get_prototype_of_
+let object_set_prototype_of_ x = x.object_set_prototype_of_
+let object_is_extensible_ x = x.object_is_extensible_
+let object_prevent_extensions_ x = x.object_prevent_extensions_
 let object_get_ x = x.object_get_
-
-(** val object_get_own_prop_ : coq_object -> builtin_get_own_prop **)
-
+let object_set_ x = x.object_set_
 let object_get_own_prop_ x = x.object_get_own_prop_
-
-(** val object_get_prop_ : coq_object -> builtin_get_prop **)
-
 let object_get_prop_ x = x.object_get_prop_
-
-(** val object_put_ : coq_object -> builtin_put **)
-
-let object_put_ x = x.object_put_
-
-(** val object_can_put_ : coq_object -> builtin_can_put **)
-
-let object_can_put_ x = x.object_can_put_
-
-(** val object_has_prop_ : coq_object -> builtin_has_prop **)
-
 let object_has_prop_ x = x.object_has_prop_
-
-(** val object_delete_ : coq_object -> builtin_delete **)
-
 let object_delete_ x = x.object_delete_
-
-(** val object_default_value_ : coq_object -> builtin_default_value **)
-
 let object_default_value_ x = x.object_default_value_
-
-(** val object_define_own_prop_ : coq_object -> builtin_define_own_prop **)
-
 let object_define_own_prop_ x = x.object_define_own_prop_
-
-(** val object_construct_ : coq_object -> construct option **)
-
+let object_own_property_keys_ x = x.object_own_property_keys_
 let object_construct_ x = x.object_construct_
-
-(** val object_call_ : coq_object -> call option **)
-
 let object_call_ x = x.object_call_
-
-(** val object_has_instance_ : coq_object -> builtin_has_instance option **)
-
 let object_has_instance_ x = x.object_has_instance_
-
-(** val object_scope_ : coq_object -> lexical_env option **)
-
 let object_scope_ x = x.object_scope_
-
-(** val object_formal_parameters_ : coq_object -> string list option **)
-
 let object_formal_parameters_ x = x.object_formal_parameters_
-
-(** val object_code_ : coq_object -> funcbody option **)
-
 let object_code_ x = x.object_code_
-
-(** val object_target_function_ : coq_object -> object_loc option **)
-
 let object_target_function_ x = x.object_target_function_
-
-(** val object_bound_this_ : coq_object -> value option **)
-
 let object_bound_this_ x = x.object_bound_this_
-
-(** val object_bound_args_ : coq_object -> value list option **)
-
 let object_bound_args_ x = x.object_bound_args_
-
-(** val object_parameter_map_ : coq_object -> object_loc option **)
-
 let object_parameter_map_ x = x.object_parameter_map_
+let object_revocable_proxy_ x = x.object_revocable_proxy_
+let object_proxy_target_ x = x.object_proxy_target_
+let object_proxy_handler_ x = x.object_proxy_handler_
 
 type event =
 | Coq_delete_event of object_loc * prop_name * object_loc option [@f loc, name, locopt]
@@ -590,6 +610,11 @@ type resvalue =
 | Coq_resvalue_empty
 | Coq_resvalue_value of value [@f value]
 | Coq_resvalue_ref of ref [@f ref]
+
+type resvalue_type =
+| Type_resvalue_empty
+| Type_resvalue_value
+| Type_resvalue_ref
 
 type res = { res_type : restype; res_value : resvalue; res_label : label }
 
@@ -653,57 +678,12 @@ let res_throw v =
   { res_type = Coq_restype_throw; res_value = v; res_label =
     Coq_label_empty }
 
-type out =
-| Coq_out_div
-| Coq_out_ter of state * res [@f state, res]
-
-(** val out_void : state -> out **)
-
-let out_void s =
-  Coq_out_ter (s, res_empty)
-
+(** Return types from specification functions *)
 type 't specret =
-| Coq_specret_val of state * 't [@f state, res]
-| Coq_specret_out of out [@f out]
+| Coq_specret_val of state * 't [@f state, value] (** A pure/specification value *)
+| Coq_specret_out of state * res [@f state, res]  (** A completion record (possibly abrupt) *)
 
 type codetype =
 | Coq_codetype_func
 | Coq_codetype_global
 | Coq_codetype_eval
-
-(*
-let thebound = 
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           ((fun p -> 1. +. (2. *. p))
-                                           1.)))))))))))))))))))))))))))))))
-
-*)

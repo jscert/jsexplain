@@ -28,14 +28,15 @@ implementation of this library as the functions None, Some, mk_nil, mk_cons.
 *)
 
 (**{6 Exceptions }*)
-(** Behaves as [throw "Not_found"] in JS. *)
+(** Behaves as [throw x] in JS. *)
 val raise : exn -> 'a
+val failwith : string -> 'a
 
 (**{6 Boolean operations }*)
 (** Note: Both OCaml and JS implement lazy evaluation for boolean operators. *)
 val not : bool -> bool
-val ( && ) : bool -> bool -> bool
-val ( || ) : bool -> bool -> bool
+external ( && ) : bool -> bool -> bool = "%sequand";;
+external ( || ) : bool -> bool -> bool = "%sequor";;
 
 (**{6 Debugging }*)
 external __LOC__ : string = "%loc_LOC"
