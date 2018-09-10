@@ -8,10 +8,7 @@
 <link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
-<link title="BinNums" rel="Chapter" href="BinNums.html">
 <link title="Datatypes" rel="Chapter" href="Datatypes.html">
-<link title="Fappli_IEEE_bits" rel="Chapter" href="Fappli_IEEE_bits.html">
-<link title="Fappli_IEEE" rel="Chapter" href="Fappli_IEEE.html">
 <link title="LibList" rel="Chapter" href="LibList.html">
 <link title="LibOption" rel="Chapter" href="LibOption.html">
 <link title="LibProd" rel="Chapter" href="LibProd.html">
@@ -29,7 +26,6 @@
 <link title="Translate_syntax" rel="Chapter" href="Translate_syntax.html">
 <link title="JsCommon" rel="Chapter" href="JsCommon.html">
 <link title="JsCommonAux" rel="Chapter" href="JsCommonAux.html">
-<link title="JsPreliminary" rel="Chapter" href="JsPreliminary.html">
 <link title="JsInit" rel="Chapter" href="JsInit.html">
 <link title="Prheap" rel="Chapter" href="Prheap.html">
 <link title="Debug" rel="Chapter" href="Debug.html">
@@ -44,9 +40,6 @@
 &nbsp;</div>
 <h1>Index of modules</h1>
 <table>
-<tr><td align="left"><br>B</td></tr>
-<tr><td><a href="BinNums.html">BinNums</a> </td>
-<td></td></tr>
 <tr><td align="left"><br>C</td></tr>
 <tr><td><a href="Compare.html">Compare</a> </td>
 <td></td></tr>
@@ -57,11 +50,6 @@ val fst : ('a1 * 'a2) -&gt; 'a1 *
 </div>
 </td></tr>
 <tr><td><a href="Debug.html">Debug</a> </td>
-<td></td></tr>
-<tr><td align="left"><br>F</td></tr>
-<tr><td><a href="Fappli_IEEE.html">Fappli_IEEE</a> </td>
-<td></td></tr>
-<tr><td><a href="Fappli_IEEE_bits.html">Fappli_IEEE_bits</a> </td>
 <td></td></tr>
 <tr><td align="left"><br>H</td></tr>
 <tr><td><a href="Heap.html">Heap</a> </td>
@@ -77,9 +65,15 @@ val empty : ('a1, 'a2) heap *
 </div>
 </td></tr>
 <tr><td><a href="HeapObj.html">HeapObj</a> </td>
-<td></td></tr>
+<td><div class="info">
+HeapObj: Implementation of heaps with locations as keys
+</div>
+</td></tr>
 <tr><td><a href="HeapStr.html">HeapStr</a> </td>
-<td></td></tr>
+<td><div class="info">
+HeapStr: Implementation of heaps with strings as keys
+</div>
+</td></tr>
 <tr><td align="left"><br>J</td></tr>
 <tr><td><a href="JsCommon.html">JsCommon</a> </td>
 <td><div class="info">
@@ -88,9 +82,7 @@ val res_overwrite_value_if_empty : resvalue -&gt; res -&gt; res *
 </td></tr>
 <tr><td><a href="JsCommonAux.html">JsCommonAux</a> </td>
 <td><div class="info">
-val if_some_then_same_dec :
-    'a1 option -&gt; 'a1 option -&gt; ('a1 -&gt; 'a1 -&gt; bool) -&gt;
-    bool *
+If x is Some value, then y has same value, according to comparison d.
 </div>
 </td></tr>
 <tr><td><a href="JsInit.html">JsInit</a> </td>
@@ -100,7 +92,7 @@ val if_some_then_same_dec :
 </td></tr>
 <tr><td><a href="JsInterpreter.html">JsInterpreter</a> </td>
 <td><div class="info">
-val convert_number_to_bool : number -&gt; bool *
+ECMAScript Reference Interpreter Implementation
 </div>
 </td></tr>
 <tr><td><a href="JsInterpreterMonads.html">JsInterpreterMonads</a> </td>
@@ -112,8 +104,6 @@ val res_out : out -&gt; 'a1 specres *
 <td></td></tr>
 <tr><td><a href="JsNumber.html">JsNumber</a> </td>
 <td></td></tr>
-<tr><td><a href="JsPreliminary.html">JsPreliminary</a> </td>
-<td></td></tr>
 <tr><td><a href="JsSyntax.html">JsSyntax</a> </td>
 <td><div class="info">
 val strictness_false : strictness_flag *
@@ -121,8 +111,7 @@ val strictness_false : strictness_flag *
 </td></tr>
 <tr><td><a href="JsSyntaxAux.html">JsSyntaxAux</a> </td>
 <td><div class="info">
-val object_create :
-    value -&gt; class_name -&gt; bool -&gt; object_properties_type -&gt; coq_object *
+val string_of_prealloc : prealloc -&gt; string *
 </div>
 </td></tr>
 <tr><td align="left"><br>L</td></tr>

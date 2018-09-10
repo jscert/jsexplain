@@ -6,16 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Start" href="index.html">
 <link rel="previous" href="JsCommon.html">
-<link rel="next" href="JsPreliminary.html">
+<link rel="next" href="JsInit.html">
 <link rel="Up" href="index.html">
 <link title="Index of types" rel=Appendix href="index_types.html">
 <link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
-<link title="BinNums" rel="Chapter" href="BinNums.html">
 <link title="Datatypes" rel="Chapter" href="Datatypes.html">
-<link title="Fappli_IEEE_bits" rel="Chapter" href="Fappli_IEEE_bits.html">
-<link title="Fappli_IEEE" rel="Chapter" href="Fappli_IEEE.html">
 <link title="LibList" rel="Chapter" href="LibList.html">
 <link title="LibOption" rel="Chapter" href="LibOption.html">
 <link title="LibProd" rel="Chapter" href="LibProd.html">
@@ -33,7 +30,6 @@
 <link title="Translate_syntax" rel="Chapter" href="Translate_syntax.html">
 <link title="JsCommon" rel="Chapter" href="JsCommon.html">
 <link title="JsCommonAux" rel="Chapter" href="JsCommonAux.html">
-<link title="JsPreliminary" rel="Chapter" href="JsPreliminary.html">
 <link title="JsInit" rel="Chapter" href="JsInit.html">
 <link title="Prheap" rel="Chapter" href="Prheap.html">
 <link title="Debug" rel="Chapter" href="Debug.html">
@@ -46,26 +42,22 @@
 <body>
 <div class="navbar"><a class="pre" href="JsCommon.html" title="JsCommon">Previous</a>
 &nbsp;<a class="up" href="index.html" title="Index">Up</a>
-&nbsp;<a class="post" href="JsPreliminary.html" title="JsPreliminary">Next</a>
+&nbsp;<a class="post" href="JsInit.html" title="JsInit">Next</a>
 </div>
 <h1>Module <a href="type_JsCommonAux.html">JsCommonAux</a></h1>
 
 <pre><span class="keyword">module</span> JsCommonAux: <code class="code">sig</code> <a href="JsCommonAux.html">..</a> <code class="code">end</code></pre><div class="info module top">
-val if_some_then_same_dec :
-    'a1 option -&gt; 'a1 option -&gt; ('a1 -&gt; 'a1 -&gt; bool) -&gt;
-    bool *<br>
+If x is Some value, then y has same value, according to comparison d.
+    (x = Some a) implies (y = Some b) and (d a b)<br>
 </div>
 <hr width="100%">
 
-<pre><span id="VAL__"><span class="keyword">val</span> __</span> : <code class="type">unit</code></pre><br>
-val if_some_then_same_dec :
-    'a1 option -&gt; 'a1 option -&gt; ('a1 -&gt; 'a1 -&gt; bool) -&gt;
-    bool *<br>
+<pre><span id="VALif_some_then_same"><span class="keyword">val</span> if_some_then_same</span> : <code class="type">'a option -> 'b option -> ('a -> 'b -> bool) -> bool</code></pre><div class="info ">
+If x is Some value, then y has same value, according to comparison d.
+    (x = Some a) implies (y = Some b) and (d a b)<br>
+</div>
 
-<pre><span id="VALif_some_then_same_dec"><span class="keyword">val</span> if_some_then_same_dec</span> : <code class="type">'a option -> 'b option -> ('b -> 'a -> bool) -> bool</code></pre><br>
-val same_value_dec : value -&gt; value -&gt; bool *<br>
-
-<pre><span id="VALsame_value_dec"><span class="keyword">val</span> same_value_dec</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool</code></pre><br>
+<pre><span id="VALsame_value_dec"><span class="keyword">val</span> same_value_dec</span> : <code class="type">'a -> 'b -> 'c</code></pre><br>
 val attributes_data_compare :
     attributes_data -&gt; attributes_data -&gt; bool *<br>
 
@@ -83,11 +75,11 @@ val full_descriptor_compare :
 <pre><span id="VALfull_descriptor_compare"><span class="keyword">val</span> full_descriptor_compare</span> : <code class="type"><a href="JsSyntax.html#TYPEfull_descriptor">JsSyntax.full_descriptor</a> -> <a href="JsSyntax.html#TYPEfull_descriptor">JsSyntax.full_descriptor</a> -> bool</code></pre><br>
 val ref_kind_comparable : ref_kind coq_Comparable *<br>
 
-<pre><span id="VALref_kind_comparable"><span class="keyword">val</span> ref_kind_comparable</span> : <code class="type"><a href="JsCommon.html#TYPEref_kind">JsCommon.ref_kind</a> -> <a href="JsCommon.html#TYPEref_kind">JsCommon.ref_kind</a> -> bool</code></pre><br>
-val object_binds_option :
-    state -&gt; object_loc -&gt; coq_object option *<br>
-
-<pre><span id="VALobject_binds_option"><span class="keyword">val</span> object_binds_option</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> option</code></pre><br>
+<pre><span id="VALref_kind_comparable"><span class="keyword">val</span> ref_kind_comparable</span> : <code class="type"><a href="JsCommon.html#TYPEref_kind">JsCommon.ref_kind</a> -> <a href="JsCommon.html#TYPEref_kind">JsCommon.ref_kind</a> -> bool</code></pre>
+<pre><span id="VALobject_binds_option"><span class="keyword">val</span> object_binds_option</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> option</code></pre><div class="info ">
+Fetches Some object from location l in the heap, None if it is not allocated<br>
+</div>
+<br>
 val env_record_binds_option :
     state -&gt; env_loc -&gt; env_record option *<br>
 
@@ -96,39 +88,32 @@ val decl_env_record_option :
     decl_env_record -&gt; prop_name -&gt; (mutability * value) option *<br>
 
 <pre><span id="VALdecl_env_record_option"><span class="keyword">val</span> decl_env_record_option</span> : <code class="type">(string, 'a) <a href="StdMap.html#TYPEt">StdMap.t</a> -> string -> 'a option</code></pre><br>
-val descriptor_is_data_dec : descriptor -&gt; bool *<br>
-
-<pre><span id="VALdescriptor_is_data_dec"><span class="keyword">val</span> descriptor_is_data_dec</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> bool</code></pre><br>
-val descriptor_is_accessor_dec : descriptor -&gt; bool *<br>
-
-<pre><span id="VALdescriptor_is_accessor_dec"><span class="keyword">val</span> descriptor_is_accessor_dec</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> bool</code></pre><br>
-val descriptor_is_generic_dec : descriptor -&gt; bool *<br>
-
-<pre><span id="VALdescriptor_is_generic_dec"><span class="keyword">val</span> descriptor_is_generic_dec</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> bool</code></pre><br>
 val prepost_unary_op_dec : unary_op -&gt; bool *<br>
 
 <pre><span id="VALprepost_unary_op_dec"><span class="keyword">val</span> prepost_unary_op_dec</span> : <code class="type"><a href="JsSyntax.html#TYPEunary_op">JsSyntax.unary_op</a> -> bool</code></pre><br>
 val attributes_is_data_dec : attributes -&gt; bool *<br>
 
-<pre><span id="VALattributes_is_data_dec"><span class="keyword">val</span> attributes_is_data_dec</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> bool</code></pre><br>
-val run_object_heap_map_properties :
-    state -&gt; object_loc -&gt; (object_properties_type -&gt; object_properties_type)
-    -&gt; state option *<br>
+<pre><span id="VALattributes_is_data_dec"><span class="keyword">val</span> attributes_is_data_dec</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> bool</code></pre>
+<pre><span id="VALdescriptor_get_defined"><span class="keyword">val</span> descriptor_get_defined</span> : <code class="type"><a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a></code></pre><div class="info ">
+Unpacks a the descriptor_undef type to a descriptor.
+<p>
 
-<pre><span id="VALrun_object_heap_map_properties"><span class="keyword">val</span> run_object_heap_map_properties</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       (<a href="JsSyntax.html#TYPEobject_properties_type">JsSyntax.object_properties_type</a> -> <a href="JsSyntax.html#TYPEobject_properties_type">JsSyntax.object_properties_type</a>) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> option</code></pre><br>
-val object_heap_map_properties_option :
-    state -&gt; object_loc -&gt; (object_properties_type -&gt; object_properties_type)
-    -&gt; state option *<br>
+    The spec assumes this step automatically after testing that a
+    descriptor is not undefined, or through the IsGenericDescriptor
+    and IsDataDescriptor tests.<br>
+</div>
 
-<pre><span id="VALobject_heap_map_properties_option"><span class="keyword">val</span> object_heap_map_properties_option</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       (<a href="JsSyntax.html#TYPEobject_properties_type">JsSyntax.object_properties_type</a> -> <a href="JsSyntax.html#TYPEobject_properties_type">JsSyntax.object_properties_type</a>) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> option</code></pre><br>
-val descriptor_contains_dec :
-    descriptor -&gt; descriptor -&gt; bool *<br>
+<pre><span id="VALdescriptor_contained_by"><span class="keyword">val</span> descriptor_contained_by</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> (<a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool) -> bool</code></pre><div class="info ">
+Function to test if d0 is contained within d1.
+    Implements the spec text:
+    "true, if every field in d0 also occurs in d1 and the value of every field in d0 is the
+    same value as the corresponding field in d1 when compared using the sv algorithm."<br>
+</div>
 
-<pre><span id="VALdescriptor_contains_dec"><span class="keyword">val</span> descriptor_contains_dec</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> bool</code></pre><br>
-val descriptor_enumerable_not_same_dec :
-    attributes -&gt; descriptor -&gt; bool *<br>
-
-<pre><span id="VALdescriptor_enumerable_not_same_dec"><span class="keyword">val</span> descriptor_enumerable_not_same_dec</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> bool</code></pre><br>
+<pre><span id="VALdescriptor_is_empty"><span class="keyword">val</span> descriptor_is_empty</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> bool</code></pre><div class="info ">
+Implements spec text: "true, if every field in d is absent"<br>
+</div>
+<br>
 val descriptor_value_not_same_dec :
     attributes_data -&gt; descriptor -&gt; bool *<br>
 
@@ -141,10 +126,6 @@ val descriptor_set_not_same_dec :
     attributes_accessor -&gt; descriptor -&gt; bool *<br>
 
 <pre><span id="VALdescriptor_set_not_same_dec"><span class="keyword">val</span> descriptor_set_not_same_dec</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> bool</code></pre><br>
-val attributes_change_enumerable_on_non_configurable_dec :
-    attributes -&gt; descriptor -&gt; bool *<br>
-
-<pre><span id="VALattributes_change_enumerable_on_non_configurable_dec"><span class="keyword">val</span> attributes_change_enumerable_on_non_configurable_dec</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> bool</code></pre><br>
 val attributes_change_data_on_non_configurable_dec :
     attributes_data -&gt; descriptor -&gt; bool *<br>
 
@@ -169,4 +150,34 @@ val is_callable_dec : state -&gt; value -&gt; bool *<br>
 val object_properties_keys_as_list_option :
     state -&gt; object_loc -&gt; prop_name list option *<br>
 
-<pre><span id="VALobject_properties_keys_as_list_option"><span class="keyword">val</span> object_properties_keys_as_list_option</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> list option</code></pre></body></html>
+<pre><span id="VALobject_properties_keys_as_list_option"><span class="keyword">val</span> object_properties_keys_as_list_option</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> list option</code></pre>
+<pre><span id="VALrun_object_heap_map_properties"><span class="keyword">val</span> run_object_heap_map_properties</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       (<a href="JsSyntax.html#TYPEobject_properties_type">JsSyntax.object_properties_type</a> -> <a href="JsSyntax.html#TYPEobject_properties_type">JsSyntax.object_properties_type</a>) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> option</code></pre><div class="info ">
+Updates the properties Heap of a given object using f<br>
+</div>
+
+<pre><span id="VALproperties_map_property"><span class="keyword">val</span> properties_map_property</span> : <code class="type">(string, 'a) <a href="StdMap.html#TYPEt">StdMap.t</a> -> string -> ('a -> 'a) -> (string, 'a) <a href="StdMap.html#TYPEt">StdMap.t</a></code></pre><div class="info ">
+Given a properties Heap, a property name, updates the given property attributes using function f<br>
+</div>
+
+<pre><span id="VALobject_set_property"><span class="keyword">val</span> object_set_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> option</code></pre><div class="info ">
+Update an object's property given the location, property name and new attributes value<br>
+</div>
+
+<pre><span id="VALobject_map_property"><span class="keyword">val</span> object_map_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -><br>       (<a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a>) -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> option</code></pre><div class="info ">
+Updates an object's property given the location, property name and function mapping old to new attributes<br>
+</div>
+
+<pre><span id="VALobject_retrieve_property"><span class="keyword">val</span> object_retrieve_property</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> string -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> option</code></pre>
+<pre><span id="VALobject_property_exists"><span class="keyword">val</span> object_property_exists</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> string -> bool</code></pre>
+<pre><span id="VALrun_object_method"><span class="keyword">val</span> run_object_method</span> : <code class="type">(<a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> 'a) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a option</code></pre><div class="info ">
+Fetches a given object slot value (using proj) from the object l in state s
+    FIXME: The name is very confusing.<br>
+</div>
+<br>
+val run_object_heap_set :
+    (coq_object -&gt; a' -&gt; coq_object) -&gt; state -&gt; object_loc -&gt; a' -&gt; state option *<br>
+<br>
+Updates an object's internal field with the given update function <code class="code">prj</code>.
+    (Update functions are defined in JsSyntaxAux)<br>
+
+<pre><span id="VALrun_object_set_internal"><span class="keyword">val</span> run_object_set_internal</span> : <code class="type">(<a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> 'a -> <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a>) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> 'a -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> option</code></pre></body></html>

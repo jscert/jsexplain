@@ -12,10 +12,7 @@
 <link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
-<link title="BinNums" rel="Chapter" href="BinNums.html">
 <link title="Datatypes" rel="Chapter" href="Datatypes.html">
-<link title="Fappli_IEEE_bits" rel="Chapter" href="Fappli_IEEE_bits.html">
-<link title="Fappli_IEEE" rel="Chapter" href="Fappli_IEEE.html">
 <link title="LibList" rel="Chapter" href="LibList.html">
 <link title="LibOption" rel="Chapter" href="LibOption.html">
 <link title="LibProd" rel="Chapter" href="LibProd.html">
@@ -33,7 +30,6 @@
 <link title="Translate_syntax" rel="Chapter" href="Translate_syntax.html">
 <link title="JsCommon" rel="Chapter" href="JsCommon.html">
 <link title="JsCommonAux" rel="Chapter" href="JsCommonAux.html">
-<link title="JsPreliminary" rel="Chapter" href="JsPreliminary.html">
 <link title="JsInit" rel="Chapter" href="JsInit.html">
 <link title="Prheap" rel="Chapter" href="Prheap.html">
 <link title="Debug" rel="Chapter" href="Debug.html">
@@ -52,9 +48,10 @@
 
 <pre><span class="keyword">module</span> Debug: <code class="code">sig</code> <a href="Debug.html">..</a> <code class="code">end</code></pre><hr width="100%">
 
-<pre><span id="VALnot_yet_implemented_because"><span class="keyword">val</span> not_yet_implemented_because</span> : <code class="type">string -> string -> unit</code></pre>
-<pre><span id="VALimpossible_because"><span class="keyword">val</span> impossible_because</span> : <code class="type">string -> string -> unit</code></pre>
-<pre><span id="VALimpossible_with_heap_because"><span class="keyword">val</span> impossible_with_heap_because</span> : <code class="type">string -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> string -> unit</code></pre>
+<pre><span id="VALnot_yet_implemented_because"><span class="keyword">val</span> not_yet_implemented_because</span> : <code class="type">string -> string -> 'a</code></pre>
+<pre><span id="VALimpossible_because"><span class="keyword">val</span> impossible_because</span> : <code class="type">string -> string -> 'a</code></pre>
+<pre><span id="VALimpossible_with_heap_because"><span class="keyword">val</span> impossible_with_heap_because</span> : <code class="type">string -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> string -> 'a</code></pre>
+<pre><span id="VALimpossible_resvalue"><span class="keyword">val</span> impossible_resvalue</span> : <code class="type">string -> <a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -> string -> 'a</code></pre>
 <pre><span id="VALref_get_value"><span class="keyword">val</span> ref_get_value</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> unit</code></pre>
 <pre><span id="VALref_get_value_2"><span class="keyword">val</span> ref_get_value_2</span> : <code class="type"><a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -> unit</code></pre>
 <pre><span id="VALrun_object_method"><span class="keyword">val</span> run_object_method</span> : <code class="type"><a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> unit</code></pre>

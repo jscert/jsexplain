@@ -9,10 +9,7 @@
 <link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
-<link title="BinNums" rel="Chapter" href="BinNums.html">
 <link title="Datatypes" rel="Chapter" href="Datatypes.html">
-<link title="Fappli_IEEE_bits" rel="Chapter" href="Fappli_IEEE_bits.html">
-<link title="Fappli_IEEE" rel="Chapter" href="Fappli_IEEE.html">
 <link title="LibList" rel="Chapter" href="LibList.html">
 <link title="LibOption" rel="Chapter" href="LibOption.html">
 <link title="LibProd" rel="Chapter" href="LibProd.html">
@@ -30,7 +27,6 @@
 <link title="Translate_syntax" rel="Chapter" href="Translate_syntax.html">
 <link title="JsCommon" rel="Chapter" href="JsCommon.html">
 <link title="JsCommonAux" rel="Chapter" href="JsCommonAux.html">
-<link title="JsPreliminary" rel="Chapter" href="JsPreliminary.html">
 <link title="JsInit" rel="Chapter" href="JsInit.html">
 <link title="Prheap" rel="Chapter" href="Prheap.html">
 <link title="Debug" rel="Chapter" href="Debug.html">
@@ -50,13 +46,10 @@
 </ul>
 <br/><br>
 <table class="indextable">
-<tr><td class="module"><a href="BinNums.html">BinNums</a></td><td></td></tr>
 <tr><td class="module"><a href="Datatypes.html">Datatypes</a></td><td><div class="info">
 val fst : ('a1 * 'a2) -&gt; 'a1 *
 </div>
 </td></tr>
-<tr><td class="module"><a href="Fappli_IEEE_bits.html">Fappli_IEEE_bits</a></td><td></td></tr>
-<tr><td class="module"><a href="Fappli_IEEE.html">Fappli_IEEE</a></td><td></td></tr>
 <tr><td class="module"><a href="LibList.html">LibList</a></td><td><div class="info">
 val hd : 'a1 -&gt; 'a1 list -&gt; 'a1 *
 </div>
@@ -78,7 +71,10 @@ val empty : ('a1, 'a2) heap *
 </div>
 </td></tr>
 <tr><td class="module"><a href="HeapInt.html">HeapInt</a></td><td></td></tr>
-<tr><td class="module"><a href="HeapStr.html">HeapStr</a></td><td></td></tr>
+<tr><td class="module"><a href="HeapStr.html">HeapStr</a></td><td><div class="info">
+HeapStr: Implementation of heaps with strings as keys
+</div>
+</td></tr>
 <tr><td class="module"><a href="HeapList.html">HeapList</a></td><td><div class="info">
 val empty : ('a1, 'a2) heap *
 </div>
@@ -94,11 +90,13 @@ val strictness_false : strictness_flag *
 </div>
 </td></tr>
 <tr><td class="module"><a href="JsSyntaxAux.html">JsSyntaxAux</a></td><td><div class="info">
-val object_create :
-    value -&gt; class_name -&gt; bool -&gt; object_properties_type -&gt; coq_object *
+val string_of_prealloc : prealloc -&gt; string *
 </div>
 </td></tr>
-<tr><td class="module"><a href="HeapObj.html">HeapObj</a></td><td></td></tr>
+<tr><td class="module"><a href="HeapObj.html">HeapObj</a></td><td><div class="info">
+HeapObj: Implementation of heaps with locations as keys
+</div>
+</td></tr>
 <tr><td class="module"><a href="Translate_syntax.html">Translate_syntax</a></td><td><div class="info">
 val add_infos_funcbody : strictness_flag -&gt; funcbody -&gt; funcbody *
 </div>
@@ -108,12 +106,9 @@ val res_overwrite_value_if_empty : resvalue -&gt; res -&gt; res *
 </div>
 </td></tr>
 <tr><td class="module"><a href="JsCommonAux.html">JsCommonAux</a></td><td><div class="info">
-val if_some_then_same_dec :
-    'a1 option -&gt; 'a1 option -&gt; ('a1 -&gt; 'a1 -&gt; bool) -&gt;
-    bool *
+If x is Some value, then y has same value, according to comparison d.
 </div>
 </td></tr>
-<tr><td class="module"><a href="JsPreliminary.html">JsPreliminary</a></td><td></td></tr>
 <tr><td class="module"><a href="JsInit.html">JsInit</a></td><td><div class="info">
 ------------JS Preliminary ------------------
 </div>
@@ -125,7 +120,7 @@ val res_out : out -&gt; 'a1 specres *
 </div>
 </td></tr>
 <tr><td class="module"><a href="JsInterpreter.html">JsInterpreter</a></td><td><div class="info">
-val convert_number_to_bool : number -&gt; bool *
+ECMAScript Reference Interpreter Implementation
 </div>
 </td></tr>
 <tr><td class="module"><a href="JsInterpreterUtils.html">JsInterpreterUtils</a></td><td></td></tr>

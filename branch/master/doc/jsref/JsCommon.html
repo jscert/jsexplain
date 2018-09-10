@@ -12,10 +12,7 @@
 <link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
-<link title="BinNums" rel="Chapter" href="BinNums.html">
 <link title="Datatypes" rel="Chapter" href="Datatypes.html">
-<link title="Fappli_IEEE_bits" rel="Chapter" href="Fappli_IEEE_bits.html">
-<link title="Fappli_IEEE" rel="Chapter" href="Fappli_IEEE.html">
 <link title="LibList" rel="Chapter" href="LibList.html">
 <link title="LibOption" rel="Chapter" href="LibOption.html">
 <link title="LibProd" rel="Chapter" href="LibProd.html">
@@ -33,7 +30,6 @@
 <link title="Translate_syntax" rel="Chapter" href="Translate_syntax.html">
 <link title="JsCommon" rel="Chapter" href="JsCommon.html">
 <link title="JsCommonAux" rel="Chapter" href="JsCommonAux.html">
-<link title="JsPreliminary" rel="Chapter" href="JsPreliminary.html">
 <link title="JsInit" rel="Chapter" href="JsInit.html">
 <link title="Prheap" rel="Chapter" href="Prheap.html">
 <link title="Debug" rel="Chapter" href="Debug.html">
@@ -63,48 +59,74 @@ val res_label_in : res -&gt; label_set -&gt; bool *<br>
 <pre><span id="VALres_label_in"><span class="keyword">val</span> res_label_in</span> : <code class="type"><a href="JsSyntax.html#TYPEres">JsSyntax.res</a> -> <a href="JsSyntax.html#TYPElabel">JsSyntax.label</a> list -> bool</code></pre><br>
 val convert_literal_to_prim : literal -&gt; prim *<br>
 
-<pre><span id="VALconvert_literal_to_prim"><span class="keyword">val</span> convert_literal_to_prim</span> : <code class="type"><a href="JsSyntax.html#TYPEliteral">JsSyntax.literal</a> -> <a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a></code></pre><br>
-val type_of_prim : prim -&gt; coq_type *<br>
-
-<pre><span id="VALtype_of_prim"><span class="keyword">val</span> type_of_prim</span> : <code class="type"><a href="JsSyntax.html#TYPEprim">JsSyntax.prim</a> -> <a href="JsSyntax.html#TYPEcoq_type">JsSyntax.coq_type</a></code></pre><br>
+<pre><span id="VALconvert_literal_to_prim"><span class="keyword">val</span> convert_literal_to_prim</span> : <code class="type"><a href="JsSyntax.html#TYPEliteral">JsSyntax.literal</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><br>
 val type_of : value -&gt; coq_type *<br>
 
-<pre><span id="VALtype_of"><span class="keyword">val</span> type_of</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEcoq_type">JsSyntax.coq_type</a></code></pre><br>
-val attributes_data_default : attributes_data *<br>
+<pre><span id="VALtype_of"><span class="keyword">val</span> type_of</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEcoq_type">JsSyntax.coq_type</a></code></pre>
+<pre><span id="VALtype_of_resvalue"><span class="keyword">val</span> type_of_resvalue</span> : <code class="type"><a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -> <a href="JsSyntax.html#TYPEresvalue_type">JsSyntax.resvalue_type</a></code></pre>
+<pre><span id="VALref_of_resvalue"><span class="keyword">val</span> ref_of_resvalue</span> : <code class="type"><a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -> <a href="JsSyntax.html#TYPEref">JsSyntax.ref</a></code></pre>
+<pre><span id="VALattributes_data_default"><span class="keyword">val</span> attributes_data_default</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><div class="info ">
+Default vales for data property attributes.<br>
+ECMAScript Specification section: <a href="#table-4">6.1.7.1 Table 4</a></div>
 
-<pre><span id="VALattributes_data_default"><span class="keyword">val</span> attributes_data_default</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><br>
-val attributes_accessor_default : attributes_accessor *<br>
+<pre><span id="VALattributes_accessor_default"><span class="keyword">val</span> attributes_accessor_default</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><div class="info ">
+Default vales for accessor property attributes.<br>
+ECMAScript Specification section: <a href="#table-4">6.1.7.1 Table 4</a></div>
 
-<pre><span id="VALattributes_accessor_default"><span class="keyword">val</span> attributes_accessor_default</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><br>
-val attributes_accessor_of_attributes_data :
-    attributes_data -&gt; attributes_accessor *<br>
+<pre><span id="VALattributes_accessor_of_attributes_data"><span class="keyword">val</span> attributes_accessor_of_attributes_data</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a></code></pre><div class="info ">
+Convert a data attribute into an accessor attribute.
+<p>
 
-<pre><span id="VALattributes_accessor_of_attributes_data"><span class="keyword">val</span> attributes_accessor_of_attributes_data</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a> -> <a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><br>
-val attributes_data_of_attributes_accessor :
-    attributes_accessor -&gt; attributes_data *<br>
+    Implements the following spec text: "Convert the property [...] from a
+    data property to an accessor property.  Preserve the existing values of the
+    converted property's [[Configurable]] and [[Enumerable]] attributes
+    and set the rest of the property's attributes to their default values."<br>
+</div>
 
-<pre><span id="VALattributes_data_of_attributes_accessor"><span class="keyword">val</span> attributes_data_of_attributes_accessor</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><br>
-val attributes_data_update :
-    attributes_data -&gt; descriptor -&gt; attributes_data *<br>
+<pre><span id="VALattributes_data_of_attributes_accessor"><span class="keyword">val</span> attributes_data_of_attributes_accessor</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a></code></pre><div class="info ">
+Convert an accessor attribute into a data attribute.
+<p>
 
-<pre><span id="VALattributes_data_update"><span class="keyword">val</span> attributes_data_update</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><br>
-val attributes_accessor_update :
-    attributes_accessor -&gt; descriptor -&gt; attributes_accessor *<br>
+    Implements the following spec text: "Convert the property [...] from an
+    accessor property to a data property.  Preserve the existing values of the
+    converted property's [[Configurable]] and [[Enumerable]] attributes
+    and set the rest of the property's attributes to their default values."<br>
+</div>
 
-<pre><span id="VALattributes_accessor_update"><span class="keyword">val</span> attributes_accessor_update</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><br>
-val attributes_update : attributes -&gt; descriptor -&gt; attributes *<br>
+<pre><span id="VALattributes_data_update"><span class="keyword">val</span> attributes_data_update</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><div class="info ">
+Updates a given data attribute with values from the given descriptor<br>
+</div>
 
-<pre><span id="VALattributes_update"><span class="keyword">val</span> attributes_update</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a></code></pre><br>
-val attributes_data_of_descriptor : descriptor -&gt; attributes_data *<br>
+<pre><span id="VALattributes_accessor_update"><span class="keyword">val</span> attributes_accessor_update</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><div class="info ">
+Updates a given accessor attribute with values from the given descriptor<br>
+</div>
 
-<pre><span id="VALattributes_data_of_descriptor"><span class="keyword">val</span> attributes_data_of_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><br>
-val attributes_accessor_of_descriptor :
-    descriptor -&gt; attributes_accessor *<br>
+<pre><span id="VALattributes_update"><span class="keyword">val</span> attributes_update</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a></code></pre><div class="info ">
+Updates a given attribute with values from the given descriptor. Additional
+    attributes on the descriptor are ignored.<br>
+</div>
 
-<pre><span id="VALattributes_accessor_of_descriptor"><span class="keyword">val</span> attributes_accessor_of_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><br>
+<pre><span id="VALattributes_data_of_descriptor"><span class="keyword">val</span> attributes_data_of_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><div class="info ">
+Create a data property from a descriptor, using default attribute values if
+    the required attribute is absent.<br>
+</div>
+
+<pre><span id="VALattributes_accessor_of_descriptor"><span class="keyword">val</span> attributes_accessor_of_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><div class="info ">
+Create an accessor property from a descriptor, using default attribute
+    values if the required attribute is absent.<br>
+</div>
+
+<pre><span id="VALattributes_of_descriptor"><span class="keyword">val</span> attributes_of_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>For backwards compatibility only.<br>
+Converts a complete descriptor into attributes. Nonstandard operation for backwards compat only. Not to be used with
+    generic descriptors.<br>
+</div>
+<br>
 val descriptor_of_attributes : attributes -&gt; descriptor *<br>
 
-<pre><span id="VALdescriptor_of_attributes"><span class="keyword">val</span> descriptor_of_attributes</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a></code></pre><br>
+<pre><span id="VALdescriptor_of_attributes"><span class="keyword">val</span> descriptor_of_attributes</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a></code></pre>
+<pre><span id="VALfull_descriptor_of_undef_descriptor"><span class="keyword">val</span> full_descriptor_of_undef_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> <a href="JsSyntax.html#TYPEfull_descriptor">JsSyntax.full_descriptor</a></code></pre>
+<pre><span id="VALundef_descriptor_of_full_descriptor"><span class="keyword">val</span> undef_descriptor_of_full_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEfull_descriptor">JsSyntax.full_descriptor</a> -> <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a></code></pre><br>
 val attributes_configurable : attributes -&gt; bool *<br>
 
 <pre><span id="VALattributes_configurable"><span class="keyword">val</span> attributes_configurable</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> bool</code></pre><br>
@@ -133,7 +155,15 @@ val object_map_properties :
 <pre><span id="VALobject_map_properties"><span class="keyword">val</span> object_map_properties</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -><br>       (<a href="JsSyntax.html#TYPEobject_properties_type">JsSyntax.object_properties_type</a> -> <a href="JsSyntax.html#TYPEobject_properties_type">JsSyntax.object_properties_type</a>) -><br>       <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a></code></pre><br>
 val object_new : value -&gt; class_name -&gt; coq_object *<br>
 
-<pre><span id="VALobject_new"><span class="keyword">val</span> object_new</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEclass_name">JsSyntax.class_name</a> -> <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a></code></pre><br>
+<pre><span id="VALobject_new"><span class="keyword">val</span> object_new</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEclass_name">JsSyntax.class_name</a> -> <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a></code></pre>
+<pre><span id="VALproxy_object_new"><span class="keyword">val</span> proxy_object_new</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> * <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a></code></pre>
+<pre><span id="VALlength_property_attributes"><span class="keyword">val</span> length_property_attributes</span> : <code class="type"><a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="#17-11
+
+    Unless otherwise specified, the length property of a built-in function object has the attributes
+    { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: true }.">sec-ecmascript-standard-built-in-objects</a></div>
+
+<pre><span id="VALbuiltin_function_new"><span class="keyword">val</span> builtin_function_new</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> bool -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> * <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><br>
 val attributes_writable : attributes -&gt; bool *<br>
 
 <pre><span id="VALattributes_writable"><span class="keyword">val</span> attributes_writable</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> bool</code></pre><br>
@@ -191,7 +221,9 @@ val descriptor_intro_empty : descriptor *<br>
 <br>
 val ref_kind_of : ref -&gt; ref_kind *<br>
 
-<pre><span id="VALref_kind_of"><span class="keyword">val</span> ref_kind_of</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> <a href="JsCommon.html#TYPEref_kind">ref_kind</a></code></pre><br>
+<pre><span id="VALref_kind_of"><span class="keyword">val</span> ref_kind_of</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> <a href="JsCommon.html#TYPEref_kind">ref_kind</a></code></pre>
+<pre><span id="VALvalue_of_ref_base_type"><span class="keyword">val</span> value_of_ref_base_type</span> : <code class="type"><a href="JsSyntax.html#TYPEref_base_type">JsSyntax.ref_base_type</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre>
+<pre><span id="VALenv_loc_of_ref_base_type"><span class="keyword">val</span> env_loc_of_ref_base_type</span> : <code class="type"><a href="JsSyntax.html#TYPEref_base_type">JsSyntax.ref_base_type</a> -> <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a></code></pre><br>
 val ref_create_value : value -&gt; prop_name -&gt; bool -&gt; ref *<br>
 
 <pre><span id="VALref_create_value"><span class="keyword">val</span> ref_create_value</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -> bool -> <a href="JsSyntax.html#TYPEref">JsSyntax.ref</a></code></pre><br>
