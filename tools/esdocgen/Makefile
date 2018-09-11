@@ -7,6 +7,6 @@ all: esdocgen.cmo esdocgen.cmxs
 	ocamlopt -I +ocamldoc -shared -o $@ $<
 
 clean:
-	rm -f *.{cm{o,i,x,xs},o} || true
+	rm -f *.cmo *.cmi *.cmx *.cmxs *.o
 
 .PHONY: all clean

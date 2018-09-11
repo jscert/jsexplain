@@ -6,3 +6,8 @@ parse.byte: syntaxConv.ml parse.ml
 
 parse.js: syntax.unlog.js parse.byte
 	js_of_ocaml parse.byte
+
+clean:
+	rm -f *.cmi *.cmo *.js parse.byte
+
+.PHONY: clean
