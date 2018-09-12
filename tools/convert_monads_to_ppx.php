@@ -25,15 +25,15 @@ and run_expr_assign s c opo e1 e2 =
   if_success (run_expr s c e1) (fun s1 rv1 ->
     let_binding (fun s0 rv_2 ->
       match rv_2 with
-      | Coq_resvalue_empty ->
-        (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+      | Resvalue_empty ->
+        (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Result_impossible)
           s0
           ("Non-value result in [run_expr_assign].")
-      | Coq_resvalue_value v ->
+      | Resvalue_value v ->
         if_void (ref_put_value s0 c rv1 v) (fun s_2 ->
-          result_out (Coq_out_ter (s_2, (res_val v))))
-      | Coq_resvalue_ref r ->
-        (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+          result_out (Out_ter (s_2, (res_val v))))
+      | Resvalue_ref r ->
+        (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Result_impossible)
           s0
           ("Non-value result in [run_expr_assign]."))
       (fun follow ->
@@ -44,7 +44,7 @@ and run_expr_assign s c opo e1 e2 =
             if_success (run_binary_op s3 c op v1 v2) (fun s4 v -> follow s4 v)))
       | None ->
         if_spec (run_expr_get_value s1 c e2) (fun x x0 ->
-          follow x (Coq_resvalue_value x0))))
+          follow x (Resvalue_value x0))))
 EOF;
 */
 $ninput = strlen($sinput);

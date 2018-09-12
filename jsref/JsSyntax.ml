@@ -4,53 +4,53 @@ open Shared
 open LibOption
 
 type unary_op =
-| Coq_unary_op_delete
-| Coq_unary_op_void
-| Coq_unary_op_typeof
-| Coq_unary_op_post_incr
-| Coq_unary_op_post_decr
-| Coq_unary_op_pre_incr
-| Coq_unary_op_pre_decr
-| Coq_unary_op_add
-| Coq_unary_op_neg
-| Coq_unary_op_bitwise_not
-| Coq_unary_op_not
+| Unary_op_delete
+| Unary_op_void
+| Unary_op_typeof
+| Unary_op_post_incr
+| Unary_op_post_decr
+| Unary_op_pre_incr
+| Unary_op_pre_decr
+| Unary_op_add
+| Unary_op_neg
+| Unary_op_bitwise_not
+| Unary_op_not
 
 type binary_op =
-| Coq_binary_op_mult
-| Coq_binary_op_div
-| Coq_binary_op_mod
-| Coq_binary_op_add
-| Coq_binary_op_sub
-| Coq_binary_op_left_shift
-| Coq_binary_op_right_shift
-| Coq_binary_op_unsigned_right_shift
-| Coq_binary_op_lt
-| Coq_binary_op_gt
-| Coq_binary_op_le
-| Coq_binary_op_ge
-| Coq_binary_op_instanceof
-| Coq_binary_op_in
-| Coq_binary_op_equal
-| Coq_binary_op_disequal
-| Coq_binary_op_strict_equal
-| Coq_binary_op_strict_disequal
-| Coq_binary_op_bitwise_and
-| Coq_binary_op_bitwise_or
-| Coq_binary_op_bitwise_xor
-| Coq_binary_op_and
-| Coq_binary_op_or
-| Coq_binary_op_coma
+| Binary_op_mult
+| Binary_op_div
+| Binary_op_mod
+| Binary_op_add
+| Binary_op_sub
+| Binary_op_left_shift
+| Binary_op_right_shift
+| Binary_op_unsigned_right_shift
+| Binary_op_lt
+| Binary_op_gt
+| Binary_op_le
+| Binary_op_ge
+| Binary_op_instanceof
+| Binary_op_in
+| Binary_op_equal
+| Binary_op_disequal
+| Binary_op_strict_equal
+| Binary_op_strict_disequal
+| Binary_op_bitwise_and
+| Binary_op_bitwise_or
+| Binary_op_bitwise_xor
+| Binary_op_and
+| Binary_op_or
+| Binary_op_coma
 
 type literal =
-| Coq_literal_null
-| Coq_literal_bool of bool [@f value]
-| Coq_literal_number of JsNumber.number [@f value]
-| Coq_literal_string of string [@f value]
+| Literal_null
+| Literal_bool of bool [@f value]
+| Literal_number of JsNumber.number [@f value]
+| Literal_string of string [@f value]
 
 type label =
-| Coq_label_empty
-| Coq_label_string of string [@f value]
+| Label_empty
+| Label_string of string [@f value]
 
 type label_set = label list
 
@@ -62,61 +62,61 @@ let strictness_false =
   false
 
 type propname =
-| Coq_propname_identifier of string [@f value]
-| Coq_propname_string of string [@f value]
-| Coq_propname_number of JsNumber.number [@f value]
+| Propname_identifier of string [@f value]
+| Propname_string of string [@f value]
+| Propname_number of JsNumber.number [@f value]
 
 type expr =
-| Coq_expr_this
-| Coq_expr_identifier of string [@f name]
-| Coq_expr_literal of literal [@f value]
-| Coq_expr_object of (propname * propbody) list [@f fields]
-| Coq_expr_array of expr option list [@f elements]
-| Coq_expr_function of string option * string list * funcbody [@f func_name_opt, arg_names, body]
-| Coq_expr_access of expr * expr [@f obj, field]
-| Coq_expr_member of expr * string [@f obj, field_name]
-| Coq_expr_new of expr * expr list [@f func, args]
-| Coq_expr_call of expr * expr list [@f func, args]
-| Coq_expr_unary_op of unary_op * expr [@f op, arg]
-| Coq_expr_binary_op of expr * binary_op * expr [@f arg1, op, arg2]
-| Coq_expr_conditional of expr * expr * expr [@f cond, then_branch, else_branch]
-| Coq_expr_assign of expr * binary_op option * expr [@f left_expr, op_opt, right_expr]
+| Expr_this
+| Expr_identifier of string [@f name]
+| Expr_literal of literal [@f value]
+| Expr_object of (propname * propbody) list [@f fields]
+| Expr_array of expr option list [@f elements]
+| Expr_function of string option * string list * funcbody [@f func_name_opt, arg_names, body]
+| Expr_access of expr * expr [@f obj, field]
+| Expr_member of expr * string [@f obj, field_name]
+| Expr_new of expr * expr list [@f func, args]
+| Expr_call of expr * expr list [@f func, args]
+| Expr_unary_op of unary_op * expr [@f op, arg]
+| Expr_binary_op of expr * binary_op * expr [@f arg1, op, arg2]
+| Expr_conditional of expr * expr * expr [@f cond, then_branch, else_branch]
+| Expr_assign of expr * binary_op option * expr [@f left_expr, op_opt, right_expr]
 and propbody =
-| Coq_propbody_val of expr [@f expr]
-| Coq_propbody_get of funcbody [@f body]
-| Coq_propbody_set of string list * funcbody [@f names, body]
+| Propbody_val of expr [@f expr]
+| Propbody_get of funcbody [@f body]
+| Propbody_set of string list * funcbody [@f names, body]
 and funcbody =
-| Coq_funcbody_intro of prog * string [@f prog, source]
+| Funcbody_intro of prog * string [@f prog, source]
 and stat =
-| Coq_stat_expr of expr [@f expr]
-| Coq_stat_label of string * stat [@f label, stat]
-| Coq_stat_block of stat list [@f stats]
-| Coq_stat_var_decl of (string * expr option) list [@f decls]
-| Coq_stat_if of expr * stat * stat option [@f cond, then_branch, else_branch]
-| Coq_stat_do_while of label_set * stat * expr [@f labels, body, cond]
-| Coq_stat_while of label_set * expr * stat [@f labels, cond, body]
-| Coq_stat_with of expr * stat [@f obj, stat]
-| Coq_stat_throw of expr [@f arg]
-| Coq_stat_return of expr option [@f arg_opt]
-| Coq_stat_break of label [@f label]
-| Coq_stat_continue of label [@f label]
-| Coq_stat_try of stat * (string * stat) option * stat option [@f body, catch_stats_opt, finally_opt]
-| Coq_stat_for of label_set * expr option * expr option * expr option * stat [@f labels, init, cond, step, body]
-| Coq_stat_for_var of label_set * (string * expr option) list * expr option * expr option * stat [@f labels, init, cond, step, body]
-| Coq_stat_for_in of label_set * expr * expr * stat [@f labels, id, obj, body]
-| Coq_stat_for_in_var of label_set * string * expr option * expr * stat [@f labels, id, init, obj, body]
-| Coq_stat_debugger
-| Coq_stat_switch of label_set * expr * switchbody [@f labels, arg, body]
+| Stat_expr of expr [@f expr]
+| Stat_label of string * stat [@f label, stat]
+| Stat_block of stat list [@f stats]
+| Stat_var_decl of (string * expr option) list [@f decls]
+| Stat_if of expr * stat * stat option [@f cond, then_branch, else_branch]
+| Stat_do_while of label_set * stat * expr [@f labels, body, cond]
+| Stat_while of label_set * expr * stat [@f labels, cond, body]
+| Stat_with of expr * stat [@f obj, stat]
+| Stat_throw of expr [@f arg]
+| Stat_return of expr option [@f arg_opt]
+| Stat_break of label [@f label]
+| Stat_continue of label [@f label]
+| Stat_try of stat * (string * stat) option * stat option [@f body, catch_stats_opt, finally_opt]
+| Stat_for of label_set * expr option * expr option * expr option * stat [@f labels, init, cond, step, body]
+| Stat_for_var of label_set * (string * expr option) list * expr option * expr option * stat [@f labels, init, cond, step, body]
+| Stat_for_in of label_set * expr * expr * stat [@f labels, id, obj, body]
+| Stat_for_in_var of label_set * string * expr option * expr * stat [@f labels, id, init, obj, body]
+| Stat_debugger
+| Stat_switch of label_set * expr * switchbody [@f labels, arg, body]
 and switchbody =
-| Coq_switchbody_nodefault of switchclause list [@f clauses]
-| Coq_switchbody_withdefault of switchclause list * stat list * switchclause list [@f clauses_before, clause_default, clauses_after]
+| Switchbody_nodefault of switchclause list [@f clauses]
+| Switchbody_withdefault of switchclause list * stat list * switchclause list [@f clauses_before, clause_default, clauses_after]
 and switchclause =
-| Coq_switchclause_intro of expr * stat list [@f arg, stats]
+| Switchclause_intro of expr * stat list [@f arg, stats]
 and prog =
-| Coq_prog_intro of strictness_flag * element list [@f strictness, elements]
+| Prog_intro of strictness_flag * element list [@f strictness, elements]
 and element =
-| Coq_element_stat of stat [@f stat]
-| Coq_element_func_decl of string * string list * funcbody [@f func_name, arg_names, body]
+| Element_stat of stat [@f stat]
+| Element_func_decl of string * string list * funcbody [@f func_name, arg_names, body]
 
 type propdefs = (propname * propbody) list
 
@@ -139,209 +139,209 @@ let funcdecl_parameters x = x.funcdecl_parameters
 let funcdecl_body x = x.funcdecl_body
 
 type mathop =
-| Coq_mathop_abs
+| Mathop_abs
 
 type native_error =
-| Coq_native_error_eval
-| Coq_native_error_range
-| Coq_native_error_ref
-| Coq_native_error_syntax
-| Coq_native_error_type
-| Coq_native_error_uri
+| Native_error_eval
+| Native_error_range
+| Native_error_ref
+| Native_error_syntax
+| Native_error_type
+| Native_error_uri
 
 (** Intrinsic Objects *)
 type prealloc =
-| Coq_prealloc_global
-| Coq_prealloc_global_eval
-| Coq_prealloc_global_parse_int
-| Coq_prealloc_global_parse_float
-| Coq_prealloc_global_is_finite
-| Coq_prealloc_global_is_nan
-| Coq_prealloc_global_decode_uri
-| Coq_prealloc_global_decode_uri_component
-| Coq_prealloc_global_encode_uri
-| Coq_prealloc_global_encode_uri_component
-| Coq_prealloc_object
-| Coq_prealloc_object_get_proto_of
-| Coq_prealloc_object_get_own_prop_descriptor
-| Coq_prealloc_object_get_own_prop_name
-| Coq_prealloc_object_set_proto_of
-| Coq_prealloc_object_create
-| Coq_prealloc_object_define_prop
-| Coq_prealloc_object_define_props
-| Coq_prealloc_object_seal
-| Coq_prealloc_object_freeze
-| Coq_prealloc_object_prevent_extensions
-| Coq_prealloc_object_is_sealed
-| Coq_prealloc_object_is_frozen
-| Coq_prealloc_object_is_extensible
-| Coq_prealloc_object_keys
-| Coq_prealloc_object_proto                                   (** ObjectPrototype *)
-| Coq_prealloc_object_proto_to_string
-| Coq_prealloc_object_proto_value_of
-| Coq_prealloc_object_proto_has_own_prop
-| Coq_prealloc_object_proto_is_prototype_of
-| Coq_prealloc_object_proto_prop_is_enumerable
-| Coq_prealloc_function
-| Coq_prealloc_function_proto
-| Coq_prealloc_function_proto_to_string
-| Coq_prealloc_function_proto_apply
-| Coq_prealloc_function_proto_call
-| Coq_prealloc_function_proto_bind
-| Coq_prealloc_bool
-| Coq_prealloc_bool_proto
-| Coq_prealloc_bool_proto_to_string
-| Coq_prealloc_bool_proto_value_of
-| Coq_prealloc_number
-| Coq_prealloc_number_proto
-| Coq_prealloc_number_proto_to_string
-| Coq_prealloc_number_proto_value_of
-| Coq_prealloc_number_proto_to_fixed
-| Coq_prealloc_number_proto_to_exponential
-| Coq_prealloc_number_proto_to_precision
-| Coq_prealloc_array
-| Coq_prealloc_array_is_array
-| Coq_prealloc_array_proto
-| Coq_prealloc_array_proto_to_string
-| Coq_prealloc_array_proto_join
-| Coq_prealloc_array_proto_pop
-| Coq_prealloc_array_proto_push
-| Coq_prealloc_string
-| Coq_prealloc_string_proto
-| Coq_prealloc_string_proto_to_string
-| Coq_prealloc_string_proto_value_of
-| Coq_prealloc_string_proto_char_at
-| Coq_prealloc_string_proto_char_code_at
-| Coq_prealloc_math
-| Coq_prealloc_date
-| Coq_prealloc_regexp
-| Coq_prealloc_error
-| Coq_prealloc_error_proto
-| Coq_prealloc_error_proto_to_string
-| Coq_prealloc_throw_type_error
-| Coq_prealloc_json
-| Coq_prealloc_proxy                                          (** Proxy *)
-| Coq_prealloc_proxy_revocable
-| Coq_builtin_proxy_revocation
-| Coq_prealloc_reflect                                        (** Reflect *)
-| Coq_prealloc_reflect_apply
-| Coq_prealloc_reflect_construct
-| Coq_prealloc_reflect_define_property
-| Coq_prealloc_reflect_delete_property
-| Coq_prealloc_reflect_get
-| Coq_prealloc_reflect_get_own_property_descriptor
-| Coq_prealloc_reflect_get_prototype_of
-| Coq_prealloc_reflect_has
-| Coq_prealloc_reflect_is_extensible
-| Coq_prealloc_reflect_own_keys
-| Coq_prealloc_reflect_prevent_extensions
-| Coq_prealloc_reflect_set
-| Coq_prealloc_reflect_set_prototype_of
-| Coq_prealloc_mathop of mathop [@f mathop]
-| Coq_prealloc_native_error of native_error [@f error]
-| Coq_prealloc_native_error_proto of native_error [@f error]
+| Prealloc_global
+| Prealloc_global_eval
+| Prealloc_global_parse_int
+| Prealloc_global_parse_float
+| Prealloc_global_is_finite
+| Prealloc_global_is_nan
+| Prealloc_global_decode_uri
+| Prealloc_global_decode_uri_component
+| Prealloc_global_encode_uri
+| Prealloc_global_encode_uri_component
+| Prealloc_object
+| Prealloc_object_get_proto_of
+| Prealloc_object_get_own_prop_descriptor
+| Prealloc_object_get_own_prop_name
+| Prealloc_object_set_proto_of
+| Prealloc_object_create
+| Prealloc_object_define_prop
+| Prealloc_object_define_props
+| Prealloc_object_seal
+| Prealloc_object_freeze
+| Prealloc_object_prevent_extensions
+| Prealloc_object_is_sealed
+| Prealloc_object_is_frozen
+| Prealloc_object_is_extensible
+| Prealloc_object_keys
+| Prealloc_object_proto                                   (** ObjectPrototype *)
+| Prealloc_object_proto_to_string
+| Prealloc_object_proto_value_of
+| Prealloc_object_proto_has_own_prop
+| Prealloc_object_proto_is_prototype_of
+| Prealloc_object_proto_prop_is_enumerable
+| Prealloc_function
+| Prealloc_function_proto
+| Prealloc_function_proto_to_string
+| Prealloc_function_proto_apply
+| Prealloc_function_proto_call
+| Prealloc_function_proto_bind
+| Prealloc_bool
+| Prealloc_bool_proto
+| Prealloc_bool_proto_to_string
+| Prealloc_bool_proto_value_of
+| Prealloc_number
+| Prealloc_number_proto
+| Prealloc_number_proto_to_string
+| Prealloc_number_proto_value_of
+| Prealloc_number_proto_to_fixed
+| Prealloc_number_proto_to_exponential
+| Prealloc_number_proto_to_precision
+| Prealloc_array
+| Prealloc_array_is_array
+| Prealloc_array_proto
+| Prealloc_array_proto_to_string
+| Prealloc_array_proto_join
+| Prealloc_array_proto_pop
+| Prealloc_array_proto_push
+| Prealloc_string
+| Prealloc_string_proto
+| Prealloc_string_proto_to_string
+| Prealloc_string_proto_value_of
+| Prealloc_string_proto_char_at
+| Prealloc_string_proto_char_code_at
+| Prealloc_math
+| Prealloc_date
+| Prealloc_regexp
+| Prealloc_error
+| Prealloc_error_proto
+| Prealloc_error_proto_to_string
+| Prealloc_throw_type_error
+| Prealloc_json
+| Prealloc_proxy                                          (** Proxy *)
+| Prealloc_proxy_revocable
+| Builtin_proxy_revocation
+| Prealloc_reflect                                        (** Reflect *)
+| Prealloc_reflect_apply
+| Prealloc_reflect_construct
+| Prealloc_reflect_define_property
+| Prealloc_reflect_delete_property
+| Prealloc_reflect_get
+| Prealloc_reflect_get_own_property_descriptor
+| Prealloc_reflect_get_prototype_of
+| Prealloc_reflect_has
+| Prealloc_reflect_is_extensible
+| Prealloc_reflect_own_keys
+| Prealloc_reflect_prevent_extensions
+| Prealloc_reflect_set
+| Prealloc_reflect_set_prototype_of
+| Prealloc_mathop of mathop [@f mathop]
+| Prealloc_native_error of native_error [@f error]
+| Prealloc_native_error_proto of native_error [@f error]
 
 
 
 
 (** Identities of implementations for Object Internal Methods *)
 type call =
-| Coq_call_default
-| Coq_call_after_bind
-| Coq_call_prealloc of prealloc [@f prealloc]
-| Coq_call_proxy
+| Call_default
+| Call_after_bind
+| Call_prealloc of prealloc [@f prealloc]
+| Call_proxy
 
 type construct =
-| Coq_construct_default
-| Coq_construct_after_bind
-| Coq_construct_prealloc of prealloc [@f prealloc]
-| Coq_construct_proxy
+| Construct_default
+| Construct_after_bind
+| Construct_prealloc of prealloc [@f prealloc]
+| Construct_proxy
 
 type builtin_has_instance =
-| Coq_builtin_has_instance_function
-| Coq_builtin_has_instance_after_bind
+| Builtin_has_instance_function
+| Builtin_has_instance_after_bind
 
 type builtin_get =
-| Coq_builtin_get_default
-| Coq_builtin_get_args_obj
-| Coq_builtin_get_proxy
+| Builtin_get_default
+| Builtin_get_args_obj
+| Builtin_get_proxy
 
 type builtin_get_own_prop =
-| Coq_builtin_get_own_prop_default
-| Coq_builtin_get_own_prop_args_obj
-| Coq_builtin_get_own_prop_string
-| Coq_builtin_get_own_prop_proxy
+| Builtin_get_own_prop_default
+| Builtin_get_own_prop_args_obj
+| Builtin_get_own_prop_string
+| Builtin_get_own_prop_proxy
 
 (* FIXME: REMOVED IN ES7 *)
 type builtin_get_prop =
-| Coq_builtin_get_prop_default
+| Builtin_get_prop_default
 
 type builtin_has_prop =
-| Coq_builtin_has_prop_default
-| Coq_builtin_has_prop_proxy
+| Builtin_has_prop_default
+| Builtin_has_prop_proxy
 
 type builtin_delete =
-| Coq_builtin_delete_default
-| Coq_builtin_delete_args_obj
-| Coq_builtin_delete_proxy
+| Builtin_delete_default
+| Builtin_delete_args_obj
+| Builtin_delete_proxy
 
 (* FIXME: REMOVED IN ES7 *)
 type builtin_default_value =
-| Coq_builtin_default_value_default
+| Builtin_default_value_default
 
 type builtin_define_own_prop =
-| Coq_builtin_define_own_prop_default
-| Coq_builtin_define_own_prop_array
-| Coq_builtin_define_own_prop_args_obj
-| Coq_builtin_define_own_prop_proxy
+| Builtin_define_own_prop_default
+| Builtin_define_own_prop_array
+| Builtin_define_own_prop_args_obj
+| Builtin_define_own_prop_proxy
 
 type builtin_get_prototype_of =
-| Coq_builtin_get_prototype_of_default
-| Coq_builtin_get_prototype_of_proxy
+| Builtin_get_prototype_of_default
+| Builtin_get_prototype_of_proxy
 
 type builtin_set_prototype_of =
-| Coq_builtin_set_prototype_of_default
-| Coq_builtin_set_prototype_of_proxy
+| Builtin_set_prototype_of_default
+| Builtin_set_prototype_of_proxy
 
 type builtin_is_extensible =
-| Coq_builtin_is_extensible_default
-| Coq_builtin_is_extensible_proxy
+| Builtin_is_extensible_default
+| Builtin_is_extensible_proxy
 
 type builtin_prevent_extensions =
-| Coq_builtin_prevent_extensions_default
-| Coq_builtin_prevent_extensions_proxy
+| Builtin_prevent_extensions_default
+| Builtin_prevent_extensions_proxy
 
 type builtin_set =
-| Coq_builtin_set_default
-| Coq_builtin_set_proxy
+| Builtin_set_default
+| Builtin_set_proxy
 
 type builtin_own_property_keys =
-| Coq_builtin_own_property_keys_default
-| Coq_builtin_own_property_keys_proxy
+| Builtin_own_property_keys_default
+| Builtin_own_property_keys_proxy
 
 
 
 
 
 type object_loc =
-| Coq_object_loc_normal of int [@f address]
-| Coq_object_loc_prealloc of prealloc [@f prealloc]
+| Object_loc_normal of int [@f address]
+| Object_loc_prealloc of prealloc [@f prealloc]
 
 type value =
-| Coq_value_undef
-| Coq_value_null
-| Coq_value_bool of bool [@f value]
-| Coq_value_number of JsNumber.number [@f value]
-| Coq_value_string of string [@f value]
-| Coq_value_object of object_loc [@f value]
+| Value_undef
+| Value_null
+| Value_bool of bool [@f value]
+| Value_number of JsNumber.number [@f value]
+| Value_string of string [@f value]
+| Value_object of object_loc [@f value]
 
 type coq_type =
-| Coq_type_undef
-| Coq_type_null
-| Coq_type_bool
-| Coq_type_number
-| Coq_type_string
-| Coq_type_object
+| Type_undef
+| Type_null
+| Type_bool
+| Type_number
+| Type_string
+| Type_object
 
 type attributes_data = { attributes_data_value : value;
                          attributes_data_writable : bool;
@@ -386,8 +386,8 @@ let attributes_accessor_enumerable x = x.attributes_accessor_enumerable
 let attributes_accessor_configurable x = x.attributes_accessor_configurable
 
 type attributes =
-| Coq_attributes_data_of of attributes_data [@f value]
-| Coq_attributes_accessor_of of attributes_accessor [@f value]
+| Attributes_data_of of attributes_data [@f value]
+| Attributes_accessor_of of attributes_accessor [@f value]
 
 type descriptor = { descriptor_value : value option;
                     descriptor_writable : bool option;
@@ -428,23 +428,23 @@ type undef_descriptor =
 
 (** @deprecated Raw attributes should not be returned by GetOwnProperty *)
 type full_descriptor =
-| Coq_full_descriptor_undef
-| Coq_full_descriptor_some of attributes [@f value]
+| Full_descriptor_undef
+| Full_descriptor_some of attributes [@f value]
 
 
 type mutability =
-| Coq_mutability_uninitialized_immutable
-| Coq_mutability_immutable
-| Coq_mutability_nondeletable
-| Coq_mutability_deletable
+| Mutability_uninitialized_immutable
+| Mutability_immutable
+| Mutability_nondeletable
+| Mutability_deletable
 
 type decl_env_record = (string, mutability * value) Heap.heap
 
 type provide_this_flag = bool
 
 type env_record =
-| Coq_env_record_decl of decl_env_record [@f value]
-| Coq_env_record_object of object_loc * provide_this_flag [@f value, provide_this]
+| Env_record_decl of decl_env_record [@f value]
+| Env_record_object of object_loc * provide_this_flag [@f value, provide_this]
 
 type env_loc = int
 
@@ -482,8 +482,8 @@ let execution_ctx_strict x = x.execution_ctx_strict
 type prop_name = string
 
 type ref_base_type =
-| Coq_ref_base_type_value of value [@f value]
-| Coq_ref_base_type_env_loc of env_loc [@f value]
+| Ref_base_type_value of value [@f value]
+| Ref_base_type_env_loc of env_loc [@f value]
 
 type ref = { ref_base : ref_base_type;
              ref_name : prop_name;
@@ -583,9 +583,9 @@ let object_proxy_target_ x = x.object_proxy_target_
 let object_proxy_handler_ x = x.object_proxy_handler_
 
 type event =
-| Coq_delete_event of object_loc * prop_name * object_loc option [@f loc, name, locopt]
-| Coq_mutateproto_event of object_loc * (object_loc * prop_name) list * (object_loc * prop_name) list [@f loc, fields]
-| Coq_enumchange_event of object_loc * prop_name [@f loc, name]
+| Delete_event of object_loc * prop_name * object_loc option [@f loc, name, locopt]
+| Mutateproto_event of object_loc * (object_loc * prop_name) list * (object_loc * prop_name) list [@f loc, fields]
+| Enumchange_event of object_loc * prop_name [@f loc, name]
 
 type state = { state_object_heap : (object_loc, coq_object) Heap.heap;
                state_env_record_heap : (env_loc, env_record) Heap.heap;
@@ -600,16 +600,16 @@ let state_object_heap x = x.state_object_heap
 let state_env_record_heap x = x.state_env_record_heap
 
 type restype =
-| Coq_restype_normal
-| Coq_restype_break
-| Coq_restype_continue
-| Coq_restype_return
-| Coq_restype_throw
+| Restype_normal
+| Restype_break
+| Restype_continue
+| Restype_return
+| Restype_throw
 
 type resvalue =
-| Coq_resvalue_empty
-| Coq_resvalue_value of value [@f value]
-| Coq_resvalue_ref of ref [@f ref]
+| Resvalue_empty
+| Resvalue_value of value [@f value]
+| Resvalue_ref of ref [@f ref]
 
 type resvalue_type =
 | Type_resvalue_empty
@@ -633,57 +633,57 @@ let res_label x = x.res_label
 (** val res_ref : ref -> res **)
 
 let res_ref r =
-  { res_type = Coq_restype_normal; res_value = (Coq_resvalue_ref r);
-    res_label = Coq_label_empty }
+  { res_type = Restype_normal; res_value = (Resvalue_ref r);
+    res_label = Label_empty }
 
 (** val res_val : value -> res **)
 
 let res_val v =
-  { res_type = Coq_restype_normal; res_value = (Coq_resvalue_value v);
-    res_label = Coq_label_empty }
+  { res_type = Restype_normal; res_value = (Resvalue_value v);
+    res_label = Label_empty }
 
 (** val res_normal : resvalue -> res **)
 
 let res_normal rv =
-  { res_type = Coq_restype_normal; res_value = rv; res_label =
-    Coq_label_empty }
+  { res_type = Restype_normal; res_value = rv; res_label =
+    Label_empty }
 
 (** val res_empty : res **)
 
 let res_empty =
-  { res_type = Coq_restype_normal; res_value = Coq_resvalue_empty;
-    res_label = Coq_label_empty }
+  { res_type = Restype_normal; res_value = Resvalue_empty;
+    res_label = Label_empty }
 
 (** val res_break : label -> res **)
 
 let res_break labo =
-  { res_type = Coq_restype_break; res_value = Coq_resvalue_empty; res_label =
+  { res_type = Restype_break; res_value = Resvalue_empty; res_label =
     labo }
 
 (** val res_continue : label -> res **)
 
 let res_continue labo =
-  { res_type = Coq_restype_continue; res_value = Coq_resvalue_empty;
+  { res_type = Restype_continue; res_value = Resvalue_empty;
     res_label = labo }
 
 (** val res_return : resvalue -> res **)
 
 let res_return v =
-  { res_type = Coq_restype_return; res_value = v; res_label =
-    Coq_label_empty }
+  { res_type = Restype_return; res_value = v; res_label =
+    Label_empty }
 
 (** val res_throw : resvalue -> res **)
 
 let res_throw v =
-  { res_type = Coq_restype_throw; res_value = v; res_label =
-    Coq_label_empty }
+  { res_type = Restype_throw; res_value = v; res_label =
+    Label_empty }
 
 (** Return types from specification functions *)
 type 't specret =
-| Coq_specret_val of state * 't [@f state, value] (** A pure/specification value *)
-| Coq_specret_out of state * res [@f state, res]  (** A completion record (possibly abrupt) *)
+| Specret_val of state * 't [@f state, value] (** A pure/specification value *)
+| Specret_out of state * res [@f state, res]  (** A completion record (possibly abrupt) *)
 
 type codetype =
-| Coq_codetype_func
-| Coq_codetype_global
-| Coq_codetype_eval
+| Codetype_func
+| Codetype_global
+| Codetype_eval

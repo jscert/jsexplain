@@ -25,94 +25,94 @@ function typecheckAST(ast) {
     list: function (x) {return {"[]": {}, "::": {head: x, tail: x + " list"}}},
     option: function (x) {return {None: {}, Some: {value: x}}},
     unary_op: {
-      Coq_unary_op_delete: {}, Coq_unary_op_void: {}, Coq_unary_op_typeof: {}, Coq_unary_op_post_incr: {},
-      Coq_unary_op_post_decr: {}, Coq_unary_op_pre_incr: {}, Coq_unary_op_pre_decr: {}, Coq_unary_op_add: {},
-      Coq_unary_op_neg: {}, Coq_unary_op_bitwise_not: {}, Coq_unary_op_not: {},
+      Unary_op_delete: {}, Unary_op_void: {}, Unary_op_typeof: {}, Unary_op_post_incr: {},
+      Unary_op_post_decr: {}, Unary_op_pre_incr: {}, Unary_op_pre_decr: {}, Unary_op_add: {},
+      Unary_op_neg: {}, Unary_op_bitwise_not: {}, Unary_op_not: {},
     },
     binary_op: {
-      Coq_binary_op_mult: {}, Coq_binary_op_div: {}, Coq_binary_op_mod: {}, Coq_binary_op_add: {},
-      Coq_binary_op_sub: {}, Coq_binary_op_left_shift: {}, Coq_binary_op_right_shift: {},
-      Coq_binary_op_unsigned_right_shift: {}, Coq_binary_op_lt: {}, Coq_binary_op_gt: {}, Coq_binary_op_le: {},
-      Coq_binary_op_ge: {}, Coq_binary_op_instanceof: {}, Coq_binary_op_in: {}, Coq_binary_op_equal: {},
-      Coq_binary_op_disequal: {}, Coq_binary_op_strict_equal: {}, Coq_binary_op_strict_disequal: {},
-      Coq_binary_op_bitwise_and: {}, Coq_binary_op_bitwise_or: {}, Coq_binary_op_bitwise_xor: {}, Coq_binary_op_and: {},
-      Coq_binary_op_or: {}, Coq_binary_op_coma: {},
+      Binary_op_mult: {}, Binary_op_div: {}, Binary_op_mod: {}, Binary_op_add: {},
+      Binary_op_sub: {}, Binary_op_left_shift: {}, Binary_op_right_shift: {},
+      Binary_op_unsigned_right_shift: {}, Binary_op_lt: {}, Binary_op_gt: {}, Binary_op_le: {},
+      Binary_op_ge: {}, Binary_op_instanceof: {}, Binary_op_in: {}, Binary_op_equal: {},
+      Binary_op_disequal: {}, Binary_op_strict_equal: {}, Binary_op_strict_disequal: {},
+      Binary_op_bitwise_and: {}, Binary_op_bitwise_or: {}, Binary_op_bitwise_xor: {}, Binary_op_and: {},
+      Binary_op_or: {}, Binary_op_coma: {},
     },
     literal: {
-      Coq_literal_null: {},
-      Coq_literal_bool : {value: "boolean"},
-      Coq_literal_number : {value: "number"},
-      Coq_literal_string : {value: "string"},
+      Literal_null: {},
+      Literal_bool : {value: "boolean"},
+      Literal_number : {value: "number"},
+      Literal_string : {value: "string"},
     },
     label: {
-      Coq_label_empty: {},
-      Coq_label_string : {value: "string"},
+      Label_empty: {},
+      Label_string : {value: "string"},
     },
     label_set: "label list",
     strictness_flag: "boolean",
     propname: {
-      Coq_propname_identifier : {value: "string"},
-      Coq_propname_string : {value: "string"},
-      Coq_propname_number : {value: "number"},
+      Propname_identifier : {value: "string"},
+      Propname_string : {value: "string"},
+      Propname_number : {value: "number"},
     },
     expr: {
-      Coq_expr_this: {},
-      Coq_expr_identifier : {name: "string"},
-      Coq_expr_literal : {value: "literal"},
-      Coq_expr_object : {fields: "(propname * propbody) list"},
-      Coq_expr_array : {elements: "expr option list"},
-      Coq_expr_function : {func_name_opt: "string option", arg_names: "string list", body: "funcbody"},
-      Coq_expr_access : {obj: "expr", field: "expr"},
-      Coq_expr_member : {obj: "expr", field_name: "string"},
-      Coq_expr_new : {func: "expr", args: "expr list"},
-      Coq_expr_call : {func: "expr", args: "expr list"},
-      Coq_expr_unary_op : {op: "unary_op", arg: "expr"},
-      Coq_expr_binary_op : {arg1: "expr", op: "binary_op", arg2: "expr"},
-      Coq_expr_conditional : {cond: "expr", then_branch: "expr", else_branch: "expr"},
-      Coq_expr_assign : {left_expr: "expr", op_opt: "binary_op option", right_expr: "expr"},
+      Expr_this: {},
+      Expr_identifier : {name: "string"},
+      Expr_literal : {value: "literal"},
+      Expr_object : {fields: "(propname * propbody) list"},
+      Expr_array : {elements: "expr option list"},
+      Expr_function : {func_name_opt: "string option", arg_names: "string list", body: "funcbody"},
+      Expr_access : {obj: "expr", field: "expr"},
+      Expr_member : {obj: "expr", field_name: "string"},
+      Expr_new : {func: "expr", args: "expr list"},
+      Expr_call : {func: "expr", args: "expr list"},
+      Expr_unary_op : {op: "unary_op", arg: "expr"},
+      Expr_binary_op : {arg1: "expr", op: "binary_op", arg2: "expr"},
+      Expr_conditional : {cond: "expr", then_branch: "expr", else_branch: "expr"},
+      Expr_assign : {left_expr: "expr", op_opt: "binary_op option", right_expr: "expr"},
     },
     propbody: {
-      Coq_propbody_val : {expr: "expr"},
-      Coq_propbody_get : {body: "funcbody"},
-      Coq_propbody_set : {names: "string list", body: "funcbody"},
+      Propbody_val : {expr: "expr"},
+      Propbody_get : {body: "funcbody"},
+      Propbody_set : {names: "string list", body: "funcbody"},
     },
     funcbody: {
-      Coq_funcbody_intro : {prog: "prog", source: "string"},
+      Funcbody_intro : {prog: "prog", source: "string"},
     },
     stat: {
-      Coq_stat_expr : {expr: "expr"},
-      Coq_stat_label : {label: "string", stat: "stat"},
-      Coq_stat_block : {stats: "stat list"},
-      Coq_stat_var_decl : {decls: "(string * expr option) list"},
-      Coq_stat_if : {cond: "expr", then_branch: "stat", else_branch: "stat option"},
-      Coq_stat_do_while : {labels: "label_set", body: "stat", cond: "expr"},
-      Coq_stat_while : {labels: "label_set", cond: "expr", body: "stat"},
-      Coq_stat_with : {obj: "expr", stat: "stat"},
-      Coq_stat_throw : {arg: "expr"},
-      Coq_stat_return : {arg_opt: "expr option"},
-      Coq_stat_break : {label: "label"},
-      Coq_stat_continue : {label: "label"},
-      Coq_stat_try : {body: "stat", catch_stats_opt: "(string * stat) option", finally_opt: "stat option"},
-      Coq_stat_for : {labels: "label_set", init: "expr option", cond: "expr option", step: "expr option", body: "stat"},
-      Coq_stat_for_var : {labels: "label_set", init: "(string * expr option) list", cond: "expr option", step: "expr option", body: "stat"},
-      Coq_stat_for_in : {labels: "label_set", id: "expr", obj: "expr", body: "stat"},
-      Coq_stat_for_in_var : {labels: "label_set", id: "string", init: "expr option", obj: "expr", body: "stat"},
-      Coq_stat_debugger: {},
-      Coq_stat_switch : {labels: "label_set", arg: "expr", body: "switchbody"},
+      Stat_expr : {expr: "expr"},
+      Stat_label : {label: "string", stat: "stat"},
+      Stat_block : {stats: "stat list"},
+      Stat_var_decl : {decls: "(string * expr option) list"},
+      Stat_if : {cond: "expr", then_branch: "stat", else_branch: "stat option"},
+      Stat_do_while : {labels: "label_set", body: "stat", cond: "expr"},
+      Stat_while : {labels: "label_set", cond: "expr", body: "stat"},
+      Stat_with : {obj: "expr", stat: "stat"},
+      Stat_throw : {arg: "expr"},
+      Stat_return : {arg_opt: "expr option"},
+      Stat_break : {label: "label"},
+      Stat_continue : {label: "label"},
+      Stat_try : {body: "stat", catch_stats_opt: "(string * stat) option", finally_opt: "stat option"},
+      Stat_for : {labels: "label_set", init: "expr option", cond: "expr option", step: "expr option", body: "stat"},
+      Stat_for_var : {labels: "label_set", init: "(string * expr option) list", cond: "expr option", step: "expr option", body: "stat"},
+      Stat_for_in : {labels: "label_set", id: "expr", obj: "expr", body: "stat"},
+      Stat_for_in_var : {labels: "label_set", id: "string", init: "expr option", obj: "expr", body: "stat"},
+      Stat_debugger: {},
+      Stat_switch : {labels: "label_set", arg: "expr", body: "switchbody"},
     },
     switchbody: {
-      Coq_switchbody_nodefault : {clauses: "switchclause list"},
-      Coq_switchbody_withdefault : {clauses_before: "switchclause list", clause_default: "stat list", clauses_after: "switchclause list"},
+      Switchbody_nodefault : {clauses: "switchclause list"},
+      Switchbody_withdefault : {clauses_before: "switchclause list", clause_default: "stat list", clauses_after: "switchclause list"},
     },
     switchclause: {
-      Coq_switchclause_intro : {arg: "expr", stats: "stat list"},
+      Switchclause_intro : {arg: "expr", stats: "stat list"},
     },
     prog: {
-      Coq_prog_intro : {strictness: "strictness_flag", elements: "element list"},
+      Prog_intro : {strictness: "strictness_flag", elements: "element list"},
     },
     element: {
-      Coq_element_stat : {stat: "stat"},
-      Coq_element_func_decl : {func_name: "string", arg_names: "string list", body: "funcbody"},
+      Element_stat : {stat: "stat"},
+      Element_func_decl : {func_name: "string", arg_names: "string list", body: "funcbody"},
     },
     elements: "element list",
     /* funcdecl: { { funcdecl_name : string;
@@ -217,17 +217,17 @@ a()};`;
   });
 
   var isFunction = function(stat) {
-    return stat.tag === "Coq_element_func_decl"
-      || (stat.tag === "Coq_element_stat" &&
-          stat.stat.tag === "Coq_stat_expr" &&
-          stat.stat.expr.tag === "Coq_expr_function");
+    return stat.tag === "Element_func_decl"
+      || (stat.tag === "Element_stat" &&
+          stat.stat.tag === "Stat_expr" &&
+          stat.stat.expr.tag === "Expr_function");
   };
 
 
   var getFunctionStrictness = function(stat) {
-    if (stat.tag === "Coq_element_func_decl") {
+    if (stat.tag === "Element_func_decl") {
       return stat.body.prog.strictness;
-    } else if (stat.tag === "Coq_element_stat") {
+    } else if (stat.tag === "Element_stat") {
       return stat.stat.expr.body.prog.strictness;
     } else {
       assert.fail();

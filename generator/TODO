@@ -64,7 +64,7 @@
   
  
 *) jsinterpreter.ml: replace 
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)  s ("[run_object_method]   returned a primitive in [object_proto_is_prototype_of_body].")
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Result_impossible)  s ("[run_object_method]   returned a primitive in [object_proto_is_prototype_of_body].")
     with (after defining an « impossible » function)
       impossible s "[run_object_method] returned a primitive in [object_proto_is_prototype_of_body]."
 

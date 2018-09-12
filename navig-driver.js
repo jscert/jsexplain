@@ -189,17 +189,17 @@ function setExample(idx) {
 
 function jsvalue_of_value(v) {
   switch (v.tag) {
-    case "Coq_value_undef":
+    case "Value_undef":
       return undefined;
-    case "Coq_value_null":
+    case "Value_null":
       return null;
-    case "Coq_value_bool":
+    case "Value_bool":
       return (v.value) ? true : false;
-    case "Coq_value_number":
+    case "Value_number":
       return v.value;
-    case "Coq_value_string":
+    case "Value_string":
       return v.value;
-    case "Coq_value_object":
+    case "Value_object":
       return v.value; // TODO: reflect
     default:
       throw "unrecognized tag in jsvalue_of_value";
@@ -246,12 +246,12 @@ function lookup_var_in_object(state, name, loc) {
     case "Some":
       var attribute = ro.value;
       switch (attribute.tag) {
-        case "Coq_attributes_data_of":
+        case "Attributes_data_of":
           var attr = attribute.value;
           var prop_value = attr.attributes_data_value;
           return prop_value;
           break;
-        case "Coq_attributes_accessor_of":
+        case "Attributes_accessor_of":
           // raise error (?)
           break;
         default:
@@ -293,21 +293,21 @@ function lookup_var_in_lexical_env(state, name, lexical_env) {
     var env_record = env_record_opt.value;
 
     switch (env_record.tag) {
-      case "Coq_env_record_decl":
+      case "Env_record_decl":
         var env_record_decl = env_record.value;
         var r = lookup_var_in_record_decl(name, env_record_decl);
         if (r !== undefined) {
           return r;
         }
         break;
-      case "Coq_env_record_object":
+      case "Env_record_object":
         var object_loc = env_record.value;
         var r = lookup_var_in_object(state, name, object_loc);
         if (r !== undefined) {
           return r;
         }
         /*
-        var obj_value = { tag: "Coq_value_object", value: object_loc };
+        var obj_value = { tag: "Value_object", value: object_loc };
         var provide_this = env_record.provide_this;
         */
         break;
@@ -681,18 +681,18 @@ function array_of_heap(compare, heap) {
 
 
 function string_of_prealloc(prealloc) {
-  return (prealloc.tag).slice("Coq_prealloc_".length);
+  return (prealloc.tag).slice("Prealloc_".length);
   //TODO:
-  // Coq_prealloc_mathop  [@f mathop] of mathop
-  // Coq_prealloc_native_error  [@f error] of native_error
-  // Coq_prealloc_native_error_proto  [@f error] of native_error
+  // Prealloc_mathop  [@f mathop] of mathop
+  // Prealloc_native_error  [@f error] of native_error
+  // Prealloc_native_error_proto  [@f error] of native_error
 }
 
 function string_of_loc(loc) {
   switch (loc.tag) {
-    case "Coq_object_loc_normal":
+    case "Object_loc_normal":
       return loc.address;
-    case "Coq_object_loc_prealloc":
+    case "Object_loc_prealloc":
       return string_of_prealloc(loc.prealloc);
     default:
       throw "unrecognized tag in string_of_loc";
@@ -711,7 +711,7 @@ function string_of_option(string_of_elem, opt_elem) {
 }
 
 function string_of_mutability(mutability) {
-  return (mutability.tag).slice("Coq_mutability_".length);
+  return (mutability.tag).slice("Mutability_".length);
 }
 
 
@@ -744,8 +744,8 @@ function string_of_mutability(mutability) {
 // TODO  for object_prim_value_, use string_of_option(show_elem, opt_elem)
 /*
     type attributes =
-    | Coq_attributes_data_of [@f value] of attributes_data
-    | Coq_attributes_accessor_of [@f value] of attributes_accessor
+    | Attributes_data_of [@f value] of attributes_data
+    | Attributes_accessor_of [@f value] of attributes_accessor
 
 
     type attributes_data = { attributes_data_value : value;
@@ -784,24 +784,24 @@ function show_object(state, loc, target, depth) {
     $("#" + targetsub).html("&ndash; " + html_escape(prop_name) + ": ");
 
     switch (attribute.tag) {
-      case "Coq_attributes_data_of":
+      case "Attributes_data_of":
         var attr = attribute.value;
         var prop_value = attr.attributes_data_value;
         show_value(state, prop_value, targetsub, depth-1);
 
         break;
-      case "Coq_attributes_accessor_of":
+      case "Attributes_accessor_of":
         var attr = attribute.value;
         $("#" + targetsub).append(" &lt;accessor&gt; ");
         // TODO: complete
 
         break;
-      case "Coq_value_undef":
-      case "Coq_value_null":
-      case "Coq_value_bool":
-      case "Coq_value_number":
-      case "Coq_value_string":
-      case "Coq_value_object":
+      case "Value_undef":
+      case "Value_null":
+      case "Value_bool":
+      case "Value_number":
+      case "Value_string":
+      case "Value_object":
         show_value(state, attribute, targetsub, depth-1);
         break;
 
@@ -833,22 +833,22 @@ function show_object(state, loc, target, depth) {
 function show_value(state, v, target, depth) {
   var t = $("#" + target);
   switch (v.tag) {
-    case "Coq_value_undef":
+    case "Value_undef":
       t.append("undefined");
       return;
-    case "Coq_value_null":
+    case "Value_null":
       t.append("null");
       return;
-    case "Coq_value_bool":
+    case "Value_bool":
       t.append((v.value) ? "true" : "false");
       return;
-    case "Coq_value_number":
+    case "Value_number":
       t.append("" + v.value);
       return;
-    case "Coq_value_string":
+    case "Value_string":
       t.append("\"" + html_escape(v.value) + "\"");
       return;
-    case "Coq_value_object":
+    case "Value_object":
       var loc = v.value;
       var obj_target = fresh_id();
       t.append("<span class='heap_link'><a onclick=\"handlers['" + obj_target + "']()\" >&lt;Object&gt;(" + string_of_loc(loc) + ")</a><span id='" + obj_target + "'></span></span>");
@@ -901,15 +901,15 @@ function show_lexical_env(state, lexical_env, target) {
     var env_record = env_record_opt.value;
 
     switch (env_record.tag) {
-      case "Coq_env_record_decl":
+      case "Env_record_decl":
         var env_record_decl = env_record.value;
         var items_target = fresh_id();
         t.append("<div><b>&bull; environment-record-declaration</b>: <div style='margin-left: 1em' id='" + items_target + "'></div></div>");
         show_decl_env_record(state, env_record_decl, items_target)
         break;
-      case "Coq_env_record_object":
+      case "Env_record_object":
         var object_loc = env_record.value;
-        var obj_value = { tag: "Coq_value_object", value: object_loc };
+        var obj_value = { tag: "Value_object", value: object_loc };
         var provide_this = env_record.provide_this;
         var obj_target = fresh_id();
         t.append("<div id='" + obj_target + "'><b>&bull; environment-record-object</b>:</div>");
@@ -984,11 +984,11 @@ function interp_val_is_base_value(val) {
 }
 
 function interp_val_is_js_value(v) {
-  return has_tag_in_set(v, ["Coq_value_undef", "Coq_value_null", "Coq_value_bool", "Coq_value_number", "Coq_value_string", "Coq_value_object" ]);
+  return has_tag_in_set(v, ["Value_undef", "Value_null", "Value_bool", "Value_number", "Value_string", "Value_object" ]);
 }
 
 function interp_val_is_loc(v) {
-  return has_tag_in_set(v, [ "Coq_object_loc_normal", "Coq_object_loc_prealloc" ]);
+  return has_tag_in_set(v, [ "Object_loc_normal", "Object_loc_prealloc" ]);
 }
 
 function interp_val_is_list(v) {
@@ -996,7 +996,7 @@ function interp_val_is_list(v) {
 }
 
 function interp_val_is_syntax(v) {
-  return has_tag_in_set(v, [ "Coq_expr_this", "Coq_expr_identifier", "Coq_expr_literal", "Coq_expr_object", "Coq_expr_array", "Coq_expr_function", "Coq_expr_access", "Coq_expr_member", "Coq_expr_new", "Coq_expr_call", "Coq_expr_unary_op", "Coq_expr_binary_op", "Coq_expr_conditional", "Coq_expr_assign", "Coq_propbody_val", "Coq_propbody_get", "Coq_propbody_set", "Coq_funcbody_intro", "Coq_stat_expr", "Coq_stat_label", "Coq_stat_block", "Coq_stat_var_decl", "Coq_stat_if", "Coq_stat_do_while", "Coq_stat_while", "Coq_stat_with", "Coq_stat_throw", "Coq_stat_return", "Coq_stat_break", "Coq_stat_continue", "Coq_stat_try", "Coq_stat_for", "Coq_stat_for_var", "Coq_stat_for_in", "Coq_stat_for_in_var", "Coq_stat_debugger", "Coq_stat_switch", "Coq_switchbody_nodefault", "Coq_switchbody_withdefault", "Coq_switchclause_intro", "Coq_prog_intro", "Coq_element_stat", "Coq_element_func_decl" ]);
+  return has_tag_in_set(v, [ "Expr_this", "Expr_identifier", "Expr_literal", "Expr_object", "Expr_array", "Expr_function", "Expr_access", "Expr_member", "Expr_new", "Expr_call", "Expr_unary_op", "Expr_binary_op", "Expr_conditional", "Expr_assign", "Propbody_val", "Propbody_get", "Propbody_set", "Funcbody_intro", "Stat_expr", "Stat_label", "Stat_block", "Stat_var_decl", "Stat_if", "Stat_do_while", "Stat_while", "Stat_with", "Stat_throw", "Stat_return", "Stat_break", "Stat_continue", "Stat_try", "Stat_for", "Stat_for_var", "Stat_for_in", "Stat_for_in_var", "Stat_debugger", "Stat_switch", "Switchbody_nodefault", "Switchbody_withdefault", "Switchclause_intro", "Prog_intro", "Element_stat", "Element_func_decl" ]);
 }
 
 function interp_val_is_state(v) {
@@ -1107,9 +1107,9 @@ function ctxToHtml(ctx) {
       val.value.out !== undefined &&
       val.value.out.res !== undefined) {
       var res = val.value.out.res;
-      // Coq_result_some  [@f value] of 't
-      // Coq_specret_out  [@f value] of out
-      // Coq_out_ter  [@f state, res] of state * res
+      // Result_some  [@f value] of 't
+      // Specret_out  [@f value] of out
+      // Out_ter  [@f state, res] of state * res
       s += "<div style='white-space: nowrap;'><b>#RES#</b>: " + JSON.stringify(res) + "</div>";
       if (res.res_value !== undefined &&
         res.res_value.value !== undefined) {

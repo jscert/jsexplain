@@ -226,20 +226,20 @@ let is_coercion_constructor lident =
     let x = string_of_longident lident in
     (*  Printf.printf "%s\n" x; *)
     let b = List.mem x [ (* todo: where is JsSyntax? *)
-      "Coq_out_ter"; 
-      "Coq_prim_bool"; 
-      "Coq_prim_number"; 
-      "Coq_prim_string"; 
-      "Coq_value_prim"; 
-      "Coq_object_loc_prealloc"; 
-      "Coq_value_object"; 
-      "Coq_attributes_data_of"; 
-      "Coq_attributes_accessor_of"; 
-      "Coq_full_descriptor_some"; 
-      "Coq_env_record_decl"; 
-      "Coq_resvalue_value"; 
-      "Coq_resvalue_ref"; 
-      "Coq_resvalue_ref"; 
+      "Out_ter"; 
+      "Prim_bool"; 
+      "Prim_number"; 
+      "Prim_string"; 
+      "Value_prim"; 
+      "Object_loc_prealloc"; 
+      "Value_object"; 
+      "Attributes_data_of"; 
+      "Attributes_accessor_of"; 
+      "Full_descriptor_some"; 
+      "Env_record_decl"; 
+      "Resvalue_value"; 
+      "Resvalue_ref"; 
+      "Resvalue_ref"; 
       ] in 
     (* if (is_mode_pseudo()) then Printf.printf "%s %s\n" x (if b then " [yes]" else ""); *)
     b
@@ -1139,7 +1139,7 @@ and js_of_expression (sm : shadow_map) ctx dest e =
     let cstr_fullname = 
       if cstr_fullname = "[]" then "mk_nil" 
       else if cstr_fullname = "::" then "mk_cons" 
-      else begin (* rename the constructor to remove "Coq_" prefix *)
+      else begin (* rename the constructor to remove "" prefix *)
         let id2 = 
           match p.txt with
           | Longident.Lident s -> Longident.Lident (rename_constructor s)
