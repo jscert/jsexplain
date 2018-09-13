@@ -4,7 +4,7 @@ dist: trusty
 
 env:
   global:
-    - OCAML_VERSION=4.04
+    - OCAML_VERSION=4.04.2
     - OPAMYES=true
     - UBUNTU_TRUSTY=1
 
