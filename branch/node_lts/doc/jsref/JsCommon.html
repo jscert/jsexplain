@@ -1,0 +1,381 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Translate_syntax.html">
+<link rel="next" href="JsCommonAux.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Datatypes" rel="Chapter" href="Datatypes.html">
+<link title="LibList" rel="Chapter" href="LibList.html">
+<link title="LibOption" rel="Chapter" href="LibOption.html">
+<link title="LibProd" rel="Chapter" href="LibProd.html">
+<link title="StdMap" rel="Chapter" href="StdMap.html">
+<link title="Heap" rel="Chapter" href="Heap.html">
+<link title="HeapInt" rel="Chapter" href="HeapInt.html">
+<link title="HeapStr" rel="Chapter" href="HeapStr.html">
+<link title="HeapList" rel="Chapter" href="HeapList.html">
+<link title="Shared" rel="Chapter" href="Shared.html">
+<link title="Compare" rel="Chapter" href="Compare.html">
+<link title="JsNumber" rel="Chapter" href="JsNumber.html">
+<link title="JsSyntax" rel="Chapter" href="JsSyntax.html">
+<link title="JsSyntaxAux" rel="Chapter" href="JsSyntaxAux.html">
+<link title="HeapObj" rel="Chapter" href="HeapObj.html">
+<link title="Translate_syntax" rel="Chapter" href="Translate_syntax.html">
+<link title="JsCommon" rel="Chapter" href="JsCommon.html">
+<link title="JsCommonAux" rel="Chapter" href="JsCommonAux.html">
+<link title="JsInit" rel="Chapter" href="JsInit.html">
+<link title="Prheap" rel="Chapter" href="Prheap.html">
+<link title="Debug" rel="Chapter" href="Debug.html">
+<link title="JsInterpreterMonads" rel="Chapter" href="JsInterpreterMonads.html">
+<link title="JsInterpreter" rel="Chapter" href="JsInterpreter.html">
+<link title="JsInterpreterUtils" rel="Chapter" href="JsInterpreterUtils.html">
+<link title="ModuleExport" rel="Chapter" href="ModuleExport.html">
+<link title="Run_js" rel="Chapter" href="Run_js.html"><title>JsCommon</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Translate_syntax.html" title="Translate_syntax">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="JsCommonAux.html" title="JsCommonAux">Next</a>
+</div>
+<h1>Module <a href="type_JsCommon.html">JsCommon</a></h1>
+
+<pre><span class="keyword">module</span> JsCommon: <code class="code">sig</code> <a href="JsCommon.html">..</a> <code class="code">end</code></pre><div class="info module top">
+val res_overwrite_value_if_empty : resvalue -&gt; res -&gt; res *<br>
+</div>
+<hr width="100%">
+<br>
+val res_overwrite_value_if_empty : resvalue -&gt; res -&gt; res *<br>
+
+<pre><span id="VALres_overwrite_value_if_empty"><span class="keyword">val</span> res_overwrite_value_if_empty</span> : <code class="type"><a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -> <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> -> <a href="JsSyntax.html#TYPEres">JsSyntax.res</a></code></pre><br>
+val res_label_in : res -&gt; label_set -&gt; bool *<br>
+
+<pre><span id="VALres_label_in"><span class="keyword">val</span> res_label_in</span> : <code class="type"><a href="JsSyntax.html#TYPEres">JsSyntax.res</a> -> <a href="JsSyntax.html#TYPElabel">JsSyntax.label</a> list -> bool</code></pre><br>
+val convert_literal_to_prim : literal -&gt; prim *<br>
+
+<pre><span id="VALconvert_literal_to_prim"><span class="keyword">val</span> convert_literal_to_prim</span> : <code class="type"><a href="JsSyntax.html#TYPEliteral">JsSyntax.literal</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><br>
+val type_of : value -&gt; coq_type *<br>
+
+<pre><span id="VALtype_of"><span class="keyword">val</span> type_of</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEcoq_type">JsSyntax.coq_type</a></code></pre>
+<pre><span id="VALtype_of_resvalue"><span class="keyword">val</span> type_of_resvalue</span> : <code class="type"><a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -> <a href="JsSyntax.html#TYPEresvalue_type">JsSyntax.resvalue_type</a></code></pre>
+<pre><span id="VALref_of_resvalue"><span class="keyword">val</span> ref_of_resvalue</span> : <code class="type"><a href="JsSyntax.html#TYPEresvalue">JsSyntax.resvalue</a> -> <a href="JsSyntax.html#TYPEref">JsSyntax.ref</a></code></pre>
+<pre><span id="VALattributes_data_default"><span class="keyword">val</span> attributes_data_default</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><div class="info ">
+Default vales for data property attributes.<br>
+ECMAScript Specification section: <a href="#table-4">6.1.7.1 Table 4</a></div>
+
+<pre><span id="VALattributes_accessor_default"><span class="keyword">val</span> attributes_accessor_default</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><div class="info ">
+Default vales for accessor property attributes.<br>
+ECMAScript Specification section: <a href="#table-4">6.1.7.1 Table 4</a></div>
+
+<pre><span id="VALattributes_accessor_of_attributes_data"><span class="keyword">val</span> attributes_accessor_of_attributes_data</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a></code></pre><div class="info ">
+Convert a data attribute into an accessor attribute.
+<p>
+
+    Implements the following spec text: "Convert the property [...] from a
+    data property to an accessor property.  Preserve the existing values of the
+    converted property's [[Configurable]] and [[Enumerable]] attributes
+    and set the rest of the property's attributes to their default values."<br>
+</div>
+
+<pre><span id="VALattributes_data_of_attributes_accessor"><span class="keyword">val</span> attributes_data_of_attributes_accessor</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a></code></pre><div class="info ">
+Convert an accessor attribute into a data attribute.
+<p>
+
+    Implements the following spec text: "Convert the property [...] from an
+    accessor property to a data property.  Preserve the existing values of the
+    converted property's [[Configurable]] and [[Enumerable]] attributes
+    and set the rest of the property's attributes to their default values."<br>
+</div>
+
+<pre><span id="VALattributes_data_update"><span class="keyword">val</span> attributes_data_update</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><div class="info ">
+Updates a given data attribute with values from the given descriptor<br>
+</div>
+
+<pre><span id="VALattributes_accessor_update"><span class="keyword">val</span> attributes_accessor_update</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a> -><br>       <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><div class="info ">
+Updates a given accessor attribute with values from the given descriptor<br>
+</div>
+
+<pre><span id="VALattributes_update"><span class="keyword">val</span> attributes_update</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a></code></pre><div class="info ">
+Updates a given attribute with values from the given descriptor. Additional
+    attributes on the descriptor are ignored.<br>
+</div>
+
+<pre><span id="VALattributes_data_of_descriptor"><span class="keyword">val</span> attributes_data_of_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><div class="info ">
+Create a data property from a descriptor, using default attribute values if
+    the required attribute is absent.<br>
+</div>
+
+<pre><span id="VALattributes_accessor_of_descriptor"><span class="keyword">val</span> attributes_accessor_of_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes_accessor">JsSyntax.attributes_accessor</a></code></pre><div class="info ">
+Create an accessor property from a descriptor, using default attribute
+    values if the required attribute is absent.<br>
+</div>
+
+<pre><span id="VALattributes_of_descriptor"><span class="keyword">val</span> attributes_of_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a> -> <a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a></code></pre><div class="info ">
+<span class="warning">Deprecated.</span>For backwards compatibility only.<br>
+Converts a complete descriptor into attributes. Nonstandard operation for backwards compat only. Not to be used with
+    generic descriptors.<br>
+</div>
+<br>
+val descriptor_of_attributes : attributes -&gt; descriptor *<br>
+
+<pre><span id="VALdescriptor_of_attributes"><span class="keyword">val</span> descriptor_of_attributes</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a></code></pre>
+<pre><span id="VALfull_descriptor_of_undef_descriptor"><span class="keyword">val</span> full_descriptor_of_undef_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a> -> <a href="JsSyntax.html#TYPEfull_descriptor">JsSyntax.full_descriptor</a></code></pre>
+<pre><span id="VALundef_descriptor_of_full_descriptor"><span class="keyword">val</span> undef_descriptor_of_full_descriptor</span> : <code class="type"><a href="JsSyntax.html#TYPEfull_descriptor">JsSyntax.full_descriptor</a> -> <a href="JsSyntax.html#TYPEundef_descriptor">JsSyntax.undef_descriptor</a></code></pre><br>
+val attributes_configurable : attributes -&gt; bool *<br>
+
+<pre><span id="VALattributes_configurable"><span class="keyword">val</span> attributes_configurable</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> bool</code></pre><br>
+val attributes_enumerable : attributes -&gt; bool *<br>
+
+<pre><span id="VALattributes_enumerable"><span class="keyword">val</span> attributes_enumerable</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> bool</code></pre><br>
+val state_with_object_heap :
+    state -&gt; (object_loc, coq_object) Heap.heap -&gt; state *<br>
+
+<pre><span id="VALstate_with_object_heap"><span class="keyword">val</span> state_with_object_heap</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       (<a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a>, <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a>) <a href="Heap.html#TYPEheap">Heap.heap</a> -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a></code></pre><br>
+val state_map_object_heap :
+    state -&gt; ((object_loc, coq_object) Heap.heap -&gt; (object_loc, coq_object)
+    Heap.heap) -&gt; state *<br>
+
+<pre><span id="VALstate_map_object_heap"><span class="keyword">val</span> state_map_object_heap</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       ((<a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a>, <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a>) <a href="Heap.html#TYPEheap">Heap.heap</a> -><br>        (<a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a>, <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a>) <a href="Heap.html#TYPEheap">Heap.heap</a>) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a></code></pre><br>
+val object_write : state -&gt; object_loc -&gt; coq_object -&gt; state *<br>
+
+<pre><span id="VALobject_write"><span class="keyword">val</span> object_write</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a></code></pre><br>
+val object_alloc : state -&gt; coq_object -&gt; object_loc * state *<br>
+
+<pre><span id="VALobject_alloc"><span class="keyword">val</span> object_alloc</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -> <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> * <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a></code></pre><br>
+val object_map_properties :
+    coq_object -&gt; (object_properties_type -&gt; object_properties_type) -&gt;
+    coq_object *<br>
+
+<pre><span id="VALobject_map_properties"><span class="keyword">val</span> object_map_properties</span> : <code class="type"><a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a> -><br>       (<a href="JsSyntax.html#TYPEobject_properties_type">JsSyntax.object_properties_type</a> -> <a href="JsSyntax.html#TYPEobject_properties_type">JsSyntax.object_properties_type</a>) -><br>       <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a></code></pre><br>
+val object_new : value -&gt; class_name -&gt; coq_object *<br>
+
+<pre><span id="VALobject_new"><span class="keyword">val</span> object_new</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEclass_name">JsSyntax.class_name</a> -> <a href="JsSyntax.html#TYPEcoq_object">JsSyntax.coq_object</a></code></pre>
+<pre><span id="VALproxy_object_new"><span class="keyword">val</span> proxy_object_new</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> * <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a></code></pre>
+<pre><span id="VALlength_property_attributes"><span class="keyword">val</span> length_property_attributes</span> : <code class="type"><a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><div class="info ">
+ECMAScript Specification section: <a href="#17-11
+
+    Unless otherwise specified, the length property of a built-in function object has the attributes
+    { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: true }.">sec-ecmascript-standard-built-in-objects</a></div>
+
+<pre><span id="VALbuiltin_function_new"><span class="keyword">val</span> builtin_function_new</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -><br>       <a href="JsSyntax.html#TYPEprealloc">JsSyntax.prealloc</a> -><br>       <a href="JsNumber.html#TYPEnumber">JsNumber.number</a> -> bool -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> * <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre><br>
+val attributes_writable : attributes -&gt; bool *<br>
+
+<pre><span id="VALattributes_writable"><span class="keyword">val</span> attributes_writable</span> : <code class="type"><a href="JsSyntax.html#TYPEattributes">JsSyntax.attributes</a> -> bool</code></pre><br>
+val attributes_data_intro_constant : value -&gt; attributes_data *<br>
+
+<pre><span id="VALattributes_data_intro_constant"><span class="keyword">val</span> attributes_data_intro_constant</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><br>
+val attributes_data_intro_all_true : value -&gt; attributes_data *<br>
+
+<pre><span id="VALattributes_data_intro_all_true"><span class="keyword">val</span> attributes_data_intro_all_true</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEattributes_data">JsSyntax.attributes_data</a></code></pre><br>
+val descriptor_intro_data :
+    value -&gt; bool -&gt; bool -&gt; bool -&gt; descriptor *<br>
+
+<pre><span id="VALdescriptor_intro_data"><span class="keyword">val</span> descriptor_intro_data</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> bool -> bool -> bool -> <a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a></code></pre><br>
+val descriptor_intro_empty : descriptor *<br>
+
+<pre><span id="VALdescriptor_intro_empty"><span class="keyword">val</span> descriptor_intro_empty</span> : <code class="type"><a href="JsSyntax.html#TYPEdescriptor">JsSyntax.descriptor</a></code></pre>
+<pre><code><span id="TYPEref_kind"><span class="keyword">type</span> <code class="type"></code>ref_kind</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTref_kind.Coq_ref_kind_null"><span class="constructor">Coq_ref_kind_null</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTref_kind.Coq_ref_kind_undef"><span class="constructor">Coq_ref_kind_undef</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTref_kind.Coq_ref_kind_primitive_base"><span class="constructor">Coq_ref_kind_primitive_base</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTref_kind.Coq_ref_kind_object"><span class="constructor">Coq_ref_kind_object</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTref_kind.Coq_ref_kind_env_record"><span class="constructor">Coq_ref_kind_env_record</span></span></code></td>
+
+</tr></table>
+
+
+<br>
+val ref_kind_of : ref -&gt; ref_kind *<br>
+
+<pre><span id="VALref_kind_of"><span class="keyword">val</span> ref_kind_of</span> : <code class="type"><a href="JsSyntax.html#TYPEref">JsSyntax.ref</a> -> <a href="JsCommon.html#TYPEref_kind">ref_kind</a></code></pre>
+<pre><span id="VALvalue_of_ref_base_type"><span class="keyword">val</span> value_of_ref_base_type</span> : <code class="type"><a href="JsSyntax.html#TYPEref_base_type">JsSyntax.ref_base_type</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a></code></pre>
+<pre><span id="VALenv_loc_of_ref_base_type"><span class="keyword">val</span> env_loc_of_ref_base_type</span> : <code class="type"><a href="JsSyntax.html#TYPEref_base_type">JsSyntax.ref_base_type</a> -> <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a></code></pre><br>
+val ref_create_value : value -&gt; prop_name -&gt; bool -&gt; ref *<br>
+
+<pre><span id="VALref_create_value"><span class="keyword">val</span> ref_create_value</span> : <code class="type"><a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -> bool -> <a href="JsSyntax.html#TYPEref">JsSyntax.ref</a></code></pre><br>
+val ref_create_env_loc : env_loc -&gt; prop_name -&gt; bool -&gt; ref *<br>
+
+<pre><span id="VALref_create_env_loc"><span class="keyword">val</span> ref_create_env_loc</span> : <code class="type"><a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -> <a href="JsSyntax.html#TYPEprop_name">JsSyntax.prop_name</a> -> bool -> <a href="JsSyntax.html#TYPEref">JsSyntax.ref</a></code></pre><br>
+val mutability_of_bool : bool -&gt; mutability *<br>
+
+<pre><span id="VALmutability_of_bool"><span class="keyword">val</span> mutability_of_bool</span> : <code class="type">bool -> <a href="JsSyntax.html#TYPEmutability">JsSyntax.mutability</a></code></pre><br>
+val state_with_env_record_heap :
+    state -&gt; (env_loc, env_record) Heap.heap -&gt; state *<br>
+
+<pre><span id="VALstate_with_env_record_heap"><span class="keyword">val</span> state_with_env_record_heap</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       (<a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a>, <a href="JsSyntax.html#TYPEenv_record">JsSyntax.env_record</a>) <a href="Heap.html#TYPEheap">Heap.heap</a> -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a></code></pre><br>
+val state_map_env_record_heap :
+    state -&gt; ((env_loc, env_record) Heap.heap -&gt; (env_loc, env_record)
+    Heap.heap) -&gt; state *<br>
+
+<pre><span id="VALstate_map_env_record_heap"><span class="keyword">val</span> state_map_env_record_heap</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       ((<a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a>, <a href="JsSyntax.html#TYPEenv_record">JsSyntax.env_record</a>) <a href="Heap.html#TYPEheap">Heap.heap</a> -><br>        (<a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a>, <a href="JsSyntax.html#TYPEenv_record">JsSyntax.env_record</a>) <a href="Heap.html#TYPEheap">Heap.heap</a>) -><br>       <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a></code></pre><br>
+val env_record_write : state -&gt; env_loc -&gt; env_record -&gt; state *<br>
+
+<pre><span id="VALenv_record_write"><span class="keyword">val</span> env_record_write</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -> <a href="JsSyntax.html#TYPEenv_record">JsSyntax.env_record</a> -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a></code></pre><br>
+val env_record_alloc : state -&gt; env_record -&gt; int * state *<br>
+
+<pre><span id="VALenv_record_alloc"><span class="keyword">val</span> env_record_alloc</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEenv_record">JsSyntax.env_record</a> -> int * <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a></code></pre><br>
+val provide_this_true : provide_this_flag *<br>
+
+<pre><span id="VALprovide_this_true"><span class="keyword">val</span> provide_this_true</span> : <code class="type">bool</code></pre><br>
+val provide_this_false : provide_this_flag *<br>
+
+<pre><span id="VALprovide_this_false"><span class="keyword">val</span> provide_this_false</span> : <code class="type">bool</code></pre><br>
+val env_record_object_default : object_loc -&gt; env_record *<br>
+
+<pre><span id="VALenv_record_object_default"><span class="keyword">val</span> env_record_object_default</span> : <code class="type"><a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -> <a href="JsSyntax.html#TYPEenv_record">JsSyntax.env_record</a></code></pre><br>
+val decl_env_record_empty : decl_env_record *<br>
+
+<pre><span id="VALdecl_env_record_empty"><span class="keyword">val</span> decl_env_record_empty</span> : <code class="type">('a, 'b) <a href="StdMap.html#TYPEt">StdMap.t</a></code></pre><br>
+val decl_env_record_write :
+    decl_env_record -&gt; prop_name -&gt; mutability -&gt; value -&gt; decl_env_record *<br>
+
+<pre><span id="VALdecl_env_record_write"><span class="keyword">val</span> decl_env_record_write</span> : <code class="type">(string, 'a * 'b) <a href="StdMap.html#TYPEt">StdMap.t</a> -><br>       string -> 'a -> 'b -> (string, 'a * 'b) <a href="StdMap.html#TYPEt">StdMap.t</a></code></pre><br>
+val decl_env_record_rem :
+    decl_env_record -&gt; prop_name -&gt; decl_env_record *<br>
+
+<pre><span id="VALdecl_env_record_rem"><span class="keyword">val</span> decl_env_record_rem</span> : <code class="type">(string, 'a) <a href="StdMap.html#TYPEt">StdMap.t</a> -> string -> (string, 'a) <a href="StdMap.html#TYPEt">StdMap.t</a></code></pre><br>
+val env_record_write_decl_env :
+    state -&gt; env_loc -&gt; prop_name -&gt; mutability -&gt; value -&gt; state *<br>
+
+<pre><span id="VALenv_record_write_decl_env"><span class="keyword">val</span> env_record_write_decl_env</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       <a href="JsSyntax.html#TYPEenv_loc">JsSyntax.env_loc</a> -><br>       string -> <a href="JsSyntax.html#TYPEmutability">JsSyntax.mutability</a> -> <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a></code></pre><br>
+val lexical_env_alloc :
+    state -&gt; int list -&gt; env_record -&gt; int list * state *<br>
+
+<pre><span id="VALlexical_env_alloc"><span class="keyword">val</span> lexical_env_alloc</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       int list -> <a href="JsSyntax.html#TYPEenv_record">JsSyntax.env_record</a> -> int list * <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a></code></pre><br>
+val lexical_env_alloc_decl : state -&gt; int list -&gt; int list * state *<br>
+
+<pre><span id="VALlexical_env_alloc_decl"><span class="keyword">val</span> lexical_env_alloc_decl</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> int list -> int list * <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a></code></pre><br>
+val lexical_env_alloc_object :
+    state -&gt; int list -&gt; object_loc -&gt; provide_this_flag -&gt; int list * state *<br>
+
+<pre><span id="VALlexical_env_alloc_object"><span class="keyword">val</span> lexical_env_alloc_object</span> : <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -><br>       int list -><br>       <a href="JsSyntax.html#TYPEobject_loc">JsSyntax.object_loc</a> -><br>       <a href="JsSyntax.html#TYPEprovide_this_flag">JsSyntax.provide_this_flag</a> -> int list * <a href="JsSyntax.html#TYPEstate">JsSyntax.state</a></code></pre><br>
+val execution_ctx_intro_same :
+    lexical_env -&gt; value -&gt; strictness_flag -&gt; execution_ctx *<br>
+
+<pre><span id="VALexecution_ctx_intro_same"><span class="keyword">val</span> execution_ctx_intro_same</span> : <code class="type"><a href="JsSyntax.html#TYPElexical_env">JsSyntax.lexical_env</a> -><br>       <a href="JsSyntax.html#TYPEvalue">JsSyntax.value</a> -> <a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -> <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a></code></pre><br>
+val execution_ctx_with_lex :
+    execution_ctx -&gt; lexical_env -&gt; execution_ctx *<br>
+
+<pre><span id="VALexecution_ctx_with_lex"><span class="keyword">val</span> execution_ctx_with_lex</span> : <code class="type"><a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -> <a href="JsSyntax.html#TYPElexical_env">JsSyntax.lexical_env</a> -> <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a></code></pre><br>
+val execution_ctx_with_lex_same :
+    execution_ctx -&gt; lexical_env -&gt; execution_ctx *<br>
+
+<pre><span id="VALexecution_ctx_with_lex_same"><span class="keyword">val</span> execution_ctx_with_lex_same</span> : <code class="type"><a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a> -> <a href="JsSyntax.html#TYPElexical_env">JsSyntax.lexical_env</a> -> <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a></code></pre><br>
+val lexical_env_initial : lexical_env *<br>
+
+<pre><span id="VALlexical_env_initial"><span class="keyword">val</span> lexical_env_initial</span> : <code class="type">int list</code></pre><br>
+val execution_ctx_initial : strictness_flag -&gt; execution_ctx *<br>
+
+<pre><span id="VALexecution_ctx_initial"><span class="keyword">val</span> execution_ctx_initial</span> : <code class="type"><a href="JsSyntax.html#TYPEstrictness_flag">JsSyntax.strictness_flag</a> -> <a href="JsSyntax.html#TYPEexecution_ctx">JsSyntax.execution_ctx</a></code></pre><br>
+val element_funcdecl : element -&gt; funcdecl list *<br>
+
+<pre><span id="VALelement_funcdecl"><span class="keyword">val</span> element_funcdecl</span> : <code class="type"><a href="JsSyntax.html#TYPEelement">JsSyntax.element</a> -> <a href="JsSyntax.html#TYPEfuncdecl">JsSyntax.funcdecl</a> list</code></pre><br>
+val prog_funcdecl : prog -&gt; funcdecl list *<br>
+
+<pre><span id="VALprog_funcdecl"><span class="keyword">val</span> prog_funcdecl</span> : <code class="type"><a href="JsSyntax.html#TYPEprog">JsSyntax.prog</a> -> <a href="JsSyntax.html#TYPEfuncdecl">JsSyntax.funcdecl</a> list</code></pre><br>
+val stat_vardecl : stat -&gt; string list *<br>
+
+<pre><span id="VALstat_vardecl"><span class="keyword">val</span> stat_vardecl</span> : <code class="type"><a href="JsSyntax.html#TYPEstat">JsSyntax.stat</a> -> string list</code></pre><br>
+val switchbody_vardecl : switchbody -&gt; string list *<br>
+
+<pre><span id="VALswitchbody_vardecl"><span class="keyword">val</span> switchbody_vardecl</span> : <code class="type"><a href="JsSyntax.html#TYPEswitchbody">JsSyntax.switchbody</a> -> string list</code></pre><br>
+val switchclause_vardecl : switchclause -&gt; string list *<br>
+
+<pre><span id="VALswitchclause_vardecl"><span class="keyword">val</span> switchclause_vardecl</span> : <code class="type"><a href="JsSyntax.html#TYPEswitchclause">JsSyntax.switchclause</a> -> string list</code></pre><br>
+val element_vardecl : element -&gt; string list *<br>
+
+<pre><span id="VALelement_vardecl"><span class="keyword">val</span> element_vardecl</span> : <code class="type"><a href="JsSyntax.html#TYPEelement">JsSyntax.element</a> -> string list</code></pre><br>
+val prog_vardecl : prog -&gt; string list *<br>
+
+<pre><span id="VALprog_vardecl"><span class="keyword">val</span> prog_vardecl</span> : <code class="type"><a href="JsSyntax.html#TYPEprog">JsSyntax.prog</a> -> string list</code></pre>
+<pre><code><span id="TYPEpreftype"><span class="keyword">type</span> <code class="type"></code>preftype</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTpreftype.Coq_preftype_number"><span class="constructor">Coq_preftype_number</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTpreftype.Coq_preftype_string"><span class="constructor">Coq_preftype_string</span></span></code></td>
+
+</tr></table>
+
+
+<br>
+val method_of_preftype : preftype -&gt; string *<br>
+
+<pre><span id="VALmethod_of_preftype"><span class="keyword">val</span> method_of_preftype</span> : <code class="type"><a href="JsCommon.html#TYPEpreftype">preftype</a> -> string</code></pre><br>
+val other_preftypes : preftype -&gt; preftype *<br>
+
+<pre><span id="VALother_preftypes"><span class="keyword">val</span> other_preftypes</span> : <code class="type"><a href="JsCommon.html#TYPEpreftype">preftype</a> -> <a href="JsCommon.html#TYPEpreftype">preftype</a></code></pre><br>
+val throw_true : strictness_flag *<br>
+
+<pre><span id="VALthrow_true"><span class="keyword">val</span> throw_true</span> : <code class="type">bool</code></pre><br>
+val throw_false : strictness_flag *<br>
+
+<pre><span id="VALthrow_false"><span class="keyword">val</span> throw_false</span> : <code class="type">bool</code></pre><br>
+val throw_irrelevant : strictness_flag *<br>
+
+<pre><span id="VALthrow_irrelevant"><span class="keyword">val</span> throw_irrelevant</span> : <code class="type">bool</code></pre><br>
+val add_one : number -&gt; number *<br>
+
+<pre><span id="VALadd_one"><span class="keyword">val</span> add_one</span> : <code class="type">float -> float</code></pre><br>
+val sub_one : number -&gt; number *<br>
+
+<pre><span id="VALsub_one"><span class="keyword">val</span> sub_one</span> : <code class="type">float -> float</code></pre><br>
+val is_syntactic_eval : expr -&gt; bool *<br>
+
+<pre><span id="VALis_syntactic_eval"><span class="keyword">val</span> is_syntactic_eval</span> : <code class="type"><a href="JsSyntax.html#TYPEexpr">JsSyntax.expr</a> -> bool</code></pre><br>
+val elision_head_count : 'a1 option list -&gt; int *<br>
+
+<pre><span id="VALelision_head_count"><span class="keyword">val</span> elision_head_count</span> : <code class="type">'a option list -> int</code></pre><br>
+val elision_head_remove : 'a1 option list -&gt; 'a1 option list *<br>
+
+<pre><span id="VALelision_head_remove"><span class="keyword">val</span> elision_head_remove</span> : <code class="type">'a option list -> 'a option list</code></pre><br>
+val elision_tail_count : 'a1 option list -&gt; int *<br>
+
+<pre><span id="VALelision_tail_count"><span class="keyword">val</span> elision_tail_count</span> : <code class="type">'a option list -> int</code></pre><br>
+val elision_tail_remove : 'a1 option list -&gt; 'a1 option list *<br>
+
+<pre><span id="VALelision_tail_remove"><span class="keyword">val</span> elision_tail_remove</span> : <code class="type">'a option list -> 'a option list</code></pre><br>
+val parse_pickable : string -&gt; bool -&gt; prog coq_Pickable_option *<br>
+
+<pre><span id="VALparse_pickable"><span class="keyword">val</span> parse_pickable</span> : <code class="type">string -> bool -> <a href="JsSyntax.html#TYPEprog">JsSyntax.prog</a> option</code></pre></body></html>
