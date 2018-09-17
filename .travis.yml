@@ -1,26 +1,23 @@
 language: node_js
+node_js: "lts/carbon"
 sudo: required
 dist: trusty
 
 env:
   global:
-    - OCAML_VERSION=4.04.2
+    - OCAML_VERSION=4.04
+    - OPAM_SWITCH=4.04.2
     - OPAMYES=true
     - UBUNTU_TRUSTY=1
 
 matrix:
   include:
     - os: linux
-      node_js: "10"
       env: DEPLOY=true
     - os: linux
-      node_js: "10"
       env: TEST=true
-    #- os: osx
-    #  node_js: "10"
   allow_failures:
     - os: linux
-      node_js: "10"
       env: TEST=true
 
 cache:
