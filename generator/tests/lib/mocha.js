@@ -20,4 +20,4 @@ it = function(string, callback) {
 Mocha.assert_unit = x => {
   Mocha.assert_struct_eq(x, {}, x + " is not unit ({}).")
 }
-Mocha.assert_failwith = (f, e, m) => Mocha.throws(f, Error(e), m);
+Mocha.assert_failwith = (f, e, m) => Mocha.throws(f, RegExp(e), m);
