@@ -29,10 +29,3 @@ for the abstract operations of `ReturnIfAbrupt` and ...
   `object_internal_foo` would be the function to dispatch a `O.[[Foo]]` call to
   the appropriate function depending on the implementations defined on the `O`
   object.
-
-### Type Constructor Names
-  At present, many type constructors are prefixed with the string ``. This
-  is for legacy reasons only, and is to be removed in the future. (See issue
-  #19)
-
-
