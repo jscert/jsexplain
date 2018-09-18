@@ -1,6 +1,6 @@
 "use strict";
 
-const assert = require('assert').strict;
+const assert = require('assert');
 const util = require('util');
 
 var esprima = require('esprima');
@@ -143,7 +143,7 @@ function typecheckAST(ast) {
     if (i >= 0) {
       var polyTypeName = type.substring(i+1);
       var polyTypeConstr = getType(polyTypeName);
-      assert(typeof polyTypeConstr === 'function');
+      assert.strictEqual(typeof polyTypeConstr, 'function');
       var instance = polyTypeConstr(type.substring(0, i));
       instance._typeName = polyTypeName;
       return instance;
@@ -163,13 +163,13 @@ function typecheckAST(ast) {
   var typecheck = function(type, value) {
     var t = getType(type);
     if (isBaseType(t)) {
-      assert(t === typeof value, errorMsg(value, "was expected to have type of "+t));
+      assert.strictEqual(typeof value, t, errorMsg(value, "was expected to have type of "+t));
     } else if (Array.isArray(t)) {
-      assert(Array.isArray(value));
+      assert(Array.isArray(value), errorMsg(value, "was expected to be an array"));
       t.forEach((type, index) => typecheck(type, value[index]));
     } else {
-      assert(value.type === t._typeName, errorMsg(value, "was expected to have type of " + t._typeName));
-      assert.notEqual(value.tag, "_typeName");
+      assert.strictEqual(t._typeName, value.type, errorMsg(value, "was expected to have type of " + t._typeName));
+      assert.notEqual("_typeName", value.tag);
       assert(t.hasOwnProperty(value.tag), value.tag + " is a not a valid constructor of " + t._typeName);
 
       // Test each field defined in the type constructor
@@ -199,7 +199,7 @@ a()};`;
     var ast = esprimaToAST.esprimaToAST(prog, source);
 
     var sourceBody = /{([^]*)}/.exec(source)[1];
-    assert.equal(sourceBody, ast.elements.head.body.source);
+    assert.strictEqual(sourceBody, ast.elements.head.body.source);
 
   });
 
@@ -212,7 +212,7 @@ a()};`;
     it("Correctly parses that `" + test.source + "` is " + (test.strict ? " " : "not ") + "strict mode code?", function() {
       var est = esprima.parse(test.source, {loc: true, range: true});
       var ast = esprimaToAST.esprimaToAST(est, test.source);
-      assert.equal(test.strict, ast.strictness);
+      assert.strictEqual(test.strict, ast.strictness);
     });
   });
 
@@ -248,7 +248,7 @@ a()};`;
       var index = 0;
       while (listElem.tag === "::") {
         if (isFunction(listElem.head)) {
-          assert.equal(test.strict[index], getFunctionStrictness(listElem.head));
+          assert.strictEqual(test.strict[index], getFunctionStrictness(listElem.head));
           index++;
         }
         listElem = listElem.tail;

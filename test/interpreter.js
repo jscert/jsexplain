@@ -1,7 +1,7 @@
 "use strict";
 
 const fs = require('fs');
-const assert = require('assert').strict;
+const assert = require('assert');
 // tripwire module is no longer maintained
 //const tripwire = require('tripwire');
 
@@ -31,7 +31,7 @@ before(function(done) {
   fs.readFile(__dirname + '/data/test_prelude.js', (err, data) => {
     if (err) throw err;
     prelude = jsref.JsInterpreter.run_javascript(parse(data));
-    assert.doesNotThrow(() => testResultForException(prelude, undefined), "Prelude execution threw!");
+    testResultForException(prelude, undefined);
     done();
   });
 });
