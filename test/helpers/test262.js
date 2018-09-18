@@ -19,20 +19,9 @@ const filter = require('through2-filter');
 fs.readlinkSync = require('readlink').sync; // a non-broken readlink...
 const test262parser = require('test262-parser');
 const supportedFeatures = require('./supported-features.js');
+const baseReporter = require('mocha').reporters.Base;
 
 const testConstructors = [];
-
-// Shorten failure output
-const Base = require('mocha').reporters.Base;
-const oldReporterList = Base.list;
-Base.list = failures => {
-  if (!process.env.CI || process.env.CI === 'false') {
-    oldReporterList(failures);
-  } else {
-    console.log(Base.color('fail', 'Failure stack traces are suppressed in the CI environment.'));
-  }
-};
-
 const testDataPath = path.join(__dirname, '..', 'data');
 const test262path = fs.readlinkSync(path.join(testDataPath, 'test262'));
 const localHarnessPath = path.join(testDataPath, 'harness');
@@ -66,7 +55,8 @@ setImmediate(() => {
                   usedFeatures.delete(feature);
                 }
                 if (usedFeatures.size > 0) {
-                  console.log(Base.color('pending', 'Test skipped due to missing features: %s'), Array.from(usedFeatures).join(', '));
+                  console.log(baseReporter.color('pending', 'Test skipped due to missing features: %s'),
+                    Array.from(usedFeatures).join(', '));
                   this.skip();
                 }
               })
