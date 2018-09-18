@@ -9,6 +9,7 @@ init: .merlin
 	opam install -y jsjsref --deps-only
 	@# Temporary hack until opam can install test dependencies only
 	opam install alcotest
+	npm install
 	@echo
 	@echo 'You now need to execute: eval `opam config env`'
 
@@ -24,7 +25,6 @@ mljsref: generator # (requires the ppx)
 
 # Test Stages
 test_init: test/data/test262
-	npm install
 
 test: test_generator test_jsjsref
 
