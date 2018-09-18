@@ -34,7 +34,8 @@ install:
 
 script:
   - make
-  - if [ -n "$TEST" ]; then make test; fi
+  - make test_generator
+  - if [ -n "$TEST" ]; then make test_jsjsref; fi
 
 deploy:
   skip_cleanup: true
