@@ -31,20 +31,6 @@ let string_of_longident i =
 
 
 (****************************************************************)
-(* RENAMING OF CONSTRUCTOR NAMES *)
-
-let rename_constructor s =
-  if is_mode_not_pseudo() then s else begin
-    let n = String.length s in
-    if (n > 4 && s.[0] = 'C' && s.[1] = 'o' && s.[2] = 'q' && s.[3] = '_') then begin
-      let r = String.sub s 4 (n-4) in
-      r.[0] <- Char.uppercase_ascii r.[0];
-      r
-    end else s
-  end
-
-
-(****************************************************************)
 (* SHADOWING CHECKER *)
 
 module ShadowMapM = Map406.Make(String)
@@ -796,8 +782,7 @@ and js_of_structure_item s =
               let fields = extract_cstr_attrs_basic cstr_name cd.cd_attributes in
               let sargs = show_list ", " fields in
               let sbindings = map_opt2 (fun x y -> ppf_cstr x y) fields fields in (* FIXME: twice fields, really?! *)
-              let rest = show_list ", " sbindings in
-              let cstr_name = rename_constructor cstr_name in
+              let rest = show_list ", " sbindings in              
               let sobj = ppf_cstrs styp cstr_name rest in 
               let sbody = Printf.sprintf "function %s(%s) { return %s; }" cstr_name sargs sobj in
               (sbody, [cstr_name])
@@ -1142,8 +1127,8 @@ and js_of_expression (sm : shadow_map) ctx dest e =
       else begin (* rename the constructor to remove "" prefix *)
         let id2 = 
           match p.txt with
-          | Longident.Lident s -> Longident.Lident (rename_constructor s)
-          | Longident.Ldot(l, s) -> Longident.Ldot(l, rename_constructor s)  
+          | Longident.Lident s -> Longident.Lident s
+          | Longident.Ldot(l, s) -> Longident.Ldot(l, s 
           | Longident.Lapply(_, _) -> unsupported "Longident.Lapply"
           in
         string_of_longident id2 
