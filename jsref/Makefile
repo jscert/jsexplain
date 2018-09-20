@@ -216,9 +216,8 @@ Translate_syntax.cmo: Translate_syntax.ml Translate_syntax.mli Translate_syntax.
 	ocamlc -c $(REPLACE_STDLIB) $(PPX_FLAG) $(OCAMLCFLAGS) $<
 
 clean_mljsref:
-	rm -f $(ML_FRONTEND_SRC)/*.mli
-	rm -f $(ML_FRONTEND_SRC)/*.cmo
-	rm -f $(ML_FRONTEND_SRC)/*.byte
+	rm -f ./*.cmo
+	rm -f ./*.byte
 
 .PHONY: mljsref clean_mljsref
 
