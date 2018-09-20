@@ -1128,7 +1128,7 @@ and js_of_expression (sm : shadow_map) ctx dest e =
         let id2 = 
           match p.txt with
           | Longident.Lident s -> Longident.Lident s
-          | Longident.Ldot(l, s) -> Longident.Ldot(l, s 
+          | Longident.Ldot(l, s) -> Longident.Ldot(l, s) 
           | Longident.Lapply(_, _) -> unsupported "Longident.Lapply"
           in
         string_of_longident id2 
