@@ -1,1 +1,7 @@
+REC
+S .
+B .
+S ../generator/stdlib_ml
+B ../generator/stdlib_ml
 PKG JS_Parser
+FLG -nopervasives -nostdlib -open Stdlib

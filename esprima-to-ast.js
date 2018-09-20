@@ -76,9 +76,9 @@ function esprimaToAST(prog, sourceText, filename) {
   var trOptLabel = function (label) {
     var option = { type: "label" };
     if (label === null) {
-      option.tag = "Coq_label_empty";
+      option.tag = "Label_empty";
     } else {
-      option.tag = "Coq_label_string";
+      option.tag = "Label_string";
       option.value = trIdentifier(label);
     }
     return option;
@@ -92,7 +92,7 @@ function esprimaToAST(prog, sourceText, filename) {
       throw new EsprimaToASTError("trProg error: " + prog.type, prog);
     };
     var r = {loc: toLoc(prog.loc), type: "prog"};
-    r.tag = "Coq_prog_intro";
+    r.tag = "Prog_intro";
     r.strictness = contextStrictMode = bodyIsStrict(prog.body);
     r.elements = toList(prog.body.map(trStatAsElement));
     return r;
@@ -104,13 +104,13 @@ function esprimaToAST(prog, sourceText, filename) {
     var loc = toLoc(stat.loc);
     var r = {loc: loc, type: "element"};
     if (stat.type === "FunctionDeclaration") {
-      r.tag = "Coq_element_func_decl";
+      r.tag = "Element_func_decl";
       r.func_name = trIdentifier(stat.id);
       r.arg_names = trParams(stat.params);
       // TODO this could be detected by stat.expression of type bool
       r.body = trBlockStatAsFuncbody(stat.body);
     } else /* if (stat.type <: "Statement") */  {
-      r.tag = "Coq_element_stat";
+      r.tag = "Element_stat";
       r.stat = trStat(stat);
     } // else {
     //   throw new EsprimaToASTError("trStatAsElement error: " + stat.type, stat);
@@ -124,7 +124,7 @@ function esprimaToAST(prog, sourceText, filename) {
       }
 
       var loc = toLoc(stat.loc);
-      var prog = { loc: loc, type: "prog", tag: "Coq_prog_intro" };
+      var prog = { loc: loc, type: "prog", tag: "Prog_intro" };
 
       var oldContextStrictMode = contextStrictMode;
       contextStrictMode = contextStrictMode || bodyIsStrict(stat.body);
@@ -138,7 +138,7 @@ function esprimaToAST(prog, sourceText, filename) {
         source = sourceText.slice(stat.range[0]+1, stat.range[1]-1);
       }
 
-      return {loc: loc, type: "funcbody", tag: "Coq_funcbody_intro",
+      return {loc: loc, type: "funcbody", tag: "Funcbody_intro",
                 prog: prog, source: source};
   };
 
@@ -192,14 +192,14 @@ function esprimaToAST(prog, sourceText, filename) {
       propname.value = property.key.value;
 
       if ((typeof propname.value) === "number") {
-        propname.tag = "Coq_propname_number";
+        propname.tag = "Propname_number";
       } else if ((typeof propname.value) === "string") {
-        propname.tag = "Coq_propname_string";
+        propname.tag = "Propname_string";
       } else {
         throw new EsprimaToASTError("Property key may only be number or string, got: " + property.key.value);
       }
     } else if (property.key.type === "Identifier") {
-      propname.tag = "Coq_propname_identifier";
+      propname.tag = "Propname_identifier";
       propname.value = trIdentifier(property.key);
     } else {
       throw new EsprimaToASTError("trProperty called with wrong identifier type: " + property.type);
@@ -207,13 +207,13 @@ function esprimaToAST(prog, sourceText, filename) {
 
     var propbody = { loc: toLoc(property.value.loc), type: "propbody" }
     if (property.kind === "init") {
-      propbody.tag = "Coq_propbody_val";
+      propbody.tag = "Propbody_val";
       propbody.expr = trExpr(property.value);
     } else if (property.kind === "get") {
-      propbody.tag = "Coq_propbody_get";
+      propbody.tag = "Propbody_get";
       propbody.body = trFuncExprAsFuncbody(property.value);
     } else if (property.kind === "set") {
-      propbody.tag = "Coq_propbody_get";
+      propbody.tag = "Propbody_set";
       propbody.body = trFuncExprAsFuncbody(property.value);
       propbody.names = toList(property.value.params.map(trPattern));
     } else {
@@ -237,7 +237,7 @@ function esprimaToAST(prog, sourceText, filename) {
     }
     return {
       type: "switchclause",
-      tag: "Coq_switchclause_intro",
+      tag: "Switchclause_intro",
       loc: toLoc(scase.loc),
       arg: trExpr(scase.test),
       stats: toList(scase.consequent.map(trStat))
@@ -250,7 +250,7 @@ function esprimaToAST(prog, sourceText, filename) {
   var trBlockStat = function (stat) {
     var r = {loc: toLoc(stat.loc), type: "stat"};
     if (stat.type === "BlockStatement") {
-      r.tag = "Coq_stat_block";
+      r.tag = "Stat_block";
       r.stats = toList(stat.body.map(trStat));
     } else {
       throw new EsprimaToASTError("trStat error: " + stat.type, stat);
@@ -261,34 +261,34 @@ function esprimaToAST(prog, sourceText, filename) {
   var trStat = function (stat) {
     var r = {loc: toLoc(stat.loc), type: "stat"};
     if (stat.type === "EmptyStatement") {
-      r.tag = "Coq_stat_block";
+      r.tag = "Stat_block";
       r.stats = toList([]);
     } else if (stat.type === "BlockStatement") {
       r = trBlockStat(stat);
     } else if (stat.type === "ExpressionStatement") {
-      r.tag = "Coq_stat_expr";
+      r.tag = "Stat_expr";
       r.expr = trExpr(stat.expression);
     } else if (stat.type === "IfStatement") {
-      r.tag = "Coq_stat_if";
+      r.tag = "Stat_if";
       r.cond = trExpr(stat.test);
       r.then_branch = trStat(stat.consequent);
       r.else_branch = toOption(trStat, stat.alternate);
     } else if (stat.type === "LabeledStatement") {
-      r.tag = "Coq_stat_label";
+      r.tag = "Stat_label";
       r.label = trIdentifier(stat.label);
       r.stat = trStat(stat.body);
     } else if (stat.type === "BreakStatement") {
-      r.tag = "Coq_stat_break";
+      r.tag = "Stat_break";
       r.label = trOptLabel(stat.label);
     } else if (stat.type === "ContinueStatement") {
-      r.tag = "Coq_stat_continue";
+      r.tag = "Stat_continue";
       r.label = trOptLabel(stat.label);
     } else if (stat.type === "WithStatement") {
-      r.tag = "Coq_stat_with";
+      r.tag = "Stat_with";
       r.obj = trExpr(stat.object);
       r.stat = trStat(stat.body);
     } else if (stat.type === "SwitchStatement") {
-      r.tag = "Coq_stat_switch";
+      r.tag = "Stat_switch";
       r.arg = trExpr(stat.discriminant);
       r.labels = toList([]);
       r.body = { type: "switchbody" };
@@ -296,23 +296,23 @@ function esprimaToAST(prog, sourceText, filename) {
       // Find the index of the default clause (if any)
       var index = stat.cases.findIndex(clause => clause.test === null);
       if (index >= 0) {
-        r.body.tag = "Coq_switchbody_withdefault";
+        r.body.tag = "Switchbody_withdefault";
         r.body.clauses_before = toList(stat.cases.slice(0, index).map(trSwitchCase));
         r.body.clause_default = toList(stat.cases[index].consequent.map(trStat));
         r.body.clauses_after  = toList(stat.cases.slice(index+1).map(trSwitchCase));
       } else {
-        r.body.tag = "Coq_switchbody_nodefault";
+        r.body.tag = "Switchbody_nodefault";
         r.body.clauses = toList(stat.cases.map(trSwitchCase));
       }
 
     } else if (stat.type === "ReturnStatement") {
-      r.tag = "Coq_stat_return";
+      r.tag = "Stat_return";
       r.arg_opt = toOption(trExpr, stat.argument);
     } else if (stat.type === "ThrowStatement") {
-      r.tag = "Coq_stat_throw";
+      r.tag = "Stat_throw";
       r.arg = trExpr(stat.argument);
     } else if (stat.type === "TryStatement") {
-      r.tag = "Coq_stat_try";
+      r.tag = "Stat_try";
       r.body = trStat(stat.block);
       // NOTE: Esprima v1.2.5 deviates from the SpiderMonkey AST standard here:
       // handler: CatchClause | null;
@@ -321,14 +321,14 @@ function esprimaToAST(prog, sourceText, filename) {
       r.catch_stats_opt = arrayToOption(trCatchClause, stat.handlers);
       r.finally_opt = toOption(trBlockStat, stat.finalizer);
     } else if (stat.type === "WhileStatement") {
-      r.tag = "Coq_stat_while";
+      r.tag = "Stat_while";
       r.cond = trExpr(stat.test);
       r.body = trStat(stat.body);
 
       // This is precisely what interp/src/translate_syntax.ml does...
       r.labels = toList([]);
     } else if (stat.type === "DoWhileStatement") {
-      r.tag = "Coq_stat_do_while";
+      r.tag = "Stat_do_while";
       r.cond = trExpr(stat.test);
       r.body = trStat(stat.body);
 
@@ -336,10 +336,10 @@ function esprimaToAST(prog, sourceText, filename) {
       r.labels = toList([]);
     } else if (stat.type === "ForStatement") {
       if (stat.init && stat.init.type === "VariableDeclaration") {
-        r.tag = "Coq_stat_for_var";
+        r.tag = "Stat_for_var";
         r.init = trStat(stat.init).decls;
       } else {
-        r.tag = "Coq_stat_for";
+        r.tag = "Stat_for";
         r.init = toOption(trExpr, stat.init);
       }
       r.cond = toOption(trExpr, stat.test);
@@ -354,7 +354,7 @@ function esprimaToAST(prog, sourceText, filename) {
       // Everything below here is for when we do support for-in ;P
 
       if (stat.left.type === "VariableDeclaration") {
-        r.tag = "Coq_stat_for_in_var";
+        r.tag = "Stat_for_in_var";
         if (stat.left.declarations.length != 1) {
           throw new EsprimaToASTError("ForInStatement: Wrong number of declarations.", stat);
         }
@@ -362,7 +362,7 @@ function esprimaToAST(prog, sourceText, filename) {
         // doesn't match our (current, broken) JsSyntax type signature
         r.id = trStat(stat.left).decls.head[0];
       } else {
-        r.tag = "Coq_stat_for_in";
+        r.tag = "Stat_for_in";
         r.id = trExpr(stat.left);
       }
       r.obj = trExpr(stat.right);
@@ -370,7 +370,7 @@ function esprimaToAST(prog, sourceText, filename) {
       r.labels = toList([]);
 
     } else if (stat.type === "VariableDeclaration") {
-      r.tag = "Coq_stat_var_decl";
+      r.tag = "Stat_var_decl";
       if ("kind" in stat && stat.kind !== "var") {
         throw new UnsupportedSyntaxError("Only var bindings are supported.", stat);
       }
@@ -390,15 +390,15 @@ function esprimaToAST(prog, sourceText, filename) {
     var v = expr.value;
     var t = typeof(v);
     if (t === "object" && expr.raw === "null") {
-      r.tag = "Coq_literal_null";
+      r.tag = "Literal_null";
     } else if (t === "boolean") {
-      r.tag = "Coq_literal_bool";
+      r.tag = "Literal_bool";
       r.value = v;
     } else if (t === "number") {
-      r.tag = "Coq_literal_number";
+      r.tag = "Literal_number";
       r.value = v;
     } else if (t === "string") {
-      r.tag = "Coq_literal_string";
+      r.tag = "Literal_string";
       r.value = v;
     } else if (t === "object" && expr.raw[0] === "/") {
       throw new UnsupportedSyntaxError("Regular Expression literal: " + expr.raw, expr);
@@ -411,16 +411,16 @@ function esprimaToAST(prog, sourceText, filename) {
   var trExpr = function (expr) {
     var r = {loc: toLoc(expr.loc), type: "expr"};
     if (expr.type === "ThisExpression") {
-      r.tag = "Coq_expr_this";
+      r.tag = "Expr_this";
     } else if (expr.type === "ArrayExpression") {
-      r.tag = "Coq_expr_array";
+      r.tag = "Expr_array";
       r.elements = toList(expr.elements.map(toOption.bind(null, trExpr)));
     } else if (expr.type === "ObjectExpression") {
-      r.tag = "Coq_expr_object";
+      r.tag = "Expr_object";
       r.fields = toList(expr.properties.map(trProperty));
     } else if (expr.type === "FunctionExpression") {
       checkFuncExpr(expr);
-      r.tag = "Coq_expr_function";
+      r.tag = "Expr_function";
       r.func_name_opt = toOption(trIdentifier, expr.id);
       r.arg_names = toList(expr.params.map(trPattern));
       r.body = trBlockStatAsFuncbody(expr.body);
@@ -429,9 +429,9 @@ function esprimaToAST(prog, sourceText, filename) {
       r = expr.expressions.map(trExpr).reduce(function (previousValue, currentValue) {
         return {
           type: "expr",
-          tag: "Coq_expr_binary_op",
+          tag: "Expr_binary_op",
           arg1: previousValue,
-          op: { type: "binary_op", tag: "Coq_binary_op_coma" },
+          op: { type: "binary_op", tag: "Binary_op_coma" },
           arg2: currentValue,
           loc: {
             file: previousValue.loc.file,
@@ -441,55 +441,55 @@ function esprimaToAST(prog, sourceText, filename) {
         };
       });
     } else if (expr.type === "UnaryExpression") {
-      r.tag = "Coq_expr_unary_op";
+      r.tag = "Expr_unary_op";
       r.op = trUnaryOp(expr.operator);
       // expr.prefix (boolean) unused
       r.arg = trExpr(expr.argument);
     } else if (expr.type === "BinaryExpression") {
-      r.tag = "Coq_expr_binary_op";
+      r.tag = "Expr_binary_op";
       r.arg1 = trExpr(expr.left);
       r.op = trBinaryOp(expr.operator);
       r.arg2 = trExpr(expr.right);
     } else if (expr.type === "AssignmentExpression") {
-      r.tag = "Coq_expr_assign";
+      r.tag = "Expr_assign";
       r.left_expr = trExpr(expr.left);
       r.op_opt = trAssignmentOp(expr.operator);
       r.right_expr = trExpr(expr.right);
     } else if (expr.type === "UpdateExpression") {
-      r.tag = "Coq_expr_unary_op";
+      r.tag = "Expr_unary_op";
       r.op = trUpdateOp(expr.operator, expr.prefix);
       r.arg = trExpr(expr.argument);
     } else if (expr.type === "LogicalExpression") {
-      r.tag = "Coq_expr_binary_op";
+      r.tag = "Expr_binary_op";
       r.arg1 = trExpr(expr.left);
       r.op = trLogicalOp(expr.operator);
       r.arg2 = trExpr(expr.right);
     } else if (expr.type === "ConditionalExpression") {
-      r.tag = "Coq_expr_conditional";
+      r.tag = "Expr_conditional";
       r.cond = trExpr(expr.test);
       r.then_branch = trExpr(expr.consequent);
       r.else_branch = trExpr(expr.alternate);
     } else if (expr.type === "NewExpression") {
-      r.tag = "Coq_expr_new";
+      r.tag = "Expr_new";
       r.func = trExpr(expr.callee);
       r.args = toList(expr.arguments.map(trExpr));
     } else if (expr.type === "CallExpression") {
-      r.tag = "Coq_expr_call";
+      r.tag = "Expr_call";
       r.func = trExpr(expr.callee);
       r.args = toList(expr.arguments.map(trExpr));
     } else if (expr.type === "MemberExpression" && !expr.computed) {
-      r.tag = "Coq_expr_member";
+      r.tag = "Expr_member";
       r.obj = trExpr(expr.object);
       r.field_name = trIdentifier(expr.property);
     } else if (expr.type === "MemberExpression" && expr.computed) {
-      r.tag = "Coq_expr_access";
+      r.tag = "Expr_access";
       r.obj = trExpr(expr.object);
       r.field = trExpr(expr.property);
     } else if (expr.type === "Identifier") {
-      r.tag = "Coq_expr_identifier";
+      r.tag = "Expr_identifier";
       r.name = trIdentifier(expr);
     } else if (expr.type === "Literal") {
-      r.tag = "Coq_expr_literal";
+      r.tag = "Expr_literal";
       r.value = trExprAsLiteral(expr);
     } else {
       throw new EsprimaToASTError("trExpr error: " + expr.type, expr);
@@ -507,13 +507,13 @@ function esprimaToAST(prog, sourceText, filename) {
   /*** Operators ***/
 
   const unary_operators = Object.create(null);
-  unary_operators["-"] = "Coq_unary_op_neg";
-  unary_operators["+"] = "Coq_unary_op_add";
-  unary_operators["!"] = "Coq_unary_op_not";
-  unary_operators["~"] = "Coq_unary_op_bitwise_not";
-  unary_operators["void"] = "Coq_unary_op_void";
-  unary_operators["typeof"] = "Coq_unary_op_typeof";
-  unary_operators["delete"] = "Coq_unary_op_delete";
+  unary_operators["-"] = "Unary_op_neg";
+  unary_operators["+"] = "Unary_op_add";
+  unary_operators["!"] = "Unary_op_not";
+  unary_operators["~"] = "Unary_op_bitwise_not";
+  unary_operators["void"] = "Unary_op_void";
+  unary_operators["typeof"] = "Unary_op_typeof";
+  unary_operators["delete"] = "Unary_op_delete";
   var trUnaryOp = function (op) {
     return { type: "unary_op", tag: unary_operators[op] };
   };
@@ -523,44 +523,44 @@ function esprimaToAST(prog, sourceText, filename) {
   };
 
   const binary_operators = Object.create(null);
-  binary_operators["=="] = "Coq_binary_op_equal";
-  binary_operators["!="] = "Coq_binary_op_disequal";
-  binary_operators["==="] = "Coq_binary_op_strict_equal";
-  binary_operators["!=="] = "Coq_binary_op_strict_disequal";
-  binary_operators["<"] = "Coq_binary_op_lt";
-  binary_operators["<="] = "Coq_binary_op_le";
-  binary_operators[">"] = "Coq_binary_op_gt";
-  binary_operators[">="] = "Coq_binary_op_ge";
-  binary_operators["<<"] = "Coq_binary_op_left_shift";
-  binary_operators[">>"] = "Coq_binary_op_right_shift";
-  binary_operators[">>>"] = "Coq_binary_op_unsigned_right_shift";
-  binary_operators["+"] = "Coq_binary_op_add";
-  binary_operators["-"] = "Coq_binary_op_sub";
-  binary_operators["*"] = "Coq_binary_op_mult";
-  binary_operators["/"] = "Coq_binary_op_div";
-  binary_operators["%"] = "Coq_binary_op_mod";
-  binary_operators["|"] = "Coq_binary_op_bitwise_or";
-  binary_operators["^"] = "Coq_binary_op_bitwise_xor";
-  binary_operators["&"] = "Coq_binary_op_bitwise_and";
-  binary_operators["in"] = "Coq_binary_op_in";
-  binary_operators["instanceof"] = "Coq_binary_op_instanceof";
+  binary_operators["=="] = "Binary_op_equal";
+  binary_operators["!="] = "Binary_op_disequal";
+  binary_operators["==="] = "Binary_op_strict_equal";
+  binary_operators["!=="] = "Binary_op_strict_disequal";
+  binary_operators["<"] = "Binary_op_lt";
+  binary_operators["<="] = "Binary_op_le";
+  binary_operators[">"] = "Binary_op_gt";
+  binary_operators[">="] = "Binary_op_ge";
+  binary_operators["<<"] = "Binary_op_left_shift";
+  binary_operators[">>"] = "Binary_op_right_shift";
+  binary_operators[">>>"] = "Binary_op_unsigned_right_shift";
+  binary_operators["+"] = "Binary_op_add";
+  binary_operators["-"] = "Binary_op_sub";
+  binary_operators["*"] = "Binary_op_mult";
+  binary_operators["/"] = "Binary_op_div";
+  binary_operators["%"] = "Binary_op_mod";
+  binary_operators["|"] = "Binary_op_bitwise_or";
+  binary_operators["^"] = "Binary_op_bitwise_xor";
+  binary_operators["&"] = "Binary_op_bitwise_and";
+  binary_operators["in"] = "Binary_op_in";
+  binary_operators["instanceof"] = "Binary_op_instanceof";
   var trBinaryOp = function (op) {
     return binaryOpTagToObj(binary_operators[op]);
   };
 
   const assignment_operators = Object.create(null);
   assignment_operators["="] = null;
-  assignment_operators["+="] = "Coq_binary_op_add";
-  assignment_operators["-="] = "Coq_binary_op_sub";
-  assignment_operators["*="] = "Coq_binary_op_mult";
-  assignment_operators["/="] = "Coq_binary_op_div";
-  assignment_operators["%="] = "Coq_binary_op_mod";
-  assignment_operators["<<="] = "Coq_binary_op_left_shift";
-  assignment_operators[">>="] = "Coq_binary_op_right_shift";
-  assignment_operators[">>>="] = "Coq_binary_op_unsigned_right_shift";
-  assignment_operators["|="] = "Coq_binary_op_bitwise_or";
-  assignment_operators["^="] = "Coq_binary_op_bitwise_xor";
-  assignment_operators["&="] = "Coq_binary_op_bitwise_and";
+  assignment_operators["+="] = "Binary_op_add";
+  assignment_operators["-="] = "Binary_op_sub";
+  assignment_operators["*="] = "Binary_op_mult";
+  assignment_operators["/="] = "Binary_op_div";
+  assignment_operators["%="] = "Binary_op_mod";
+  assignment_operators["<<="] = "Binary_op_left_shift";
+  assignment_operators[">>="] = "Binary_op_right_shift";
+  assignment_operators[">>>="] = "Binary_op_unsigned_right_shift";
+  assignment_operators["|="] = "Binary_op_bitwise_or";
+  assignment_operators["^="] = "Binary_op_bitwise_xor";
+  assignment_operators["&="] = "Binary_op_bitwise_and";
   var trAssignmentOp = function (op) {
     return toOption(binaryOpTagToObj, assignment_operators[op]);
   };
@@ -572,13 +572,13 @@ function esprimaToAST(prog, sourceText, filename) {
     var fix = prefix ? "pre" : "post";
     return {
       type: "unary_op",
-      tag: "Coq_unary_op_" + fix + "_" + update_operators[op]
+      tag: "Unary_op_" + fix + "_" + update_operators[op]
     };
   };
 
   const logical_operators = Object.create(null);
-  logical_operators["||"] = "Coq_binary_op_or";
-  logical_operators["&&"] = "Coq_binary_op_and";
+  logical_operators["||"] = "Binary_op_or";
+  logical_operators["&&"] = "Binary_op_and";
   var trLogicalOp = function (op) {
     return { type: "binary_op", tag: logical_operators[op] };
   };

@@ -40,12 +40,7 @@ let bool_of_option xo =
 let rec list_make n v =
    if n = 0 then [] else v::(list_make (n-1) v)
   
-let list_mapi f l =
-  let rec aux i = function
-    | [] -> []
-    | h::t -> (f i h)::(aux (i+1) t)
-    in
-  aux 0 l
+let list_mapi f l = List.mapi
 
 let range i j =
   let rec aux j acc =
@@ -54,6 +49,12 @@ let range i j =
     
 let list_nat n = (* for n >= 0 *)
   range 0 n
+
+let rec list_split3 = function
+  | []            -> [], [], []
+  | (x, y, z)::ls ->
+    let xs, ys, zs = list_split3 ls in
+    x::xs, y::ys, z::zs
     
 let rec list_separ sep = function 
   | [] -> []
@@ -64,6 +65,40 @@ let rec filter_somes = function
   | [] -> []
   | None :: l -> filter_somes l
   | (Some x) :: l -> x :: filter_somes l
+
+let map_opt f l = filter_somes @@ List.map f l
+let map_opt2 f l1 l2 = filter_somes @@ List.map2 f l1 l2
+
+(* A list map with left-fold for state update propagation *)
+let rec map_state f st l = match l with
+  | []      -> (st, [])
+  | i :: l' ->
+      let (st', i') = f st i in
+      let (st'', l'') = map_state f st' l' in
+      (st'', i' :: l'')
+
+(* A list map with left-fold for state update propagation, removing any None results *)
+let rec map_opt_state f st l = match l with
+  | []       -> (st, [])
+  | i :: l' -> begin
+      match f st i with
+      | None           -> map_opt_state f st l'
+      | Some (st', i') ->
+        let (st'', rl) = map_opt_state f st' l' in
+        (st'', i' :: rl)
+    end
+
+(* A 2 list version of map_opt_state *)
+let rec map_opt_state2 f st l1 l2 = match (l1, l2) with
+  | [], []               -> (st, [])
+  | i1 :: l1', i2 :: l2' -> begin
+      match f st i1 i2 with
+      | None          -> map_opt_state2 f st l1' l2'
+      | Some (st', r) ->
+        let (st'', rl) = map_opt_state2 f st' l1' l2' in
+        (st'', r :: rl)
+    end
+  | _ -> raise (Invalid_argument "map_opt_state2 called with lists of differing lengths")
 
 let list_unique l =
    let rec aux acc = function
@@ -112,12 +147,6 @@ let list_index k l =
       | x::l -> if x = k then n else aux (n+1) l
       in
    aux 0 l 
-
-let list_split3 l =
-   let l1 = List.map (fun (x,_,_) -> x) l in
-   let l2 = List.map (fun (_,x,_) -> x) l in
-   let l3 = List.map (fun (_,_,x) -> x) l in
-   (l1,l2,l3)
 
 let add_to_list li s =
   li := s :: !li

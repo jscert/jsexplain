@@ -1,3 +1,4 @@
+(** HeapStr: Implementation of heaps with strings as keys *)
 
 let empty =
   Heap.empty

@@ -9,12 +9,13 @@ This file is to be compiled with the standard OCaml compiler with the
 library into the end program file.
 *)
 let raise = Pervasives.raise;;
+let failwith = Pervasives.failwith;;
 
 (**{6 Boolean operations }*)
 (** Note: Both OCaml and JS implement lazy evaluation for boolean operators. *)
 let not = Pervasives.not;;
-let ( && ) = Pervasives.( && );;
-let ( || ) = Pervasives.( || );;
+external ( && ) : bool -> bool -> bool = "%sequand";;
+external ( || ) : bool -> bool -> bool = "%sequor";;
 
 (**{6 Debugging }*)
 external __LOC__ : string = "%loc_LOC"

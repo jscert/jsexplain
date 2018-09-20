@@ -1,3 +1,4 @@
+open Mocha
 
 let testp1 x = 
   let (a,b,c) = x in
@@ -105,4 +106,54 @@ let test6 (x,y) =
   x
   *)
   
-  
+;;
+
+describe "testctx.ml" (fun _ ->
+  it "testp1" (fun _ ->
+    assert_int (testp1 (40,2,10)) 42 "testp1 (40,2,10) == 42"
+  );
+  it "testa" (fun _ ->
+    assert_int (testa 42) 42 "testa 42 == 42"
+  );
+  it "testb" (fun _ ->
+    assert_int (testb 42) 42 "testb 42 == 42"
+  );
+  it "testc" (fun _ ->
+    assert_int (testc 42) 85 "testc 42 == 85"
+  );
+  it "testd" (fun _ ->
+    assert_int (testd 42) 42 "testd 42 == 42"
+  );
+  it "teste" (fun _ ->
+    assert_int (teste 42) 42 "teste 42 == 42"
+  );
+  it "testf" (fun _ ->
+    assert_int (testf 42) 84 "testf 42 == 84"
+  );
+  it "testg" (fun _ ->
+    assert_int (testg true) 1 "testg true == 1";
+    assert_int (testg false) 0 "testg false == 0"
+  );
+  it "test00" (fun _ ->
+    assert_int (test00 None) 2 "test00 None == 2";
+    assert_int (test00 (Some 3)) 3 "test00 (Some 3) == 3"
+  );
+  it "test1" (fun _ ->
+    assert_int (test1 None) 0 "test1 None == 0";
+    assert_int (test1 (Some 42)) 84 "test1 (Some 42) == 84"
+  );
+  it "test2" (fun _ ->
+    assert_int (test2 42) 4 "test2 _ == 4";
+    assert_int (test2 ()) 4 "test2 _ == 4";
+    assert_int (test2 "test") 4 "test2 _ == 4"
+  );
+  it "test3" (fun _ ->
+    assert_int (test3 None) 1 "test3 None == 1";
+    assert_int (test3 (Some 42)) 44 "test3 (Some 42) == 44"
+  );
+  it "test4" (fun _ ->
+    assert_int (test4 None) 1 "test4 None == 1";
+    assert_int (test4 (Some None)) 2 "test4 Some None == 2";
+    assert_int (test4 (Some (Some 42))) 42 "test4 (Some (Some 42)) == 42"
+  )
+)

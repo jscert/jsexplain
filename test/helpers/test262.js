@@ -3,70 +3,68 @@
 // Registers test cases to be run against Test262
 // To add a testcase to be tested against test262:
 //   var test262tests = require('./helper-test262.js')'
-//   test262tests.push(function testConstructorFunction(source, negativity) {});
+//   test262tests.push(function testConstructorFunction(getFile) {});
 //
 // Tests are run in the order added to the array. If inter-module test ordering is required,
 // ensure the later test module depends on the earlier one.
 //
-// Arguments to testConstructorFunction:
-// - source: The raw test source code
-// - negative: The @negative test header content
-// -
+// The testConstructorFunction should call its first argument to get the test case.
+// The test case is an object as returned from the test262-parser library, it will contain
+// the fields file, contents, attrs, and async at minimum.
 
-var fs = require('mz/fs');
-var walk = require('klaw');
-var filter = require('through2-filter');
+const fs = require('mz/fs');
+const path = require('path');
+const walk = require('klaw');
+const filter = require('through2-filter');
 fs.readlinkSync = require('readlink').sync; // a non-broken readlink...
+const test262parser = require('test262-parser');
+const supportedFeatures = require('./supported-features.js');
+const baseReporter = require('mocha').reporters.Base;
 
-var testConstructors = [];
+const testConstructors = [];
+const testDataPath = path.join(__dirname, '..', 'data');
+const test262path = fs.readlinkSync(path.join(testDataPath, 'test262'));
+const localHarnessPath = path.join(testDataPath, 'harness');
+const test262HarnessPath = path.join(test262path, 'harness');
 
-function testNegativity(str) {
-  var result = /@negative[ \t]*(\S*)?[ \t]*$/m.exec(str);
-  if(result) {
-    result = result[1] || true;
-  } else {
-    result = false;
-  }
-  return result;
-}
-
+// Run the given callback at the end of this I/O Loop, so that testConstructors may be registered before constructing
+// test cases.
 setImmediate(() => {
-  var testDataDir = __dirname + '/../data';
-  var test262path = fs.readlinkSync(testDataDir + '/test262/test/suite');
-  var tests = [];
+  const tests = [];
 
-  walk(test262path)
+  walk(path.join(test262path, 'test'))
   .pipe(filter.obj(file => file.stats.isFile() && file.path.endsWith(".js")))
   .on('data', (item) => { tests.push(item.path); })
   .on('end', function() {
     describe("test262", function() {
       if (tests.length === 0) { throw new Error("Unable to find any test262 tests (uninitialised git submodule?)") }
-      tests.forEach(item => {
-        describe(item, function() {
-          // Preseed test arguments with safe defaults
-          var args = {
-            path: "not initialised",
-            source: "if // invalid syntax",
-            negative: false
-          };
-
-          var source;
-          var negative = '';
+      tests.forEach(path => {
+        describe(path, function() {
+          // Variable to be lazy-loaded, captured by closure below.
+          let test = null;
 
           // Lazy-load the source file prior to tests
           before(function(doneFile) {
-            fs.readFile(item).then(
-              data => {
-                args.path = item;
-                args.source = data.toString();
-                args.negative = testNegativity(args.source);
-              }
-            ).then(doneFile);
+            fs.readFile(path)
+              .then(data => {
+                test = test262parser.parseFile({ file: path, contents: data.toString() });
+
+                // Skip the test if it uses features that we don't support.
+                const usedFeatures = new Set(test.attrs.features);
+                for (const feature of supportedFeatures) {
+                  usedFeatures.delete(feature);
+                }
+                if (usedFeatures.size > 0) {
+                  console.log(baseReporter.color('pending', 'Test skipped due to missing features: %s'),
+                    Array.from(usedFeatures).join(', '));
+                  this.skip();
+                }
+              })
+              .then(doneFile)
+              .catch(doneFile);
           });
 
-          // args only gets populated prior to the execution of this item
-          // (it is empty at the point of construction of the test)
-          testConstructors.forEach(constructor => constructor(args));
+          testConstructors.forEach(constructor => constructor(() => test));
         });
       });
     });
@@ -75,4 +73,22 @@ setImmediate(() => {
   });
 });
 
-module.exports = testConstructors;
+const harnessCache = new Map();
+async function fetchHarness(name) {
+  if (harnessCache.has(name)) {
+    return harnessCache.get(name);
+  }
+  let content;
+  try {
+    content = await fs.readFile(path.join(localHarnessPath, name));
+  } catch (e) {
+    content = await fs.readFile(path.join(test262HarnessPath, name));
+  }
+  harnessCache.set(name, content);
+  return content;
+}
+
+module.exports = {
+  addTest: test => testConstructors.push(test),
+  fetchHarness: fetchHarness
+}

@@ -16,14 +16,14 @@
 //   more recent binding at the tail of the array.
 
 // type event_item = { type: event_type, loc: loc, ctx: ctx,
-//                     state: JsSyntax.state, 
+//                     state: JsSyntax.state,
 //                     execution_ctx: JsSyntax.execution_ctx,
 //                     source_loc: loc }
 //   Event items are created on every call to the "log_event" function.
 //   Such calls are located in the *.log.js files.
 //   Field "ctx" describes the state of the variables from the interpreter,
 //   and this description is constructed by the instrumented code in "*.log.js".
-//   Fields "state" and "execution_ctx" and "source_loc" fields are filled in 
+//   Fields "state" and "execution_ctx" and "source_loc" fields are filled in
 //   by the function "assignExtraInfosInTrace".
 
 // type trace = [event_item]
@@ -35,13 +35,13 @@
 // --------------- Representation for predicate evaluation ----------------
 
 function env_to_jsobject(env) {
-      // TODO implement
-   throw "unimplemented env_to_jsobject"; 
+  // TODO implement
+  throw "unimplemented env_to_jsobject";
 };
 
 function ctx_to_jsobject(env) {
-      // TODO implement
-   throw "unimplemented ctx_to_jsobject"; 
+  // TODO implement
+  throw "unimplemented ctx_to_jsobject";
 };
 
 
@@ -53,14 +53,11 @@ var handlers = [];
 
 // --------------- Variables ----------------
 
-// file currently displayed
-var curfile = '';
-
 // object of type loc describing the text currenctly selected
 var source_loc_selected = undefined;
 
 // current trace being displayed
-  // TODO: do we need tracer_iterms in addition to datalog? 
+// TODO: do we need tracer_iterms in addition to datalog?
 var tracer_items = [];
 var tracer_length = 0;
 var tracer_pos = 0;
@@ -69,13 +66,9 @@ var tracer_pos = 0;
 var source = null;
 var interpreter = null;
 
-var source_docs = {};
-var initialSourceName = "";
-
-// Initial source code
+// --------------- Source Code UI ----------------------
 
 var source_files = [
-  // '',
   'var x = 1;\nx++;\nx',
   'var x = { a : { c : 1 } };\nx.a.b = 2;\nx.a.x = x;\nx',
   'var t = [];\nfor (var i = 0; i < 3; i++) {\n  t[i] = function() { return i; } \n};\nt[0](); ',
@@ -89,7 +82,7 @@ var source_files = [
   'var x = 2;\nx',
   '"use strict";\nvar x = 1;\ nx++;\nx',
   '{} + {}',
-  'x = [1]',  
+  'x = [1]',
   'throw 3',
   'var x = { a : 1, b : 2 }; ',
   'var x = { a : 1 };\n x.b = 2;\nx',
@@ -105,6 +98,7 @@ var source_files = [
   '2 === 2',
 ];
 
+// Populate the source files dropdown
 source_files.reduce((select, file_content) => {
   var option = document.createElement('option');
   option.textContent = file_content;
@@ -113,72 +107,76 @@ source_files.reduce((select, file_content) => {
   return select;
 }, $('#select_source_code'));
 
-function initSourceDocs() {
-  source_docs = {};
-  Translate_syntax.eval_counter = 0;
-  $('#source_tabs').empty();
-}
+// Preload the test262 harness files from the network/filesystem
+const test262_harness_docs = new Map();
+const test262_promises = ['assert.js', 'sta.js', 'propertyHelper.js'].map(f => {
+  test262_harness_docs.set(f, null); // Populate the map for insertion order
+  return fetch("test/data/test262/harness/"+f, {mode: 'same-origin'})
+    .then(r => r.text())
+    .then(t => test262_harness_docs.set(f, newSourceDoc(f, t, false)))
+});
+test262_promises.push(new Promise((resolve, reject) => window.addEventListener("load", resolve)));
+Promise.all(test262_promises).then(() => setExample(0));
 
 // Registers a new source doc
 function newSourceDoc(name, text, readOnly) {
-  if (!source_docs.hasOwnProperty(name)) {
-    source_docs[name] = CodeMirror.Doc(text, 'js');
-    var tab = $('<span>').addClass('file_item')
-                .text(name)
-                .click(e => selectSourceDoc(e.target.textContent))
-                .appendTo('#source_tabs');
-    if (name === '_eval_') { tab.hide(); }
-    source_docs[name].doc_name = name;
-    source_docs[name].tab = tab;
-    source_docs[name].readOnly = Boolean(readOnly);
-  }
-  return source_docs[name];
-}
-
-function selectSourceDocFromLoc(loc) {
-  var name = loc.file;
-  if (name === '_eval_') {
-    source_docs['_eval_'].tab.show();
-    source_docs['_eval_'].setValue(loc.sourceText);
-  }
-  var old_doc = selectSourceDoc(loc.file);
-  if (old_doc.doc_name === "_eval_" && name !== "_eval_") {
-    source_docs['_eval_'].tab.hide();
-  }
-}
-
-// Switches current source doc
-function selectSourceDoc(name) {
-  var old_doc = source.swapDoc(source_docs[name]);
-  if (old_doc.tab) old_doc.tab.removeClass('file_item_current');
-  source_docs[name].tab.addClass('file_item_current');
-  source.setOption('readOnly', source_docs[name].readOnly);
-  return old_doc;
+  let doc = CodeMirror.Doc(text, 'text/javascript');
+  doc.setName(name);
+  doc.cantEdit = !!readOnly;
+  return doc;
 }
 
 // Sets the initial source doc
 function setInitialSourceCode(name, text) {
-  initSourceDocs();
-  var doc = newSourceDoc(name, text);
-  initialSourceName = name;
-
-  $("#source_code").val(text);
-
-  selectSourceDoc(name);
+  const newDocs = getTest262Docs();
+  newDocs.push(newSourceDoc(name, text));
+  source.setDocs(newDocs);
+  source.swapDocByName(name);
 }
 
 $('#select_source_code').change(e => {
-  setInitialSourceCode("example" + (e.target.selectedOptions[0].index - 1) + ".js", e.target.value);
+  let selected = e.target.selectedOptions[0];
+  if (selected.disabled) {
+    return;
+  }
+  $('#select_file')[0].value = null;
+  setInitialSourceCode("example" + (selected.index - 1) + ".js", e.target.value);
   buttonRunHandler();
 });
+
 $('#select_file').change(e => {
+  if (e.target.files.length == 0) {
+    return;
+  }
+  $('#select_source_code')[0].selectedIndex = 0;
   var f = e.target.files[0];
   var fr = new FileReader();
-  fr.onload = function (e) {
+  fr.onload = (e) => {
     setInitialSourceCode(f.name, e.target.result);
     buttonRunHandler();
   };
   fr.readAsText(f);
+});
+
+function getTest262Docs() {
+  const ret = [];
+  if($('#use_test262_harness')[0].checked) {
+    for (const doc of test262_harness_docs.values()) {
+      const copy = doc.copy();
+      copy.setName(doc.getName());
+      ret.push(copy);
+    }
+  }
+  return ret;
+}
+
+$('#use_test262_harness').change(e => {
+  if(e.target.checked) {
+    source.setDocs([...getTest262Docs(), ...source]);
+  } else {
+    source.removeDocs(test262_harness_docs.keys());
+  }
+  buttonRunHandler();
 });
 
 function setExample(idx) {
@@ -189,31 +187,22 @@ function setExample(idx) {
 
 // --------------- Predicate search ----------------
 
-function jsvalue_of_prim(v) {
-  switch (v.tag) {
-  case "Coq_prim_undef":
-    return undefined;
-  case "Coq_prim_null":
-    return null;
-  case "Coq_prim_bool":
-    return (v.value) ? true : false;
-  case "Coq_prim_number":
-    return v.value;
-  case "Coq_prim_string":
-    return v.value;
-  default:
-    throw "unrecognized tag in jsvalue_of_prim";
-  }
-}
-
 function jsvalue_of_value(v) {
   switch (v.tag) {
-     case "Coq_value_prim":
-       return jsvalue_of_prim(v.value);
-     case "Coq_value_object":
-       return v.value; // TODO: reflect
-     default:
-       throw "unrecognized tag in jsvalue_of_value";
+    case "Value_undef":
+      return undefined;
+    case "Value_null":
+      return null;
+    case "Value_bool":
+      return (v.value) ? true : false;
+    case "Value_number":
+      return v.value;
+    case "Value_string":
+      return v.value;
+    case "Value_object":
+      return v.value; // TODO: reflect
+    default:
+      throw "unrecognized tag in jsvalue_of_value";
   }
 }
 
@@ -231,66 +220,69 @@ function lookup_var_in_record_decl(name, env_record_decl) {
       throw "unrecognized tag in lookup_var_in_record_decl";
   }
 }
-  /* DEPRECATED, naive code for lookup_var_in_record_decl:
+/* DEPRECATED, naive code for lookup_var_in_record_decl:
+
    var items_array = array_of_heap(env_record_decl);
    for (var i = 0; i < items_array.length; i++) {
-      var var_name = items_array[i][0];
-      // var mutability = items_array[i][1][0];
-      var value = items_array[i][1][1];
-      if (var_name === name) {
-         return value;
-      }
+     var var_name = items_array[i][0];
+     // var mutability = items_array[i][1][0];
+     var value = items_array[i][1][1];
+     if (var_name === name) {
+       return value;
+     }
    }
    return undefined;
-  */
+*/
 
 function lookup_var_in_object(state, name, loc) {
-   var obj_opt = JsCommonAux.object_binds_option(state, loc);
-   if (obj_opt.tag != "Some") throw "show_object: unbound object";
-   var obj = obj_opt.value;
-   var props = obj.object_properties_;
-   var ro = HeapStr.read_option(props, name);
-   switch (ro.tag) {
-     case "None":
-       return undefined;
+  var obj_opt = JsCommonAux.object_binds_option(state, loc);
+  if (obj_opt.tag != "Some") throw "show_object: unbound object";
+  var obj = obj_opt.value;
+  var props = obj.object_properties_;
+  var ro = HeapStr.read_option(props, name);
+  switch (ro.tag) {
+    case "None":
+      return undefined;
     case "Some":
-       var attribute = ro.value;
-       switch (attribute.tag) {
-         case "Coq_attributes_data_of":
-           var attr = attribute.value;
-           var prop_value = attr.attributes_data_value;
-           return prop_value;
-           break;
-         case "Coq_attributes_accessor_of": 
-           // raise error (?)
-           break;
-         default: 
-           throw "invalid attribute.tag";
-       }
-       break;
-     default:
-       throw "unrecognized tag in lookup_var_in_record_decl";
-   }
+      var attribute = ro.value;
+      switch (attribute.tag) {
+        case "Attributes_data_of":
+          var attr = attribute.value;
+          var prop_value = attr.attributes_data_value;
+          return prop_value;
+          break;
+        case "Attributes_accessor_of":
+          // raise error (?)
+          break;
+        default:
+          throw "invalid attribute.tag";
+      }
+      break;
+    default:
+      throw "unrecognized tag in lookup_var_in_record_decl";
+  }
 }
-  /* DEPRECATED, naive code for lookup_var_in_object:
+
+/* DEPRECATED, naive code for lookup_var_in_object:
    var key_value_pair_array = array_of_heap(props);
    for (var i = 0; i < key_value_pair_array.length; i++) {
-      var prop_name = key_value_pair_array[i][0];
-      if (prop_name !== name) {
-         continue;
-      }
-      var attribute = key_value_pair_array[i][1];
-  */
+     var prop_name = key_value_pair_array[i][0];
+     if (prop_name !== name) {
+       continue;
+     }
+     var attribute = key_value_pair_array[i][1];
+   }
+*/
 
 
 
 // todo : handle objects
 function lookup_var_in_lexical_env(state, name, lexical_env) {
-   // var env_record_heap = state.state_env_record_heap;
+  // var env_record_heap = state.state_env_record_heap;
   /* DEPRECATED: naive processing of the loop
-    var env_loc_array = encoded_list_to_array(lexical_env);
-    for (var i = 0; i < env_loc_array.length; i++) {
-      var env_loc = env_loc_array[i];
+     var env_loc_array = encoded_list_to_array(lexical_env);
+     for (var i = 0; i < env_loc_array.length; i++) {
+       var env_loc = env_loc_array[i];
   */
   var list = lexical_env;
   while (list.tag == "::") {
@@ -301,25 +293,25 @@ function lookup_var_in_lexical_env(state, name, lexical_env) {
     var env_record = env_record_opt.value;
 
     switch (env_record.tag) {
-      case "Coq_env_record_decl":
+      case "Env_record_decl":
         var env_record_decl = env_record.value;
         var r = lookup_var_in_record_decl(name, env_record_decl);
         if (r !== undefined) {
-           return r;
+          return r;
         }
         break;
-      case "Coq_env_record_object":   
+      case "Env_record_object":
         var object_loc = env_record.value;
         var r = lookup_var_in_object(state, name, object_loc);
         if (r !== undefined) {
-           return r;
+          return r;
         }
         /*
-        var obj_value = { tag: "Coq_value_object", value: object_loc };
+        var obj_value = { tag: "Value_object", value: object_loc };
         var provide_this = env_record.provide_this;
         */
         break;
-      default: 
+      default:
         throw "invalid env_record.tag";
     }
   }
@@ -327,75 +319,75 @@ function lookup_var_in_lexical_env(state, name, lexical_env) {
 }
 
 function evalPred(item, pred) {
-   var I = function(name) {
-      var a = ctx_to_array(item.ctx);
-      for (var i = 0; i < a.length; i++) {
-        var key = a[i].key;
-        if (key !== name) {
-           continue;
-        }
-        var val = a[i].val;
-        return val;
+  var I = function(name) {
+    var a = ctx_to_array(item.ctx);
+    for (var i = 0; i < a.length; i++) {
+      var key = a[i].key;
+      if (key !== name) {
+        continue;
       }
-      return undefined;
-   }
-   /*var interp_val = function(name) {
+      var val = a[i].val;
+      return val;
+    }
+    return undefined;
+  }
+  /*var interp_val = function(name) {
       return interp_raw(name);
    }*/
-   var I_line = function () {
-      var locByExt = item.locByExt;
-      if (locByExt === undefined) {
-         return -1;
-      }
-      var ext = get_file_extension(curfile);
-      var loc = locByExt[ext];
-      if (loc === undefined) {
-         return -1;
-      }
-      return loc.start.line;
-   };
-   var S_line = function () {
-      var loc = item.source_loc;
-      if (loc === undefined) {
-         return -1;
-      } 
-      return loc.start.line;
-   };
-   var S_core = function(name) {
-      var execution_ctx = item.execution_ctx;
-      var state = item.state;
-      if (execution_ctx === undefined || state === undefined) {
-         return undefined;
-      }
-      return lookup_var_in_lexical_env(state, name, execution_ctx.execution_ctx_lexical_env);      
-   };
-   var S_raw = function(name) {
-      var v = S_core(name);
-      return JSON.stringify(v);
-   };
-   var S = function(name) {
-      var v = S_core(name);
-      if (v === undefined) {
-         return undefined;
-      }
-      return jsvalue_of_value(v);
-   };
-   return eval(pred);
+  var I_line = function () {
+    var locByExt = item.locByExt;
+    if (locByExt === undefined) {
+      return -1;
+    }
+    var ext = get_file_extension(interpreter.getDoc().getName()); // TODO: Make work for any I_line
+    var loc = locByExt[ext];
+    if (loc === undefined) {
+      return -1;
+    }
+    return loc.start.line;
+  };
+  var S_line = function () {
+    var loc = item.source_loc;
+    if (loc === undefined) {
+      return -1;
+    }
+    return loc.start.line;
+  };
+  var S_core = function(name) {
+    var execution_ctx = item.execution_ctx;
+    var state = item.state;
+    if (execution_ctx === undefined || state === undefined) {
+      return undefined;
+    }
+    return lookup_var_in_lexical_env(state, name, execution_ctx.execution_ctx_lexical_env);
+  };
+  var S_raw = function(name) {
+    var v = S_core(name);
+    return JSON.stringify(v);
+  };
+  var S = function(name) {
+    var v = S_core(name);
+    if (v === undefined) {
+      return undefined;
+    }
+    return jsvalue_of_value(v);
+  };
+  return eval(pred);
 }
 
 function itemSatisfiesPred(item, pred) {
-   var ok = evalPred(item, pred);
-   return (ok === true) ? true : false;
-    // forces to return a boolean even if "pred" does not
+  var ok = evalPred(item, pred);
+  return (ok === true) ? true : false;
+  // forces to return a boolean even if "pred" does not
 }
 
 function goToPred(pred) {
   for (var k = 1; k < tracer_length+1; k++) {
-     var i = (tracer_pos + k) % tracer_length;
-     if (itemSatisfiesPred(tracer_items[i], pred)) {
-        stepTo(i);
-        return;
-     }
+    var i = (tracer_pos + k) % tracer_length;
+    if (itemSatisfiesPred(tracer_items[i], pred)) {
+      stepTo(i);
+      return;
+    }
   }
   $("#action_output").html("Could not find an event matching the reach condition.");
   var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 1000);
@@ -407,30 +399,28 @@ function goToPred(pred) {
 function button_test_handler() {
   var pred = $("#reach_condition").val();
   var r = evalPred(tracer_items[tracer_pos], pred);
-   console.log(r);
+  console.log(r);
   // $("#disp_infos").html(r);
   /*if (r === undefined) {
      r = "undefined";
   }*/
   $("#action_output").html("" + r);
-  var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 3000); 
+  var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 3000);
 }
 
 function button_reach_handler() {
- var pred = $("#reach_condition").val();
- var res = goToPred(pred);
- if (res !== true){
-   $("#action_output").html(res);
-   var timeoutID =
-         window.setTimeout(function() {
-           $("#action_output").html(""); }, 3000);
- }
+  var pred = $("#reach_condition").val();
+  var res = goToPred(pred);
+  if (res !== true){
+    $("#action_output").html(res);
+    var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 3000);
+  }
 };
 
 $('#text_condition').keypress(function(e){
   var keycode = (e.keyCode ? e.keyCode : e.which);
   if (keycode == '13') {
-     button_reach_handler();
+    button_reach_handler();
   }
 });
 
@@ -439,13 +429,13 @@ $("#button_test_condition").click(button_test_handler);
 
 
 $("#navigation_step").change(function(e) {
- var n = + $("#navigation_step").val();
- n = Math.max(0, Math.min(tracer_length - 1, n));
- stepTo(n);
+  var n = + $("#navigation_step").val();
+  n = Math.max(0, Math.min(tracer_length - 1, n));
+  stepTo(n);
 });
 
 function buttonRunHandler() {
-  initSourceDocs();
+  source.markAllClean();
   var message = readSourceParseAndRun();
   $("#action_output").html(message);
   var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 1000);
@@ -453,23 +443,23 @@ function buttonRunHandler() {
 
 $("#button_run").click(buttonRunHandler);
 
-$("#button_goto_begin").click(function() { goto_begin(); }); 
-$("#button_goto_end").click(function() { goto_end(); }); 
-  // stepTo(0);
-$("#button_backward").click(function() { backward(); }); 
-  // stepTo(Math.max(0, tracer_pos-1));
-$("#button_forward").click(function() { forward() }); 
-  // stepTo(Math.min(tracer_length-1, tracer_pos+1));
+$("#button_goto_begin").click(function() { goto_begin(); });
+$("#button_goto_end").click(function() { goto_end(); });
+// stepTo(0);
+$("#button_backward").click(function() { backward(); });
+// stepTo(Math.max(0, tracer_pos-1));
+$("#button_forward").click(function() { forward() });
+// stepTo(Math.min(tracer_length-1, tracer_pos+1));
 
-$("#button_srcprevious").click(function() { src_previous() }); 
-$("#button_srcnext").click(function() { src_next() }); 
+$("#button_srcprevious").click(function() { src_previous() });
+$("#button_srcnext").click(function() { src_next() });
 
-$("#button_previous").click(function() { previous() }); 
-$("#button_next").click(function() { next() }); 
-$("#button_finish").click(function() { finish() }); 
+$("#button_previous").click(function() { previous() });
+$("#button_next").click(function() { next() });
+$("#button_finish").click(function() { finish() });
 
-$("#button_cursor").click(function() { cursor() }); 
-$("#button_selection").click(function() { selection() }); 
+$("#button_cursor").click(function() { cursor() });
+$("#button_selection").click(function() { selection() });
 
 
 
@@ -481,72 +471,70 @@ $("#button_selection").click(function() { selection() });
 // - contents, a string containing its source code
 
 function tracer_valid_pos(i) {
- return (i >= 0 && i < tracer_length);
+  return (i >= 0 && i < tracer_length);
 }
 
 function stepTo(i) {
- if (! tracer_valid_pos(i))
-   return; 
- tracer_pos = i;
- updateSelection();
+  if (! tracer_valid_pos(i)) { return; }
+  tracer_pos = i;
+  updateSelection();
 }
 
 
 // dir is -1 or +1
 function shared_step(dir) {
- var i = tracer_pos;
- i += dir;
- if (! tracer_valid_pos(i))
-   return; // not found, we don’t update the tracer position.
- stepTo(i);
+  var i = tracer_pos;
+  i += dir;
+  if (! tracer_valid_pos(i)) { return; } // not found, we don’t update the tracer position.
+  stepTo(i);
 }
 
 // dir is -1 or +1,
 // target (= target depth) is 0 for (next/prev) or -1 (finish)
 function shared_next(dir, target) {
- var i = tracer_pos;
- var depth = 0;
- var ty = tracer_items[i].type;
- // TODO check if this works
- if (dir === +1 && ty === 'return') {
-   depth = 1;
- } else if (dir === -1 && ty === 'enter') {
-   depth = -1;
- }
- while (true) {
-   if (! tracer_valid_pos(i)) {
-     stepTo(i - dir); // just before out of range
-     return; // not found
-   }
-   if (i !== tracer_pos && depth === target) {
-     stepTo(i);
-     return;
-   }
-   var ty = tracer_items[i].type;
-   if (ty === 'enter') {
-     depth++;
-   } else if (ty === 'return') {
-     depth--;
-   }
-   i += dir;
- }
+  var i = tracer_pos;
+  var depth = 0;
+  var ty = tracer_items[i].type;
+  // TODO check if this works
+  if (dir === +1 && ty === 'return') {
+    depth = 1;
+  } else if (dir === -1 && ty === 'enter') {
+    depth = -1;
+  }
+  while (true) {
+    if (! tracer_valid_pos(i)) {
+      stepTo(i - dir); // just before out of range
+      return; // not found
+    }
+    if (i !== tracer_pos && depth === target) {
+      stepTo(i);
+      return;
+    }
+    var ty = tracer_items[i].type;
+    if (ty === 'enter') {
+      depth++;
+    } else if (ty === 'return') {
+      depth--;
+    }
+    i += dir;
+  }
 }
 
 function src_shared_next(dir) {
-   var cur_item = tracer_items[tracer_pos];
-   var cur_loc = cur_item.source_loc;
-   var i = tracer_pos += dir;
-   // for (var k = 1; k < tracer_length; k++) {
-   //    var i = (tracer_pos + tracer_length + dir * k) % tracer_length;
-   while (i >= 0 && i < tracer_length) {
-      var next_item = tracer_items[i];
-      var next_loc = next_item.source_loc;
-      if (next_loc !== cur_loc) {
-         stepTo(i);
-         return;
-      }
-      i += dir;
-   }
+  var cur_item = tracer_items[tracer_pos];
+  var cur_loc = cur_item.source_loc;
+  var i = tracer_pos += dir;
+  // for (var k = 1; k < tracer_length; k++) {
+  //    var i = (tracer_pos + tracer_length + dir * k) % tracer_length;
+  while (i >= 0 && i < tracer_length) {
+    var next_item = tracer_items[i];
+    var next_loc = next_item.source_loc;
+    if (next_loc !== cur_loc) {
+      stepTo(i);
+      return;
+    }
+    i += dir;
+  }
   // $("#action_output").html("Distinct loc event not found");
   // var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 1000);
 }
@@ -598,17 +586,17 @@ function cursor() {
   for (var i = tracer_length-1; i >= 0; i--) {
     var loc = tracer_items[i].source_loc;
     if (loc === undefined) continue;
-    if (loc.start.line <= line && 
-        loc.start.column <= column &&
-        loc.end.line >= line &&
-        loc.end.column >= column) {
+    if (loc.start.line <= line &&
+      loc.start.column <= column &&
+      loc.end.line >= line &&
+      loc.end.column >= column) {
       stepTo(i);
       return;
     }
   }
   $("#action_output").html("Event covering cursor not found");
   var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 1000);
-};
+}
 
 
 
@@ -617,42 +605,24 @@ function cursor() {
 function get_file_extension(filename) {
   var re = /(?:\.([^.]+))?$/;
   var s = re.exec(filename)[1];
-  // if (s == "pseudo") { return "js"; }
   return s;
 }
 
-// load files in CodeMirror view
-var docs = {};
-for (var i = 0; i < tracer_files.length; i++) {
-  var file = tracer_files[i].file;
-  var ext = get_file_extension(file);
-  var txt = tracer_files[i].contents;
-  docs[file] = CodeMirror.Doc(txt, ext);
+function get_file_mime(filename) {
+  switch(get_file_extension(filename)) {
+    case "js":
+    case "pseudo":
+      return "text/javascript";
+    case "ml":
+      return "text/x-ocaml";
+    default:
+      return "text/plain";
+  }
 }
 
 function viewFile(file) {
- if (curfile !== file) {
-   curfile = file;
-   if (docs[curfile] == undefined) {
-     console.log("Cannot view file " + curfile);
-     return;
-   }
-   interpreter.swapDoc(docs[curfile]);
-   interpreter.focus();
-   updateFileList();
-   updateSelection();
- }
+  interpreter.swapDocByName(file);
 }
-
-function updateFileList() {
- var s = '';
- for (var i = 0; i < tracer_files.length; i++) {
-   var file = tracer_files[i].file;
-   s += "<span class=\"file_item" + ((curfile == file) ? '_current' : '') + "\" onclick=\"viewFile('" + file + "')\">" + file + "</span> ";
- }
- $('#file_list').html(s);
-}
-
 
 
 // --------------- Tools for Views ----------------
@@ -660,7 +630,7 @@ function updateFileList() {
 // fresh name generated used for handlers of interactively-explorable values
 var next_fresh_id = 0;
 function fresh_id() {
- return "fresh_id_" + (next_fresh_id++);
+  return "fresh_id_" + (next_fresh_id++);
 }
 
 function encoded_list_to_array(list) {
@@ -672,7 +642,7 @@ function encoded_list_to_array(list) {
   return r;
 }
 
-  /* for reversed lists
+/* for reversed lists
   var i = LibList.length(list) - 1;
   while (i >= 0) {
     if (list.tag != "::") throw "encoded_list_to_array: bug";
@@ -683,15 +653,17 @@ function encoded_list_to_array(list) {
   */
 
 function html_escape(stringToEncode) {
-   var entityMap = {
-      "&": "&amp;", 
-      "<": "&lt;",
-      ">": "&gt;",
-/*      '"': '&quot;',
-      "'": '&#39;',
-      "/": '&#x2F;' */ };
-   return String(stringToEncode).replace(/[&<>]/g, function (s) {
-      return entityMap[s]; });  // "'\/
+  var entityMap = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+/*  '"': '&quot;',
+    "'": '&#39;',
+    "/": '&#x2F;' */
+  };
+  return String(stringToEncode).replace(/[&<>]/g, function (s) {
+    return entityMap[s];
+  });  // "'\/
 }
 
 function string_of_any(v) {
@@ -709,58 +681,41 @@ function array_of_heap(compare, heap) {
 
 
 function string_of_prealloc(prealloc) {
-    return (prealloc.tag).slice("Coq_prealloc_".length);
+  return (prealloc.tag).slice("Prealloc_".length);
   //TODO:
-  // Coq_prealloc_mathop  [@f mathop] of mathop
-  // Coq_prealloc_native_error  [@f error] of native_error
-  // Coq_prealloc_native_error_proto  [@f error] of native_error
+  // Prealloc_mathop  [@f mathop] of mathop
+  // Prealloc_native_error  [@f error] of native_error
+  // Prealloc_native_error_proto  [@f error] of native_error
 }
 
 function string_of_loc(loc) {
   switch (loc.tag) {
-  case "Coq_object_loc_normal":
-    return loc.address;
-  case "Coq_object_loc_prealloc":
-    return string_of_prealloc(loc.prealloc);
-  default:
-    throw "unrecognized tag in string_of_loc";
-  }
-}
-
-function string_of_prim(v) {
-  switch (v.tag) {
-  case "Coq_prim_undef":
-    return "undefined";
-  case "Coq_prim_null":
-    return "null";
-  case "Coq_prim_bool":
-    return (v.value) ? "true" : "false";
-  case "Coq_prim_number":
-    return "" + v.value;
-  case "Coq_prim_string":
-    return "\"" + html_escape(v.value) + "\"";
-  default:
-    throw "unrecognized tag in string_of_prim";
+    case "Object_loc_normal":
+      return loc.address;
+    case "Object_loc_prealloc":
+      return string_of_prealloc(loc.prealloc);
+    default:
+      throw "unrecognized tag in string_of_loc";
   }
 }
 
 function string_of_option(string_of_elem, opt_elem) {
   switch (opt_elem.tag) {
-  case "None":
-    return "None";
-  case "Some":
-    return "Some (" + string_of_elem(opt_elem.value) + ")";
-  default:
-    throw "unrecognized tag in string_of_option";
+    case "None":
+      return "None";
+    case "Some":
+      return "Some (" + string_of_elem(opt_elem.value) + ")";
+    default:
+      throw "unrecognized tag in string_of_option";
   }
 }
 
 function string_of_mutability(mutability) {
-  return (mutability.tag).slice("Coq_mutability_".length);
+  return (mutability.tag).slice("Mutability_".length);
 }
 
 
-  /*
+/*
   type coq_object = { object_proto_ : value;
                     object_class_ : class_name;
                     object_extensible_ : bool;
@@ -786,11 +741,11 @@ function string_of_mutability(mutability) {
                     object_bound_args_ : value list option;
                     object_parameter_map_ : object_loc option }
                     */
-   // TODO  for object_prim_value_, use string_of_option(show_elem, opt_elem)
+// TODO  for object_prim_value_, use string_of_option(show_elem, opt_elem)
 /*
     type attributes =
-    | Coq_attributes_data_of [@f value] of attributes_data
-    | Coq_attributes_accessor_of [@f value] of attributes_accessor
+    | Attributes_data_of [@f value] of attributes_data
+    | Attributes_accessor_of [@f value] of attributes_accessor
 
 
     type attributes_data = { attributes_data_value : value;
@@ -802,156 +757,170 @@ function string_of_mutability(mutability) {
                                  attributes_accessor_set : value;
                                  attributes_accessor_enumerable : bool;
                                  attributes_accessor_configurable : bool }
-*/
+                                 */
 
 function show_object(state, loc, target, depth) {
-   var t = $("#" + target);
-   if (depth < 0) {
-     t.append("&lt;hidden&gt;");
-     return;
-   }
-   var obj_opt = JsCommonAux.object_binds_option(state, loc);
-   if (obj_opt.tag != "Some") throw "show_object: unbound object";
-   var obj = obj_opt.value;
-   var props = obj.object_properties_;
-   var key_value_pair_array = encoded_list_to_array(HeapStr.to_list(props));
-   // 
-   var is_global = (string_of_loc(loc) == "global");
+  var t = $("#" + target);
+  if (depth < 0) {
+    t.append("&lt;hidden&gt;");
+    return;
+  }
+  var obj_opt = JsCommonAux.object_binds_option(state, loc);
+  if (obj_opt.tag != "Some") throw "show_object: unbound object";
+  var obj = obj_opt.value;
+  var props = obj.object_properties_;
+  var key_value_pair_array = encoded_list_to_array(HeapStr.to_list(props));
+  var is_global = (string_of_loc(loc) == "global");
 
-   key_value_pair_array.push(["[[Prototype]]", obj.object_proto_]);
+  key_value_pair_array.push(["[[Prototype]]", obj.object_proto_]);
 
-   for (var j = 0; j < key_value_pair_array.length; j++) {
-      var i = key_value_pair_array.length-j-1;
-      var prop_name = key_value_pair_array[i][0];
-      var attribute = key_value_pair_array[i][1];
+  for (var j = 0; j < key_value_pair_array.length; j++) {
+    var i = key_value_pair_array.length-j-1;
+    var prop_name = key_value_pair_array[i][0];
+    var attribute = key_value_pair_array[i][1];
 
-      var targetsub = fresh_id();
-      t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
-      $("#" + targetsub).html("&ndash; " + html_escape(prop_name) + ": ");
+    var targetsub = fresh_id();
+    t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
+    $("#" + targetsub).html("&ndash; " + html_escape(prop_name) + ": ");
 
-      switch (attribute.tag) {
-        case "Coq_attributes_data_of":
-          var attr = attribute.value;
-          var prop_value = attr.attributes_data_value;
-          show_value(state, prop_value, targetsub, depth-1);
+    switch (attribute.tag) {
+      case "Attributes_data_of":
+        var attr = attribute.value;
+        var prop_value = attr.attributes_data_value;
+        show_value(state, prop_value, targetsub, depth-1);
 
-          break;
-        case "Coq_attributes_accessor_of": 
-          var attr = attribute.value;
-          $("#" + targetsub).append(" &lt;accessor&gt; ");
-          // TODO: complete
+        break;
+      case "Attributes_accessor_of":
+        var attr = attribute.value;
+        $("#" + targetsub).append(" &lt;accessor&gt; ");
+        // TODO: complete
 
-          break;
-        case "Coq_value_prim":
-        case "Coq_value_object":
-          show_value(state, attribute, targetsub, depth-1);
-          break;
+        break;
+      case "Value_undef":
+      case "Value_null":
+      case "Value_bool":
+      case "Value_number":
+      case "Value_string":
+      case "Value_object":
+        show_value(state, attribute, targetsub, depth-1);
+        break;
 
-        default: 
-          console.log(attribute);
-          throw "invalid attribute.tag";
-      }
-   }
+      default:
+        console.log(attribute);
+        throw "invalid attribute.tag";
+    }
+  }
 
-   // special display for empty objects
-   if (key_value_pair_array.length === 0) {
-     t.append("(empty object)");
-   }
+  // special display for empty objects
+  if (key_value_pair_array.length === 0) {
+    t.append("(empty object)");
+  }
 
-   // custom fields
-   var props = obj.object_code_;
-   if (obj.object_code_.tag == "Some") {
-      var targetfunc = fresh_id();
-      t.append("<div style='margin-left:1em' id='" + targetfunc + "'>&ndash; &lt;Function&gt;</div>");
-      if (obj.object_scope_.tag == "Some") {
-         var func_lexical_env = obj.object_scope_.value;
-         var targetscope = fresh_id();
-         $("#" + targetfunc).append("<div style='margin-left:1em'>&ndash; scope:<div style='margin-left:1em' id='" + targetscope + "'></div></div>");
-         show_lexical_env(state, func_lexical_env, targetscope);
-      }
-   }
+  // custom fields
+  var props = obj.object_code_;
+  if (obj.object_code_.tag == "Some") {
+    var targetfunc = fresh_id();
+    t.append("<div style='margin-left:1em' id='" + targetfunc + "'>&ndash; &lt;Function&gt;</div>");
+    if (obj.object_scope_.tag == "Some") {
+      var func_lexical_env = obj.object_scope_.value;
+      var targetscope = fresh_id();
+      $("#" + targetfunc).append("<div style='margin-left:1em'>&ndash; scope:<div style='margin-left:1em' id='" + targetscope + "'></div></div>");
+      show_lexical_env(state, func_lexical_env, targetscope);
+    }
+  }
 }
 
 function show_value(state, v, target, depth) {
   var t = $("#" + target);
   switch (v.tag) {
-  case "Coq_value_prim":
-    var s = string_of_prim(v.value);
-    t.append(s);
-    return;
-  case "Coq_value_object":
-     var loc = v.value;
-     var obj_target = fresh_id();
-     t.append("<span class='heap_link'><a onclick=\"handlers['" + obj_target + "']()\" >&lt;Object&gt;(" + string_of_loc(loc) + ")</a><span id='" + obj_target + "'></span></span>"); 
-     function handler_close() {
-       handlers[obj_target] = handler_open;
-       $("#" + obj_target).html("");
-       interpreter.focus();
-     }
-     function handler_open() {
-       handlers[obj_target] = handler_close;
-       show_object(state, loc, obj_target, 1);
-       interpreter.focus();
-     };
-     // initial opening of the object
-     if (depth > 0) {
-       handlers[obj_target] = handler_close;
-       show_object(state, loc, obj_target, depth);
-     } else {
-       handler_close();
-     }
-     return;
-  default:
-    throw "unrecognized tag in show_value";
+    case "Value_undef":
+      t.append("undefined");
+      return;
+    case "Value_null":
+      t.append("null");
+      return;
+    case "Value_bool":
+      t.append((v.value) ? "true" : "false");
+      return;
+    case "Value_number":
+      t.append("" + v.value);
+      return;
+    case "Value_string":
+      t.append("\"" + html_escape(v.value) + "\"");
+      return;
+    case "Value_object":
+      var loc = v.value;
+      var obj_target = fresh_id();
+      t.append("<span class='heap_link'><a onclick=\"handlers['" + obj_target + "']()\" >&lt;Object&gt;(" + string_of_loc(loc) + ")</a><span id='" + obj_target + "'></span></span>");
+      function handler_close() {
+        handlers[obj_target] = handler_open;
+        $("#" + obj_target).html("");
+        interpreter.focus();
+      }
+      function handler_open() {
+        handlers[obj_target] = handler_close;
+        show_object(state, loc, obj_target, 1);
+        interpreter.focus();
+      };
+      // initial opening of the object
+      if (depth > 0) {
+        handlers[obj_target] = handler_close;
+        show_object(state, loc, obj_target, depth);
+      } else {
+        handler_close();
+      }
+      return;
+    default:
+      throw "unrecognized tag in show_value";
   }
 }
 
 function show_decl_env_record(state, env_record_decl, target) {
-   // env_record_decl : (string, mutability * value) Heap.heap
-   var t = $("#" + target);
-   var items_array = encoded_list_to_array(HeapStr.to_list(env_record_decl));
-   for (var i = 0; i < items_array.length; i++) {
-      var var_name = items_array[i][0];
-      var mutability = items_array[i][1][0];
-      var value = items_array[i][1][1];
-      var value_target = fresh_id();
-      t.append("<div id='" + value_target + "'>	&rarr; " + html_escape(var_name) + ":</div>");
-      // + " (" + string_of_mutability(mutability) + ")" +
-      show_value(state, value, value_target, 0);
-   }
+  // env_record_decl : (string, mutability * value) Heap.heap
+  var t = $("#" + target);
+  var items_array = encoded_list_to_array(HeapStr.to_list(env_record_decl));
+  for (var i = 0; i < items_array.length; i++) {
+    var var_name = items_array[i][0];
+    var mutability = items_array[i][1][0];
+    var value = items_array[i][1][1];
+    var value_target = fresh_id();
+    t.append("<div id='" + value_target + "'>	&rarr; " + html_escape(var_name) + ":</div>");
+    // + " (" + string_of_mutability(mutability) + ")" +
+    show_value(state, value, value_target, 0);
+  }
 }
 
 function show_lexical_env(state, lexical_env, target) {
-   var t = $("#" + target);
-   // var env_record_heap = state.state_env_record_heap;
-   var env_loc_array = encoded_list_to_array(lexical_env);
-   for (var i = 0; i < env_loc_array.length; i++) {
-      var env_loc = env_loc_array[i];
-      var env_record_opt = JsCommonAux.env_record_binds_option(state, env_loc);
-      if (env_record_opt.tag != "Some") throw "show_object: unbound object";
-      var env_record = env_record_opt.value;
+  var t = $("#" + target);
+  // var env_record_heap = state.state_env_record_heap;
+  var env_loc_array = encoded_list_to_array(lexical_env);
+  for (var i = 0; i < env_loc_array.length; i++) {
+    var env_loc = env_loc_array[i];
+    var env_record_opt = JsCommonAux.env_record_binds_option(state, env_loc);
+    if (env_record_opt.tag != "Some") throw "show_object: unbound object";
+    var env_record = env_record_opt.value;
 
-      switch (env_record.tag) {
-        case "Coq_env_record_decl":
-          var env_record_decl = env_record.value;
-          var items_target = fresh_id();
-          t.append("<div><b>&bull; environment-record-declaration</b>: <div style='margin-left: 1em' id='" + items_target + "'></div></div>");
-          show_decl_env_record(state, env_record_decl, items_target)
-          break;
-        case "Coq_env_record_object":   
-          var object_loc = env_record.value;
-          var obj_value = { tag: "Coq_value_object", value: object_loc };
-          var provide_this = env_record.provide_this;
-          var obj_target = fresh_id();
-          t.append("<div id='" + obj_target + "'><b>&bull; environment-record-object</b>:</div>");
-          // (" + ((provide_this) ? "" : "not ") + "providing 'this'):
-          show_value(state, obj_value, obj_target, 0);
-          // show_object(state, object_loc, obj_target, 1);
-          break;
-        default: 
-          throw "invalid env_record.tag";
-      }
-   }
+    switch (env_record.tag) {
+      case "Env_record_decl":
+        var env_record_decl = env_record.value;
+        var items_target = fresh_id();
+        t.append("<div><b>&bull; environment-record-declaration</b>: <div style='margin-left: 1em' id='" + items_target + "'></div></div>");
+        show_decl_env_record(state, env_record_decl, items_target)
+        break;
+      case "Env_record_object":
+        var object_loc = env_record.value;
+        var obj_value = { tag: "Value_object", value: object_loc };
+        var provide_this = env_record.provide_this;
+        var obj_target = fresh_id();
+        t.append("<div id='" + obj_target + "'><b>&bull; environment-record-object</b>:</div>");
+        // (" + ((provide_this) ? "" : "not ") + "providing 'this'):
+        show_value(state, obj_value, obj_target, 0);
+        // show_object(state, object_loc, obj_target, 1);
+        break;
+      default:
+        throw "invalid env_record.tag";
+    }
+  }
 }
 
 
@@ -964,14 +933,14 @@ function show_execution_ctx(state, execution_ctx, target) {
   // this object
   var this_target = fresh_id();
   t.append("<div id='" + this_target + "'><b>this:</b> </div>");
-  //TODO 
+  //TODO
   show_value(state, execution_ctx.execution_ctx_this_binding, this_target, 0);
 
   // lexical env
   var lexical_env_target = fresh_id();
   t.append("<div><b>lexical-env:</b> <div style='margin-left: 1em' id='" + lexical_env_target + "'></div></div>");
   show_lexical_env(state, execution_ctx.execution_ctx_lexical_env, lexical_env_target);
-  
+
   // variable env -- TODO, like above
   var variable_env_target = fresh_id();
   t.append("<div><b>variable-env:</b> <div style='margin-left: 1em' id='" + variable_env_target + "'></div></div>");
@@ -1002,36 +971,32 @@ function updateContext(targetid, state, env) {
 
 function has_tag_in_set(value, array_tags) {
   return (value.tag !== undefined &&
-          array_tags.indexOf(value.tag) != -1);
+    array_tags.indexOf(value.tag) != -1);
 }
 
 function interp_val_is_base_value(val) {
   var t = typeof(val);
-  return t == "string" || 
-         t == "number" ||
-         t == "boolean" ||
-         t == "undefined" ||
-         t == "null";
-}
-
-function interp_val_is_js_prim(v) {
-  return has_tag_in_set(v, [ "Coq_prim_undef", "Coq_prim_null", "Coq_prim_bool", "Coq_prim_number", "Coq_prim_string" ]);
+  return t == "string" ||
+    t == "number" ||
+    t == "boolean" ||
+    t == "undefined" ||
+    t == "null";
 }
 
 function interp_val_is_js_value(v) {
-  return has_tag_in_set(v, ["Coq_value_prim", "Coq_value_object" ]);
+  return has_tag_in_set(v, ["Value_undef", "Value_null", "Value_bool", "Value_number", "Value_string", "Value_object" ]);
 }
 
 function interp_val_is_loc(v) {
-  return has_tag_in_set(v, [ "Coq_object_loc_normal", "Coq_object_loc_prealloc" ]);
+  return has_tag_in_set(v, [ "Object_loc_normal", "Object_loc_prealloc" ]);
 }
 
 function interp_val_is_list(v) {
   return has_tag_in_set(v, [ "::", "[]" ]);
 }
-  
+
 function interp_val_is_syntax(v) {
-  return has_tag_in_set(v, [ "Coq_expr_this", "Coq_expr_identifier", "Coq_expr_literal", "Coq_expr_object", "Coq_expr_array", "Coq_expr_function", "Coq_expr_access", "Coq_expr_member", "Coq_expr_new", "Coq_expr_call", "Coq_expr_unary_op", "Coq_expr_binary_op", "Coq_expr_conditional", "Coq_expr_assign", "Coq_propbody_val", "Coq_propbody_get", "Coq_propbody_set", "Coq_funcbody_intro", "Coq_stat_expr", "Coq_stat_label", "Coq_stat_block", "Coq_stat_var_decl", "Coq_stat_if", "Coq_stat_do_while", "Coq_stat_while", "Coq_stat_with", "Coq_stat_throw", "Coq_stat_return", "Coq_stat_break", "Coq_stat_continue", "Coq_stat_try", "Coq_stat_for", "Coq_stat_for_var", "Coq_stat_for_in", "Coq_stat_for_in_var", "Coq_stat_debugger", "Coq_stat_switch", "Coq_switchbody_nodefault", "Coq_switchbody_withdefault", "Coq_switchclause_intro", "Coq_prog_intro", "Coq_element_stat", "Coq_element_func_decl" ]);
+  return has_tag_in_set(v, [ "Expr_this", "Expr_identifier", "Expr_literal", "Expr_object", "Expr_array", "Expr_function", "Expr_access", "Expr_member", "Expr_new", "Expr_call", "Expr_unary_op", "Expr_binary_op", "Expr_conditional", "Expr_assign", "Propbody_val", "Propbody_get", "Propbody_set", "Funcbody_intro", "Stat_expr", "Stat_label", "Stat_block", "Stat_var_decl", "Stat_if", "Stat_do_while", "Stat_while", "Stat_with", "Stat_throw", "Stat_return", "Stat_break", "Stat_continue", "Stat_try", "Stat_for", "Stat_for_var", "Stat_for_in", "Stat_for_in_var", "Stat_debugger", "Stat_switch", "Switchbody_nodefault", "Switchbody_withdefault", "Switchclause_intro", "Prog_intro", "Element_stat", "Element_func_decl" ]);
 }
 
 function interp_val_is_state(v) {
@@ -1047,7 +1012,7 @@ function interp_val_is_execution_ctx(v) {
 
 function show_interp_val(state, v, target, depth) {
   if (depth == 0) {
-    t.append("&lt; ... &gt;"); 
+    t.append("&lt; ... &gt;");
   }
   var t = $("#" + target);
   if (interp_val_is_base_value(v)) {
@@ -1059,52 +1024,50 @@ function show_interp_val(state, v, target, depth) {
     show_object(state, v, target, 0);
   } else if (interp_val_is_js_value(v)) {
     show_value(state, v, target, 0);
-  } else if (interp_val_is_js_prim(v)) {
-    t.append(string_of_prim(v));
   } else if (interp_val_is_state(v)) {
-    t.append("&lt;state-object&gt;"); 
+    t.append("&lt;state-object&gt;");
   } else if (interp_val_is_execution_ctx(v)) {
-    t.append("&lt;execution-ctx-object&gt;"); 
+    t.append("&lt;execution-ctx-object&gt;");
   } else if (interp_val_is_syntax(v)) {
     t.append("&lt;syntax-object&gt;");  // + JSON.stringify(v)
   } else if (interp_val_is_list(v)) {
-      var items = encoded_list_to_array(v)
-      t.append("List:");
-      for (var i = 0; i < items.length; i++) {
-        var vi = items[i];
-        var targetsub = fresh_id();
-        t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
-        $("#" + targetsub).html("&bull; "); 
-        show_interp_val(state, vi, targetsub, depth-1);
-      }
+    var items = encoded_list_to_array(v)
+    t.append("List:");
+    for (var i = 0; i < items.length; i++) {
+      var vi = items[i];
+      var targetsub = fresh_id();
+      t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
+      $("#" + targetsub).html("&bull; ");
+      show_interp_val(state, vi, targetsub, depth-1);
+    }
   } else if (v.tag !== undefined) { // data constructor
-      var constr = html_escape(v.tag); // TODO: rename constructor prefix
-      var hasArgs = (function() {
-                        for (var key in v) {
-                          if (key !== "tag") {
-                            return true;
-                          }
-                        }
-                        return false;
-                      })();
-      t.append(constr + ((hasArgs) ? " with:" : ""));
+    var constr = html_escape(v.tag); // TODO: rename constructor prefix
+    var hasArgs = (function() {
       for (var key in v) {
         if (key !== "tag") {
-          var targetsub = fresh_id();
-          t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
-          $("#" + targetsub).html(html_escape(key) + ": ");
-          show_interp_val(state, v[key], targetsub, depth-1);
+          return true;
         }
       }
-  } else { // record
-      var items_target = fresh_id();
-      t.append("Struct with:");
-      for (var key in v) {
-         var targetsub = fresh_id();
-         t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
-         $("#" + targetsub).html(html_escape(key) + ": ");
-         show_interp_val(state, v[key], targetsub, depth-1);
+      return false;
+    })();
+    t.append(constr + ((hasArgs) ? " with:" : ""));
+    for (var key in v) {
+      if (key !== "tag") {
+        var targetsub = fresh_id();
+        t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
+        $("#" + targetsub).html(html_escape(key) + ": ");
+        show_interp_val(state, v[key], targetsub, depth-1);
       }
+    }
+  } else { // record
+    var items_target = fresh_id();
+    t.append("Struct with:");
+    for (var key in v) {
+      var targetsub = fresh_id();
+      t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
+      $("#" + targetsub).html(html_escape(key) + ": ");
+      show_interp_val(state, v[key], targetsub, depth-1);
+    }
   }
   // t.append(string_of_any(v));
 }
@@ -1139,21 +1102,21 @@ function ctxToHtml(ctx) {
     var val = a[i].val;
     // Uncomment next line for debug:
     // s += "<div style='white-space: nowrap;'><b>" + b.key + "</b>: " + JSON.stringify(b.val) + "</div>";
-    if (key == "#RETURN_VALUE#" && 
-        val.value !== undefined &&
-        val.value.out !== undefined &&
-        val.value.out.res !== undefined) {
+    if (key == "#RETURN_VALUE#" &&
+      val.value !== undefined &&
+      val.value.out !== undefined &&
+      val.value.out.res !== undefined) {
       var res = val.value.out.res;
-      // Coq_result_some  [@f value] of 't 
-      // Coq_specret_out  [@f value] of out
-      // Coq_out_ter  [@f state, res] of state * res
+      // Result_some  [@f value] of 't
+      // Specret_out  [@f value] of out
+      // Out_ter  [@f state, res] of state * res
       s += "<div style='white-space: nowrap;'><b>#RES#</b>: " + JSON.stringify(res) + "</div>";
-      if (res.res_value !== undefined && 
-          res.res_value.value !== undefined) {
+      if (res.res_value !== undefined &&
+        res.res_value.value !== undefined) {
         var value = res.res_value.value;
         s += "<div style='white-space: nowrap;'><b>#RESVALUE#: " + JSON.stringify(value) + "</b></div>";
       }
-    } 
+    }
   }
   return s;
 }
@@ -1174,160 +1137,184 @@ function itemToHtml(item) {
 
 // --------------- Selection view ----------------
 
-function updateSelectionInCodeMirror(codeMirrorObj, loc) {
+// Converts a loc from Esprima to CodeMirror and sets the highlight on the given doc
+// codeMirrorObj may be either a CodeMirror instance, or a Doc instance
+// opts are the same as can be passed to CodeMirror's doc.markText.
+function updateSelectionInCodeMirror(codeMirrorObj, loc, opts) {
   if (loc === undefined) {
-     return; 
-  }
-  // Substracting 1 because Esprima counts from 1, and Codemirror from 0
-  var anchor = {line: loc.start.line-1 , ch: loc.start.column };
-  var head = {line: loc.end.line-1, ch: loc.end.column };
-  codeMirrorObj.setSelection(anchor, head);
-}
-
-function updateSelectionInCodeMirrorAccordingToExt(codeMirrorObj, locByExt) {
-  if (locByExt === undefined) {
-   return; 
-  }
-  var ext = get_file_extension(curfile);
-  var loc = locByExt[ext];
-  if (loc === undefined) {
-    console.log("Error: missing loc for " + curfile + " in:");
-    console.log(locByExt);
     return;
   }
-  updateSelectionInCodeMirror(codeMirrorObj, loc);
+
+  // Clear old marks
+  codeMirrorObj.getAllMarks().forEach(m => m.clear());
+
+  // Substracting 1 because Esprima counts from 1, and Codemirror from 0
+  var from = {line: loc.start.line-1 , ch: loc.start.column };
+  var to = {line: loc.end.line-1, ch: loc.end.column };
+
+  codeMirrorObj.markText(from, to, opts);
+  scrollToLoc(codeMirrorObj, {from: from, to: to});
+}
+
+function updateInterpreterSelection(locByExt, selectionOpts) {
+  if (locByExt === undefined) {
+    return;
+  }
+
+  for (let doc of interpreter) {
+    let curfile = doc.getName();
+    let ext = get_file_extension(curfile);
+    let loc = locByExt[ext];
+    if (loc === undefined) {
+      console.log("Error: missing loc for " + curfile + " in:");
+      console.log(locByExt);
+      return;
+    }
+    updateSelectionInCodeMirror(doc, loc, selectionOpts);
+  }
+}
+
+// Scroll to the first mark in the given CodeMirror or Doc object.
+// No-op if given object not active, or if no marks in the doc.
+function scrollToFirstMark(doc) {
+  let ms = doc.getAllMarks();
+  if (ms.length < 1) return;
+  let loc = ms[0].find();
+  scrollToLoc(doc, loc);
+}
+
+// Scroll to the given location in the given CodeMirror or Doc object.
+// No-op if the given doc is not currently active.
+function scrollToLoc(doc, loc) {
+  if (doc instanceof CodeMirror.Doc) {
+    doc = doc.getEditor();
+  }
+  if (doc) {
+    doc.scrollIntoView(loc, 100);
+  }
 }
 
 function clearFeedback() {
-   $("#disp_infos").html("");
-   $("#disp_env").html("");
-   $("#disp_ctx").html("");
+  $("#disp_infos").html("");
+  $("#disp_env").html("");
+  $("#disp_ctx").html("");
 }
 
 function updateSelection() {
+  const selectionOpts = {className: "debug-selection"};
   clearFeedback();
   var item = tracer_items[tracer_pos];
-  source.setSelection({line: 0, ch:0}, {line: 0, ch:0}); // TODO: introduce a fct reset
 
- if (item !== undefined) {
-   // console.log(item);
-   // $("#disp_infos").html(itemToHtml(item));
-   if (item.source_loc === undefined) {
-     console.log("Error: missing line in log event");
+  if (item !== undefined) {
+    // $("#disp_infos").html(itemToHtml(item));
+    if (item.source_loc === undefined) {
+      console.log("Error: missing line in log event");
+    } else {
+      // source panel
+      source_loc_selected = item.source_loc;
 
-   } else {
+      source.swapDocByName(source_loc_selected.file);
+      updateSelectionInCodeMirror(source, source_loc_selected, selectionOpts);
 
-     // source panel
-     source_loc_selected = item.source_loc;
+      // source heap/env panel
+      if (item.state === undefined || item.execution_ctx === undefined) {
+        $("#disp_env").html("<undefined state or context>");
+      } else {
+        show_execution_ctx(item.state, item.execution_ctx, "disp_env");
+      }
 
-     selectSourceDocFromLoc(source_loc_selected);
-     updateSelectionInCodeMirror(source, source_loc_selected);
-     // console.log(source_loc_selected);
+      // interpreter ctx panel
+      show_interp_ctx(item.state, item.ctx, "disp_ctx");
 
-     // source heap/env panel
-     if (item.state === undefined || item.execution_ctx === undefined) {
-       $("#disp_env").html("<undefined state or context>");
-     } else {
-       show_execution_ctx(item.state, item.execution_ctx, "disp_env");
-     }
+      // interpreter code panel
+      // TEMPORARILY DISABLED BECAUSE ONLY SINGLE FILE TO TRACE
+      // viewFile(item.loc.file);
 
-     // interpreter ctx panel
-     show_interp_ctx(item.state, item.ctx, "disp_ctx");
+      updateInterpreterSelection(item.locByExt, selectionOpts);
+    }
 
-     // interpreter code panel
-     // TEMPORARILY DISABLED BECAUSE ONLY SINGLE FILE TO TRACE
-     // viewFile(item.loc.file);
-
-     var color = '#F3F781';
-        // possible to use different colors depending on event type
-        // var color = (item.type === 'enter') ? '#F3F781' : '#CCCCCC';
-     $('.CodeMirror-selected').css({ background: color });
-     $('.CodeMirror-focused .CodeMirror-selected').css({ background: color });
-     updateSelectionInCodeMirrorAccordingToExt(interpreter, item.locByExt);
-   }
-
-   // navig panel
-   $("#navigation_step").val(tracer_pos);
-   $("#event_type").html(item.type);
- }
- updateFileList();
- interpreter.focus();
+    // navig panel
+    $("#navigation_step").val(tracer_pos);
+    $("#event_type").html(item.type);
+  }
+  interpreter.focus();
 }
 
 // --------------- CodeMirror ----------------
 
-source = CodeMirror.fromTextArea(document.getElementById('source_code'), {
- mode: 'text/javascript',
- lineNumbers: true,
- lineWrapping: true
+source = new CodeMirror(document.getElementById('source_code'), {
+  mode: 'text/javascript',
+  lineNumbers: true,
+  lineWrapping: true
 });
 source.setSize(500, 150);
 
-setInitialSourceCode("source.js", "source code here");
-
 interpreter = CodeMirror.fromTextArea(document.getElementById('interpreter_code'), {
- mode: 'text/javascript',
- lineNumbers: true,
- lineWrapping: true,
- readOnly: true,
- extraKeys: {
-   'R': function(cm) { goto_begin();  },
-   'F': function(cm) { forward();},
-   '6': function(cm) { forward();},
-   'B': function(cm) { backward(); },
-   '4': function(cm) { backward(); },
-   'P': function(cm) { previous(); },
-   '8': function(cm) { previous(); },
-   'N': function(cm) { next(); },
-   '2': function(cm) { next(); },
-   'H': function(cm) { finish(); },
-   '3': function(cm) { finish(); }
- },
+  mode: 'text/javascript',
+  lineNumbers: true,
+  lineWrapping: true,
+  readOnly: true,
+  extraKeys: {
+    'R': function(cm) { goto_begin();  },
+    'F': function(cm) { forward();},
+    '6': function(cm) { forward();},
+    'B': function(cm) { backward(); },
+    '4': function(cm) { backward(); },
+    'P': function(cm) { previous(); },
+    '8': function(cm) { previous(); },
+    'N': function(cm) { next(); },
+    '2': function(cm) { next(); },
+    'H': function(cm) { finish(); },
+    '3': function(cm) { finish(); }
+  },
 });
 interpreter.setSize(800,250);
 
+interpreter.setDocs(tracer_files.map(file => {
+  let name = file.file;
+  let mime = get_file_mime(name);
+  let txt = file.contents;
+  let doc = CodeMirror.Doc(txt, mime);
+  doc.setName(name);
+  return doc;
+}));
+interpreter.swapDocByName("JsInterpreter.pseudo");
+interpreter.on("swapDoc", scrollToFirstMark);
 
-/* ==> try in new version of codemirror*/
+
 try {
- $(interpreter.getWrapperElement()).resizable({
-   resize: function() {
-     interpreter.setSize($(this).width(), $(this).height());
-   }
- });
-} catch(e) { }
-// TODO: factorize code below with the above
-try {
- $(source.getWrapperElement()).resizable({
-   resize: function() {
-     source.setSize($(this).width(), $(this).height());
-   }
- });
+  $(interpreter.getWrapperElement()).resizable({
+    resize: function() {
+      interpreter.setSize($(this).width(), $(this).height());
+    }
+  });
+  $(source.getWrapperElement()).resizable({
+    resize: function() {
+      source.setSize($(this).width(), $(this).height());
+    }
+  });
 } catch(e) { }
 try {
- $("disp_env_pane").resizable({
-   resize: function() {
-     disp_env_pane.setSize($(this).width(), $(this).height());
-   }
- });
+  $("disp_env_pane").resizable({
+    resize: function() {
+      disp_env_pane.setSize($(this).width(), $(this).height());
+    }
+  });
 } catch(e) { }
-
-
-
-
 
 interpreter.on('dblclick', function() {
- var line = interpreter.getCursor().line;
- var txt = interpreter.getLine(line);
- var prefix = "#sec-";
- var pos_start = txt.indexOf(prefix);
- if (pos_start === -1)
-   return;
- var pos_end = txt.indexOf("*", pos_start);
- if (pos_end === -1)
-   return;
- var sec = txt.substring(pos_start, pos_end);
- var url = "http://www.ecma-international.org/ecma-262/5.1/" + sec;
- window.open(url, '_blank');
+  var line = interpreter.getCursor().line;
+  var txt = interpreter.getLine(line);
+  var prefix = "#sec-";
+  var pos_start = txt.indexOf(prefix);
+  if (pos_start === -1)
+    return;
+  var pos_end = txt.indexOf("*", pos_start);
+  if (pos_end === -1)
+    return;
+  var sec = txt.substring(pos_start, pos_end);
+  var url = "http://www.ecma-international.org/ecma-262/5.1/" + sec;
+  window.open(url, '_blank');
 });
 
 interpreter.focus();
@@ -1340,72 +1327,75 @@ interpreter.focus();
 // the corresponding location from the piece of AST that corresponds.
 // These locations are used for source highlighting.
 function assignExtraInfosInTrace() {
- var last_loc = program.loc;
- var last_state = undefined;
- var last_execution_ctx = undefined;
-   // { start: { line: 1, column: 0}, end: { line: 1, column: 1 } };
- for (var k = 0; k < tracer_items.length; k++) {
-   var item = tracer_items[k];
-   if (item.ctx !== undefined && item.ctx.bindings !== undefined) {
-     var bindings = item.ctx.bindings;
-     for (var i = 0; i < bindings.length; i++) {
-       var binding = bindings[i];
-       if (binding.val === undefined) {
-         continue; // might happen on run with errors
-       }
-       if (binding.key === "_term_") {
-         var t = binding.val;
-         if (t.loc != undefined) {
-           last_loc = t.loc;
-           /*console.log("found source loc: " +
-             last_loc.start.line + "," + 
-             last_loc.start.column + " --> " + 
-             last_loc.end.line + "," + 
+  var last_loc;
+  var last_state = undefined;
+  var last_execution_ctx = undefined;
+  // { start: { line: 1, column: 0}, end: { line: 1, column: 1 } };
+  for (var k = 0; k < tracer_items.length; k++) {
+    var item = tracer_items[k];
+    if (item.ctx !== undefined && item.ctx.bindings !== undefined) {
+      var bindings = item.ctx.bindings;
+      for (var i = 0; i < bindings.length; i++) {
+        var binding = bindings[i];
+        if (binding.val === undefined) {
+          continue; // might happen on run with errors
+        }
+        if (binding.key === "_term_") {
+          var t = binding.val;
+          if (t.loc != undefined) {
+            last_loc = t.loc;
+            /*console.log("found source loc: " +
+             last_loc.start.line + "," +
+             last_loc.start.column + " --> " +
+             last_loc.end.line + "," +
              last_loc.end.column);*/
-         }
-       } else if (interp_val_is_state(binding.val)) {
-         // assuming: 'is an state object' iff 'has a state_object_heap field'
-         last_state = binding.val;
-       } else if (interp_val_is_execution_ctx(binding.val)) {
-         // assuming: 'is an execution_ctx' iff 'has a execution_ctx_lexical_env field'
-         last_execution_ctx = binding.val;
-       }
-     }
-   }
-   item.source_loc = last_loc;
-   item.state = last_state;
-   item.execution_ctx = last_execution_ctx;
- }
+          }
+        } else if (interp_val_is_state(binding.val)) {
+          // assuming: 'is an state object' iff 'has a state_object_heap field'
+          last_state = binding.val;
+        } else if (interp_val_is_execution_ctx(binding.val)) {
+          // assuming: 'is an execution_ctx' iff 'has a execution_ctx_lexical_env field'
+          last_execution_ctx = binding.val;
+        }
+      }
+    }
+    item.source_loc = last_loc;
+    item.state = last_state;
+    item.execution_ctx = last_execution_ctx;
+  }
 }
 
 
 
-function runDebug() {
+function runInterpreter(asts) {
+  let result;
+  for (let ast of asts) {
+    if (!result) {
+      result = JsInterpreter.run_javascript(ast);
+    } else {
+      result = JsInterpreter.run_javascript_from_result(result, ast);
+    }
+  }
+  return result;
+}
+
+function run(asts) {
   reset_datalog();
-  JsInterpreter.run_javascript(program);
-}
+  var success = true;
+  try {
+    runInterpreter(asts);
+  } catch (e) {
+    success = false;
+    console.log(e);
+  }
 
-function run() {
- reset_datalog();
- var success = true;
- try {
-    JsInterpreter.run_javascript(program);
- } catch (e) {
-   success = false;
-   // alert("Error during the run");
-   console.log(e);
-   console.log("execute runDebug() to get the trace.");
-   // throw e;
-   // LATER: return "Error during the run.";
- }
-
- tracer_items = datalog;
- tracer_length = tracer_items.length;
- assignExtraInfosInTrace();
- $("#navigation_total").html(tracer_length - 1);
- // stepTo(tracer_length-1);
- stepTo(0);
- return (success) ? "Run successful!" : "Error during the run!";
+  tracer_items = datalog;
+  tracer_length = tracer_items.length;
+  assignExtraInfosInTrace(asts[0].loc);
+  $("#navigation_total").html(tracer_length - 1);
+  // stepTo(tracer_length-1);
+  stepTo(0);
+  return (success) ? "Run successful!" : "Error during the run!";
 }
 
 function parseSource(source, name, readOnly) {
@@ -1415,30 +1405,18 @@ function parseSource(source, name, readOnly) {
 }
 
 function readSourceParseAndRun() {
-   var message = "";
-   var code = source.getValue();
-   //console.log(code);
-   // TODO handle parsing error
-   // TODO handle out of scope errors
-   try {
-     program = parseSource(code, initialSourceName);
-   } catch (e) {
-     return "Parse error";
-   }
-
-   return run();
+  Translate_syntax.eval_counter = 0;
+  let asts = [];
+  try {
+    for (let doc of source) {
+      asts.push(parseSource(doc.getValue(), doc.getName()));
+    }
+  } catch (e) {
+    console.log(e);
+    return "Parse error";
+  }
+  return run(asts);
 }
-
-
-// --------------- Initialization, continuted ----------------
-
-
-// interpreter file displayed initially
-// -- viewFile(tracer_files[0].file);
-viewFile("JsInterpreter.pseudo");
-
-//$timeout(function() {codeMirror.refresh();});
-
 
 
 // -------------- Testing ----------------
@@ -1455,32 +1433,9 @@ function testLineof(filename, token) {
   console.log(lineof(filename, token));
 }
 
-// for easy debugging, launch at startup:
-//
-//  ---readSourceParseAndRun();
-
-// stepTo(2466);
-
-// button_reach_handler();
-// $("#reach_condition").val("S_raw('x')");
-// button_test_handler();
-
-//  $("#reach_condition").val("I_line()");
-//  button_test_handler();
-
-//$("#reach_condition").val("S('x') == 2");
-
-//stepTo(5873);
-// setExample(20);
-setExample(0);
-// setExample(11);
-$("#reach_condition").val("S_line() == 3 && S('i') == 1");
-
-
 function showCurrent() {
   console.log(tracer_items[tracer_pos]);
-};
-
+}
 
 function findToken(token) {
   for (var i = 0; i < tracer_items.length; i++) {
@@ -1489,6 +1444,4 @@ function findToken(token) {
     }
   }
   return -1;
-};
-
-//S_line() == 4 && S("j") == 2
+}

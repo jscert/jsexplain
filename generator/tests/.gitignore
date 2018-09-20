@@ -4,3 +4,5 @@
 *.cmi
 *.token.js
 *.mlloc.js
+*.as.js
+test_ml

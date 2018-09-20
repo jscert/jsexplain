@@ -8,22 +8,18 @@
 	=> inline the definition of "if_ter" inside its body
 	  and assign an explicit name to the local function there
 
-*) remove Coq_value_prim (flatten the value data type)
-
-
 *) make sure the "reach condition" works properly
 
 *) clean up the ML code for: type_compare mutability_compare prim_compare;
    for prim_compare, we should be able to match on pairs of arguments, with a catch-all
 
 *) move prim_compare and value_compare to JsInterpreter because it is interesting and should be logged;
-   move same_value_dec from jscommonaux 
 
 *) bigger test262 testing.
 
 *) Flag to force esprima to parse in strict mode
 
-*) put online the tool on the jscert website
+*) put online the tool on the jscert website (DONE, needs below:)
 	  - make sure to describe the supported features 
 	    (ecma5 minus for-in and a few other things)
      - explain that currently JS files are generated
@@ -58,10 +54,6 @@
 
 *) find out how to have syntax highlighting
 
-*) make sure to document that if doing "make" before "make init", 
-   then it is needed to do a "make clean" before compilation may work.
-
-
 *) in pseudo_code
   - hide or change these:
     - var%void _ = // hide
@@ -72,7 +64,7 @@
   
  
 *) jsinterpreter.ml: replace 
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)  s ("[run_object_method]   returned a primitive in [object_proto_is_prototype_of_body].")
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Result_impossible)  s ("[run_object_method]   returned a primitive in [object_proto_is_prototype_of_body].")
     with (after defining an « impossible » function)
       impossible s "[run_object_method] returned a primitive in [object_proto_is_prototype_of_body]."
 

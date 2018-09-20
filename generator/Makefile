@@ -10,6 +10,9 @@ all: byte native stdlib
 byte:   $(addsuffix .byte,$(EXECUTABLES))
 native: $(addsuffix .native,$(EXECUTABLES))
 
+test: byte stdlib
+	$(MAKE) -C tests test
+
 stdlib:
 	$(MAKE) -C $(STDLIB_DIR)
 
@@ -39,6 +42,7 @@ clean:
 	bash -c "rm -f .ocamldebug .depend archi_generator.pdf"
 	$(MAKE) -C $(STDLIB_DIR) clean
 	$(MAKE) -C $(OCAMLDOT_DIR) clean
+	$(MAKE) -C tests clean
 
 .PHONY: default all byte native stdlib debug clean
 
