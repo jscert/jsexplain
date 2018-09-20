@@ -59,14 +59,14 @@ let attributes_accessor_compare aa1 aa2 =
 
 let attributes_compare a1 a2 =
   match a1 with
-  | Coq_attributes_data_of ad1 ->
+  | Attributes_data_of ad1 ->
     (match a2 with
-     | Coq_attributes_data_of ad2 -> attributes_data_compare ad1 ad2
-     | Coq_attributes_accessor_of a -> false)
-  | Coq_attributes_accessor_of aa1 ->
+     | Attributes_data_of ad2 -> attributes_data_compare ad1 ad2
+     | Attributes_accessor_of a -> false)
+  | Attributes_accessor_of aa1 ->
     (match a2 with
-     | Coq_attributes_data_of a -> false
-     | Coq_attributes_accessor_of aa2 ->
+     | Attributes_data_of a -> false
+     | Attributes_accessor_of aa2 ->
        attributes_accessor_compare aa1 aa2)
 
 (** val full_descriptor_compare :
@@ -74,54 +74,54 @@ let attributes_compare a1 a2 =
 
 let full_descriptor_compare an1 an2 =
   match an1 with
-  | Coq_full_descriptor_undef ->
+  | Full_descriptor_undef ->
     (match an2 with
-     | Coq_full_descriptor_undef -> true
-     | Coq_full_descriptor_some _ -> false)
-  | Coq_full_descriptor_some a1 ->
+     | Full_descriptor_undef -> true
+     | Full_descriptor_some _ -> false)
+  | Full_descriptor_some a1 ->
     (match an2 with
-     | Coq_full_descriptor_some a2 -> attributes_compare a1 a2
-     | Coq_full_descriptor_undef -> false)
+     | Full_descriptor_some a2 -> attributes_compare a1 a2
+     | Full_descriptor_undef -> false)
 
 (** val ref_kind_comparable : ref_kind coq_Comparable **)
 
 let ref_kind_comparable x y =
   match x with
-  | Coq_ref_kind_null ->
+  | Ref_kind_null ->
     (match y with
-     | Coq_ref_kind_null -> true
-     | Coq_ref_kind_undef -> false
-     | Coq_ref_kind_primitive_base -> false
-     | Coq_ref_kind_object -> false
-     | Coq_ref_kind_env_record -> false)
-  | Coq_ref_kind_undef ->
+     | Ref_kind_null -> true
+     | Ref_kind_undef -> false
+     | Ref_kind_primitive_base -> false
+     | Ref_kind_object -> false
+     | Ref_kind_env_record -> false)
+  | Ref_kind_undef ->
     (match y with
-     | Coq_ref_kind_null -> false
-     | Coq_ref_kind_undef -> true
-     | Coq_ref_kind_primitive_base -> false
-     | Coq_ref_kind_object -> false
-     | Coq_ref_kind_env_record -> false)
-  | Coq_ref_kind_primitive_base ->
+     | Ref_kind_null -> false
+     | Ref_kind_undef -> true
+     | Ref_kind_primitive_base -> false
+     | Ref_kind_object -> false
+     | Ref_kind_env_record -> false)
+  | Ref_kind_primitive_base ->
     (match y with
-     | Coq_ref_kind_null -> false
-     | Coq_ref_kind_undef -> false
-     | Coq_ref_kind_primitive_base -> true
-     | Coq_ref_kind_object -> false
-     | Coq_ref_kind_env_record -> false)
-  | Coq_ref_kind_object ->
+     | Ref_kind_null -> false
+     | Ref_kind_undef -> false
+     | Ref_kind_primitive_base -> true
+     | Ref_kind_object -> false
+     | Ref_kind_env_record -> false)
+  | Ref_kind_object ->
     (match y with
-     | Coq_ref_kind_null -> false
-     | Coq_ref_kind_undef -> false
-     | Coq_ref_kind_primitive_base -> false
-     | Coq_ref_kind_object -> true
-     | Coq_ref_kind_env_record -> false)
-  | Coq_ref_kind_env_record ->
+     | Ref_kind_null -> false
+     | Ref_kind_undef -> false
+     | Ref_kind_primitive_base -> false
+     | Ref_kind_object -> true
+     | Ref_kind_env_record -> false)
+  | Ref_kind_env_record ->
     (match y with
-     | Coq_ref_kind_null -> false
-     | Coq_ref_kind_undef -> false
-     | Coq_ref_kind_primitive_base -> false
-     | Coq_ref_kind_object -> false
-     | Coq_ref_kind_env_record -> true)
+     | Ref_kind_null -> false
+     | Ref_kind_undef -> false
+     | Ref_kind_primitive_base -> false
+     | Ref_kind_object -> false
+     | Ref_kind_env_record -> true)
 
 (** Fetches Some object from location l in the heap, None if it is not allocated *)
 (* STATEFUL-RO *)
@@ -144,23 +144,23 @@ let decl_env_record_option ed x =
 (** val prepost_unary_op_dec : unary_op -> bool **)
 
 let prepost_unary_op_dec op = match op with
-| Coq_unary_op_delete -> false
-| Coq_unary_op_void -> false
-| Coq_unary_op_typeof -> false
-| Coq_unary_op_post_incr -> true
-| Coq_unary_op_post_decr -> true
-| Coq_unary_op_pre_incr -> true
-| Coq_unary_op_pre_decr -> true
-| Coq_unary_op_add -> false
-| Coq_unary_op_neg -> false
-| Coq_unary_op_bitwise_not -> false
-| Coq_unary_op_not -> false
+| Unary_op_delete -> false
+| Unary_op_void -> false
+| Unary_op_typeof -> false
+| Unary_op_post_incr -> true
+| Unary_op_post_decr -> true
+| Unary_op_pre_incr -> true
+| Unary_op_pre_decr -> true
+| Unary_op_add -> false
+| Unary_op_neg -> false
+| Unary_op_bitwise_not -> false
+| Unary_op_not -> false
 
 (** val attributes_is_data_dec : attributes -> bool **)
 
 let attributes_is_data_dec a = match a with
-| Coq_attributes_data_of a0 -> true
-| Coq_attributes_accessor_of a0 -> false
+| Attributes_data_of a0 -> true
+| Attributes_accessor_of a0 -> false
 
 (** Unpacks a the descriptor_undef type to a descriptor.
 
@@ -220,7 +220,7 @@ let descriptor_set_not_same_dec aa desc =
     attributes_data -> descriptor -> bool **)
 
 let attributes_change_data_on_non_configurable_dec ad desc =
-    (not (attributes_configurable (Coq_attributes_data_of ad)))
+    (not (attributes_configurable (Attributes_data_of ad)))
   &&
     (not ad.attributes_data_writable)
   &&  (   (option_compare bool_eq desc.descriptor_writable (Some true)) 
@@ -230,7 +230,7 @@ let attributes_change_data_on_non_configurable_dec ad desc =
     attributes_accessor -> descriptor -> bool **)
 
 let attributes_change_accessor_on_non_configurable_dec aa desc =
-     (not (attributes_configurable (Coq_attributes_accessor_of aa)))
+     (not (attributes_configurable (Attributes_accessor_of aa)))
   && (    (descriptor_get_not_same_dec aa desc)
        || (descriptor_set_not_same_dec aa desc))
 
@@ -239,7 +239,7 @@ let attributes_change_accessor_on_non_configurable_dec aa desc =
 (* STATEFUL-RO *)
 let run_function_get_error_case s x v =
 match v with
-| Coq_value_object l ->
+| Value_object l ->
     (* In strict mode, cannot call "caller" *)
     (if string_eq x ("caller")
      then true
@@ -262,7 +262,7 @@ let spec_function_get_error_case_dec s x v =
 (* STATEFUL-RO *)
 let run_callable s v = 
 match v with
-| Coq_value_object l ->
+| Value_object l ->
   option_case None (fun o -> Some o.object_call_)
     (object_binds_option s l)
 | _ -> Some None

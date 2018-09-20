@@ -7,22 +7,22 @@ open LibOption
 open Shared
 
 type 't resultof =
-| Coq_result_some of 't [@f value]
-| Coq_result_not_yet_implemented
-| Coq_result_impossible
-| Coq_result_bottom of state [@f state]
+| Result_some of 't [@f value]
+| Result_not_yet_implemented
+| Result_impossible
+| Result_bottom of state [@f state]
 
 type 't specres = 't specret resultof
 
 (** val res_out : out -> 'a1 specres **)
 
 let res_out s r =
-  Coq_result_some (Coq_specret_out (s, r))
+  Result_some (Specret_out (s, r))
 
 (** val res_spec : state -> 'a1 -> 'a1 specres **)
 
 let res_spec s a =
-  Coq_result_some (Coq_specret_val (s, a))
+  Result_some (Specret_val (s, a))
 
 (** val res_ter : state -> res -> result **)
 
@@ -49,12 +49,12 @@ let res_void s =
 *)
 let spec_assertion_failure _ =
   Debug.impossible_because __LOC__ "spec assertion failed";
-  Coq_result_impossible
+  Result_impossible
 
 (** val get_arg : int -> value list -> value **)
 
 let get_arg x l =
-  nth_def Coq_value_undef x l
+  nth_def Value_undef x l
 
 let get_arg_opt x l =
   nth_def_map None (fun x -> Some x) x l
@@ -75,9 +75,9 @@ let destr_list l d f =
   | a :: l0 -> f a
 
 let if_empty_label2 s r k kfail =
-  if label_compare r.res_label Coq_label_empty
+  if label_compare r.res_label Label_empty
   then k ()
-  else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
+  else (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Result_impossible)
          s
          ("[if_empty_label] received a normal result with non-empty label.")
 
@@ -89,7 +89,7 @@ let if_some2 op k kfail =
   match op with
   | Some a -> k a
   | None ->
-    (fun s -> Debug.impossible_because __LOC__ s; kfail Coq_result_impossible)
+    (fun s -> Debug.impossible_because __LOC__ s; kfail Result_impossible)
       ("[if_some] called with [None].")
 
 let if_some op k = if_some2 op k (fun x -> x)
@@ -104,19 +104,19 @@ let if_some_or_default o d k =
 
 let if_result_some2 w k kfail =
   match w with
-  | Coq_result_some a -> k a
-  | Coq_result_not_yet_implemented -> kfail Coq_result_not_yet_implemented
-  | Coq_result_impossible -> kfail Coq_result_impossible
-  | Coq_result_bottom s0 -> kfail (Coq_result_bottom s0)
+  | Result_some a -> k a
+  | Result_not_yet_implemented -> kfail Result_not_yet_implemented
+  | Result_impossible -> kfail Result_impossible
+  | Result_bottom s0 -> kfail (Result_bottom s0)
 
 let if_result_some w k = if_result_some2 w k (fun x -> x)
 
-(** Unpack a result assuming it contains a Coq_specret_out *)
+(** Unpack a result assuming it contains a Specret_out *)
 let if_ter2 w k kfail =
   if_result_some2 w (fun sp ->
     match sp with
-    | Coq_specret_out (s, r) -> k s r
-    | _ -> failwith "if_ter2 failed: not a Coq_specret_out"
+    | Specret_out (s, r) -> k s r
+    | _ -> failwith "if_ter2 failed: not a Specret_out"
   ) kfail
 
 let if_ter w k = if_ter2 w k (fun x -> x)
@@ -131,13 +131,13 @@ let throw_result w =
 let if_success_state rv w k =
   if_ter w (fun s0 r ->
     match r.res_type with
-    | Coq_restype_normal ->
+    | Restype_normal ->
       if_empty_label s0 r (fun x ->
         k s0
-          (if resvalue_compare r.res_value Coq_resvalue_empty
+          (if resvalue_compare r.res_value Resvalue_empty
            then rv
            else r.res_value))
-    | Coq_restype_throw -> res_ter s0 r
+    | Restype_throw -> res_ter s0 r
     | _ -> res_ter s0 (res_overwrite_value_if_empty rv r)
     )
 
@@ -147,11 +147,11 @@ let if_success_state rv w k =
 let if_success2 w k kfail =
   if_ter2 w (fun s0 r ->
     match r.res_type with
-    | Coq_restype_normal -> if_empty_label2 s0 r (fun x -> k s0 r.res_value) kfail
-    | Coq_restype_break -> kfail (res_out s0 r)
-    | Coq_restype_continue -> kfail (res_out s0 r)
-    | Coq_restype_return -> kfail (res_out s0 r)
-    | Coq_restype_throw -> kfail (res_out s0 r))
+    | Restype_normal -> if_empty_label2 s0 r (fun x -> k s0 r.res_value) kfail
+    | Restype_break -> kfail (res_out s0 r)
+    | Restype_continue -> kfail (res_out s0 r)
+    | Restype_return -> kfail (res_out s0 r)
+    | Restype_throw -> kfail (res_out s0 r))
     kfail
 
 let if_success w k =
@@ -165,24 +165,24 @@ let assert_success w k =
 let if_void w k =
   if_success w (fun s rv ->
     match rv with
-    | Coq_resvalue_empty -> k s
-    | Coq_resvalue_value v ->
+    | Resvalue_empty -> k s
+    | Resvalue_value v ->
         (Debug.impossible_resvalue __LOC__ rv "[if_void called] with non-void result value.";
-        Coq_result_impossible)
-    | Coq_resvalue_ref r ->
+        Result_impossible)
+    | Resvalue_ref r ->
         (Debug.impossible_resvalue __LOC__ rv "[if_void called] with non-void result value.";
-        Coq_result_impossible))
+        Result_impossible))
 
 (** val if_not_throw : result -> (state -> res -> result) -> result **)
 
 let if_not_throw w k =
   if_ter w (fun s0 r ->
     match r.res_type with
-    | Coq_restype_normal -> k s0 r
-    | Coq_restype_break -> k s0 r
-    | Coq_restype_continue -> k s0 r
-    | Coq_restype_return -> k s0 r
-    | Coq_restype_throw -> res_out s0 r)
+    | Restype_normal -> k s0 r
+    | Restype_break -> k s0 r
+    | Restype_continue -> k s0 r
+    | Restype_return -> k s0 r
+    | Restype_throw -> res_out s0 r)
 
 (** val if_any_or_throw :
     result -> (state -> res -> result) -> (state -> value -> result) ->
@@ -191,15 +191,15 @@ let if_not_throw w k =
 let if_any_or_throw w k1 k2 =
   if_ter w (fun s r ->
     match r.res_type with
-    | Coq_restype_normal -> k1 s r
-    | Coq_restype_break -> k1 s r
-    | Coq_restype_continue -> k1 s r
-    | Coq_restype_return -> k1 s r
-    | Coq_restype_throw ->
+    | Restype_normal -> k1 s r
+    | Restype_break -> k1 s r
+    | Restype_continue -> k1 s r
+    | Restype_return -> k1 s r
+    | Restype_throw ->
       (match r.res_value with
-       | Coq_resvalue_value v -> if_empty_label s r (fun x -> k2 s v)
+       | Resvalue_value v -> if_empty_label s r (fun x -> k2 s v)
        | _ ->
-         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+         (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Result_impossible)
            s
            ("[if_any_or_throw] called with a non-value result.")))
 
@@ -209,35 +209,35 @@ let if_any_or_throw w k1 k2 =
 let if_success_or_return w k1 k2 =
   if_ter w (fun s r ->
     match r.res_type with
-    | Coq_restype_normal -> if_empty_label s r (fun x -> k1 s)
-    | Coq_restype_break -> res_out s r
-    | Coq_restype_continue -> res_out s r
-    | Coq_restype_return -> if_empty_label s r (fun x -> k2 s r.res_value)
-    | Coq_restype_throw -> res_out s r)
+    | Restype_normal -> if_empty_label s r (fun x -> k1 s)
+    | Restype_break -> res_out s r
+    | Restype_continue -> res_out s r
+    | Restype_return -> if_empty_label s r (fun x -> k2 s r.res_value)
+    | Restype_throw -> res_out s r)
 
 (** val if_break : result -> (state -> res -> result) -> result **)
 
 let if_break w k =
   if_ter w (fun s r ->
     match r.res_type with
-    | Coq_restype_normal -> res_ter s r
-    | Coq_restype_break -> k s r
-    | Coq_restype_continue -> res_ter s r
-    | Coq_restype_return -> res_ter s r
-    | Coq_restype_throw -> res_ter s r)
+    | Restype_normal -> res_ter s r
+    | Restype_break -> k s r
+    | Restype_continue -> res_ter s r
+    | Restype_return -> res_ter s r
+    | Restype_throw -> res_ter s r)
 
 (** This method is equivalent to the [!] operator of section 5.2 Algorithm Conventions
     ppx_monads maps this to the [let%value] syntax. *)
 let if_value2 w k kfail =
   if_success2 w (fun s rv ->
     match rv with
-    | Coq_resvalue_empty ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
+    | Resvalue_empty ->
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Result_impossible)
         s
         ("[if_value] called with non-value.")
-    | Coq_resvalue_value v -> k s v
-    | Coq_resvalue_ref r ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
+    | Resvalue_value v -> k s v
+    | Resvalue_ref r ->
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Result_impossible)
         s
         ("[if_value] called with non-value."))
     kfail
@@ -248,25 +248,25 @@ let if_value w k =
 let if_bool2 w k kfail =
   if_value2 w (fun s v ->
     match v with
-    | Coq_value_undef ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
+    | Value_undef ->
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Result_impossible)
         s
         ("[if_bool] called with non-boolean value.")
-    | Coq_value_null ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
+    | Value_null ->
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Result_impossible)
         s
         ("[if_bool] called with non-boolean value.")
-    | Coq_value_bool b -> k s b
-    | Coq_value_number n ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
+    | Value_bool b -> k s b
+    | Value_number n ->
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Result_impossible)
         s
         ("[if_bool] called with non-boolean value.")
-    | Coq_value_string s0 ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
+    | Value_string s0 ->
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Result_impossible)
         s
         ("[if_bool] called with non-boolean value.")
-    | Coq_value_object o ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
+    | Value_object o ->
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Result_impossible)
         s
         ("[if_bool] called with non-boolean value.")) kfail
 
@@ -279,9 +279,9 @@ let if_bool w k =
 let if_object2 w k kfail =
   if_value2 w (fun s v ->
     match v with
-    | Coq_value_object l -> k s l
+    | Value_object l -> k s l
     | _ ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Result_impossible)
         s
         ("[if_object] called on a non-object.")) kfail
 
@@ -293,9 +293,9 @@ let if_object w k = if_object2 w k (fun x -> x)
 let if_string2 w k kfail =
   if_value2 w (fun s v ->
     match v with
-    | Coq_value_string s0 -> k s s0
+    | Value_string s0 -> k s s0
     | _ ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Result_impossible)
         s ("[if_string] called on a non-string value.")) kfail
 
 let if_string w k = if_string2 w k (fun x -> x)
@@ -306,9 +306,9 @@ let if_string w k = if_string2 w k (fun x -> x)
 let if_number2 w k kfail =
   if_value2 w (fun s v ->
     match v with
-    | Coq_value_number n -> k s n
+    | Value_number n -> k s n
     | _ ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Coq_result_impossible)
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; kfail Result_impossible)
         s
         ("[if_number] called with non-number value.")) kfail
 
@@ -319,8 +319,8 @@ let if_number w k = if_number2 w k (fun x -> x)
 let if_prim w k =
   if_value w (fun s v ->
     match v with
-    | Coq_value_object o ->
-      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Coq_result_impossible)
+    | Value_object o ->
+      (fun s m -> Debug.impossible_with_heap_because __LOC__ s m; Result_impossible)
         s
         ("[if_primitive] called on an object.")
     | _ -> k s v)
@@ -329,26 +329,26 @@ let if_prim w k =
     attributes option -> full_descriptor option **)
 
 let convert_option_attributes o =
-  map (fun a -> Coq_full_descriptor_some a) o
+  map (fun a -> Full_descriptor_some a) o
 
 (** val if_abort : out -> (unit -> 'a1 resultof) -> 'a1 resultof **)
 
 let if_abort r k =
-    if restype_compare r.res_type Coq_restype_normal
-    then (Debug.impossible_because __LOC__ "[if_abort] received a normal result!"; Coq_result_impossible)
+    if restype_compare r.res_type Restype_normal
+    then (Debug.impossible_because __LOC__ "[if_abort] received a normal result!"; Result_impossible)
     else k ()
 
-(** Unpacks a Coq_specret_val (specification return value), returns an abrupt Coq_specret_out *)
+(** Unpacks a Specret_val (specification return value), returns an abrupt Specret_out *)
 let if_spec2 w k kfail =
   if_result_some2 w (fun sp ->
     match sp with
-    | Coq_specret_val (s0, a) -> k s0 a
-    | Coq_specret_out (s0, r) -> kfail (if_abort r (fun _ -> res_out s0 r))) kfail
+    | Specret_val (s0, a) -> k s0 a
+    | Specret_out (s0, r) -> kfail (if_abort r (fun _ -> res_out s0 r))) kfail
 
 let if_spec w k = if_spec2 w k (fun x -> x)
 
 (** A Specification assertion that b is true, continuing with k,
-    or failing with Coq_result_impossible otherwise *)
+    or failing with Result_impossible otherwise *)
 let check_assert b k =
   if b then k () else spec_assertion_failure ()
 
@@ -468,10 +468,10 @@ and iterate' l acc f = match l with
 let list = [] in
 let index = 0. in
 let%ret (s, index, list) = repeat (fun (_, index, _) -> index < len) (s, index, list) (fun (s, index, list) ->
-  let%VALUE_ret s, indexName = to_string s (Coq_value_number index) in
+  let%VALUE_ret s, indexName = to_string s (Value_number index) in
   let%value_ret s, next = get s obj indexName in
   if not (mem_decide (fun x y -> x === y) (type_of next) elementTypes) then
-    Return (run_error_no_c s Coq_native_error_type)
+    Return (run_error_no_c s Native_error_type)
   else
   let list = append list [next] in
   let index = index +. 1. in
