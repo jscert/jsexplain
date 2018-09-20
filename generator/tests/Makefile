@@ -55,7 +55,7 @@ lib/mocha.cmo: lib/mocha.ml lib/mocha.cmi
 	ocamlc -c -g $(REPLACE_STDLIB) $(LIBS) $< -o $@
 
 clean:
-	rm -rf *.{cmi,cmo} test_ml _build lib/*.{cmi,cmo} *.{unlog,log,token,as}.js
+	rm -rf *.cmi *.cmo test_ml _build lib/*.cmi lib/*cmo *.unlog.js *.log.js *.token.js *.as.js
 
 .PRECIOUS: %.js %.unlog.js
 .NOTPARALLEL:
