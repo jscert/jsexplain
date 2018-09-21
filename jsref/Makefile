@@ -183,10 +183,9 @@ assembly: assembly.js
 
 display: displayed_sources.js
 
-DIRTY_EXTS := {log,unlog,token,pseudo,ptoken,mlloc}.js
 clean_jsjsref:
-	sh -c "rm -f {lineof,assembly,displayed_sources}.js"
-	sh -c "rm -f *.$(DIRTY_EXTS)"
+	rm -f lineof.js assembly.js displayed_sources.js
+	rm -f *.log.js *.unlog.js *.token.js *.pseudo.js *.ptoken.js *.mlloc.js
 
 .PHONY: jsjsref cmi gen ref pseudo log unlog lineof assembly display clean_jsjsref
 
@@ -228,8 +227,8 @@ Translate_syntax.cmo: Translate_syntax.ml Translate_syntax.mli Translate_syntax.
 	ocamlc -c $(REPLACE_STDLIB) $(PPX_FLAG) $(OCAMLCFLAGS) $<
 
 clean_mljsref:
-	sh -c "rm -f $(ML_FRONTEND_SRC)/*.mli"
-	sh -c "rm -f {,$(ML_FRONTEND_SRC)/}*.{cmo,byte}"
+	rm -f ./*.cmo
+	rm -f ./*.byte
 
 .PHONY: mljsref clean_mljsref
 
@@ -247,7 +246,7 @@ DUMP = -dump $(DUMP_FILE) -load $(DUMP_FILE)
 ODOC_FLAGS = -html -d $(DOC_DIR) $(DUMP) $(PPX_FLAG) -g $(ESDOCGEN)
 
 doc: $(addprefix doc_build/,$(addsuffix .html,$(basename $(ASSEMBLY_ML_FILES))))
-	sh -c "rm -f $(DUMP_FILE)"
+	rm -f $(DUMP_FILE)
 	touch $(DOC_DIR)
 
 $(DOC_DIR):
@@ -269,11 +268,9 @@ $(DOC_DIR)/%.html $(DOC_DIR)/type_%.html: %.ml %.cmi $(PPX_BIN) $(ESDOCGEN) $(DU
 # Global options
 
 clean: clean_jsjsref clean_mljsref
-	sh -c "rm -f *.cmi"
-	sh -c "rm -f .depends"
-	sh -c "rm -Rf $(DOC_DIR)"
-	sh -c "rm -f *.depend archi_jsref.pdf"
-	$(MAKE) -C $(OCAMLDOT_DIR) clean
+	rm -f *.cmi *.cmo  *.unlog.js .depends archi_jsref.pdf
+	rm -Rf $(DOC_DIR)
+  $(MAKE) -C $(OCAMLDOT_DIR) clean
 
 # Phony global targets
 .PHONY: all clean

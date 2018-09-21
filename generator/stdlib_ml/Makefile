@@ -9,6 +9,6 @@ stdlib.cmo: stdlib.ml stdlib.cmi
 	$(CC) $<
 
 clean:
-	rm -f *.{cmi,cmo}
+	rm -f *.cmi *.cmo
 
 .PHONY: all clean
