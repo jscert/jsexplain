@@ -56,28 +56,28 @@ val res_out : out -&gt; 'a1 specres *<br>
 <td align="left" valign="top" >
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
-<code><span id="TYPEELTresultof.Coq_result_some"><span class="constructor">Coq_result_some</span></span> <span class="keyword">of</span> <code class="type">'t</code></code></td>
+<code><span id="TYPEELTresultof.Result_some"><span class="constructor">Result_some</span></span> <span class="keyword">of</span> <code class="type">'t</code></code></td>
 
 </tr>
 <tr>
 <td align="left" valign="top" >
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
-<code><span id="TYPEELTresultof.Coq_result_not_yet_implemented"><span class="constructor">Coq_result_not_yet_implemented</span></span></code></td>
+<code><span id="TYPEELTresultof.Result_not_yet_implemented"><span class="constructor">Result_not_yet_implemented</span></span></code></td>
 
 </tr>
 <tr>
 <td align="left" valign="top" >
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
-<code><span id="TYPEELTresultof.Coq_result_impossible"><span class="constructor">Coq_result_impossible</span></span></code></td>
+<code><span id="TYPEELTresultof.Result_impossible"><span class="constructor">Result_impossible</span></span></code></td>
 
 </tr>
 <tr>
 <td align="left" valign="top" >
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
-<code><span id="TYPEELTresultof.Coq_result_bottom"><span class="constructor">Coq_result_bottom</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a></code></code></td>
+<code><span id="TYPEELTresultof.Result_bottom"><span class="constructor">Result_bottom</span></span> <span class="keyword">of</span> <code class="type"><a href="JsSyntax.html#TYPEstate">JsSyntax.state</a></code></code></td>
 
 </tr></table>
 
@@ -142,7 +142,7 @@ val if_result_some :
 <pre><span id="VALif_result_some2"><span class="keyword">val</span> if_result_some2</span> : <code class="type">'a <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a> -><br>       ('a -> 'b) -> ('c <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a> -> 'b) -> 'b</code></pre>
 <pre><span id="VALif_result_some"><span class="keyword">val</span> if_result_some</span> : <code class="type">'a <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a> -><br>       ('a -> 'b <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a>) -> 'b <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></pre>
 <pre><span id="VALif_ter2"><span class="keyword">val</span> if_ter2</span> : <code class="type">'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a> -><br>       (<a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> -> 'b) -><br>       ('c <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a> -> 'b) -> 'b</code></pre><div class="info ">
-Unpack a result assuming it contains a Coq_specret_out<br>
+Unpack a result assuming it contains a Specret_out<br>
 </div>
 
 <pre><span id="VALif_ter"><span class="keyword">val</span> if_ter</span> : <code class="type">'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a> -><br>       (<a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> <a href="JsSyntax.html#TYPEres">JsSyntax.res</a> -> 'b <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a>) -><br>       'b <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></pre>
@@ -212,13 +212,13 @@ val if_abort : out -&gt; (unit -&gt; 'a1 resultof) -&gt; 'a1 resultof *<br>
 
 <pre><span id="VALif_abort"><span class="keyword">val</span> if_abort</span> : <code class="type"><a href="JsSyntax.html#TYPEres">JsSyntax.res</a> -><br>       (unit -> 'a <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a>) -> 'a <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></pre>
 <pre><span id="VALif_spec2"><span class="keyword">val</span> if_spec2</span> : <code class="type">'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a> -><br>       (<a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> 'a -> 'b) -><br>       ('c <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a> -> 'b) -> 'b</code></pre><div class="info ">
-Unpacks a Coq_specret_val (specification return value), returns an abrupt Coq_specret_out<br>
+Unpacks a Specret_val (specification return value), returns an abrupt Specret_out<br>
 </div>
 
 <pre><span id="VALif_spec"><span class="keyword">val</span> if_spec</span> : <code class="type">'a <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a> -><br>       (<a href="JsSyntax.html#TYPEstate">JsSyntax.state</a> -> 'a -> 'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a>) -><br>       'b <a href="JsSyntax.html#TYPEspecret">JsSyntax.specret</a> <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></pre>
 <pre><span id="VALcheck_assert"><span class="keyword">val</span> check_assert</span> : <code class="type">bool -><br>       (unit -> 'a <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a>) -> 'a <a href="JsInterpreterMonads.html#TYPEresultof">resultof</a></code></pre><div class="info ">
 A Specification assertion that b is true, continuing with k,
-    or failing with Coq_result_impossible otherwise<br>
+    or failing with Result_impossible otherwise<br>
 </div>
 
 <pre><span id="VALspec_assert"><span class="keyword">val</span> spec_assert</span> : <code class="type">bool -> unit</code></pre><div class="info ">
@@ -322,10 +322,10 @@ A continuation-passing while loop with early function-level return.
 let list = [] in
 let index = 0. in
 let%ret (s, index, list) = repeat (fun (_, index, _) -&gt; index &lt; len) (s, index, list) (fun (s, index, list) -&gt;
-  let%VALUE_ret s, indexName = to_string s (Coq_value_number index) in
+  let%VALUE_ret s, indexName = to_string s (Value_number index) in
   let%value_ret s, next = get s obj indexName in
   if not (mem_decide (fun x y -&gt; x === y) (type_of next) elementTypes) then
-    Return (run_error_no_c s Coq_native_error_type)
+    Return (run_error_no_c s Native_error_type)
   else
   let list = append list [next] in
   let index = index +. 1. in
