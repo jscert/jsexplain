@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Datatypes.html">
+<link rel="next" href="LibOption.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Datatypes" rel="Chapter" href="Datatypes.html">
+<link title="LibList" rel="Chapter" href="LibList.html">
+<link title="LibOption" rel="Chapter" href="LibOption.html">
+<link title="LibProd" rel="Chapter" href="LibProd.html">
+<link title="StdMap" rel="Chapter" href="StdMap.html">
+<link title="Heap" rel="Chapter" href="Heap.html">
+<link title="HeapInt" rel="Chapter" href="HeapInt.html">
+<link title="HeapStr" rel="Chapter" href="HeapStr.html">
+<link title="HeapList" rel="Chapter" href="HeapList.html">
+<link title="Shared" rel="Chapter" href="Shared.html">
+<link title="Compare" rel="Chapter" href="Compare.html">
+<link title="JsNumber" rel="Chapter" href="JsNumber.html">
+<link title="JsSyntax" rel="Chapter" href="JsSyntax.html">
+<link title="JsSyntaxAux" rel="Chapter" href="JsSyntaxAux.html">
+<link title="HeapObj" rel="Chapter" href="HeapObj.html">
+<link title="Translate_syntax" rel="Chapter" href="Translate_syntax.html">
+<link title="JsCommon" rel="Chapter" href="JsCommon.html">
+<link title="JsCommonAux" rel="Chapter" href="JsCommonAux.html">
+<link title="JsInit" rel="Chapter" href="JsInit.html">
+<link title="Prheap" rel="Chapter" href="Prheap.html">
+<link title="Debug" rel="Chapter" href="Debug.html">
+<link title="JsInterpreterMonads" rel="Chapter" href="JsInterpreterMonads.html">
+<link title="JsInterpreter" rel="Chapter" href="JsInterpreter.html">
+<link title="JsInterpreterUtils" rel="Chapter" href="JsInterpreterUtils.html">
+<link title="ModuleExport" rel="Chapter" href="ModuleExport.html">
+<link title="Run_js" rel="Chapter" href="Run_js.html"><title>LibList</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Datatypes.html" title="Datatypes">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="LibOption.html" title="LibOption">Next</a>
+</div>
+<h1>Module <a href="type_LibList.html">LibList</a></h1>
+
+<pre><span class="keyword">module</span> LibList: <code class="code">sig</code> <a href="LibList.html">..</a> <code class="code">end</code></pre><div class="info module top">
+val hd : 'a1 -&gt; 'a1 list -&gt; 'a1 *<br>
+</div>
+<hr width="100%">
+
+<pre><span id="VALhd"><span class="keyword">val</span> hd</span> : <code class="type">'a -> 'a list -> 'a</code></pre><br>
+val tl : 'a1 list -&gt; 'a1 list *<br>
+
+<pre><span id="VALtl"><span class="keyword">val</span> tl</span> : <code class="type">'a list -> 'a list</code></pre><br>
+val list_eq_nil_decidable : 'a1 list -&gt; bool *<br>
+
+<pre><span id="VALlist_eq_nil_decidable"><span class="keyword">val</span> list_eq_nil_decidable</span> : <code class="type">'a list -> bool</code></pre>
+<pre><span id="VALis_empty"><span class="keyword">val</span> is_empty</span> : <code class="type">'a list -> bool</code></pre><br>
+val fold_right : ('a1 -&gt; 'a2 -&gt; 'a2) -&gt; 'a2 -&gt; 'a1 list -&gt; 'a2 *<br>
+
+<pre><span id="VALfold_right"><span class="keyword">val</span> fold_right</span> : <code class="type">('a -> 'b -> 'b) -> 'b -> 'a list -> 'b</code></pre><br>
+val fold_left : ('a1 -&gt; 'a2 -&gt; 'a2) -&gt; 'a2 -&gt; 'a1 list -&gt; 'a2 *<br>
+
+<pre><span id="VALfold_left"><span class="keyword">val</span> fold_left</span> : <code class="type">('a -> 'b -> 'b) -> 'b -> 'a list -> 'b</code></pre><br>
+val map : ('a1 -&gt; 'a2) -&gt; 'a1 list -&gt; 'a2 list *<br>
+
+<pre><span id="VALmap"><span class="keyword">val</span> map</span> : <code class="type">('a -> 'b) -> 'a list -> 'b list</code></pre><br>
+val filter : ('a1 -&gt; bool) -&gt; 'a1 list -&gt; 'a1 list *<br>
+
+<pre><span id="VALfilter"><span class="keyword">val</span> filter</span> : <code class="type">('a -> bool) -> 'a list -> 'a list</code></pre><br>
+val append : 'a1 list -&gt; 'a1 list -&gt; 'a1 list *<br>
+
+<pre><span id="VALappend"><span class="keyword">val</span> append</span> : <code class="type">'a list -> 'a list -> 'a list</code></pre><br>
+val concat : 'a1 list list -&gt; 'a1 list *<br>
+
+<pre><span id="VALconcat"><span class="keyword">val</span> concat</span> : <code class="type">'a list list -> 'a list</code></pre><br>
+val rev : 'a1 list -&gt; 'a1 list *<br>
+
+<pre><span id="VALrev"><span class="keyword">val</span> rev</span> : <code class="type">'a list -> 'a list</code></pre><br>
+val length : 'a1 list -&gt; int *<br>
+
+<pre><span id="VALlength"><span class="keyword">val</span> length</span> : <code class="type">'a list -> int</code></pre><br>
+val take_drop_last : 'a1 list -&gt; 'a1 list * 'a1 *<br>
+
+<pre><span id="VALtake_drop_last"><span class="keyword">val</span> take_drop_last</span> : <code class="type">'a list -> 'a list * 'a</code></pre><br>
+val nth_def : 'a1 -&gt; int -&gt; 'a1 list -&gt; 'a1 *<br>
+
+<pre><span id="VALnth_def"><span class="keyword">val</span> nth_def</span> : <code class="type">'a -> int -> 'a list -> 'a</code></pre>
+<pre><span id="VALnth_def_map"><span class="keyword">val</span> nth_def_map</span> : <code class="type">'a -> ('b -> 'a) -> int -> 'b list -> 'a</code></pre><br>
+val mem_decide :  ('a1 -&gt; 'a1 -&gt; bool)  -&gt; 'a1 -&gt; 'a1 list -&gt; bool *<br>
+
+<pre><span id="VALmem_decide"><span class="keyword">val</span> mem_decide</span> : <code class="type">('a -> 'b -> bool) -> 'a -> 'b list -> bool</code></pre></body></html>
