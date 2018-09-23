@@ -270,7 +270,7 @@ $(DOC_DIR)/%.html $(DOC_DIR)/type_%.html: %.ml %.cmi $(PPX_BIN) $(ESDOCGEN) $(DU
 clean: clean_jsjsref clean_mljsref
 	rm -f *.cmi *.cmo  *.unlog.js .depends archi_jsref.pdf
 	rm -Rf $(DOC_DIR)
-  $(MAKE) -C $(OCAMLDOT_DIR) clean
+	$(MAKE) -C $(OCAMLDOT_DIR) clean
 
 # Phony global targets
 .PHONY: all clean
