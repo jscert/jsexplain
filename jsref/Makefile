@@ -33,6 +33,10 @@ ASSEMBLY     := $(ASSEMBLY_BIN)
 DISPLAYGEN_BIN := $(GENERATOR_DIR)/displayed_sources.byte
 DISPLAYGEN     := $(OCAMLPAR) $(DISPLAYGEN_BIN)
 
+
+OCAMLDOT_DIR := ../tools/ocamldot
+OCAMLDOT := $(OCAMLDOT_DIR)/ocamldot
+
 ESDOCGEN := ../tools/esdocgen/esdocgen.cmo
 
 # Warn if buildtools are missing
@@ -102,7 +106,14 @@ ALL_DISPLAYED := $(DISPLAYED:.ml=.unlog.js) $(DISPLAYED:.ml=.pseudo.js) $(DISPLA
 
 ALL_LINEOF := $(DISPLAYED:.ml=.token.js) $(DISPLAYED:.ml=.mlloc.js) $(DISPLAYED:.ml=.ptoken.js)
 
+###############################################################
 
+ocamldot :
+	$(MAKE) -C $(OCAMLDOT_DIR)
+
+archi : all ocamldot
+	$(OCAMLDEP) *.ml > .depend
+	cat .depend | $(OCAMLDOT) | dot -Tpdf > archi_jsref.pdf
 
 ###############################################################
 # Rules
@@ -257,8 +268,9 @@ $(DOC_DIR)/%.html $(DOC_DIR)/type_%.html: %.ml %.cmi $(PPX_BIN) $(ESDOCGEN) $(DU
 # Global options
 
 clean: clean_jsjsref clean_mljsref
-	rm -f *.cmi *.cmo  *.unlog.js .depends
+	rm -f *.cmi *.cmo  *.unlog.js .depends archi_jsref.pdf
 	rm -Rf $(DOC_DIR)
+	$(MAKE) -C $(OCAMLDOT_DIR) clean
 
 # Phony global targets
 .PHONY: all clean
