@@ -12,7 +12,7 @@ all: jsjsref mljsref
 ###############################################################
 ##### Tools
 
-GENERATOR_DIR := ../generator
+GENERATOR_DIR := /home/sam/git/fjs_of_fml/generator
 
 OCAMLDEP := ocamldep -one-line
 OCAMLPAR := OCAMLRUNPARAM="l=200M"
@@ -191,7 +191,7 @@ ASSEMBLY_ML_FILES := \
 	Run_js.cmo
 
 ASSEMBLY_ML := \
-  	$(STDLIB_DIR)/stdlib.cmo \
+	$(STDLIB_DIR)/stdlib.cmo \
 	$(ASSEMBLY_ML_FILES)
 
 mljsref: main.byte
@@ -217,8 +217,9 @@ Translate_syntax.cmo: Translate_syntax.ml Translate_syntax.mli Translate_syntax.
 	ocamlc -c $(REPLACE_STDLIB) $(PPX_FLAG) $(OCAMLCFLAGS) $<
 
 clean_mljsref:
-	sh -c "rm -f $(ML_FRONTEND_SRC)/*.mli"
-	sh -c "rm -f {,$(ML_FRONTEND_SRC)/}*.{cmo,byte}"
+	rm -f $(ML_FRONTEND_SRC)/*.mli
+	rm -f {,$(ML_FRONTEND_SRC)/}*.cmo
+	rm -f {,$(ML_FRONTEND_SRC)/}*.byte
 
 .PHONY: mljsref clean_mljsref
 
@@ -258,9 +259,9 @@ $(DOC_DIR)/%.html $(DOC_DIR)/type_%.html: %.ml %.cmi $(PPX_BIN) $(ESDOCGEN) $(DU
 # Global options
 
 clean: clean_jsjsref clean_mljsref
-	sh -c "rm -f *.cmi"
-	sh -c "rm -f .depends"
-	sh -c "rm -Rf $(DOC_DIR)"
+	rm -f *.cmi
+	rm -f .depends
+	rm -Rf $(DOC_DIR)
 
 # Phony global targets
 .PHONY: all clean

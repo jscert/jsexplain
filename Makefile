@@ -1,4 +1,4 @@
-all: generator mljsref jsjsref
+all: mljsref jsjsref
 
 # Init stages
 init: .merlin
@@ -13,9 +13,6 @@ init: .merlin
 	@echo 'You now need to execute: eval `opam config env`'
 
 # Build Stages
-generator:
-	$(MAKE) -C generator
-
 jsjsref: generator
 	$(MAKE) -C jsref jsjsref
 
@@ -85,7 +82,6 @@ opendoc: doc
 
 # Clean stages
 clean:
-	$(MAKE) -C generator clean
 	$(MAKE) -C jsref clean
 	$(MAKE) -C tools/esdocgen clean
 	rm -Rf doc/jsref || true
