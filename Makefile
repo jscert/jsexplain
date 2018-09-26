@@ -1,3 +1,6 @@
+#FIXME/TODO : GENERATOR_DIR should be dynamically set, maybe via opam config
+GENERATOR_DIR := ../fjs_of_fml/generator
+
 all: mljsref jsjsref
 
 # Init stages
@@ -26,7 +29,7 @@ test_init: test/data/test262
 test: test_generator test_jsjsref
 
 test_generator: FORCE
-	$(MAKE) -C generator test
+	$(MAKE) -C $(GENERATOR_DIR) test
 
 test_jsjsref: jsjsref
 	node_modules/.bin/mocha
