@@ -12,7 +12,8 @@ all: jsjsref mljsref
 ###############################################################
 ##### Tools
 
-GENERATOR_DIR := ../generator
+#FIXME/TODO : GENERATOR_DIR should be dynamically set, maybe via opam config
+GENERATOR_DIR := ../../fjs_of_fml/generator
 
 OCAMLDEP := ocamldep -one-line
 OCAMLPAR := OCAMLRUNPARAM="l=200M"
