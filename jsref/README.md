@@ -31,7 +31,7 @@ for the abstract operations of `ReturnIfAbrupt` and ...
   object.
 
 ### Type Constructor Names
-  At present, many type constructors are prefixed with the string `Coq_`. This
+  At present, many type constructors are prefixed with the string ``. This
   is for legacy reasons only, and is to be removed in the future. (See issue
   #19)
 

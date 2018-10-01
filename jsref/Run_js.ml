@@ -80,22 +80,22 @@ let pr_test state =
 let handle_result result =
   let exit_if_test _ = if !test then exit 1 in
   match result with
-    | JsInterpreterMonads.Coq_result_some (JsSyntax.Coq_specret_val (_, _)) ->
+    | JsInterpreterMonads.Result_some (JsSyntax.Specret_val (_, _)) ->
           print_endline "\n\nA `nothing' object has been created.\n" ;
           print_endline "\n\nFIXME:  this should be impossible!\n" ;
           exit_if_test ()
-    | JsInterpreterMonads.Coq_result_some (JsSyntax.Coq_specret_out (state, res)) ->
+    | JsInterpreterMonads.Result_some (JsSyntax.Specret_out (state, res)) ->
       begin
         if !printHeap then print_endline (Prheap.prstate !skipInit state);
         match JsSyntax.res_type res with
-        | JsSyntax.Coq_restype_normal ->
+        | JsSyntax.Restype_normal ->
           if not !test then
           begin
              match JsSyntax.res_value res with
-             | JsSyntax.Coq_resvalue_value v ->
+             | JsSyntax.Resvalue_value v ->
                print_endline "\n\nResult:\n";
                print_endline (Prheap.prvalue v)
-             | JsSyntax.Coq_resvalue_ref re ->
+             | JsSyntax.Resvalue_ref re ->
                print_endline
                  ("\n\nResult is a reference of name " ^ (* I’ve added this relatively ugly part to get more precision from the result. -- Martin *)
                       Prheap.string_of_char_list re.JsSyntax.ref_name ^
@@ -104,26 +104,26 @@ let handle_result result =
                          (match get_value_ref state re with
                          | Some v -> Prheap.prvalue v
                          | None -> "Unknown!")) ^ "\n")
-             | JsSyntax.Coq_resvalue_empty ->
+             | JsSyntax.Resvalue_empty ->
                print_endline "\n\nNo result\n"
           end;
           pr_test state
-        | JsSyntax.Coq_restype_break ->
+        | JsSyntax.Restype_break ->
                   print_endline "\n\nBREAK\n" ; exit_if_test ()
-        | JsSyntax.Coq_restype_continue ->
+        | JsSyntax.Restype_continue ->
           print_endline "\n\nCONTINUE\n" ; exit_if_test ()
-        | JsSyntax.Coq_restype_return ->
+        | JsSyntax.Restype_return ->
              print_endline "\n\nRETURN\n" ; exit_if_test ()
-        | JsSyntax.Coq_restype_throw ->
+        | JsSyntax.Restype_throw ->
           print_endline "\n\nEXCEPTION THROWN\n" ;
           (match JsSyntax.res_value res with
-           | JsSyntax.Coq_resvalue_value v ->
+           | JsSyntax.Resvalue_value v ->
              print_endline ("\tReturned value:\t" ^ Prheap.prvalue v) ;
              (match v with
-              | JsSyntax.Coq_value_object l ->
+              | JsSyntax.Value_object l ->
                 print_newline () ;
                 let r = {
-                  JsSyntax.ref_base = JsSyntax.Coq_ref_base_type_value v ;
+                  JsSyntax.ref_base = JsSyntax.Ref_base_type_value v ;
                   JsSyntax.ref_name = "__$ERROR__" ;
                   JsSyntax.ref_strict = false;
                   JsSyntax.ref_this_value = None
@@ -136,29 +136,29 @@ let handle_result result =
                     print_endline "No `__$ERROR__' field has been defined in this returned object.")
               | _ -> ()
              )
-              | JsSyntax.Coq_resvalue_ref _ -> print_endline "With a reference."
-              | JsSyntax.Coq_resvalue_empty -> print_endline "No result with this throw.") ;
+              | JsSyntax.Resvalue_ref _ -> print_endline "With a reference."
+              | JsSyntax.Resvalue_empty -> print_endline "No result with this throw.") ;
           pr_test state ; exit_if_test ()
       end;
-    | JsInterpreterMonads.Coq_result_impossible ->
+    | JsInterpreterMonads.Result_impossible ->
       print_endline "\n\nFIXME:  this should be impossible!\n" ; exit_if_test ()
-    | JsInterpreterMonads.Coq_result_not_yet_implemented ->
+    | JsInterpreterMonads.Result_not_yet_implemented ->
       print_endline "\n\nNYI:  this has not yet been implemented in Coq!\n" ; exit 2
-    | JsInterpreterMonads.Coq_result_bottom s ->
+    | JsInterpreterMonads.Result_bottom s ->
       print_endline ("\n\nBOTTOM\nCurrent state:\n" ^ Prheap.prstate !skipInit s)
 
 let run_prog_with_state state prog =
   let ctx = JsCommon.execution_ctx_initial (JsSyntaxAux.prog_intro_strictness prog) in
   (JsInterpreterMonads.if_void
-    (JsInterpreter.execution_ctx_binding_inst state ctx JsSyntax.Coq_codetype_global None prog [])
+    (JsInterpreter.execution_ctx_binding_inst state ctx JsSyntax.Codetype_global None prog [])
     (fun s' -> JsInterpreter.run_prog s' ctx prog))
 
 let run_prog_incremental prog_res prog =
   match prog_res with
-  | JsInterpreterMonads.Coq_result_some (JsSyntax.Coq_specret_out (state, res)) ->
+  | JsInterpreterMonads.Result_some (JsSyntax.Specret_out (state, res)) ->
     begin
       match JsSyntax.res_type res with
-      | JsSyntax.Coq_restype_normal ->
+      | JsSyntax.Restype_normal ->
           (run_prog_with_state state prog)
       | _ -> (handle_result prog_res; raise AbnormalPreludeTermination) (* to print out a sensible error *)
     end
@@ -170,15 +170,15 @@ let _ =
   let exit_if_test _ = if !test then exit 1 in
   try
     let prog = Translate_syntax.parse_js_syntax_from_file !strictMode !file in
-    let JsSyntax.Coq_prog_intro (str, el) = prog in
+    let JsSyntax.Prog_intro (str, el) = prog in
     let str'  = !strictMode || str in
-    let prog' = JsSyntax.Coq_prog_intro (str', el) in
+    let prog' = JsSyntax.Prog_intro (str', el) in
     let exp_prelude = begin
       let els = List.concat (List.map (fun f ->
-          let JsSyntax.Coq_prog_intro (_, el0) =
+          let JsSyntax.Prog_intro (_, el0) =
             Translate_syntax.parse_js_syntax_from_file str' f in
           el0) !test_prelude) in
-      JsSyntax.Coq_prog_intro (str', els)
+      JsSyntax.Prog_intro (str', els)
     end in
     let prelude_res = JsInterpreter.run_javascript exp_prelude in
     handle_result (run_prog_incremental prelude_res prog')
