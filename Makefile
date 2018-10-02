@@ -1,5 +1,5 @@
 #FIXME/TODO : GENERATOR_DIR should be dynamically set, maybe via opam config
-GENERATOR_DIR := ../fjs_of_fml/generator
+GENERATOR_DIR := ../fjs_of_fml
 
 all: mljsref jsjsref
 
