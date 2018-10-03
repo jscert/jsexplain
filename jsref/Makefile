@@ -62,7 +62,7 @@ JSREF_ML  := $(wildcard *.ml)
 JSREF_MLI := $(wildcard *.mli)
 
 
-STDLIB_DIR := $(GENERATOR_DIR)/stdlib_ml
+STDLIB_DIR := $(GENERATOR_DIR)/src/stdlib_ml
 STDLIB_FLAG := -I $(STDLIB_DIR) -open Stdlib
 REPLACE_STDLIB := -nopervasives -nostdlib $(STDLIB_FLAG)
 
