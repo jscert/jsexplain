@@ -24,9 +24,9 @@ LINEOF     := $(OCAMLPAR) $(LINEOF_BIN)
 PPX_BIN    := $(GENERATOR_DIR)/monad_ppx.byte
 PPX_FLAG   := -ppx $(PPX_BIN)
 
-MLTOJS_BIN := $(GENERATOR_DIR)/main.byte
+MLTOJS_BIN := $(GENERATOR_DIR)/fjs_of_fml.byte
 MLTOJS 	   := $(OCAMLPAR) $(MLTOJS_BIN) $(PPX_FLAG)
-# -dsource is automatically considered by main.byte
+# -dsource is automatically considered by fjs_of_fml.byte
 
 ASSEMBLY_BIN := $(GENERATOR_DIR)/assembly.byte
 ASSEMBLY     := $(ASSEMBLY_BIN)
@@ -206,12 +206,12 @@ ASSEMBLY_ML := \
 	$(STDLIB_DIR)/stdlib.cmo \
 	$(ASSEMBLY_ML_FILES)
 
-mljsref: main.byte
+mljsref: fjs_of_fml.byte
 
 mljsref_debug: OCAMLCFLAGS+=-g
 mljsref_debug: mljsref
 
-main.byte: $(ASSEMBLY_ML)
+fjs_of_fml.byte: $(ASSEMBLY_ML)
 	ocamlfind ocamlc -linkpkg -package JS_Parser -o $@ $(OCAMLCFLAGS) $^
 
 Run_js.cmo: Run_js.ml Run_js.mli Run_js.cmi
