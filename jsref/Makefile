@@ -12,8 +12,16 @@ all: jsjsref mljsref
 ###############################################################
 ##### Tools
 
-#FIXME/TODO : GENERATOR_DIR should be dynamically set, maybe via opam config
-GENERATOR_DIR := ../../fjs_of_fml
+OPAMLIBDIR = /home/sam/.opam/4.04.2/lib
+
+# FILL this path to fjs_of_fml project when it's not in path
+GENERATOR_DIR = /home/sam/.opam/4.04.2/bin
+
+ifeq (no, $(GENERATOR_DIR))
+	STDLIB_DIR := $(GENERATOR_DIR)/src/stdlib_ml
+else
+	STDLIB_DIR := $(OPAMLIBDIR)/fjs_of_fml/stdlib_ml
+endif
 
 OCAMLDEP := ocamldep -one-line
 OCAMLPAR := OCAMLRUNPARAM="l=200M"
@@ -61,8 +69,6 @@ endif
 JSREF_ML  := $(wildcard *.ml)
 JSREF_MLI := $(wildcard *.mli)
 
-
-STDLIB_DIR := $(GENERATOR_DIR)/src/stdlib_ml
 STDLIB_FLAG := -I $(STDLIB_DIR) -open Stdlib
 REPLACE_STDLIB := -nopervasives -nostdlib $(STDLIB_FLAG)
 
