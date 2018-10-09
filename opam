@@ -1,5 +1,5 @@
-opam-version: "1.2"
-name: "jsjsref-generator"
+opam-version: "2"
+name: "jsexplain"
 version: "1.0~dev"
 maintainer: "Thomas Wood <thomas.wood09@imperial.ac.uk>"
 authors: [
@@ -13,8 +13,18 @@ license: "BSD 3-clause"
 dev-repo: "https://github.com/jscert/jsexplain.git"
 
 available: [ocaml-version >= "4.04.0" & ocaml-version < "4.05"]
+
 build: [
-  [make]
+       ["autoconf"]
+       ["./configure" "-prefix" "%{prefix}%"]
+]
+install: [
+         [make "opam_install"]
+]
+remove: [
+        ["autoconf"]
+        ["./configure" "-prefix" "%{prefix}%"]
+	[make "clean"]
 ]
 build-test: [
   [make test]
@@ -22,5 +32,6 @@ build-test: [
 depends: [
   "ocamlfind" {build}
   "alcotest" {test}
-  "JS_Parser" { >= "0.1" & < "0.2" }
+  "conf-autoconf" {build}
+  "fjs_of_fml" {build}
 ]
