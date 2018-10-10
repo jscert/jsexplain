@@ -32,3 +32,6 @@ depends: [
   "conf-autoconf" {build}
   "fjs_of_fml" {build}
 ]
+pin-depends: [
+ ["JS_Parser.dev" "git://github.com/resource-reasoning/JS_Parser.git#v0.1.0"]
+]
