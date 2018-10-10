@@ -1,6 +1,4 @@
 
-GENERATOR_DIR = @GENERATOR_DIR@
-
 all: mljsref jsjsref
 
 # Build Stages
@@ -9,15 +7,13 @@ jsjsref: generator
 	$(MAKE) -C jsref jsjsref
 
 mljsref: generator # (requires the ppx)
+	cd jsref ; autoconf ; ./configure
 	$(MAKE) -C jsref mljsref
 
 # Test Stages
 test_init: test/data/test262
 
-test: test_generator test_jsjsref
-
-test_generator: FORCE
-	$(MAKE) -C $(GENERATOR_DIR) test
+test: test_jsjsref
 
 npm :
 	npm install
@@ -80,6 +76,7 @@ clean:
 	$(MAKE) -C tools/esdocgen clean
 	rm -Rf doc/jsref || true
 	rm -Rf dist || true
+	rm -Rf jsref/autom4te.cache jsref/config.status jsref/configure jsref/Makefile
 
 FORCE:
 .PHONY: jsjsref mljsref generator generator-stdlib test_init test doc esdocgen clean
