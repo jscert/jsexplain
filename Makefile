@@ -1,23 +1,11 @@
-#FIXME/TODO : GENERATOR_DIR should be dynamically set, maybe via opam config
-GENERATOR_DIR := ../fjs_of_fml
+
+GENERATOR_DIR = @GENERATOR_DIR@
 
 all: mljsref jsjsref
 
-# Init stages
-init: .merlin
-	opam switch 4.04.2
-	eval `opam config env`
-	opam pin -yn add jsjsref .
-	opam pin -yn add JS_Parser "https://github.com/resource-reasoning/JS_Parser.git#v0.1.0"
-	opam install -y jsjsref --deps-only
-	@# Temporary hack until opam can install test dependencies only
-	opam install alcotest
-	npm install
-	@echo
-	@echo 'You now need to execute: eval `opam config env`'
-
 # Build Stages
 jsjsref: generator
+	cd jsref ; autoconf ; ./configure
 	$(MAKE) -C jsref jsjsref
 
 mljsref: generator # (requires the ppx)
@@ -31,7 +19,10 @@ test: test_generator test_jsjsref
 test_generator: FORCE
 	$(MAKE) -C $(GENERATOR_DIR) test
 
-test_jsjsref: jsjsref
+npm :
+	npm install
+
+test_jsjsref: jsjsref npm
 	node_modules/.bin/mocha
 
 test/data/test262: FORCE
