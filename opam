@@ -15,7 +15,7 @@ dev-repo: "https://github.com/jscert/jsexplain.git"
 available: [ocaml-version >= "4.04.0" & ocaml-version < "4.05"]
 
 build: [
-       ["make"]
+       [make]
 ]
 install: [
          [make "opam_install"]
