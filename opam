@@ -17,14 +17,8 @@ available: [ocaml-version >= "4.04.0" & ocaml-version < "4.05"]
 build: [
        [make]
 ]
-install: [
-         [make "opam_install"]
-]
 remove: [
 	[make "clean"]
-]
-build-test: [
-  [make test]
 ]
 depends: [
   "ocamlfind" {build}
