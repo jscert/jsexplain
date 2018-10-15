@@ -15,17 +15,25 @@ dev-repo: "https://github.com/jscert/jsexplain.git"
 available: [ocaml-version >= "4.04.0" & ocaml-version < "4.05"]
 
 build: [
-       [make]
+       ["autoconf"]
+       ["./configure" "-prefix" "%{prefix}%"]
+]
+install: [
+         [make "opam_install"]
 ]
 remove: [
+        ["autoconf"]
+        ["./configure" "-prefix" "%{prefix}%"]
 	[make "clean"]
 ]
+build: [
+       [make]
+]
+
 depends: [
   "ocamlfind" {build}
   "alcotest" {test}
   "conf-autoconf" {build}
   "fjs_of_fml" {build}
-]
-pin-depends: [
- ["JS_Parser.dev" "git://github.com/resource-reasoning/JS_Parser.git#v0.1.0"]
+  "JS_Parser" { >= "0.1" & < "0.2" }
 ]

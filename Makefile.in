@@ -1,9 +1,14 @@
+CURRENT_DIR := $(shell pwd)
+
+# FILL this path to fjs_of_fml project when it's not in path
+GENERATOR_DIR = @GENERATOR_DIR@
 
 all: mljsref jsjsref
+opam_install : all
 
 # Build Stages
 jsjsref: generator
-	cd jsref ; autoconf ; ./configure
+	cd $(CURRENT_DIR)/jsref ; autoconf ; ./configure
 	$(MAKE) -C jsref jsjsref
 
 mljsref: generator # (requires the ppx)
@@ -66,7 +71,7 @@ opendoc: doc
 	xdg-open doc/jsref/index.html &
 
 .merlin: FORCE
-	echo "FLG -ppx $(PWD)/generator/monad_ppx.byte" > $@
+	echo "FLG -ppx $(GENERATOR_DIR)/monad_ppx.byte" > $@
 
 .PHONY: open opendoc
 
