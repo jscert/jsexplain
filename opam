@@ -26,9 +26,7 @@ remove: [
         ["./configure" "-prefix" "%{prefix}%"]
 	[make "clean"]
 ]
-build: [
-       [make]
-]
+
 
 depends: [
   "ocamlfind" {build}
