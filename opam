@@ -11,8 +11,6 @@ homepage: "http://jscert.org/"
 bug-reports: "https://github.com/jscert/jsexplain/issues"
 license: "BSD 3-clause"
 dev-repo: "https://github.com/jscert/jsexplain.git"
-
-available: [ocaml-version >= "4.04.2"]
 build: [
        ["autoconf"]
        ["./configure" "-prefix" "%{prefix}%"]
