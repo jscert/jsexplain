@@ -26,12 +26,12 @@ remove: [
         ["./configure" "-prefix" "%{prefix}%"]
 	[make "clean"]
 ]
-
-
 depends: [
   "ocamlfind" {build}
   "alcotest" {test}
   "conf-autoconf" {build}
   "fjs_of_fml" {build}
-  "JS_Parser" { >= "0.1" & < "0.2" }
+]
+pin-depends: [
+ ["JS_Parser.dev" "git://github.com/resource-reasoning/JS_Parser.git#v0.1.0"]
 ]
