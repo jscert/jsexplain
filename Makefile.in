@@ -2,9 +2,15 @@ CURRENT_DIR := $(shell pwd)
 
 # FILL this path to fjs_of_fml project when it's not in path
 GENERATOR_DIR = @GENERATOR_DIR@
+OPAMSHAREDIR = @OPAMSHAREDIR@
+OPAMBINDIR = @OPAMBINDIR@
+OPAMLIBDIR = @OPAMLIBDIR@
+OPAM = @OPAM@
+
+JSEXP_OPAM_SHARE_DIR := $(OPAMSHAREDIR)/jsexplain
+
 
 all: mljsref jsjsref
-opam_install : all
 
 # Build Stages
 jsjsref: generator
@@ -63,6 +69,24 @@ publish-github: dist
 
 .PHONY: publish publish-github
 
+# Opam Install
+#
+OPAM_FILES=driver.html libraries jquery-ui-1.11.4.custom jquery_scroll \
+	  jsref/displayed_sources.js tools.js node_modules/esprima/esprima.js \
+	  esprima-to-ast.js jsref/lineof.js navig-driver.js codemirror-tabs.js \
+	  jsref/assembly.js doc/documentation.html doc/screenshots doc/jsref \
+	  test/data/*.js
+
+opam_install : all $(OPAM_FILES)
+ifeq ($(OPAM),opam)
+  ifneq ($(OPAMBINDIR),)
+    ifneq ($(OPAMLIBDIR),)	
+	@mkdir -p $(JSEXP_OPAM_SHARE_DIR)	 
+	  @rsync -Rrv --ignore-errors $(OPAM_FILES) $(JSEXP_OPAM_SHARE_DIR)
+    endif
+  endif
+endif
+
 # Development support
 open: jsjsref
 	xdg-open driver.html &
@@ -81,7 +105,7 @@ clean:
 	$(MAKE) -C tools/esdocgen clean
 	rm -Rf doc/jsref || true
 	rm -Rf dist || true
-	rm -Rf jsref/autom4te.cache jsref/config.status jsref/configure jsref/Makefile
+	rm -Rf jsref/autom4te.cache jsref/config.status jsref/configure jsref/Makefile $(JSEXP_OPAM_SHARE_DIR)
 
 FORCE:
 .PHONY: jsjsref mljsref generator generator-stdlib test_init test doc esdocgen clean

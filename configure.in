@@ -63,6 +63,8 @@ else
   AC_MSG_RESULT(opam bin path is $OPAMBINDIR.)
   OPAMLIBDIR=`opam config var lib`
   AC_MSG_RESULT(opam lib path is $OPAMLIBDIR.)
+  OPAMSHAREDIR=`opam config var share`
+  AC_MSG_RESULT(opam lib path is $OPAMSHAREDIR.)
 fi
 
 # TODO/FIXME
@@ -179,6 +181,7 @@ AC_SUBST(OPAMBINDIR)
 AC_SUBST(OPAMLIBDIR)
 AC_SUBST(OPAM)
 AC_SUBST(GENERATOR_DIR)
+AC_SUBST(OPAMSHAREDIR)
 
 # Finally create the Makefile from Makefile.in
 AC_OUTPUT(Makefile)
