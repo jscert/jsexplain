@@ -10,7 +10,7 @@ authors: [
 homepage: "http://jscert.org/"
 bug-reports: "https://github.com/jscert/jsexplain/issues"
 license: "BSD 3-clause"
-dev-repo: "https://github.com/jscert/jsexplain#fjs_of_fml"
+dev-repo: "git://github.com/jscert/jsexplain.git#fjs_of_fml"
 build: [
        ["autoconf"]
        ["./configure" "-prefix" "%{prefix}%"]
