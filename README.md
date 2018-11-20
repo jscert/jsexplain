@@ -17,6 +17,21 @@ Optional dependencies:
 * Perl / PHP interpreters, for single-use scripts within the tools directory
 * Python, for the runtests distributed test execution tool in tools/runtests
 
+### Installation and test with OPAM
+```
+opam switch create jsexplain 4.04.2
+eval $(opam env)
+
+opam pin -yn add JS_Parser "https://github.com/resource-reasoning/JS_Parser.git#v0.1.0"
+opam install -y JS_Parser
+
+opam repository add jsexplain https://github.com/jscert/opam-repository.git#add-pkg-fjs_of_fml
+
+opam install -y jsexplain
+
+firefox .opam/jsexplain/share/jsexplain/driver.html 
+```
+
 ### Initialising the build environment
 To install other dependencies:
 ```sh

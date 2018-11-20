@@ -9,6 +9,21 @@ OPAM = @OPAM@
 
 JSEXP_OPAM_SHARE_DIR := $(OPAMSHAREDIR)/jsexplain
 
+######################################
+
+NAME := jsexplain
+
+GIT_REPO := https://github.com/jscert/$(NAME).git
+GIT_BRANCH := $$(git rev-parse --abbrev-ref HEAD)
+TMP_DIR := /tmp
+TMP_FJS := $(TMP_DIR)/$(NAME)
+VERSION := 1.0
+TGZ := $(NAME)-$(VERSION).tar.gz
+MD5TXT := $(TGZ).md5sum.txt
+OPAM_REPO_GIT := ~/git/opam-repository
+
+######################################
+
 
 all: mljsref jsjsref
 
@@ -70,7 +85,6 @@ publish-github: dist
 .PHONY: publish publish-github
 
 # Opam Install
-#
 OPAM_FILES=driver.html libraries jquery-ui-1.11.4.custom jquery_scroll \
 	  jsref/displayed_sources.js tools.js node_modules/esprima/esprima.js \
 	  esprima-to-ast.js jsref/lineof.js navig-driver.js codemirror-tabs.js \
@@ -86,6 +100,32 @@ ifeq ($(OPAM),opam)
     endif
   endif
 endif
+
+# Deployment
+
+# Caution : One could say that these commands should be remove from the Makefile for security
+#	    reasons. 
+$(TGZ) :
+	rm -rf $(TMP_NAME) $(TGZ)
+	mkdir $(TMP_NAME)
+	git clone $(GIT_REPO) $(TMP_NAME)
+	git -C $(TMP_NAME)/ checkout $(GIT_BRANCH)
+	rm -rf $(TMP_NAME)/.git
+	tar -cvzf $(TGZ) -C $(TMP_DIR) $(NAME)
+	md5sum $(TGZ) > $(MD5TXT)
+
+# WARNING : md5sum of opam file in the tgz archive won't ever be the same
+# 	    as the one in opam-repository.
+#	    This should not be an issue since the md5sum checked is the one in
+#	    in Opam repository not the one in the archive. 
+#	    And it's done only at dowload time, not when the package is pinned.
+opam_file_update : $(TGZ)
+	sed -i -r 's|^(\schecksum: "md5\s*=\s*).*"|\1'$$(cat *.txt | cut -d" " -f 1)'"|' opam
+	cp opam $(OPAM_REPO_GIT)/packages/$(NAME)/$(NAME).$(VERSION)
+
+deploy : opam_file_update
+	read -p "User ?" FORGE_USER; \
+	scp -p $(TGZ) $$FORGE_USER@scm.gforge.inria.fr:/home/groups/jsexplain/htdocs 
 
 # Development support
 open: jsjsref

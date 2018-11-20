@@ -1,6 +1,6 @@
 opam-version: "2"
 name: "jsexplain"
-version: "1.0~dev"
+version: "1.0"
 maintainer: "Thomas Wood <thomas.wood09@imperial.ac.uk>"
 authors: [
   "Arthur Charguéraud <arthur@chargueraud.org>"
@@ -10,7 +10,7 @@ authors: [
 homepage: "http://jscert.org/"
 bug-reports: "https://github.com/jscert/jsexplain/issues"
 license: "BSD 3-clause"
-dev-repo: "git://github.com/jscert/jsexplain.git#fjs_of_fml"
+dev-repo: "git://github.com/jscert/jsexplain.git"
 build: [
        ["autoconf"]
        ["./configure" "-prefix" "%{prefix}%"]
@@ -25,11 +25,18 @@ remove: [
 	[make "clean"]
 ]
 depends: [
-  "ocamlfind" {build}
-  "alcotest" {test}
-  "conf-autoconf" {build}
-  "fjs_of_fml" {build}
+  "ocamlfind"
+  "ocamlbuild"
+  "alcotest"
+  "conf-autoconf"
+  "fjs_of_fml"
+  "ocaml" {>= "4.04.0" &  < "4.05"}
 ]
 pin-depends: [
  ["JS_Parser.dev" "git://github.com/resource-reasoning/JS_Parser.git#v0.1.0"]
 ]
+url {
+ src : "http://jsexplain.gforge.inria.fr/jsexplain-1.0.tar.gz"
+ checksum: "md5=79260bb187f0218ea5015d7f4cdb7c2c"
+}
+

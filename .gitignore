@@ -12,3 +12,12 @@ doc/jsref
 *.cmxs
 gh-pages
 /.merlin
+*.log
+autom4te.cache
+configure
+Makefile
+config.status
+jsref/Makefile
+jsref/autom4te.cache
+jsref/config.log
+jsref/config.status
