@@ -21,3 +21,5 @@ jsref/Makefile
 jsref/autom4te.cache
 jsref/config.log
 jsref/config.status
+*.tar.gz
+*.md5sum.txt
