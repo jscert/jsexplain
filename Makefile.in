@@ -146,6 +146,7 @@ clean:
 	rm -Rf doc/jsref || true
 	rm -Rf dist || true
 	rm -Rf jsref/autom4te.cache jsref/config.status jsref/configure jsref/Makefile $(JSEXP_OPAM_SHARE_DIR)
+	rm -Rf autom4te.cache config.status configure *.log *.tar.gz *.md5sum.txt
 
 FORCE:
 .PHONY: jsjsref mljsref generator generator-stdlib test_init test doc esdocgen clean
