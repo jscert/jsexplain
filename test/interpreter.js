@@ -10,7 +10,7 @@ const assert = require('assert');
 ['ctx_empty', 'ctx_push', 'log_event'].forEach(f => global[f] = function(){})
 
 const esprima = require('esprima');
-const esprimaToAST = require('../esprima-to-ast.js').esprimaToAST;
+const esprimaToAST = require('../js/esprima-to-ast.js').esprimaToAST;
 const jsref = require('../jsref/assembly.js');
 
 const timeout = 5000;

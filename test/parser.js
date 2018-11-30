@@ -4,7 +4,7 @@ const assert = require('assert');
 const util = require('util');
 
 var esprima = require('esprima');
-var esprimaToAST = require('../esprima-to-ast.js');
+var esprimaToAST = require('../js/esprima-to-ast.js');
 
 var test262 = require('./helpers/test262.js');
 
