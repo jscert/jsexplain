@@ -1,0 +1,69 @@
+
+.source_div {
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+}
+
+.heap_link {
+  color: black;
+}
+
+.file_item, .file_item_current {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-size: smaller;
+  margin-right: 3px;
+  padding: 3px;
+  text-decoration: underline;
+}
+
+.file_item, .file_item_current:hover {
+  cursor: pointer;
+  cursor: hand;
+}
+
+.file_item {
+  background-color: #FAFAFA;
+}
+
+.file_item_current {
+  background-color: #FFCCCC;
+}
+
+#main_table td {
+  vertical-align: top;
+  border: 1px solid black;
+}
+
+#action_output {
+  font-weight: bold;
+  color: red;
+}
+
+#disp_env {
+  margin-top: 0.5em;
+}
+
+#select_source_code {
+  width: 40em;
+}
+
+#disp_env_pane {
+  height: 100%;
+}
+
+.debug-selection {
+  background: #F3F781;
+}
+
+.scroll-pane
+{
+  width: 100%;
+  height: 300px;
+  overflow: auto;
+}
+.hint {
+  display: none;
+}

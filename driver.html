@@ -1,175 +1,138 @@
 <!doctype html>
-<html>
+<html lang="en">
+
 <head>
-<meta charset="utf-8">
-<title>Interactive Debugger for the JavaScript Specification</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<script src="js/libraries/jquery-2.1.1.min.js"></script>
+    <title>Interactive Debugger for the JavaScript Specification</title>
 
-<link rel=stylesheet href="js/libraries/codemirror/codemirror.css">
-<script src="js/libraries/codemirror/codemirror.js"></script>
-<script src="js/libraries/codemirror/panel.js"></script>
-<script src="js/codemirror-tabs.js"></script>
-<script src="js/libraries/codemirror/javascript.js"></script>
-<script src="js/libraries/codemirror/mllike.js"></script>
+    <script src="js/libraries/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="js/libraries/bootstrap/css/bootstrap.min.css">
+    <script src="js/libraries/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-<!-- styles needed by jScrollPane - include in your own sites -->
-<link type="text/css" href="js/jquery_scroll/jquery.jscrollpane.css" rel="stylesheet" media="all" />
-<!-- the mousewheel plugin -->
-<script type="text/javascript" src="js/jquery_scroll/jquery.mousewheel.js"></script>
-<!-- the jScrollPane script -->
-<script type="text/javascript" src="js/jquery_scroll/jquery.jscrollpane.min.js"></script>
+    <link rel=stylesheet href="js/libraries/codemirror/codemirror.css">
+    <script src="js/libraries/codemirror/codemirror.js"></script>
+    <script src="js/libraries/codemirror/panel.js"></script>
+    <script src="js/codemirror-tabs.js"></script>
+    <script src="js/libraries/codemirror/javascript.js"></script>
+    <script src="js/libraries/codemirror/mllike.js"></script>
 
-<link rel="stylesheet" href="js/jquery-ui-1.11.4.custom/jquery-ui.css">
-<script src="js/jquery-ui-1.11.4.custom/jquery-ui.js"></script>
+    <!-- styles needed by jScrollPane - include in your own sites -->
+    <link type="text/css" href="js/jquery_scroll/jquery.jscrollpane.css" rel="stylesheet" media="all" />
+    <!-- the mousewheel plugin -->
+    <script type="text/javascript" src="js/jquery_scroll/jquery.mousewheel.js"></script>
+    <!-- the jScrollPane script -->
+    <script type="text/javascript" src="js/jquery_scroll/jquery.jscrollpane.min.js"></script>
 
-<script src="node_modules/esprima/esprima.js"></script>
-<script type = "text/javascript" src="js/esprima-to-ast.js"></script>
+    <link rel="stylesheet" href="js/jquery-ui-1.11.4.custom/jquery-ui.css">
+    <script src="js/jquery-ui-1.11.4.custom/jquery-ui.js"></script>
 
+    <script src="node_modules/esprima/esprima.js"></script>
+    <script type = "text/javascript" src="js/esprima-to-ast.js"></script>
 
-<style>
-.source_div {
-  border-top: 1px solid black;
-  border-bottom: 1px solid black;
-}
-
-.heap_link {
-  color: black;
-}
-
-.file_item, .file_item_current {
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  font-size: smaller;
-  margin-right: 3px;
-  padding: 3px;
-  text-decoration: underline;
-}
-
-.file_item, .file_item_current:hover {
-  cursor: pointer;
-  cursor: hand;
-}
-
-.file_item {
-  background-color: #FAFAFA;
-}
-
-.file_item_current {
-  background-color: #FFCCCC;
-}
-
-#main_table td {
-  vertical-align: top;
-  border: 1px solid black;
-}
-
-#action_output {
-  font-weight: bold;
-  color: red;
-}
-
-#disp_env {
-  margin-top: 0.5em;
-}
-
-#select_source_code {
-  width: 40em;
-}
-
-#disp_env_pane {
-  height: 100%;
-}
-
-.debug-selection {
-  background: #F3F781;
-}
-
-.scroll-pane
-{
-  width: 100%;
-  height: 300px;
-  overflow: auto;
-}
-.hint {
-  display: none;
-}
-</style>
-
-
+    <link type="text/css" href="driver.css" rel="stylesheet" media="all" />
 </head>
+
 <body>
 
-<h2 class="hint">Interactive Debugger for the JavaScript Specification</h2>
+ <nav class="navbar navbar-light bg-light">
+  <form class="form-inline">
+   <div class="nav-item dropright">
+     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Menu</a>
+     <div class="dropdown-menu" aria-labelledby="navbarDropdown" >
+      Load example :
+      <select id='select_source_code'><option disabled selected>Example Programs</option></select>
+     <div class="dropdown-divider"></div>
+      Load file :
+      <input type='file' accept='.js' id='select_file' />
+     <div class="dropdown-divider"></div>
+      <label><input type='checkbox' id='use_test262_harness' /> Use test262 harness (not Chrome from file://)</label>
+   </div>
+  </div>
+ </div>
+ <span style="width:0.5em">&nbsp;</span>
 
+ <button class="btn btn-primary btn-sm" type="button"  id='button_run'>RUN</button>
+ <span style="width:0.5em">&nbsp;</span>
 
-<div class='source_div' style="">
-     Load example: 
-     <select id='select_source_code'><option disabled selected>Example Programs</option></select>
-     Load file: <input type='file' accept='.js' id='select_file' />
-     <label><input type='checkbox' id='use_test262_harness' /> Use test262 harness (not Chrome from file://)</label>
-   <table id='main_table'><tr>
-   <td>
-      <div id='source_code' class='source'></div>
-   </td>
-   <td width='600'>
-      <div id='disp_env_pane' class="scroll-pane">
-      <div id='disp_env'>ctx here</div>
+ <div class="input-group input-group-sm mb-0">
+      <div class="input-group-prepend">
+        <span class="input-group-text">Step:</span>
       </div>
-   </td>
-   </tr></table>
-</div>
+      <input type="text" id='navigation_step' style="width:5em" value="0" class="form-control"/>
+      
+      <div class="input-group-append">
+        <span class="input-group-text">/ <span id="navigation_total"></span> (<span id="event_type"></span>)</span>
+      </div>
+    </div>
+    
+    <span style="width:0.5em">&nbsp;</span>
+    <button class="btn btn-primary btn-sm" type="button" id='button_goto_begin'>Begin</button>
+    <span style="width:0.5em">&nbsp;</span>
+    <button class="btn btn-primary btn-sm" type="button" id='button_goto_end'>End</button>
+    <span style="width:0.5em">&nbsp;</span>
+    <button class="btn btn-primary btn-sm" type="button" id='button_backward'>Backward</button>
+    <span style="width:0.5em">&nbsp;</span>
+    <button class="btn btn-primary btn-sm" type="button" id='button_forward'>Forward</button>
+    <span style="width:0.5em">&nbsp;</span>
+    <button class="btn btn-primary btn-sm" type="button" id='button_previous'>Previous</button>
+    <span style="width:0.5em">&nbsp;</span>
+    <button class="btn btn-primary btn-sm" type="button" id='button_next'>Next</button>
+    <span style="width:0.5em">&nbsp;</span>
+    <button class="btn btn-primary btn-sm" type="button" id='button_finish'>Finish</button>
+    <span style="width:0.5em">&nbsp;</span>
+    <button class="btn btn-primary btn-sm" type="button" id='button_srcprevious'>Source Previous</button>
+    <span style="width:0.5em">&nbsp;</span>
+    <button class="btn btn-primary btn-sm" type="button" id='button_srcnext'>Source Next</button>
+    <span style="width:0.5em">&nbsp;</span>
+    <button class="btn btn-primary btn-sm" type="button" id='button_cursor'>Source Cursor</button>
+    <span style="width:0.5em">&nbsp;</span>
+    
+    <div class="input-group input-group-sm mb-0">
 
-
-<div style="margin-top:0.2em">
-<input type="button" id="button_run" value="RUN" />
-Step:
-<input type="textbox" id='navigation_step' style="width:3em" value="0"/>
-/ <span id="navigation_total"></span> (<span id="event_type"></span>)
-<br/>
-<input type="button" id='button_goto_begin' value="Begin" />
-<input type="button" id='button_goto_end' value="End" />
-<input type="button" id='button_backward' value="Backward" /><div class="hint">(4)</div>
-<input type="button" id='button_forward' value="Forward" /><div class="hint">(6)</div>
-<span style="width:3em">&nbsp;</span>
-<input type="button" id='button_previous' value="Prev" /><div class="hint">(8)</div>
-<input type="button" id='button_next' value="Next" /><div class="hint">(2)</div>
-<input type="button" id='button_finish' value="Finish" /><div class="hint">(3)</div>
-<span style="width:3em">&nbsp;</span>
-<input type="button" id='button_srcprevious' value="Source Prev" /><div class="hint">(7)</div>
-<input type="button" id='button_srcnext' value="Source Next" /><div class="hint">(7)</div>
-<input type="button" id='button_cursor' value="Source Cursor" /><div class="hint">(7)</div>
-<!--<input type="button" id='button_selection' value="ReachSelection" /><div class="hint">(7)</div>-->
-
-<div style="margin-top: 0.2em">Condition:
-<input type="textbox" id='reach_condition' style="width:30em" />
-<input type="button" id='button_reach_condition' value="Reach" />
-<input type="button" id='button_test_condition' value="Test" />
-<span id="reach_output"></span>
+     <div class="input-group-prepend">
+    <span class="input-group-text" id="inputGroup-sizing-sm">Conditions:</span>
+  </div>
+  <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id='reach_condition'>
+  <div class="input-group-append">
+    <button class="btn btn-outline-secondary" type="button" id='button_test_condition'>Test</button> <span id="reach_output"></span><span style="width:0.5em">&nbsp;</span>
 <font style="size: 50%">
 Using: S('x'), S_raw('x'), S_line(), I('x'), I_line().
 </font>
+  </div>
 </div>
-</div>
-
 <div id="action_output"></div>
 
-<div class='source_div'>
+  </form>
+</nav>
 
-<table id='main_table'><tr>
-<td>
-   <textarea id='interpreter_code' class='source' rows='15' cols='60'></textarea>
-</td>
-<!--<td width='600'>
+<div class="container-fluid">
+
+ <div class="source_div row" style="" id='main_table'>
+  <div id='source_code' class="source col-sm"></div>
+  <textarea id='interpreter_code' class="source col-sm" rows='15' cols='60'></textarea>
+ </div>
+
+ <div class="source_div row" id='main_table2'>
+  <div id='disp_env_pane' class="scroll-pane col-sm-3">
+   <div id='disp_env'>ctx here</div>
+  </div>
+  <div class="embed-responsive embed-responsive-4by3 col-sm-6">
+   <iframe class="embed-responsive-item" src="https://tc39.github.io/ecma262/" id='frame_spec' ></iframe>
+  </div>
+  <div class='col-sm-3'>
    <div id='disp_ctx'></div>
-</td>-->
-</tr></table>
+   <div id='disp_infos'></div>
+  </div>
 </div>
-<div id='disp_ctx'></div>
-<!--<hr>-->
-<div id='disp_infos'></div>
+
+
+
+
+
+
 
 <script src="js/tools.js"></script> 
 <script src="jsref/displayed_sources.js"></script> 
