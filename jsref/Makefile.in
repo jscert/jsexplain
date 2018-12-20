@@ -20,7 +20,7 @@ GENERATOR_DIR = @GENERATOR_DIR@
 # FIXME/TODO
 # Uncomment this path if you are not installing throw opam
  #	STDLIB_DIR := $(GENERATOR_DIR)/src/stdlib_ml
-STDLIB_DIR := $(OPAMLIBDIR)/fjs_of_fml/stdlib_ml
+STDLIB_DIR := $(OPAMLIBDIR)/fjs_of_fml/stdlib_fml
 
 OCAMLDEP := ocamldep -one-line
 OCAMLPAR := OCAMLRUNPARAM="l=200M"
@@ -68,7 +68,7 @@ endif
 JSREF_ML  := $(wildcard *.ml)
 JSREF_MLI := $(wildcard *.mli)
 
-STDLIB_FLAG := -I $(STDLIB_DIR) -open Stdlib
+STDLIB_FLAG := -I $(STDLIB_DIR) -open Stdlib_fml
 REPLACE_STDLIB := -nopervasives -nostdlib $(STDLIB_FLAG)
 
 # ASSEMBLY_JS_FILES must respect dependencies order
@@ -100,7 +100,7 @@ ASSEMBLY_JS_FILES := \
 	ModuleExport.js
 
 ASSEMBLY_JS := \
-	$(STDLIB_DIR)/stdlib.js \
+	$(STDLIB_DIR)/stdlib_fml.js \
 	$(ASSEMBLY_JS_FILES)
 
 ###############################################################
@@ -208,7 +208,7 @@ ASSEMBLY_ML_FILES := \
 	Run_js.cmo
 
 ASSEMBLY_ML := \
-	$(STDLIB_DIR)/stdlib.cmo \
+	$(STDLIB_DIR)/stdlib_fml.cmo \
 	$(ASSEMBLY_ML_FILES)
 
 mljsref: fjs_of_fml.byte

@@ -1,4 +1,4 @@
-opam-version: "2"
+opam-version: "2.0.2"
 name: "jsexplain"
 version: "1.0"
 maintainer: "Thomas Wood <thomas.wood09@imperial.ac.uk>"
@@ -30,7 +30,7 @@ depends: [
   "alcotest"
   "conf-autoconf"
   "fjs_of_fml"
-  "ocaml" {>= "4.04.0" &  < "4.05"}
+  "ocaml" {= "4.07.1"}
 ]
 pin-depends: [
  ["JS_Parser.dev" "git://github.com/resource-reasoning/JS_Parser.git#v0.1.0"]
