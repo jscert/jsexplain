@@ -1247,7 +1247,7 @@ source = new CodeMirror(document.getElementById('source_code'), {
   lineNumbers: true,
   lineWrapping: true
 });
-source.setSize(500, 150);
+
 
 interpreter = CodeMirror.fromTextArea(document.getElementById('interpreter_code'), {
   mode: 'text/javascript',
