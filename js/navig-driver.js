@@ -1,4 +1,3 @@
-
 // ----------- Types ----------------
 
 // type loc
@@ -851,7 +850,7 @@ function show_value(state, v, target, depth) {
     case "Value_object":
       var loc = v.value;
       var obj_target = fresh_id();
-      t.append("<span class='heap_link'><a onclick=\"handlers['" + obj_target + "']()\" >&lt;Object&gt;(" + string_of_loc(loc) + ")</a><span id='" + obj_target + "'></span></span>");
+      t.append("<span clas='heap_link'><a onclick=\"handlers['" + obj_target + "']()\" >&lt;Object&gt;(" + string_of_loc(loc) + ")</a><span id='" + obj_target + "'></span></span>");
       function handler_close() {
         handlers[obj_target] = handler_open;
         $("#" + obj_target).html("");
@@ -1087,6 +1086,9 @@ function show_interp_ctx(state, ctx, target) {
   }
 }
 
+// ------------ Specification view ---------------
+
+$("#frame_spec").attr("src", url_spec + "#sec-intro");
 
 // --------------- Debugging view ----------------
 
@@ -1223,6 +1225,13 @@ function updateSelection() {
         show_execution_ctx(item.state, item.execution_ctx, "disp_env");
       }
 
+      // spec panel
+      if (item.last_tag_id !== undefined) {
+          if ( $("#frame_spec").attr("src") !== item.last_tag_id) {
+           $("#frame_spec").attr("src", item.last_tag_id);
+          }
+      }
+
       // interpreter ctx panel
       show_interp_ctx(item.state, item.ctx, "disp_ctx");
 
@@ -1330,6 +1339,7 @@ function assignExtraInfosInTrace() {
   var last_loc;
   var last_state = undefined;
   var last_execution_ctx = undefined;
+  var last_tag_id = $("#frame_spec").attr("src");
   // { start: { line: 1, column: 0}, end: { line: 1, column: 1 } };
   for (var k = 0; k < tracer_items.length; k++) {
     var item = tracer_items[k];
@@ -1340,7 +1350,12 @@ function assignExtraInfosInTrace() {
         if (binding.val === undefined) {
           continue; // might happen on run with errors
         }
-        if (binding.key === "_term_") {
+        else if (binding.key === "_tag_id_") {
+            //console.log ("binding.val : " + binding.val);
+            //$("#frame_spec").attr("src", binding.val);
+            last_tag_id = binding.val;
+        }
+        else if (binding.key === "_term_") {
           var t = binding.val;
           if (t.loc != undefined) {
             last_loc = t.loc;
@@ -1362,6 +1377,7 @@ function assignExtraInfosInTrace() {
     item.source_loc = last_loc;
     item.state = last_state;
     item.execution_ctx = last_execution_ctx;
+    item.last_tag_id = last_tag_id;
   }
 }
 
