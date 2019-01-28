@@ -343,7 +343,7 @@ function evalPred(item, pred) {
     if (loc === undefined) {
       return -1;
     }
-    return loc.start.line;
+   return loc.start.line;
   };
   var S_line = function () {
     var loc = item.source_loc;
@@ -1071,19 +1071,56 @@ function show_interp_val(state, v, target, depth) {
   // t.append(string_of_any(v));
 }
 
+/* Recusive search of tag_id in ctx list  */
+function find_tag_id (ctx) {
+ if (ctx.tag === undefined)
+  return {tag:"None", debug:"ctx.tag === undefined"};
+
+ if (ctx.bindings === undefined)
+  return {tag:"None", debug:"ctx.bindings === undefined"};
+
+ if (ctx.next === undefined)
+  return {tag:"None", debug:"ctx.next === undefined"};
+
+ if (ctx.tag === "ctx_nil")
+  return {tag:"None", debug:"ctx.tag === ctx_nil"};
+
+ if (ctx.tag === "ctx_cons")
+ {
+  for (var i = ctx.bindings.length-1; i >= 0; i--) {
+    if (ctx.bindings[i].key === "_tag_id_") {
+     if (ctx.bindings[i].val === undefined)
+      return {tag:"None", debug:"ctx.bindings[i].val === undefined"};
+     return {tag:"Some", tag_id: ctx.bindings[i].val};
+    }
+  }
+  return (find_tag_id (ctx.next)); /* Recursive call of find_tag_id  */
+ }
+
+ return {tag:"None", debug:"wrong value of ctx.tag === " + ctx.tag};
+}
+
 function show_interp_ctx(state, ctx, target) {
   var depth = 1000;
   var t = $("#" + target);
   var a = ctx_to_array(ctx);
+
   // for (var i = 0; i < a.length; i++) {
   for (var i = a.length-1; i >= 0; i--) {
     var key = a[i].key;
     var val = a[i].val;
     var targetsub = fresh_id();
-    t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
-    $("#" + targetsub).html("<b>" + html_escape(key) + "</b>: ");
-    show_interp_val(state, val, targetsub, depth);
+    if (key !== "_tag_id_") {
+     t.append("<div style='margin-left:1em' id='" + targetsub + "'></div>");
+     $("#" + targetsub).html("<b>" + html_escape(key) + "</b>: ");
+     show_interp_val(state, val, targetsub, depth);
+    }
   }
+  
+  var op_tid = find_tag_id (ctx);
+  if (op_tid.tag_id !== undefined)
+      $("#frame_spec").attr("src", op_tid.tag_id);
+
 }
 
 // ------------ Specification view ---------------
@@ -1225,13 +1262,6 @@ function updateSelection() {
         show_execution_ctx(item.state, item.execution_ctx, "disp_env");
       }
 
-      // spec panel
-      if (item.last_tag_id !== undefined) {
-          if ( $("#frame_spec").attr("src") !== item.last_tag_id) {
-           $("#frame_spec").attr("src", item.last_tag_id);
-          }
-      }
-
       // interpreter ctx panel
       show_interp_ctx(item.state, item.ctx, "disp_ctx");
 
@@ -1339,7 +1369,6 @@ function assignExtraInfosInTrace() {
   var last_loc;
   var last_state = undefined;
   var last_execution_ctx = undefined;
-  var last_tag_id = $("#frame_spec").attr("src");
   // { start: { line: 1, column: 0}, end: { line: 1, column: 1 } };
   for (var k = 0; k < tracer_items.length; k++) {
     var item = tracer_items[k];
@@ -1349,11 +1378,6 @@ function assignExtraInfosInTrace() {
         var binding = bindings[i];
         if (binding.val === undefined) {
           continue; // might happen on run with errors
-        }
-        else if (binding.key === "_tag_id_") {
-            //console.log ("binding.val : " + binding.val);
-            //$("#frame_spec").attr("src", binding.val);
-            last_tag_id = binding.val;
         }
         else if (binding.key === "_term_") {
           var t = binding.val;
@@ -1367,7 +1391,7 @@ function assignExtraInfosInTrace() {
           }
         } else if (interp_val_is_state(binding.val)) {
           // assuming: 'is an state object' iff 'has a state_object_heap field'
-          last_state = binding.val;
+          last_state = binding.val; 
         } else if (interp_val_is_execution_ctx(binding.val)) {
           // assuming: 'is an execution_ctx' iff 'has a execution_ctx_lexical_env field'
           last_execution_ctx = binding.val;
@@ -1377,7 +1401,6 @@ function assignExtraInfosInTrace() {
     item.source_loc = last_loc;
     item.state = last_state;
     item.execution_ctx = last_execution_ctx;
-    item.last_tag_id = last_tag_id;
   }
 }
 
