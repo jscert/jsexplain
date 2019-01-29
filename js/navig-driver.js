@@ -1117,15 +1117,17 @@ function show_interp_ctx(state, ctx, target) {
     }
   }
   
+  // update frame_spec url 
   var op_tid = find_tag_id (ctx);
-  if (op_tid.tag_id !== undefined)
-      $("#frame_spec").attr("src", op_tid.tag_id);
+  var url = url_root + "#"  + op_tid.tag_id; 
+  if (op_tid.tag_id !== undefined && $("#frame_spec").attr("src") !== url )
+      $("#frame_spec").attr("src", url);
 
 }
 
 // ------------ Specification view ---------------
 
-$("#frame_spec").attr("src", url_spec + "#sec-intro");
+$("#frame_spec").attr("src", url_root + "#sec-intro");
 
 // --------------- Debugging view ----------------
 
