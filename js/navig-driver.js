@@ -219,19 +219,6 @@ function lookup_var_in_record_decl(name, env_record_decl) {
       throw "unrecognized tag in lookup_var_in_record_decl";
   }
 }
-/* DEPRECATED, naive code for lookup_var_in_record_decl:
-
-   var items_array = array_of_heap(env_record_decl);
-   for (var i = 0; i < items_array.length; i++) {
-     var var_name = items_array[i][0];
-     // var mutability = items_array[i][1][0];
-     var value = items_array[i][1][1];
-     if (var_name === name) {
-       return value;
-     }
-   }
-   return undefined;
-*/
 
 function lookup_var_in_object(state, name, loc) {
   var obj_opt = JsCommonAux.object_binds_option(state, loc);
@@ -262,27 +249,9 @@ function lookup_var_in_object(state, name, loc) {
   }
 }
 
-/* DEPRECATED, naive code for lookup_var_in_object:
-   var key_value_pair_array = array_of_heap(props);
-   for (var i = 0; i < key_value_pair_array.length; i++) {
-     var prop_name = key_value_pair_array[i][0];
-     if (prop_name !== name) {
-       continue;
-     }
-     var attribute = key_value_pair_array[i][1];
-   }
-*/
-
-
-
 // todo : handle objects
 function lookup_var_in_lexical_env(state, name, lexical_env) {
   // var env_record_heap = state.state_env_record_heap;
-  /* DEPRECATED: naive processing of the loop
-     var env_loc_array = encoded_list_to_array(lexical_env);
-     for (var i = 0; i < env_loc_array.length; i++) {
-       var env_loc = env_loc_array[i];
-  */
   var list = lexical_env;
   while (list.tag == "::") {
     var env_loc = list.head;
@@ -330,9 +299,7 @@ function evalPred(item, pred) {
     }
     return undefined;
   }
-  /*var interp_val = function(name) {
-      return interp_raw(name);
-   }*/
+
   var I_line = function () {
     var locByExt = item.locByExt;
     if (locByExt === undefined) {
@@ -441,22 +408,15 @@ function buttonRunHandler() {
 };
 
 $("#button_run").click(buttonRunHandler);
-
 $("#button_goto_begin").click(function() { goto_begin(); });
 $("#button_goto_end").click(function() { goto_end(); });
-// stepTo(0);
 $("#button_backward").click(function() { backward(); });
-// stepTo(Math.max(0, tracer_pos-1));
 $("#button_forward").click(function() { forward() });
-// stepTo(Math.min(tracer_length-1, tracer_pos+1));
-
 $("#button_srcprevious").click(function() { src_previous() });
 $("#button_srcnext").click(function() { src_next() });
-
 $("#button_previous").click(function() { previous() });
 $("#button_next").click(function() { next() });
 $("#button_finish").click(function() { finish() });
-
 $("#button_cursor").click(function() { cursor() });
 $("#button_selection").click(function() { selection() });
 
@@ -479,7 +439,6 @@ function stepTo(i) {
   updateSelection();
 }
 
-
 // dir is -1 or +1
 function shared_step(dir) {
   var i = tracer_pos;
@@ -488,93 +447,144 @@ function shared_step(dir) {
   stepTo(i);
 }
 
-// dir is -1 or +1,
-// target (= target depth) is 0 for (next/prev) or -1 (finish)
-function shared_next(dir, target) {
-  var i = tracer_pos;
-  var depth = 0;
-  var ty = tracer_items[i].type;
-  // TODO check if this works
-  if (dir === +1 && ty === 'return') {
-    depth = 1;
-  } else if (dir === -1 && ty === 'enter') {
-    depth = -1;
-  }
-  while (true) {
-    if (! tracer_valid_pos(i)) {
-      stepTo(i - dir); // just before out of range
-      return; // not found
-    }
-    if (i !== tracer_pos && depth === target) {
-      stepTo(i);
-      return;
-    }
-    var ty = tracer_items[i].type;
-    if (ty === 'enter') {
-      depth++;
-    } else if (ty === 'return') {
-      depth--;
-    }
-    i += dir;
-  }
-}
-
-function src_shared_next(dir) {
-  var cur_item = tracer_items[tracer_pos];
-  var cur_loc = cur_item.source_loc;
-  var i = tracer_pos += dir;
-  // for (var k = 1; k < tracer_length; k++) {
-  //    var i = (tracer_pos + tracer_length + dir * k) % tracer_length;
-  while (i >= 0 && i < tracer_length) {
-    var next_item = tracer_items[i];
-    var next_loc = next_item.source_loc;
-    if (next_loc !== cur_loc) {
-      stepTo(i);
-      return;
-    }
-    i += dir;
-  }
-  // $("#action_output").html("Distinct loc event not found");
-  // var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 1000);
-}
-
-
+/***********************************************
+   Button Begin
+ **********************************************/
 function goto_begin() { stepTo(0); }
+
+/***********************************************
+   Button End
+ **********************************************/
 function goto_end() { stepTo(tracer_length - 1); }
+
+/***********************************************
+   Button Forward
+ **********************************************/
 function forward() { shared_step(+1); }
+
+/***********************************************
+   Button Backward
+ **********************************************/
 function backward() { shared_step(-1); }
 
-function previous() { shared_next(-1, 0); }
-function next() { shared_next(+1, 0); }
-function finish() { shared_next(+1, -1); }
-
-function src_previous() { src_shared_next(-1); }
-function src_next() { src_shared_next(+1); }
-
-
-/*
-function selection() {
-  // jump to the last event that contains the source location
-  var pos = source.getSelection();
-  console.log(source);
-  var line = pos.line + 1; // adding 1 because Codemirror counts from 0
-  var column = pos.ch;
-  // for (var i = 0; i < tracer_length; i++) {
-  for (var i = tracer_length-1; i >= 0; i--) {
-    var loc = tracer_items[i].source_loc;
-    if (loc === undefined) continue;
-    if (loc.start.line <= line && 
-        loc.start.column <= column &&
-        loc.end.line >= line &&
-        loc.end.column >= column) {
-      stepTo(i);
-      return;
-    }
+//DEBUG
+  function log(j, dpt, f) {
+   function space (i) {
+    if (i<0) return space(-i);
+    if (i === 0) {return '';}
+    return (' ' + space (i-1));
   }
-  $("#action_output").html("Event covering cursor not found");
-  var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 1000);
-};
-*/
+  if ( tracer_valid_pos(j))
+   console.log(f.name + " : j = " + j +  "\t| " + space(dpt) + dpt + tracer_items[j].type);
+  }
+
+  var debug = true;
+
+/***********************************************
+   Button Previous
+
+    Need deeper specification understanding to
+    document
+
+ **********************************************/
+function previous() {
+
+  function sn_aux (j, dpt) {
+   if (! tracer_valid_pos(j)) return (++j);
+   if (j !== tracer_pos && dpt === 0) { if (debug) log(j, dpt, previous); return j; }
+   var ty = tracer_items[j].type;
+   if (ty === 'enter' || ty === 'call')
+     { if (debug) log(j, dpt, previous); return sn_aux(--j, ++dpt); }
+   if (ty === 'return') { if (debug) log(j, dpt, previous); return sn_aux(--j, --dpt); }
+   return sn_aux(--j, dpt);
+  }
+
+  var depth = 0;
+  if (tracer_items[tracer_pos].type === 'enter') {depth = -1;}
+  var n = sn_aux(tracer_pos, depth);
+  stepTo(n);
+}
+
+/***********************************************
+   Button Next
+
+    Need deeper specification understanding to
+    document
+
+ **********************************************/
+function next() {
+
+  var target = 0;
+  if (arguments.length !== 0) { target = -1; } // if any argument it's a finish function
+
+  function sn_aux (j, dpt) {
+   if (! tracer_valid_pos(j)) {return (--j);}
+   if (j !== tracer_pos && dpt === target) { if (debug) log(j, dpt, next); return j; }
+   var ty = tracer_items[j].type;
+   if (ty === 'enter' || ty === 'call' )
+      { if (debug) log(j, dpt, next); return sn_aux(++j, ++dpt); }
+   if (ty === 'return') { if (debug) log(j, dpt, next); return sn_aux(++j, --dpt); }
+   return sn_aux(++j, dpt);
+  }
+
+  var depth = 0;
+  if (tracer_items[tracer_pos].type === 'return') {depth = 1;}
+  var n = sn_aux(tracer_pos, depth);
+  stepTo(n);
+}
+
+/***********************************************
+   Button Finish : 
+ **********************************************/
+function finish() { next('wtf'); } // Maybe something cleaner could be expected
+                                   // At least this way next() body is not altered 
+
+/***********************************************
+   Button Source Previous 
+
+    Move from current source position to the
+    previous evaluated one.
+ **********************************************/
+function src_previous() {
+
+  if(! tracer_valid_pos(tracer_pos)) return;
+
+  var cur_item = tracer_items[tracer_pos];
+  var cur_loc = cur_item.source_loc
+  var i = tracer_pos - 1;
+
+  function ssn_aux(j) {
+    if (! tracer_valid_pos(j)) return j;
+    if (tracer_items[j].source_loc !== cur_loc) return j;
+    return ssn_aux(--j);
+  }
+
+  var n = ssn_aux(i);
+  if (tracer_valid_pos(n)) stepTo(n);
+}
+
+/***********************************************
+   Button Source Next
+
+    Move from current source position to the
+    next evaluated one.
+ **********************************************/
+function src_next() {
+
+ if(! tracer_valid_pos(tracer_pos)) return;
+
+ var cur_item = tracer_items[tracer_pos];
+ var cur_loc = cur_item.source_loc;
+ var i = tracer_pos + 1;
+
+ function ssn_aux(j) {
+  if (! tracer_valid_pos(j)) return j;
+  if (tracer_items[j].source_loc !== cur_loc) return j;
+  return ssn_aux(++j);
+ }
+ var n = ssn_aux(i);
+ if (tracer_valid_pos(n)) stepTo(n);
+}
 
 function cursor() {
   // jump to the last event that contains the source location
@@ -596,8 +606,6 @@ function cursor() {
   $("#action_output").html("Event covering cursor not found");
   var timeoutID = window.setTimeout(function() { $("#action_output").html(""); }, 1000);
 }
-
-
 
 // --------------- File Display ----------------
 
