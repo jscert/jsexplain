@@ -1,6 +1,5 @@
 CURRENT_DIR := $(shell pwd)
 
-# FILL this path to fjs_of_fml project when it's not in path
 GENERATOR_DIR = @GENERATOR_DIR@
 OPAMSHAREDIR = @OPAMSHAREDIR@
 OPAMBINDIR = @OPAMBINDIR@
@@ -25,16 +24,18 @@ OPAM_REPO_GIT := ~/git/opam-repository
 ######################################
 
 
-all: mljsref jsjsref
+all: mljsjsref
 
 # Build Stages
-jsjsref: 
+mljsjsref:
 	cd $(CURRENT_DIR)/jsref ; autoconf ; ./configure
-	$(MAKE) -C jsref jsjsref
-
-mljsref:
-	cd jsref ; autoconf ; ./configure
-	$(MAKE) -C jsref mljsref
+ifeq ($(GENERATOR_DIR),no)
+	@read -p "Please fill path to GENERATOR_DIR (root of fjs_of_fml project):" g;\
+	$(MAKE) -C jsref jsjsref GENERATOR_DIR=$$g STDLIB_DIR=$$g/src/stdlib_fml;\
+	$(MAKE) -C jsref mljsref GENERATOR_DIR=$$g STDLIB_DIR=$$g/src/stdlib_fml
+else
+	$(MAKE) -C jsref jsjsref; $(MAKE) -C jsref mljsref
+endif
 
 # Test Stages
 test_init: test/data/test262
@@ -147,5 +148,5 @@ clean:
 	rm -Rf autom4te.cache config.status configure *.log *.tar.gz *.md5sum.txt
 
 FORCE:
-.PHONY: jsjsref mljsref test_init test doc esdocgen clean package
+.PHONY: mljsjsref test_init test doc esdocgen clean package
 .NOTPARALLEL:
