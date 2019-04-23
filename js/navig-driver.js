@@ -586,6 +586,11 @@ function src_next() {
  if (tracer_valid_pos(n)) stepTo(n);
 }
 
+
+/***********************************************
+   Button Source Cursor
+
+ **********************************************/
 function cursor() {
   // jump to the last event that contains the source location
   var pos = source.getCursor();
