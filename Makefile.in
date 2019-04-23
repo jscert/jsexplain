@@ -20,6 +20,9 @@ VERSION := 1.0
 TGZ := $(NAME)-$(VERSION).tar.gz
 MD5TXT := $(TGZ).md5sum.txt
 OPAM_REPO_GIT := ~/git/opam-repository
+DATE_ARCHIVE := $(shell date +%Y-%m-%d-%H-%M-%S)
+TGZ_ARCHIVE := $(NAME)-$(VERSION)-$(DATE_ARCHIVE).tar.gz
+OPAM_PROD_DIR := /home/groups/jsexplain/htdocs/opam/$(NAME)
 
 ######################################
 
@@ -99,9 +102,13 @@ ifeq ($(OPAM),opam)
 endif
 
 # Deployment
+# Inria gorge : https://gforge.inria.fr/
+# INFO : ssh connexion can be done this way ssh scm.gforge.inria.fr -l <LOGIN>
+#	 files are in /home/groups/jsexplain
 
 # Caution : One could say that these commands should be remove from the Makefile for security
 #	    reasons. 
+# WARNING : Archive file is based on current branch !
 $(TGZ) :
 	rm -rf $(TMP_NAME) $(TGZ)
 	mkdir $(TMP_NAME)
@@ -122,9 +129,14 @@ opam_file_update : package
 	sed -i -r 's|^(\schecksum: "md5\s*=\s*).*"|\1'$$(cat *.txt | cut -d" " -f 1)'"|' opam
 	cp opam $(OPAM_REPO_GIT)/packages/$(NAME)/$(NAME).$(VERSION)
 
+# WARNING/FIXME : On version upgrade archive will fail.
+#		  Manual backup on forge will be needed.
+#	          scp copy could be based on $(NAME)-*.tar.gz but deletion would still remain a problem ...
 deploy : opam_file_update
 	read -p "User ?" FORGE_USER; \
-	scp -p $(TGZ) $$FORGE_USER@scm.gforge.inria.fr:/home/groups/jsexplain/htdocs 
+        scp -p $$FORGE_USER@scm.gforge.inria.fr:$(OPAM_PROD_DIR)/$(TGZ) $(TMP_DIR)/$(TGZ_ARCHIVE); \
+	scp -p $(TMP_DIR)/$(TGZ_ARCHIVE) $$FORGE_USER@scm.gforge.inria.fr:$(OPAM_PROD_DIR)/old/$(TGZ_ARCHIVE); \
+	scp -p $(TGZ) $$FORGE_USER@scm.gforge.inria.fr:$(OPAM_PROD_DIR)
 
 # Development support
 open: jsjsref
