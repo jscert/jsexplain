@@ -24,6 +24,7 @@ DATE_ARCHIVE := $(shell date +%Y-%m-%d-%H-%M-%S)
 TGZ_ARCHIVE := $(NAME)-$(VERSION)-$(DATE_ARCHIVE).tar.gz
 HTDOCS_DIR := /home/groups/jsexplain/htdocs
 OPAM_PROD_DIR := $(HTDOCS_DIR)/opam/$(NAME)
+CURRENT_COMMIT := $(NAME)_current_commit
 
 ######################################
 
@@ -111,8 +112,9 @@ endif
 # http://jsexplain.gforge.inria.fr/index.html is a symbolic link on
 #  http://jsexplain.gforge.inria.fr/driver.html
 forge_install : all $(OPAM_FILES)
+	git rev-parse HEAD > $(CURRENT_COMMIT); \
 	read -p "User ?" FORGE_USER; \
-	rsync -Rarve ssh $(OPAM_FILES) $$FORGE_USER@scm.gforge.inria.fr:$(HTDOCS_DIR)
+	rsync -Rarve ssh $(OPAM_FILES) $(CURRENT_COMMIT) $$FORGE_USER@scm.gforge.inria.fr:$(HTDOCS_DIR)
 
 ######################################
 # Deployment
@@ -172,7 +174,7 @@ clean:
 	$(MAKE) -C tools/esdocgen clean
 	rm -Rf doc/jsref || true
 	rm -Rf dist || true
-	rm -Rf jsref/autom4te.cache jsref/config.status jsref/configure jsref/Makefile $(JSEXP_OPAM_SHARE_DIR)
+	rm -Rf jsref/autom4te.cache jsref/config.status jsref/configure jsref/Makefile $(JSEXP_OPAM_SHARE_DIR) $(CURRENT_COMMIT)
 	rm -Rf autom4te.cache config.status configure *.log *.tar.gz *.md5sum.txt
 
 FORCE:
