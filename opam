@@ -36,7 +36,7 @@ pin-depends: [
  ["JS_Parser.dev" "git://github.com/resource-reasoning/JS_Parser.git#v0.1.0"]
 ]
 url {
- src : "http://jsexplain.gforge.inria.fr/jsexplain-1.0.tar.gz"
- checksum: "md5=eee6068ad879d3b411941d3b932e1231"
+ src : "http://jsexplain.gforge.inria.fr/opam/jsexplain/jsexplain-1.0.tar.gz"
+ checksum: "md5=a5f32846e57382fbd70b073e937570c2"
 }
 
