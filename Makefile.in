@@ -50,7 +50,7 @@ test: test_jsjsref test_init
 npm :
 	npm install
 
-test_jsjsref: jsjsref npm
+test_jsjsref: mljsjsref npm
 	node_modules/.bin/mocha
 
 test/data/test262: FORCE
@@ -77,7 +77,7 @@ PUB_FILES=driver.html js/libraries js/jquery-ui-1.11.4.custom js/jquery_scroll \
 	  jsref/assembly.js doc/documentation.html doc/screenshots doc/jsref \
 	  test/data/*.js test/data/test262/harness/*.js jsref/JsInterpreter.url.js
 
-dist: jsjsref $(PUB_FILES)
+dist: mljsjsref $(PUB_FILES)
 	mkdir -p $@
 	rsync -Rrv $(PUB_FILES) $@
 
@@ -157,7 +157,7 @@ deploy : opam_file_update
 	scp -p $(TGZ) $$FORGE_USER@scm.gforge.inria.fr:$(OPAM_PROD_DIR)
 
 # Development support
-open: jsjsref
+open: mljsjsref
 	xdg-open driver.html &
 
 opendoc: doc
