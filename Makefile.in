@@ -71,7 +71,7 @@ doc/jsref: esdocgen
 	mv jsref/doc_build $@
 
 # Publication Stages
-PUB_FILES=driver.html js/libraries js/jquery-ui-1.11.4.custom js/jquery_scroll \
+PUB_FILES=driver.html driver.css js/libraries js/jquery-ui-1.11.4.custom js/jquery_scroll \
 	  jsref/displayed_sources.js js/tools.js node_modules/esprima/esprima.js \
 	  js/esprima-to-ast.js jsref/lineof.js js/navig-driver.js js/codemirror-tabs.js \
 	  jsref/assembly.js doc/documentation.html doc/screenshots doc/jsref \
