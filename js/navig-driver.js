@@ -140,6 +140,7 @@ $('#select_source_code').change(e => {
   }
   $('#select_file')[0].value = null;
   setInitialSourceCode("example" + (selected.index - 1) + ".js", e.target.value);
+  spec_to_root();
   buttonRunHandler();
 });
 
@@ -1139,8 +1140,12 @@ function show_interp_ctx(state, ctx, target) {
 }
 
 // ------------ Specification view ---------------
+function spec_to_root() {
+    $("#frame_spec").attr("src", url_root + "#sec-intro");
+}
 
-$("#frame_spec").attr("src", url_root + "#sec-intro");
+// First load specification frame position
+spec_to_root();
 
 // --------------- Debugging view ----------------
 
