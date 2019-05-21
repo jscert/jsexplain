@@ -492,11 +492,23 @@ function previous() {
 
   function sn_aux (j, dpt) {
    if (! tracer_valid_pos(j)) return (++j);
+
    if (j !== tracer_pos && dpt === 0) { if (debug) log(j, dpt, previous); return j; }
+
    var ty = tracer_items[j].type;
+
    if (ty === 'enter' || ty === 'call')
-     { if (debug) log(j, dpt, previous); return sn_aux(--j, ++dpt); }
-   if (ty === 'return') { if (debug) log(j, dpt, previous); return sn_aux(--j, --dpt); }
+     { j--; dpt++;
+       if (debug) log(j, dpt, previous);
+       return sn_aux(j, dpt);
+     }
+
+   if (ty === 'return' || ty === 'exit')
+     { j--; dpt--;
+       if (debug) log(j, dpt, previous);
+       return sn_aux(j, dpt);
+     }
+
    return sn_aux(--j, dpt);
   }
 
@@ -521,10 +533,21 @@ function next() {
   function sn_aux (j, dpt) {
    if (! tracer_valid_pos(j)) {return (--j);}
    if (j !== tracer_pos && dpt === target) { if (debug) log(j, dpt, next); return j; }
+
    var ty = tracer_items[j].type;
+
    if (ty === 'enter' || ty === 'call' )
-      { if (debug) log(j, dpt, next); return sn_aux(++j, ++dpt); }
-   if (ty === 'return') { if (debug) log(j, dpt, next); return sn_aux(++j, --dpt); }
+      { j++; dpt++;
+        if (debug) log(j, dpt, next);
+        return sn_aux(j, dpt);
+      }
+
+   if (ty === 'return' || ty === 'exit')
+      { j++; dpt--;
+        if (debug) log(j, dpt, next);
+        return sn_aux(j, dpt);
+      }
+
    return sn_aux(++j, dpt);
   }
 
