@@ -1,12 +1,14 @@
 # JSExplain
 
+## ** This repository is not maintained anymore. It moved here : https://gitlab.inria.fr/star-explain **
+
 An (unofficial) ECMAScript Reference Interpreter and Double-debugger.
 
 ## Building
 ### Dependencies
 The minimum system dependencies are:
 * **OCaml** (any working version, correct version will be installed via OPAM)
-* **OPAM ~1.2.2** (2.0.0 may also work)
+* **OPAM 2.0.2**
 * **Nodejs >=8** (Carbon LTS release) and the corresponding **npm**
 * **Make**
 * **Git**
@@ -32,13 +34,6 @@ opam install -y jsexplain
 firefox .opam/jsexplain/share/jsexplain/driver.html 
 ```
 
-### Initialising the build environment
-To install other dependencies:
-```sh
-make init
-eval `opam config env`
-```
-
 If you intend to run the test262 test suite:
 ```
 make test_init
@@ -59,8 +54,6 @@ make test
 ```
 ### Toplevel Make Targets
 * Initialisation targets
-  * `init`: Initialises the build environment by obtaining the correct OCaml
-    version, and dependencies via opam and npm.
   * `test_init`: Initialises the test262 submodule and any other dependencies
     required for testing the interpreter.
   * `.merlin`: Builds the `.merlin` IDE configuration file. (Automatically built
